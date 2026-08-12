@@ -1,0 +1,48 @@
+id,name,url,type,lang,topic,note
+npr,NPR Middle East,https://feeds.npr.org/1009/rss.xml,rss,en,regional,CI-OK 10 items. NEEDS credibility entry
+france24,France24 Middle East,https://www.france24.com/en/middle-east/rss,rss,en,regional,CI-OK 29 items. NEEDS credibility entry
+mee,Middle East Eye,http://www.middleeasteye.net/rss,rss,en,military,CI-OK 20 items. NEEDS credibility entry
+iran_international,Iran International,https://www.iranintl.com/en/feed,rss,en,iran_domestic,CI-OK 50 items
+al_monitor,Al-Monitor General,https://www.al-monitor.com/rss,rss,en,regional,CI-OK 20 items
+wotr,War on the Rocks,https://warontherocks.com/feed/,rss,en,military,CI-OK 100 items. NEEDS credibility entry
+dw,DW English,https://rss.dw.com/rdf/rss-en-all,rss,en,regional,CI-OK 144 items - very high volume
+cnbc,CNBC World,https://www.cnbc.com/id/100003114/device/rss/rss.html,rss,en,macro,CI-OK 30 items. NEEDS credibility entry
+oilprice,OilPrice Main,https://oilprice.com/rss/main,rss,en,macro,CI-OK 15 items. NEEDS credibility entry
+seeking_alpha,Seeking Alpha,https://seekingalpha.com/feed.xml,rss,en,macro,CI-OK 30 items. NEEDS credibility entry
+irna,IRNA English,https://en.irna.ir/rss,rss,en,iran_domestic,CI-OK 30 items. State media
+tehran_times,Tehran Times,https://www.tehrantimes.com/rss,rss,en,iran_domestic,CI-OK. TLS-blocked from Iran only
+mehr,Mehr News Agency,https://en.mehrnews.com/rss,rss,en,iran_domestic,CI-OK. NEEDS credibility entry
+haaretz,Haaretz English,https://www.haaretz.com/srv/israel-news-rss,rss,en,military,CI-OK 20 items. NEEDS credibility entry
+tg_geopolitics_prime,Geopolitics Prime,https://t.me/s/geopolitics_prime,telegram,en,military,CI-OK 17 posts. Owner to set trust level
+tg_militarywave,Military Wave,https://t.me/s/militarywave,telegram,en,military,CI-OK 20 posts. Candidate lead
+tg_geopwatch,Geopolitics Watch,https://t.me/s/GeoPWatch,telegram,en,military,CI-OK 19 posts. Candidate lead
+bbc_en,BBC World News,https://feeds.bbci.co.uk/news/world/rss.xml,rss,en,regional,FIX - host is bbci.co.uk not bbc.co.uk
+bbc_en_me,BBC Middle East,https://feeds.bbci.co.uk/news/world/middle_east/rss.xml,rss,en,regional,FIX - same host typo
+bbc_persian,BBC Persian,https://feeds.bbci.co.uk/persian/rss.xml,rss,fa,iran_domestic,FIX - was 404 on bbc.com/persian
+al_jazeera,Al Jazeera All,https://www.aljazeera.com/xml/rss/all.xml,rss,en,regional,FIX - old /xml/feeds/ paths are 404
+times_of_israel,Times of Israel,https://www.timesofisrael.com/feed/,rss,en,military,NEW tier2 israeli_press
+ynet,Ynet News,https://www.ynetnews.com/Integration/StoryRss3082.xml,rss,en,military,NEW tier2 israeli_press
+amwaj,Amwaj Media,https://amwaj.media/feed,rss,en,regional,NEW variant a
+amwaj_alt,Amwaj Media alt,https://amwaj.media/rss,rss,en,regional,NEW variant b - probe decides
+naval_news,Naval News,https://www.navalnews.com/feed/,rss,en,military,NEW - naval and shipping
+the_war_zone,The War Zone,https://www.twz.com/feed,rss,en,military,NEW - twz.com is the current domain
+aviationist,The Aviationist,https://theaviationist.com/feed/,rss,en,military,NEW - air activity
+isw,ISW Publications,https://www.understandingwar.org/feeds/publications.xml,rss,en,military,NEW tier1 variant a
+isw_alt,ISW alt,https://www.understandingwar.org/rss.xml,rss,en,military,NEW tier1 variant b - probe decides
+iaea,IAEA Top News,https://www.iaea.org/feeds/topnews.rss,rss,en,military,NEW tier1 - nuclear inspections
+centcom,US CENTCOM Releases,https://www.centcom.mil/DesktopModules/ArticleCS/RSS.ashx?ContentType=1&Site=1160&max=25,rss,en,military,NEW tier1 variant a
+centcom_alt,US CENTCOM alt,https://www.centcom.mil/NEWS/rss.xml,rss,en,military,NEW tier1 variant b - probe decides
+state_dept_travel,State Dept Travel Advisories,https://travel.state.gov/_res/rss/TAsTWs.xml,rss,en,regional,NEW tier1 - advisory changes are a real signal
+ukmto,UKMTO Advisories,https://www.ukmto.org/feed,rss,en,military,NEW tier1 variant a - maritime
+ukmto_alt,UKMTO alt,https://www.ukmto.org/rss,rss,en,military,NEW tier1 variant b - probe decides
+safeairspace,SafeAirspace Conflict Zones,https://safeairspace.net/feed/,rss,en,military,NEW tier1 - airspace warnings
+radio_farda,Radio Farda English,https://en.radiofarda.com/api/zrqiteuuir,rss,en,iran_domestic,FIX variant a - RFERL api feed pattern
+radio_farda_alt,Radio Farda alt,https://en.radiofarda.com/z/20035/rss.xml,rss,en,iran_domestic,FIX variant b - probe decides
+rferl_iran,RFE/RL main,https://www.rferl.org/api/zkvypeuiiq,rss,en,iran_domestic,NEW variant - RFERL main feed
+press_tv,Press TV,https://www.presstv.ir/rss.xml,rss,en,regional,FIX - unreachable from CI last round, retest
+tasnim,Tasnim News,https://www.tasnimnews.com/en/rss/feed/0/8/0/,rss,en,military,FIX - IRGC-affiliated. Unreachable from CI, retest
+financial_tribune,Financial Tribune,https://financialtribune.com/rss.xml,rss,en,macro,FIX - was TLS local and NOT_FEED in CI
+iranwire,IranWire,https://iranwire.com/en/feed/,rss,en,iran_domestic,FIX - old URL was stale 11d and DNS-failed from CI
+trading_economics,Trading Economics,https://tradingeconomics.com/rss/news.aspx,rss,en,macro,FIX - was 403 UA block
+reuters_gnews,Reuters via Google News,https://news.google.com/rss/search?q=Iran+site%3Areuters.com&hl=en-US&gl=US&ceid=US%3Aen,rss,en,regional,WORKAROUND - Reuters killed public RSS. Check licence before shipping
+ap_gnews,AP via Google News,https://news.google.com/rss/search?q=Iran+site%3Aapnews.com&hl=en-US&gl=US&ceid=US%3Aen,rss,en,regional,WORKAROUND - AP killed public RSS. Check licence before shipping

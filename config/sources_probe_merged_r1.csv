@@ -1,0 +1,39 @@
+decision,name,local,ci,ci_items,ci_newest,url
+DEAD_OR_BLOCKED,AFP Middle East,TLS,DNS,0,,https://feeds.afp.com/afp/middleeast
+URL_WRONG,AP News World,HTTP_ERROR,HTTP_ERROR,0,,https://apnews.com/hub/ap-top-news/rss
+DEAD_OR_BLOCKED,Agence France-Presse,HTTP_ERROR,DNS,0,,http://feeds.afp.com/afp/latest
+URL_WRONG,Al Jazeera English,HTTP_ERROR,HTTP_ERROR,0,,https://www.aljazeera.com/xml/feeds/rss/ir/index.rss
+URL_WRONG,Al Jazeera Middle East,HTTP_ERROR,HTTP_ERROR,0,,https://www.aljazeera.com/xml/feeds/rss/middleeast.rss
+USE,Al-Monitor General,OK,OK,20,2026-08-12T14:30:26-0400,https://www.al-monitor.com/rss
+URL_WRONG,Al-Monitor Iran,HTTP_ERROR,HTTP_ERROR,0,,https://www.al-monitor.com/iran/rss
+DEAD_OR_BLOCKED,BBC News Middle East,TLS,DNS,0,,https://feeds.bbc.co.uk/news/world/middle_east/rss.xml
+URL_WRONG,BBC Persian,HTTP_ERROR,HTTP_ERROR,0,,https://www.bbc.com/persian/index.rss
+DEAD_OR_BLOCKED,BBC World News,TLS,DNS,0,,https://feeds.bbc.co.uk/news/world/rss.xml
+USE,CNBC World,OK,OK,30,"Wed, 12 Aug 2026 21:01 G",https://www.cnbc.com/id/100003114/device/rss/rss.html
+USE,DW English,OK,OK,144,2026-08-12T21:14:28Z,https://rss.dw.com/rdf/rss-en-all
+URL_WRONG,Financial Tribune,TLS,NOT_FEED,0,,https://financialtribune.com/rss
+USE,France24 English,OK,OK,29,"Wed, 12 Aug 2026 17:48:4",https://www.france24.com/en/middle-east/rss
+USE,Geopolitics Prime,OK,OK,17,,https://t.me/s/geopolitics_prime
+USE,Geopolitics Watch,OK,OK,19,,https://t.me/s/GeoPWatch
+URL_WRONG,GlobalSecurity Iran,NOT_FEED,NOT_FEED,0,,https://www.globalsecurity.org/military/ops/iran-news-ticker.htm
+URL_WRONG,Gulf News,HTTP_ERROR,HTTP_ERROR,0,,https://gulfnews.com/latest-news/rss
+USE,Haaretz English,OK,OK,20,"Wed, 12 Aug 2026 22:44:2",https://www.haaretz.com/srv/israel-news-rss
+USE,IRNA English,OK,OK,30,"Wed, 12 Aug 2026 20:49:0",https://en.irna.ir/rss
+URL_WRONG,IRNA Politics,NOT_FEED,NOT_FEED,0,,https://en.irna.ir/rss/politics
+USE,Iran International,OK,OK,50,"Wed, 12 Aug 2026 20:12:1",https://www.iranintl.com/en/feed
+GEOBLOCKED_FROM_CI,IranWire,OK,TIMEOUT,0,,https://iranwire.com/feed/
+USE,Mehr News Agency,TLS,OK,30,"Wed, 12 Aug 2026 13:22:0",https://en.mehrnews.com/rss
+URL_WRONG,Mehr News Military,TLS,HTTP_ERROR,0,,https://en.mehrnews.com/rss/military
+USE,Middle East Eye,OK,OK,20,"Wed, 12 Aug 2026 22:01:5",http://www.middleeasteye.net/rss
+USE,Military Wave,OK,OK,20,,https://t.me/s/militarywave
+USE,NPR Middle East,OK,OK,10,"Wed, 12 Aug 2026 04:45:5",https://feeds.npr.org/1009/rss.xml
+USE,OilPrice Main,OK,OK,15,"Wed, 12 Aug 2026 16:16:1",https://oilprice.com/rss/main
+DEAD_OR_BLOCKED,Press TV,TLS,TLS,0,,https://presstv.ir/rss/world/1
+URL_WRONG,Radio Farda,NOT_FEED,NOT_FEED,0,,https://en.radiofarda.com/rssfeeds
+DEAD_OR_BLOCKED,Reuters World,TLS,DNS,0,,https://feeds.reuters.com/reuters/worldNews
+USE,Seeking Alpha Energy,OK,OK,30,"Wed, 12 Aug 2026 17:12:2",https://seekingalpha.com/feed.xml
+DEAD_OR_BLOCKED,Tasnim News,TLS,DNS,0,,https://www.tasnimnews.com/en/rss
+DEAD_OR_BLOCKED,Tasnim Politics,TLS,DNS,0,,https://www.tasnimnews.com/en/rss/politics
+USE,Tehran Times,TLS,OK,30,"Tue, 11 Aug 2026 05:47:5",https://www.tehrantimes.com/rss
+URL_WRONG,Trading Economics,HTTP_ERROR,HTTP_ERROR,0,,https://tradingeconomics.com/rss/
+USE,War on the Rocks,OK,OK,100,"Wed, 12 Aug 2026 17:30:0",https://warontherocks.com/feed/

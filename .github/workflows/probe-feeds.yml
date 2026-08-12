@@ -12,26 +12,38 @@ name: probe-feeds
 
 on:
   workflow_dispatch:
+    inputs:
+      candidates:
+        description: "Candidates CSV to probe (path from repo root)"
+        required: true
+        default: "config/sources_candidates_round2.csv"
+      tag:
+        description: "Label for this probe run; names the output file"
+        required: true
+        default: "ci"
 
 jobs:
   probe:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
-          python-version: "3.11"
+          python-version: "3.12"
 
       # Deliberately no `pip install`. check_feeds.py is stdlib-only and must
       # stay that way; if this step ever needs a package, the script broke its
       # contract.
       - name: Probe every candidate feed from a US runner
-        run: python tools/check_feeds.py --tag ci
+        run: |
+          python tools/check_feeds.py \
+            --tag "${{ inputs.tag }}" \
+            --input "${{ inputs.candidates }}"
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
-          name: sources-probe-ci
-          path: config/sources_probe_ci.csv
+          name: sources-probe-${{ inputs.tag }}
+          path: config/sources_probe_${{ inputs.tag }}.csv
           if-no-files-found: error

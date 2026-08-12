@@ -61,6 +61,9 @@ def probe(row: dict) -> dict:
     url = (row.get("url") or "").strip()
     kind = (row.get("type") or "rss").strip()
     out = {
+        # `id` is the join key into credibility.yaml. Carried through the probe
+        # so the surviving rows can be pasted straight into sources.yaml.
+        "id": row.get("id", ""),
         "name": row.get("name", ""),
         "type": kind,
         "url": url,
@@ -126,13 +129,20 @@ def main(argv: list[str] | None = None) -> int:
         help="where this ran, e.g. 'local' or 'ci'. Output goes to "
              "config/sources_probe_<tag>.csv and is recorded in a 'probe' column.",
     )
+    parser.add_argument(
+        "--input", default=None,
+        help="candidates CSV to probe, relative to repo root. Defaults to "
+             "config/sources_candidates.csv. Earlier rounds are kept on disk as "
+             "evidence, so point this at whichever round you are testing.",
+    )
     args = parser.parse_args(argv)
+    in_csv = (REPO / args.input) if args.input else IN_CSV
     out_csv = REPO / "config" / f"sources_probe_{args.tag}.csv"
 
-    if not IN_CSV.is_file():
-        print(f"missing {IN_CSV}", file=sys.stderr)
+    if not in_csv.is_file():
+        print(f"missing {in_csv}", file=sys.stderr)
         return 2
-    with IN_CSV.open(newline="", encoding="utf-8") as handle:
+    with in_csv.open(newline="", encoding="utf-8") as handle:
         rows = list(csv.DictReader(handle))
 
     print(f"probing {len(rows)} sources from '{args.tag}', {TIMEOUT}s timeout each ...")
@@ -141,7 +151,7 @@ def main(argv: list[str] | None = None) -> int:
     for res in results:
         res["probe"] = args.tag
 
-    fields = ["probe", "name", "type", "url", "http", "items", "newest", "verdict", "detail"]
+    fields = ["probe", "id", "name", "type", "url", "http", "items", "newest", "verdict", "detail"]
     with out_csv.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=fields)
         writer.writeheader()

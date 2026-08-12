@@ -1,0 +1,39 @@
+probe,name,type,url,http,items,newest,verdict,detail
+ci,Reuters World,rss,https://feeds.reuters.com/reuters/worldNews,,0,,DNS,gaierror: [Errno -2] Name or service not known
+ci,AP News World,rss,https://apnews.com/hub/ap-top-news/rss,404,0,,HTTP_ERROR,Not Found
+ci,Agence France-Presse,rss,http://feeds.afp.com/afp/latest,,0,,DNS,gaierror: [Errno -2] Name or service not known
+ci,BBC World News,rss,https://feeds.bbc.co.uk/news/world/rss.xml,,0,,DNS,ConnectionRefusedError: [Errno 111] Connection refused
+ci,BBC Persian,rss,https://www.bbc.com/persian/index.rss,404,0,,HTTP_ERROR,Not Found
+ci,Al Jazeera English,rss,https://www.aljazeera.com/xml/feeds/rss/ir/index.rss,404,0,,HTTP_ERROR,Not Found
+ci,Al Jazeera Middle East,rss,https://www.aljazeera.com/xml/feeds/rss/middleeast.rss,404,0,,HTTP_ERROR,Not Found
+ci,NPR Middle East,rss,https://feeds.npr.org/1009/rss.xml,200,10,"Wed, 12 Aug 2026 04:45:55 -0400",OK,text/xml
+ci,France24 English,rss,https://www.france24.com/en/middle-east/rss,200,29,"Wed, 12 Aug 2026 17:48:46 GMT",OK,application/rss+xml
+ci,BBC News Middle East,rss,https://feeds.bbc.co.uk/news/world/middle_east/rss.xml,,0,,DNS,ConnectionRefusedError: [Errno 111] Connection refused
+ci,AFP Middle East,rss,https://feeds.afp.com/afp/middleeast,,0,,DNS,gaierror: [Errno -2] Name or service not known
+ci,Middle East Eye,rss,http://www.middleeasteye.net/rss,200,20,"Wed, 12 Aug 2026 22:01:53 +0100",OK,application/rss+xml
+ci,Radio Farda,rss,https://en.radiofarda.com/rssfeeds,200,0,,NOT_FEED,text/html
+ci,Iran International,rss,https://www.iranintl.com/en/feed,200,50,"Wed, 12 Aug 2026 20:12:19 GMT",OK,application/xml
+ci,Al-Monitor Iran,rss,https://www.al-monitor.com/iran/rss,404,0,,HTTP_ERROR,Not Found
+ci,Al-Monitor General,rss,https://www.al-monitor.com/rss,200,20,2026-08-12T14:30:26-0400,OK,application/rss+xml
+ci,War on the Rocks,rss,https://warontherocks.com/feed/,200,100,"Wed, 12 Aug 2026 17:30:08 +0000",OK,application/rss+xml
+ci,DW English,rss,https://rss.dw.com/rdf/rss-en-all,200,144,2026-08-12T21:14:28Z,OK,text/xml
+ci,CNBC World,rss,https://www.cnbc.com/id/100003114/device/rss/rss.html,200,30,"Wed, 12 Aug 2026 21:01 GMT",OK,application/xml
+ci,Trading Economics,rss,https://tradingeconomics.com/rss/,403,0,,HTTP_ERROR,Forbidden
+ci,OilPrice Main,rss,https://oilprice.com/rss/main,200,15,"Wed, 12 Aug 2026 16:16:11 -0500",OK,rss+xml
+ci,Seeking Alpha Energy,rss,https://seekingalpha.com/feed.xml,200,30,"Wed, 12 Aug 2026 17:12:25 -0400",OK,application/xml
+ci,IranWire,rss,https://iranwire.com/feed/,,0,,TIMEOUT,
+ci,IRNA English,rss,https://en.irna.ir/rss,200,30,"Wed, 12 Aug 2026 20:49:02 GMT",OK,application/rss+xml
+ci,Tasnim News,rss,https://www.tasnimnews.com/en/rss,,0,,DNS,gaierror: [Errno -2] Name or service not known
+ci,Press TV,rss,https://presstv.ir/rss/world/1,,0,,TLS,SSLCertVerificationError: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1016)
+ci,Tehran Times,rss,https://www.tehrantimes.com/rss,200,30,"Tue, 11 Aug 2026 05:47:54 GMT",OK,application/rss+xml
+ci,Mehr News Agency,rss,https://en.mehrnews.com/rss,200,30,"Wed, 12 Aug 2026 13:22:07 GMT",OK,application/rss+xml
+ci,Gulf News,rss,https://gulfnews.com/latest-news/rss,404,0,,HTTP_ERROR,Not Found
+ci,Haaretz English,rss,https://www.haaretz.com/srv/israel-news-rss,200,20,"Wed, 12 Aug 2026 22:44:28 +0300",OK,text/xml
+ci,GlobalSecurity Iran,rss,https://www.globalsecurity.org/military/ops/iran-news-ticker.htm,200,0,,NOT_FEED,text/html
+ci,Geopolitics Prime,telegram,https://t.me/s/geopolitics_prime,200,17,,OK,text/html
+ci,Military Wave,telegram,https://t.me/s/militarywave,200,20,,OK,text/html
+ci,Geopolitics Watch,telegram,https://t.me/s/GeoPWatch,200,19,,OK,text/html
+ci,Mehr News Military,rss,https://en.mehrnews.com/rss/military,404,0,,HTTP_ERROR,Not Found
+ci,Tasnim Politics,rss,https://www.tasnimnews.com/en/rss/politics,,0,,DNS,gaierror: [Errno -2] Name or service not known
+ci,IRNA Politics,rss,https://en.irna.ir/rss/politics,200,0,,NOT_FEED,text/html
+ci,Financial Tribune,rss,https://financialtribune.com/rss,200,0,,NOT_FEED,text/html
