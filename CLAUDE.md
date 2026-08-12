@@ -1,0 +1,439 @@
+# CLAUDE.md — News Curator / Personal Intelligence Agent
+
+Read this before doing anything. Then read `ARCHITECTURE.md`. Do not start coding without both.
+
+## Goal
+
+A personal AI intelligence agent that monitors geopolitical, military and macroeconomic
+events and delivers filtered intelligence to one private Telegram chat. Runs entirely on
+free tiers, entirely unattended, on GitHub Actions. The owner's PC is always off. Owner is
+non-developer: everything must be operable by editing YAML and pasting secrets.
+
+Success is *reduced* information volume with *increased* situational awareness. A change
+that produces more output is probably wrong.
+
+---
+
+## HARD CONSTRAINTS — do not violate, do not "improve"
+
+These are decided. If you think one is wrong, argue it with the owner first. Do not
+silently work around them.
+
+1. **Zero cost. Zero credit cards.** Any dependency requiring payment or a card at signup is
+   rejected, no exceptions.
+2. **Cluster before you summarize.** Gemini free tier is 10 RPM / 1,500 RPD. Never call an
+   LLM per article. The LLM sees clusters (~25–40 per run), never raw article lists.
+   Budget: **max ~40 LLM calls per run**. Exceeding this breaks the system.
+3. **Risk scores are deterministic Python, never LLM output.** The LLM extracts discrete
+   signals only. `risk/engine.py` computes scores from `config/risk_weights.yaml`. Identical
+   input must always produce an identical score, or trend deltas are meaningless.
+4. **No OCR engine.** Gemini Flash vision handles images. Do not add Tesseract, EasyOCR, or
+   PaddleOCR.
+5. **No vector database.** SQLite + NumPy brute-force cosine. ~900 vectors. Do not add
+   Chroma, Qdrant, FAISS, pgvector, Pinecone.
+6. **No Telethon / MTProto.** Telegram channels are read via the public `t.me/s/<channel>`
+   preview endpoint only. A session string in CI risks the owner's personal account.
+7. **No agent framework in v1.** The pipeline is a linear sequence. No LangGraph, no
+   LangChain, no CrewAI. Revisit only in v2 when conversational Q&A is added.
+8. **Telegram messages are capped at 4,096 characters.** The composer must budget characters
+   and truncate by priority. Never discover this at send time.
+9. **Public repo.** Every log line is world-readable. All logging goes through the redaction
+   filter in `util/logging.py`. Never print a raw environment variable.
+10. **Never present unverified claims as fact.** Single-source events are labelled `RUMOUR`
+    and are excluded from risk scoring entirely.
+11. **Never invent content.** If nothing changed, the message says nothing changed.
+12. **No file over ~200 lines.** If one grows past that it is doing two jobs — split it.
+13. **Every new dependency needs a one-line justification comment** in `pyproject.toml`.
+14. **State must never silently reset.** If decryption or DB integrity fails, halt and alert.
+    Starting from an empty memory is a worse outcome than crashing.
+15. **Any metered LLM provider needs a hard spend cap and a per-run call counter that
+    halts.** A retry loop costs nothing on a free tier and a rent payment on a paid one.
+    This is unattended software touching a billable API — `max_calls_per_run` and
+    `max_spend_usd_per_month` in `settings.yaml` are enforced in `llm/router.py`, not
+    advisory. Applies to Anthropic, DeepSeek, Moonshot, or anything added later.
+
+## Decided facts (verified 2026-08-01)
+
+- Gemini Flash free: **10 RPM, 1,500 RPD**, no card, vision included, may train on prompts →
+  public news content only, never personal data.
+- Groq free: 30 RPM, 14,400 RPD, no card. Second-tier fallback. No vision.
+- OpenRouter free: 20 RPM but only **50 requests/day**, model roster rotates weekly.
+  Emergency parachute only, not a real fallback.
+- GitHub Actions: unlimited minutes on **public** repos; 2,000/mo private. Cache 10 GB.
+  Cron auto-disables after 60 days of repo inactivity.
+- Telegram Bot API: 1 msg/sec per chat, 4,096 char max.
+- Paid-provider rate card, verified 2026-08-01, costed against THIS pipeline
+  (~35 extraction calls/run at ~3,050 in / 400 out, 9 runs/day, vision stays on Gemini):
+
+  | Provider | $/MTok in | $/MTok out | Cache in | Wholesale /mo | Cascade /mo | Vision |
+  |---|---|---|---|---|---|---|
+  | Gemini free | 0 | 0 | — | **$0** | — | yes |
+  | DeepSeek V4-Flash | 0.14 | 0.28 | 0.0028 | **~$5** (~$2 cached) | ~$1 | no |
+  | Claude Haiku 4.5 | 1.00 | 5.00 | 0.10 | ~$38–60 | ~$11 | yes |
+  | Kimi K3 | 3.00 | 15.00 | 0.30 | ~$115–180 | ~$33 | yes |
+
+  Output price dominates — extraction emits ~400 structured tokens per call, so a
+  provider's output rate matters ~3x more than its input rate here.
+  Kimi K3 is frontier-priced for what is mechanical classification. Rejected on cost.
+  DeepSeek offers 5M free tokens/30d; with prompt caching the fresh-token load is
+  ~3.3M/month, so the free allotment may cover extraction outright — UNVERIFIED
+  whether cached reads count against it. Check before relying on it.
+  DeepSeek processes in China and is text-only; Haiku 4.5 predates the tokenizer
+  that emits ~30% more tokens, so do not "upgrade" without recosting.
+- Estimated usage: ~36 LLM calls/run, ~288/day (5x margin); ~8 min/run, ~2,600 min/month;
+  steady-state DB ~9 MB, repo ~15 MB.
+
+## Owner's chosen configuration
+
+- Public repo, state encrypted with `age`, force-pushed to an orphan `state` branch.
+- Pipeline every 3 hours (8/day) **plus** a daily digest at 07:00 Asia/Tehran.
+  Owner explicitly chose per-run messages over threshold-only delivery. Honour it, but keep
+  no-change runs to a short honest one-liner.
+- Output language: English. Sources in en / fa / ar / he.
+- LLM order: Gemini → Groq → OpenRouter → degrade gracefully.
+
+## Config decisions resolved 2026-08-01 (session 2)
+
+Six gaps found when the scoring analysis was reconciled against the pipeline design.
+All six are now written into `config/settings.yaml` and `config/credibility.yaml`.
+
+1. **Canonical daily evaluation = the 07:00 digest run.** The rulebook is day-granular
+   and Step 12 counts "7 consecutive *daily* evaluations", but the pipeline runs 8x/day —
+   7 days or 56 runs was undefined, making WARTIME entry nondeterministic. Regime
+   counters, trailing 7-day means and novelty cycles advance only at 07:00. Intra-day
+   runs score normally (a signal dated today gets AGE 0 and registers within 3h) but
+   never advance regime state.
+2. **Retention split, no longer a flat 30 days.** H1's 30-day half-life means a state
+   that ended 60 days ago still contributes 2.4; C5's is 21 days; Step 2 novelty needs
+   fire history across multiple 14-day quiet cycles; D2/D3 need a 30-day baseline *per
+   speaker* before they function. Signal rows are ~60 bytes → 180 days costs ~2 MB.
+   New: `signal_events_days: 180`, `speaker_statements_days: 45`, `score_history_days: 365`.
+   URL hashes cut 30→7 days.
+3. **Persist the uncapped score.** Jun 11 2025 computes 176.4 and displays 100.0;
+   Feb 27 2026 STRAT also pins at 100. Once saturated, Step 12 rule (i) — TACT ≥
+   trailing mean + 10 — is mathematically dead. Store both; display capped, compute
+   deltas on uncapped. Rule (i) works again inside WARTIME, which is when it is needed.
+4. **Independence groups in `credibility.yaml`.** Step 1's ">=2 independent sources"
+   would have been satisfied by Reuters + AP on identical wire copy, BBC English + BBC
+   Persian, or IRNA + Tehran Times. Step 1 now counts distinct `group`, not distinct
+   source. This was a live path to a fabricated signal entering a deterministic score.
+5. **Market fetch split.** VIXCLS, T10Y2Y and BAMLH0A0HYM2 publish once daily — fetching
+   per run was 64 requests/day for 8 useful values. Daily series fetch on the canonical
+   run or if stale >12h; oil/gold/equities stay per-run for G1. Needs a free FRED API
+   key (no card); the keyless `fredgraph.csv` endpoint works but is undocumented.
+6. **`sources.yaml` gains `signals_covered: [A1, B4, ...]` per entry**, with a startup
+   coverage check. A source covering no signal is dead weight; a signal covered by no
+   source can never fire and nobody would notice. Reframes Phase 2 from "pick good
+   outlets" to "cover 37 signals".
+
+Not changed, deliberately: tier multipliers, half-lives, base weights, caps, convergence
+and deception constants. They are backtested 5/5. Changing one without re-running
+`analysis/backtest_weights.py` destroys the only validation the scoring has.
+
+## Tone contract for generated output
+
+Calm, knowledgeable friend. Lightly humorous. Never sensational, never dramatic, never
+clickbait, never fearmongering. Alert level modulates urgency, not volume. Prompts live in
+`config/prompts/*.txt` — edit those, never hardcode prompt text in Python.
+
+## File map
+
+| Path | Contains |
+|---|---|
+| `ARCHITECTURE.md` | Full design, diagrams, free-tier analysis, failure modes, phases. Source of truth. |
+| `SETUP_ACCOUNTS.md` | Owner-facing signup walkthrough for every external service. |
+| `config/sources.yaml` | The one file the owner edits to add a feed. |
+| `config/settings.yaml` | Thresholds, schedules, feature flags. |
+| `config/credibility.yaml` | Source → credibility tier. Drives confidence scoring. |
+| `config/risk_weights.yaml` | Signal → indicator weight matrix. Drives risk scoring. |
+| `config/prompts/` | All prompt text, editable without touching code. |
+| `config/settings.yaml` | Drafted 2026-08-01. Values marked `[BACKTESTED]` must not be changed without re-running `analysis/backtest_weights.py`. |
+| `config/credibility.yaml` | Drafted 2026-08-01. `tier` = signal weight; `group` = independence. Two sources confirm only if groups differ. |
+| `analysis/WAR_SIGNALS_PAPER.md` | Empirical I&W analysis of 2025-26 Iran wars; basis for risk weights. |
+| `analysis/ESCALATION_SCORING.md` | STRAT/TACT scoring spec + signal catalog + free-source digestion strategy. Feeds Phases 7-8. |
+| `analysis/ECONOMIC_SHOCK_SCORING.md` | Market-shock relevance matrix + MSTRESS score spec. |
+| `analysis/AGENT_PROMPT.md` | Signal-extraction LLM prompt (migrate to `config/prompts/signals.txt` in Phase 7). |
+| `analysis/backtest_weights.py` | Automated 5-scenario weight backtest + alert-decision tests (stdlib, deterministic). Phase 8 gate. Results in `analysis/backtest_results.csv`. |
+| `analysis/SCORING_RULEBOOK.md` | Hand-calculable scoring algorithm: 12 numbered steps, all constants, 3 worked examples reproducing backtest numbers to the decimal, WARTIME alert regime. Human twin of future `risk/engine.py`. |
+| `deep-research-report.md` | Other-AI report. Contains factual errors (see §7 of ESCALATION_SCORING.md); do not backtest against its timeline. |
+| `agents/` | Build-agent roster: `implementer.md`, `verifier.md`, `scout.md` (Claude Code copies live in `.claude/agents/`), plus `PORTABLE_AGENT_PACK.md` — tool-agnostic prompts incl. the Architect role and the phase-brief template. |
+| `agents/briefs/` | One Architect brief per phase. `PHASE_1_BRIEF.md` (2026-08-01), `PHASE_2_BRIEF.md` (2026-08-12). An Implementer runs only from a brief. |
+| `tools/` | Dev utilities, stdlib-only, never imported by the pipeline. `check_feeds.py` probes every URL in `sources_candidates.csv`. |
+| `.github/workflows/probe-feeds.yml` | Manual `workflow_dispatch` run of `check_feeds.py --tag ci` from a US runner. Authoritative feed-liveness verdict. Uploads artifact, commits nothing. |
+| `config/sources_probe_<tag>.csv` | Probe output, one file per environment (`local` = owner's PC in Iran, `ci` = GitHub US runner). |
+| `src/agent/collectors/` | One file per source type, all implement `base.py`. |
+| `src/agent/pipeline/` | Linear stages: filter → vision → embed → cluster → understand → validate → compose. |
+| `src/agent/memory/` | SQLite schema, models, retention pruning. |
+| `src/agent/risk/` | Deterministic scoring. No LLM calls permitted in this package. |
+| `src/agent/llm/` | Provider router, backoff, circuit breaker, mock mode. |
+| `src/agent/delivery/` | Telegram client and message formatter. |
+
+## Working agreement for agents on this project
+
+- **Architecture before code, always.** Explain the approach, get approval, then implement.
+- **One phase at a time.** Phases are in `ARCHITECTURE.md` §Implementation phases. Do not
+  jump ahead. Each phase ends tested and committed.
+- **Challenge bad instructions.** If the owner asks for something that breaks a hard
+  constraint or a free-tier limit, say so with numbers before implementing.
+- **Mock mode is mandatory.** Every external call must be stubbable so tests run offline
+  with no keys and no network.
+- **Delegate mechanical work** (bulk file ops, wide greps, repetitive extraction, source-list
+  research) to a Haiku subagent with a scoped brief. Note the routing in one line.
+- **Data goes to CSV or files, not into chat.**
+- **Update this file** whenever a fact is verified, an ambiguity resolved, or a phase
+  completed. Keep it lean — facts, numbers, blockers, locations. No frameworks, no prose
+  that belongs in `ARCHITECTURE.md`.
+
+## Status
+
+- Phase 0 — architecture drafted; scoring analysis (STRAT/TACT/MSTRESS, event registry,
+  markets.py, posture-persistence) integrated into ARCHITECTURE.md 2026-08-01.
+  **Awaiting owner approval.** Scope narrowed by session-3 decision 1: the scoring half is
+  deferred out of v1.
+- **Phase 1 — BUILT and hardened 2026-08-12.** Skeleton: `pyproject.toml`, CI workflow,
+  `src/agent/{config,settings,settings_schema,run}.py`, `util/logging.py`, pipeline no-op
+  stages, package stubs for collectors/memory/risk/llm/delivery, 21 pytest cases.
+  Gate `python -m agent.run --dry-run` exits 0 with one line: `run summary: items=0
+  clusters=0 messages=0`, with zero env vars and zero network (verified with
+  `socket.connect` patched to raise).
+  Adversarial verification found 1 CRITICAL + 3 MAJOR, all now fixed:
+  (a) CRITICAL — the log redactor replaced secrets sequentially, so a secret that is a
+      prefix of another secret caused the longer one's suffix to leak verbatim into a
+      world-readable log. Now a single cached alternation regex, longest-first.
+      `_MIN_SECRET_LEN` 8 → 16 so short common words cannot be registered as secrets.
+  (b) MAJOR — `Settings.from_dict` checked key presence but never leaf types;
+      `max_items_per_source: "twenty"` and `: true` were both accepted silently. Now
+      type-checked against `settings_schema.py`, bool explicitly rejected for numerics,
+      no string coercion, negatives rejected where definitionally invalid.
+  (c) MAJOR — `tier: true` and `tier: 1.0` passed the credibility check because
+      `True == 1` in Python. Now type-identity checked.
+  (d) MAJOR — duplicate YAML keys were silently last-write-wins. Now a
+      `SafeLoader` subclass raises `ConfigError` naming the key and line.
+  **Gate confirmed on real hardware 2026-08-12** by the owner on Windows:
+  `python -m pytest -q` → `41 passed in 0.23s`; `python -m agent.run --dry-run` → the single
+  expected line. 41 = 33 test functions, one of them parametrized into 9 cases. Reconciled,
+  no skips, no phantom collection.
+- **Phase 2 (Telegram delivery) — BUILT and gate-green 2026-08-13.** Brief:
+  `agents/briefs/PHASE_2_BRIEF.md`. Files: `src/agent/delivery/{message,budget,formatter,
+  credentials,transport,telegram}.py` + tests. Brief decisions held, do not relitigate:
+  `parse_mode=HTML` not MarkdownV2; the 4,096 cap counted in **UTF-16 code units**;
+  `429` honours `retry_after`, non-429 `4xx` never retried; delivery failure returns a
+  result object and never crashes the run; `--send-test` verifies the live path.
+  **Gate confirmed on owner's Windows 2026-08-13:** `python -m pytest -q` → `95 passed`
+  (41 → 95); `--dry-run` → the single expected line; `--send-test` → mock mode, no network.
+  95 = 87 unit + 10 integration with parametrize expanded; predicted before the run and
+  matched exactly, so no phantom collection.
+  Deviations from the brief's file table, both deliberate: `telegram.py` split into
+  `credentials.py` + `transport.py` (combined = 247 lines, over constraint 12);
+  `test_telegram.py` split into `test_telegram_retry.py` for the same reason.
+  **Three review rounds were needed. The builder's own suite passed clean before each.**
+  Round 1 (independent review) found 2 CRITICAL + 3 MAJOR:
+  (a) CRITICAL — `budget.py` dropped the overflow marker whenever the header consumed the
+      budget, so truncated items vanished with no trace, breaking "never silently discard".
+  (b) CRITICAL — `retry_after: -5` reached `time.sleep(-5)` → uncaught `ValueError` out of
+      `send()`, killing an unattended run. Now clamped to `[0, MAX_RETRY_AFTER_SECONDS=60]`;
+      absent/null/non-numeric falls back to normal backoff. The 60s cap also stops a
+      server-supplied huge `retry_after` hanging the run to GitHub's 6h kill.
+  (c) MAJOR — `.get()` on a parsed JSON body assumed a dict; a list/string/number/null body
+      raised `AttributeError`. Now `isinstance` guarded in both `telegram.py` and `transport.py`.
+  (d) MAJOR — `run_send_test` only caught `TelegramConfigError` around client construction;
+      an exception from `.send()` escaped. Now caught, logged redacted, exit 0.
+  Round 2 (review of the fixes) found a NEW defect inside fix (a): the marker was appended
+  unconditionally, so a budget smaller than the marker itself produced output *over* the cap.
+  Exceeding the cap is worse than losing the marker — a 4,097-unit message fails the send
+  outright. Marker is now itself truncated via `utf16_truncate`; `max_units=0` → `""`.
+  Round 3 (owner's real gate) found the one no sandbox could: **`requests` was imported at
+  module top in `telegram.py` (only to catch `requests.exceptions.*`) and in `transport.py`,
+  and `run.py` imports `telegram.py` unconditionally — so `--dry-run`, mock mode and the
+  entire offline suite required an HTTP library they never call.** It passed in the agents'
+  sandbox purely because `requests` happens to be installed there. Owner's clean Windows
+  Python 3.12 has no third-party packages beyond pytest and PyYAML, and all five new test
+  modules plus both CLI commands died at import. Fixed by layering, not by installing:
+  `transport.py` owns `TransportError`/`TransportTimeout` and translates requests' exceptions
+  at its boundary; `import requests` moved inside `RequestsTransport.__init__`; `telegram.py`
+  no longer knows requests exists; tests use the transport-agnostic types.
+  That fix exposed a third latent bug: `from_env()` built a real `RequestsTransport` even
+  with no credentials — i.e. on the exact mock path `--send-test` uses. It now only builds
+  one when both credentials are present.
+  **Standing lesson, applies to every remaining phase:** the sandbox has PyYAML, requests,
+  bs4 and numpy pre-installed; the owner's machine and a fresh CI runner do not. Any phase
+  adding a dependency must be verified with that dependency made unimportable
+  (`sys.modules["x"] = None`), not merely "it passed here".
+  **That lesson is now enforced, not remembered.** Owner installed `requests` on Windows
+  2026-08-13, which destroyed the accident that caught the bug. Replaced by
+  `tests/integration/test_no_requests.py` (5 cases): a sentinel test that the block itself
+  works, all 6 offline modules importable, `--dry-run` exit 0, `--send-test` mock path
+  exit 0, and `RequestsTransport()` failing at construction with a `pip install requests`
+  hint. **Gate re-confirmed on owner's Windows 2026-08-13: `100 passed`** (95 → 100).
+  Any future phase adding a dependency adds its module to `OFFLINE_MODULES` there.
+- Phases 3–10 — not started.
+- Build-agent roster written 2026-08-01 (`agents/`). Four roles: Architect (strongest model,
+  brief + gate review only, never writes code), Implementer (mid-tier for phases 4–8,
+  light for 1/2/3/9/10, fresh context per phase), Verifier (light, adversarial, never the
+  agent that wrote the code), Scout (light, mechanical research, CSV output only).
+  Loop: brief → build → attack → gate review → commit → discard Implementer context.
+  Estimated one-time build cost ~$50 at these tiers; cost is driven by context reuse, not
+  model tier.
+
+## Session 3 decisions (2026-08-12) — owner-confirmed, these override earlier text
+
+1. **v1 scope = curator, not scorer.** Owner chose "curator now, scoring later". Ship
+   collect → dedupe → cluster → filter noise → label rumours → send. STRAT/TACT/MSTRESS
+   are NOT built in v1. The DB schema and extraction fields stay wired so Phases 7–8 bolt
+   on with no rework, but no risk-engine code is written until the curator is running
+   unattended. Rationale: the owner's stated goal is less noise, and none of the scoring
+   machinery reduces noise. Specs stay on disk, unbuilt.
+2. **Output = a private Telegram channel**, not a direct chat. Supersedes the "one private
+   Telegram chat" line at the top of this file. Channel ID lives in an env var only, never
+   a literal in any file. Gives scrollable, searchable history that survives phone changes.
+3. **A settings-editing bot is v2, explicitly deferred.** v1 config is YAML edits. A bot
+   that writes config needs auth, git write-back and validation — not worth it before the
+   owner knows which settings he actually touches.
+4. **Topic priority: Iran regional + military first.** Macro second. Other topics later and
+   likely in separate channels or sub-topics, not mixed into the first feed.
+5. **Clustering is a first-class v1 requirement**, not a nice-to-have. It is the mechanism
+   the owner is actually asking for when he says "duplicates" and "not overwhelming".
+6. **New `lead` source class — see DECISION 7 in `credibility.yaml`.** The owner will supply
+   Telegram channels he does not trust but finds early-warning value in. `lead` = weight
+   0.0, cannot corroborate, cannot score, never appears in output alone; it only marks a
+   topic for verification against tier 1/2. Do not let a lead become a fact.
+7. **Phase order re-cut for a thin end-to-end slice** — see the revised table in
+   `ARCHITECTURE.md § Implementation phases`. Telegram delivery moves ahead of the
+   40-source build so a real message lands on the phone in week 1.
+
+## Verified facts (session 3, 2026-08-12)
+
+- **The "server" question is closed. There is no server.** GitHub Actions US runners do all
+  fetching, so Telegram's filtering inside Iran is irrelevant to collection, and no host,
+  domain or card is ever purchased. The owner touches the system only via a browser to
+  paste secrets. Do not reopen this.
+- **The local dev sandbox has no PyPI access and no general network egress.** Proxy returns
+  403 on pypi.org / files.pythonhosted.org (no root for apt), and the egress allowlist
+  contains exactly one host, `api.metisai.ir` — a live RSS feed fetch was refused. Retried
+  2026-08-12, still blocked; this is policy, not a glitch. Consequences for every phase:
+  agents cannot `pip install`, cannot run `pytest`, and cannot test collectors against live
+  feeds. Tests must be written as real pytest files, their assertions additionally verified
+  by exercising production functions through a stdlib-only harness, and collectors must be
+  testable against **saved fixture files**, never live HTTP.
+  Already present in the sandbox and usable offline: **PyYAML 6.0.3, requests, bs4, numpy**,
+  Python 3.10.12, stdlib `unittest`. That covers config, HTTP client, HTML parsing and
+  cosine clustering — so phases 3/4/6 are still developable here.
+- **The owner can run the real gate himself on Windows** (Python installed 2026-08-12,
+  repo is on his disk). Escalate to him for any true `pytest` run:
+  `cd` to the repo, `set PYTHONPATH=src`, `python -m pytest -q`. Do not let an agent claim
+  a green suite it never ran — this is now cheap to falsify.
+- `config/sources_candidates.csv` written 2026-08-12 (38 rows: 11 tier-1, 13 tier-2,
+  10 tier-3, 4 lead; 35 RSS, 3 Telegram, 4 UNVERIFIED). **Candidates only, not pruned, not
+  yet `sources.yaml`.** Telegram coverage is thin at 3 — the owner is supplying his own
+  channel list, which is where that gap closes.
+- **A feed probe measures the network it runs on, not the feed.** Local probe 2026-08-13
+  from the owner's PC in Iran: 38 rows → OK 16, HTTP_ERROR 8, NOT_FEED 3, **TLS 11**.
+  The 11 TLS failures returned no HTTP status at all — handshake never completed. That is
+  Iran's filtering (Reuters, BBC ×3, AFP, Tasnim, PressTV, Tehran Times, Mehr ×2,
+  Financial Tribune), not dead feeds, and the pipeline never runs from Iran. **The
+  asymmetry runs both ways: IRNA English answered 200/30 items from Tehran and may
+  geo-block a US runner.** Rule: `--tag ci` (GitHub US runner) is the only verdict that
+  decides `sources.yaml`; `--tag local` is kept because a disagreement between the two is
+  itself the finding. Never cut a source on a TLS/DNS/TIMEOUT verdict.
+- **11 of 38 candidate URLs are simply wrong** (server answered, feed absent): 404 on AP
+  hub, BBC Persian, Al Jazeera English, Al Jazeera Middle East, Al-Monitor Iran, Gulf News;
+  503 AFP latest; 403 Trading Economics (UA block, may be recoverable); HTML-not-XML on
+  Radio Farda `/rssfeeds`, GlobalSecurity `.htm` (an HTML page mislabelled `type: rss`),
+  IRNA `/rss/politics` (bad subpath — IRNA `/rss` works). IranWire returns 311 items but
+  newest is 2026-08-02, i.e. stale. The scout wrote these URLs with no network access;
+  treat the whole CSV as unverified until a `ci` probe says otherwise.
+- **`sources_candidates.csv` does not join to `credibility.yaml`.** The CSV keys on `name`
+  ("Reuters World"); credibility.yaml keys on id (`reuters`, `bbc_en`, `tg_flight_osint`).
+  ~27 of 38 CSV rows have no credibility entry, and **19 of the 30 credibility sources have
+  no CSV row at all** — including every tier-1 mechanical feed (UKMTO, CENTCOM, IAEA,
+  safeairspace, ISW, FRED, Stooq) and all 4 OSINT Telegram slots. A missing id does not
+  error; it falls through to `defaults: tier 3`, which would score a Reuters wire report as
+  an anonymous channel. `sources.yaml` therefore carries an explicit `id` per entry that
+  must already exist in `credibility.yaml`. Schema + 3 worked entries:
+  `config/sources.yaml.example`.
+- **`signals_covered` is OPTIONAL in v1**, against the earlier line in File map. Hand-mapping
+  33 signals (A1–G2) across ~40 sources is hours of owner time for the scoring half that
+  session-3 decision 1 removed from v1, and it would block Phase 3 for nothing. The startup
+  coverage check ships disabled and turns on in Phase 7.
+
+## Pending / unresolved
+
+- [ ] Owner to approve `ARCHITECTURE.md`.
+- [x] Phase 2 built and gate-green 2026-08-13. See Status. Three review rounds, 2 CRITICAL
+      + 3 MAJOR + 1 new-defect-inside-a-fix + 1 dependency-layering break found after the
+      builder's suite was green. The loop is load-bearing; do not shorten it for a later phase.
+- [ ] **NEXT ACTION (2026-08-13) — the repo is NOT on GitHub yet. No git repo exists on the
+      owner's disk at all** (`git rev-parse` fails). Everything downstream is blocked on this:
+      the `ci` feed probe, the Actions cron, and Telegram secrets all need a remote.
+      Order: (1) push to a **public** repo, (2) run `probe-feeds` via workflow_dispatch and
+      download the artifact, (3) merge `local` + `ci` probes, (4) send a Haiku scout after
+      correct URLs for the 11 broken rows + the 19 missing credibility sources, (5) owner
+      prunes to ~25 and pastes his own Telegram handles incl. untrusted `lead` ones —
+      only he can do step 5, it is topic taste, (6) write `config/sources.yaml` from
+      `config/sources.yaml.example`, (7) write `agents/briefs/PHASE_3_BRIEF.md`.
+      Do not prune before step 3.
+- [x] Owner installed `requests` on Windows 2026-08-13. Offline guarantee is now asserted by
+      `tests/integration/test_no_requests.py`, not by the package being absent.
+- [ ] Owner to create accounts per `SETUP_ACCOUNTS.md` and supply secrets.
+- [ ] Owner to create the bot via @BotFather, create a private channel, add the bot as
+      admin, and put `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHANNEL_ID` in GitHub Secrets.
+      Never in chat, never in a commit — public repo.
+- [ ] **Metis (api.metisai.ir) — owner pays in rial and it may expose API keys.** This
+      partially defuses the payment blocker below, but it is NOT wired in and should not be
+      without an explicit owner decision. Open question is jurisdictional, not technical:
+      the prompt stream is a continuous record of an Iran-resident systematically monitoring
+      Iranian military/regime topics. Content is public news; the *query pattern* is not.
+      Gemini puts that outside Iranian jurisdiction, Metis puts it inside. Assumption on
+      record: **Metis stays out of v1**, chain remains Gemini → Groq → degrade. Revisit at
+      Phase 5 only if Gemini is revoked. Constraint 15 (hard spend cap, per-run call
+      counter) applies before any metered provider goes live unattended.
+- [ ] Owner to paste his own Telegram channel handles (esp. the untrusted `lead` ones)
+      and prune `config/sources_candidates.csv` → then it becomes `sources.yaml`.
+- [ ] Initial 40-source list not yet compiled → Phase 2.
+- [ ] Credibility tiers and risk weight matrix not yet populated as YAML → Phases 7 and 8.
+      Draft catalog/weights/tiers in `analysis/ESCALATION_SCORING.md` §2 and §5. Backtest
+      automated 2026-08-01 (`analysis/backtest_weights.py`): 5/5 targets pass with tier
+      multipliers 1.0/0.8/0.5 and the posture-persistence rule (stateful signals decay from
+      state end, not first report — without it Feb 21 2026 scores 40 vs target 55–70).
+      Both rules now in ESCALATION_SCORING.md §2–3. Scenario signal sets in the backtest are
+      reconstructions from WAR_SIGNALS_PAPER.md, not exhaustive — refine in Phase 8 if needed.
+      Stateful decay counts from state END date (Feb 21 state score: 63.9).
+- [x] Warning-fatigue under sustained conflict — RESOLVED 2026-08-01: WARTIME alert regime
+      (SCORING_RULEBOOK.md Step 12, ESCALATION_SCORING.md §4). Enter: TACT ≥75 for 7
+      consecutive days; exit: <55 for 7 days. In-regime, daily message is a one-liner;
+      full alert only on delta ≥ mean+10, category silent ≥14d firing, or STRAT tier rise.
+      Scores never suppressed — message layer only. Regression-tested in backtest_weights.py.
+- [x] Extraction prompt hardened 2026-08-01: AGENT_PROMPT.md catalog rewritten as per-signal
+      FIRES/NOT tests + state_update field (Rule 10) for stateful posture re-confirmations.
+- [ ] Clustering similarity threshold needs empirical tuning on real data → Phase 6.
+      Placeholder 0.62 in settings.yaml is a guess, not a measurement.
+- [~] **BLOCKER — PARTIALLY RESOLVED 2026-08-01.** Owner holds a working Gemini API key,
+      AI Studio project, **no billing attached** → free tier confirmed: 10 RPM / 1,500 RPD,
+      prompts may be used for training (public news content only, never personal data).
+      Capacity is sufficient: 35 calls/run (10 vision + 25 understanding) × 9 runs/day =
+      315 RPD vs 1,500 cap, 4.8x headroom; 3.5 min floor at 10 RPM vs the 240s budgeted for
+      the LLM stage. One key is enough — a second Gemini account is not needed.
+      Key handling: GitHub Secrets only. Public repo — a key in any commit is compromised
+      permanently (fork network retains the blob); rotate, never delete the line.
+      Residual risk is termination, not throttling: AI Studio is not offered in Iran, so the
+      account may be revoked without warning. Fallback chain is the mitigation.
+      STILL OPEN: Groq key not obtained (second-tier fallback, 30 RPM / 14,400 RPD, no
+      card). Get it on the same access path while that path works. OpenRouter and FRED
+      also unowned. Paid providers remain unconfirmed and unneeded.
+- [ ] **BLOCKER — payment and geo access not yet confirmed.** Owner is in Iran
+      (Asia/Tehran). Every paid provider (Anthropic, DeepSeek, Moonshot) requires an
+      international card or Chinese payment rails, and several US providers geo-block
+      Iranian signups outright. Pipeline *execution* is safe — API calls originate from
+      GitHub's US runners, not the owner's IP — but ACCOUNT CREATION and PAYMENT happen
+      from Iran. Confirm the owner can actually sign up and pay before any paid provider
+      enters the design. This also applies to Gemini/Groq free tiers at signup time.
+      Resolve before Phase 5, not at Phase 9.
+- [ ] **Phase 7 gate — measure Gemini extraction accuracy before paying anyone.**
+      Hand-label signal sets for the 5 backtest scenario dates (they are already
+      specified in `backtest_weights.py`), run Gemini extraction against the same
+      source text, compute per-signal precision/recall. Only if F1 is poor does a paid
+      adjudicator get switched on. Cascade is wired but disabled in settings.yaml.
+- [ ] FRED free API key needed for the daily market series → add to SETUP_ACCOUNTS.md.
+- [ ] `sources.yaml` not written. Must carry `signals_covered` per entry → Phase 2.
+- [ ] X/Twitter: no legal free path as of 2026-08. Deferred to v2. Collector interface must
+      accommodate it without changes elsewhere.

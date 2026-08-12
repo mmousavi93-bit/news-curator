@@ -1,0 +1,29 @@
+[project]
+name = "news-curator"
+version = "0.1.0"
+description = "Personal geopolitical/military/macro intelligence agent. Free-tier, unattended, Telegram delivery."
+requires-python = ">=3.11"
+dependencies = [
+    # Parses config/*.yaml -- the owner-editable interface. Only third-party runtime dep in Phase 1.
+    "PyYAML>=6.0",
+    # Phase 2: Telegram Bot API client (sendMessage). Deliberately not
+    # python-telegram-bot or any async framework -- constraint 6 forbids
+    # Telethon/MTProto and the brief calls for a plain synchronous HTTP call.
+    "requests>=2.31",
+]
+
+[project.optional-dependencies]
+dev = [
+    # Test runner. Required by the Phase 1 gate command (agents/briefs/PHASE_1_BRIEF.md).
+    "pytest>=8.0",
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -1,0 +1,39 @@
+name,url,type,lang,tier,group,topic,notes
+Reuters World,https://feeds.reuters.com/reuters/worldNews,rss,en,1,reuters,regional,Wire service Iran coverage
+AP News World,https://apnews.com/hub/ap-top-news/rss,rss,en,1,ap,regional,AP wire service world news
+Agence France-Presse,http://feeds.afp.com/afp/latest,rss,en,1,afp,regional,French wire service coverage
+BBC World News,https://feeds.bbc.co.uk/news/world/rss.xml,rss,en,1,bbc,regional,BBC world news coverage
+BBC Persian,https://www.bbc.com/persian/index.rss,rss,fa,1,bbc,iran_domestic,BBC Persian language service
+Al Jazeera English,https://www.aljazeera.com/xml/feeds/rss/ir/index.rss,rss,en,1,aljazeera,regional,AJ Iran coverage feed
+Al Jazeera Middle East,https://www.aljazeera.com/xml/feeds/rss/middleeast.rss,rss,en,1,aljazeera,regional,AJ Middle East regional feed
+NPR Middle East,https://feeds.npr.org/1009/rss.xml,rss,en,1,npr,regional,NPR Middle East section
+France24 English,https://www.france24.com/en/middle-east/rss,rss,en,1,france24,regional,France24 Middle East coverage
+BBC News Middle East,https://feeds.bbc.co.uk/news/world/middle_east/rss.xml,rss,en,1,bbc,regional,BBC Middle East regional feed
+AFP Middle East,https://feeds.afp.com/afp/middleeast,rss,en,1,afp,regional,AFP Middle East section
+Middle East Eye,http://www.middleeasteye.net/rss,rss,en,2,mee,military,In-depth Iran military analysis
+Radio Farda,https://en.radiofarda.com/rssfeeds,rss,en,2,rferl,iran_domestic,RFE/RL Persian service English
+Iran International,https://www.iranintl.com/en/feed,rss,en,2,iranintl,iran_domestic,UK-based opposition outlet
+Al-Monitor Iran,https://www.al-monitor.com/iran/rss,rss,en,2,almonitor,regional,Al-Monitor Iran section
+Al-Monitor General,https://www.al-monitor.com/rss,rss,en,2,almonitor,regional,Al-Monitor all content RSS
+War on the Rocks,https://warontherocks.com/feed/,rss,en,2,wotr,military,Defense military strategy analysis
+DW English,https://rss.dw.com/rdf/rss-en-all,rss,en,2,dw,regional,Deutsche Welle global coverage
+CNBC World,https://www.cnbc.com/id/100003114/device/rss/rss.html,rss,en,2,cnbc,macro,Business and markets news
+Trading Economics,https://tradingeconomics.com/rss/,rss,en,2,trading_econ,macro,Global economic indicators
+OilPrice Main,https://oilprice.com/rss/main,rss,en,2,oilprice,macro,Oil energy markets coverage
+Seeking Alpha Energy,https://seekingalpha.com/feed.xml,rss,en,2,seeking_alpha,macro,Equity commodity analysis
+IranWire,https://iranwire.com/feed/,rss,en,2,iranwire,iran_domestic,Independent Iranian journalism
+IRNA English,https://en.irna.ir/rss,rss,en,3,irna_state,iran_domestic,UNVERIFIED Iranian state news
+Tasnim News,https://www.tasnimnews.com/en/rss,rss,en,3,tasnim,military,IRGC-affiliated Iranian news
+Press TV,https://presstv.ir/rss/world/1,rss,en,3,presstv,regional,UNVERIFIED state broadcaster
+Tehran Times,https://www.tehrantimes.com/rss,rss,en,3,tehran_times,iran_domestic,State-controlled Iranian daily
+Mehr News Agency,https://en.mehrnews.com/rss,rss,en,3,mehr_state,iran_domestic,Semi-official Iranian agency
+Gulf News,https://gulfnews.com/latest-news/rss,rss,en,3,gulf_news,regional,UAE newspaper regional coverage
+Haaretz English,https://www.haaretz.com/srv/israel-news-rss,rss,en,lead,haaretz,military,UNVERIFIED Israeli Iran coverage
+GlobalSecurity Iran,https://www.globalsecurity.org/military/ops/iran-news-ticker.htm,rss,en,lead,globalsecurity,military,UNVERIFIED military ticker
+Geopolitics Prime,https://t.me/s/geopolitics_prime,telegram,en,2,geopolitics_prime,military,Iran war updates military
+Military Wave,https://t.me/s/militarywave,telegram,en,lead,militarywave,military,Tactical weapons military updates
+Geopolitics Watch,https://t.me/s/GeoPWatch,telegram,en,lead,geowatch,military,OSINT geopolitical analysis
+Mehr News Military,https://en.mehrnews.com/rss/military,rss,en,3,mehr_state,military,Mehr military coverage section
+Tasnim Politics,https://www.tasnimnews.com/en/rss/politics,rss,en,3,tasnim,military,Tasnim political news section
+IRNA Politics,https://en.irna.ir/rss/politics,rss,en,3,irna_state,military,IRNA political military news
+Financial Tribune,https://financialtribune.com/rss,rss,en,3,financial_tribune,macro,Iranian economy markets

@@ -1,0 +1,61 @@
+# sources.yaml -- THE one file you edit to add or remove a feed.
+#
+# Copy this file to config/sources.yaml and fill it in. This .example file is
+# never loaded by the code; it exists so you always have a clean reference.
+#
+# ---------------------------------------------------------------------------
+# THE JOIN RULE -- read this before typing anything.
+#
+#   `id` here MUST match a key under `sources:` in config/credibility.yaml.
+#
+# That is the only link between "where do I fetch" (this file) and "how much do
+# I trust it" (credibility.yaml). A typo does not error -- it silently falls
+# through to credibility.yaml `defaults:` (tier 3, own group), which means a
+# Reuters wire report gets scored as an anonymous OSINT channel. Every id you
+# write here must already exist there, or you add it there in the same edit.
+# ---------------------------------------------------------------------------
+
+version: 1
+
+sources:
+  # ---- worked example: a tier-1 wire feed ---------------------------------
+  - id: reuters                 # <- must exist in credibility.yaml
+    name: Reuters World
+    url: https://www.reuters.com/world/rss   # <- must have passed check_feeds.py
+    type: rss                   # rss | telegram
+    lang: en                    # en | fa | ar | he
+    topic: regional             # regional | iran_domestic | military | macro
+    enabled: true
+    max_items: 25               # per run; omit to use settings.yaml default
+
+  # ---- worked example: a Telegram channel, read via the public preview -----
+  - id: tg_flight_osint
+    name: Flight OSINT
+    url: https://t.me/s/flight_osint_channel   # ALWAYS the /s/ preview form
+    type: telegram
+    lang: en
+    topic: military
+    enabled: true
+
+  # ---- worked example: an untrusted lead ----------------------------------
+  # tier: lead lives in credibility.yaml, NOT here. This file says where to
+  # fetch; that file says what it is worth. A lead never scores, never
+  # corroborates, and never appears in output on its own.
+  - id: tg_some_war_channel
+    name: Some War Channel
+    url: https://t.me/s/some_war_channel
+    type: telegram
+    lang: en
+    topic: military
+    enabled: true
+
+# ---------------------------------------------------------------------------
+# signals_covered -- DEFERRED, do not fill this in yet.
+#
+# CLAUDE.md says every entry carries `signals_covered: [A1, B4, ...]`. That is
+# correct for the scoring half of the system (Phases 7-8), which session-3
+# decision 1 pushed out of v1. Hand-mapping 33 signals across ~40 sources is
+# several hours of work for a feature that is not being built, and it would
+# block Phase 3 for nothing. The field is OPTIONAL in v1. The startup coverage
+# check ships disabled and turns on in Phase 7, when the signals exist.
+# ---------------------------------------------------------------------------

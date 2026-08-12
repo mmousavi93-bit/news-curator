@@ -1,0 +1,169 @@
+# credibility.yaml — source tier and independence grouping
+#
+# Two separate jobs, do not confuse them:
+#
+#   tier  -> HOW MUCH a source's signal is worth   (rulebook Step 5 multiplier)
+#   group -> WHETHER two sources count as independent confirmation (Step 1)
+#
+# DECISION 4 — independence groups.
+#
+# Rulebook Step 1 requires >=2 independent non-Tier-3 sources before a signal can
+# score at all. As written, "independent" meant "different entry in this file",
+# which is wrong in three common ways:
+#
+#   1. Reuters and AP running the same wire copy is one report, not two.
+#   2. BBC English and BBC Persian are one newsroom in two languages.
+#   3. IRNA, Press TV and Tehran Times share an editorial line and a state owner.
+#
+# All three would have manufactured confirmation and fed a fabricated signal into
+# a deterministic score. Step 1 must count distinct GROUPS, not distinct sources.
+#
+# Rule: two sources confirm each other only if group_a != group_b.
+# Sources with no group default to a group of their own id (fully independent).
+
+version: 1
+
+# DECISION 7 (session 3, 2026-08-12) — the `lead` class.
+#
+# The owner wants to follow several Telegram channels he explicitly does not trust,
+# because they surface things early. Tier 3 is not the right home for them: tier 3
+# still carries a 0.5 weight multiplier, so a tier-3 claim still moves a score.
+#
+# `lead` carries weight 0.0. It can do exactly one thing: mark a topic as worth
+# checking. A lead never scores, never corroborates, never satisfies Step 1, and
+# never appears in output on its own. If a tier 1/2 source independently reports the
+# same thing, the signal fires on THAT source's weight and the lead is not credited.
+# If no trusted source ever backs it, the lead expires silently.
+#
+# This is the difference between "a channel told me" and "it happened". Keep it.
+
+tiers:
+  1: "Official / mechanical. Primary documents, government notices, regulator feeds."
+  2: "Established press with editorial accountability and a correction record."
+  3: "OSINT, aggregators, anonymous channels. Nominates signals, never corroborates."
+  lead: "Untrusted tip-off. Weight 0.0. Triggers a verification lookup, nothing more."
+
+# ---------------------------------------------------------------------------
+# TIER 1 — official and mechanical
+# Each is its own institution, so each is its own independence group.
+# ---------------------------------------------------------------------------
+sources:
+  ukmto:
+    tier: 1
+    group: ukmto
+    note: "Maritime advisories. Primary for B-class shipping signals."
+  us_embassy_alerts:
+    tier: 1
+    group: us_govt
+  state_dept_travel:
+    tier: 1
+    group: us_govt          # same government, NOT independent of embassy alerts
+  centcom:
+    tier: 1
+    group: us_govt
+  iaea:
+    tier: 1
+    group: iaea
+  safeairspace:
+    tier: 1
+    group: safeairspace
+    note: "NOTAM aggregation. Primary for airspace-closure signals."
+  isw:
+    tier: 1
+    group: isw
+    note: "Analytical but sources its claims. Treated as Tier 1 for posture only."
+  fred:
+    tier: 1
+    group: fred
+  stooq:
+    tier: 1
+    group: stooq
+
+# ---------------------------------------------------------------------------
+# TIER 2 — established press
+# Grouping is where the real work is. Wires and multi-language newsrooms collapse.
+# ---------------------------------------------------------------------------
+  reuters:
+    tier: 2
+    group: wire_west
+    note: "Reuters and AP frequently run identical wire copy. One group."
+  ap:
+    tier: 2
+    group: wire_west
+  afp:
+    tier: 2
+    group: wire_west
+  bbc_en:
+    tier: 2
+    group: bbc
+  bbc_persian:
+    tier: 2
+    group: bbc              # one newsroom, two languages
+  al_jazeera:
+    tier: 2
+    group: al_jazeera
+  times_of_israel:
+    tier: 2
+    group: israeli_press
+  ynet:
+    tier: 2
+    group: israeli_press
+    note: "Distinct outlets, but both routinely relay IDF Spokesperson releases.
+           Grouped conservatively. Split them only if evidence shows independent
+           sourcing in practice."
+  al_monitor:
+    tier: 2
+    group: al_monitor
+  amwaj:
+    tier: 2
+    group: amwaj
+  naval_news:
+    tier: 2
+    group: naval_trade
+  the_war_zone:
+    tier: 2
+    group: naval_trade
+  aviationist:
+    tier: 2
+    group: naval_trade
+  irna:
+    tier: 2
+    group: iran_state
+  press_tv:
+    tier: 2
+    group: iran_state
+  tehran_times:
+    tier: 2
+    group: iran_state       # shared state ownership and editorial line
+  iran_international:
+    tier: 2
+    group: iran_intl
+    note: "Opposition-aligned, Saudi-funded. Independent OF state media, but carries
+           its own directional bias. Tier 2 with the group kept separate is correct."
+
+# ---------------------------------------------------------------------------
+# TIER 3 — OSINT. Nominates, never corroborates. (scoring.tier3_can_corroborate)
+# Groups still matter: they prevent one rumour echoing across five channels from
+# looking like five reports in the RUMOUR/watchlist display.
+# ---------------------------------------------------------------------------
+  tg_tanker_trackers:
+    tier: 3
+    group: osint_maritime
+  tg_kpler_public:
+    tier: 3
+    group: osint_maritime
+  tg_flight_osint:
+    tier: 3
+    group: osint_air
+  tg_incident_aggregators:
+    tier: 3
+    group: osint_general
+
+# ---------------------------------------------------------------------------
+# DEFAULTS for a source not listed above
+# ---------------------------------------------------------------------------
+defaults:
+  tier: 3                   # unknown sources are assumed weakest, never strongest
+  group: null               # null -> own id -> treated as independent
+  warn_on_unlisted: true    # surface unlisted sources in the daily digest so the
+                            # owner can tier them deliberately

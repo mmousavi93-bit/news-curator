@@ -1,0 +1,112 @@
+# Minimal but COMPLETE settings.yaml for isolated config/settings tests.
+# Every top-level and nested key must be present -- Settings.from_dict is
+# strict, so this fixture must satisfy the schema exactly like the real file.
+version: 1
+
+schedule:
+  timezone: "Asia/Tehran"
+  pipeline_cron: "0 */3 * * *"
+  digest_cron: "0 7 * * *"
+  canonical_daily_run: "07:00"
+  lookback_hours: 6
+
+collection:
+  max_items_per_source: 20
+  concurrency: 8
+  per_source_timeout_seconds: 10
+  respect_robots_txt: true
+  user_agent: "news-curator/1.0 (test fixture)"
+  degraded_after_empty_runs: 3
+
+pipeline:
+  max_clusters_per_run: 40
+  max_vision_calls_per_run: 10
+  cluster_similarity_threshold: 0.62
+  event_match_threshold: 0.55
+  vision_min_image_bytes: 20000
+
+retention:
+  url_hashes_days: 7
+  events_days: 30
+  embeddings_days: 30
+  signal_events_days: 180
+  speaker_statements_days: 45
+  score_history_days: 365
+  scheduled_events_days: 365
+
+scoring:
+  tier_multipliers: { 1: 1.0, 2: 0.8, 3: 0.5 }
+  min_independent_sources: 2
+  tier3_can_corroborate: false
+  stateful_decay_from_state_end: true
+  category_caps: { D: 20, G: 10 }
+  convergence_step: 0.15
+  convergence_max: 1.6
+  deception_multiplier: 1.3
+  deception_window_hours: 72
+  novelty_quiet_days: 14
+  novelty_decay_factor: 0.6
+  novelty_floor: 0.3
+  novelty_reset_min_contribution: 15
+  display_cap: 100
+  persist_uncapped: true
+  delta_basis: "uncapped"
+  tier_bands:
+    0: [0, 14.9]
+    1: [15, 34.9]
+    2: [35, 54.9]
+    3: [55, 74.9]
+    4: [75, 100]
+
+alerting:
+  wartime_enter_tact: 75
+  wartime_enter_consecutive_days: 7
+  wartime_exit_tact: 55
+  wartime_exit_consecutive_days: 7
+  wartime_delta_trigger: 10
+  new_dimension_silent_days: 14
+  exit_from_wartime_is_full_alert: true
+
+markets:
+  fred_api_key_env: "FRED_API_KEY"
+  daily_series:
+    - { id: "VIXCLS", source: "fred", label: "VIX" }
+  intraday_series:
+    - { id: "cb.f", source: "stooq", label: "Brent" }
+  daily_stale_after_hours: 12
+  triggers:
+    oil_daily_move_pct: 5.0
+    gold_daily_move_pct: 3.0
+
+llm:
+  order: ["gemini", "groq", "openrouter"]
+  stages:
+    vision: { provider: "gemini" }
+    compose: { provider: "gemini" }
+    understand: { provider: "gemini", cascade_enabled: false }
+  providers:
+    gemini: { model: "gemini-2.5-flash", rpm: 10, rpd: 1500, supports_vision: true }
+  backoff:
+    max_retries: 3
+    base_delay_seconds: 2
+    circuit_breaker_failures: 5
+
+delivery:
+  telegram_max_chars: 4096
+  char_budget:
+    header: 200
+    top_events: 2200
+    risk_block: 900
+    watchlist: 500
+    footer: 150
+  truncate_priority: ["watchlist", "top_events", "risk_block"]
+  output_language: "en"
+  source_languages: ["en", "fa", "ar", "he"]
+
+ops:
+  mock_mode: true
+  dry_run: false
+  halt_on_state_decrypt_failure: true
+  halt_on_db_integrity_failure: true
+  require_signal_coverage_check: true
+  coverage_check_fails_build: false

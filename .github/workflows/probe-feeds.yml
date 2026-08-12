@@ -1,0 +1,37 @@
+name: probe-feeds
+
+# Manual only. This is the AUTHORITATIVE feed-liveness check, because it runs
+# from the same US GitHub runner the pipeline itself will run from. A probe run
+# on the owner's PC in Iran measures Iran's network, not the feed -- Western
+# outlets fail the TLS handshake there and Iranian state media may geo-block
+# here. Both readings are useful; only this one decides what goes in
+# sources.yaml.
+#
+# No secrets. Stdlib only. Nothing is committed -- the result comes back as a
+# downloadable artifact so a probe can never mutate the repo unattended.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # Deliberately no `pip install`. check_feeds.py is stdlib-only and must
+      # stay that way; if this step ever needs a package, the script broke its
+      # contract.
+      - name: Probe every candidate feed from a US runner
+        run: python tools/check_feeds.py --tag ci
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sources-probe-ci
+          path: config/sources_probe_ci.csv
+          if-no-files-found: error

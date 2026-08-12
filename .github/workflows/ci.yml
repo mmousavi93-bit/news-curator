@@ -1,0 +1,26 @@
+name: tests
+
+# Phase 1 CI: pytest on push and PR. No secrets referenced -- Phase 1 has no
+# collectors, no LLM calls, no Telegram calls, so nothing needs a key yet.
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install package + dev dependencies
+        run: pip install -e ".[dev]"
+
+      - name: Gate -- pytest offline, no keys
+        run: env -i PATH=$PATH HOME=$HOME python -m pytest -q
+
+      - name: Gate -- dry run offline, no keys
+        run: env -i PATH=$PATH HOME=$HOME python -m agent.run --dry-run

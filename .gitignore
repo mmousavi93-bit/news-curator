@@ -1,0 +1,39 @@
+# --- secrets: this repo is PUBLIC. Nothing below may ever be committed. ---
+.env
+.env.*
+*.key
+*.pem
+secrets.yaml
+config/secrets.yaml
+
+# --- state: encrypted DB lives on the orphan `state` branch, never on main ---
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+*.age
+state/
+backups/
+
+# --- python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+
+# --- embedding model cache (470 MB, restored from Actions cache) ---
+.cache/
+models/
+
+# --- editors / OS ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini

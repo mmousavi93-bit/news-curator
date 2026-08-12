@@ -1,0 +1,11 @@
+scenario,score_type,target,decay_mode,score,result
+Jun 11 2025 evening,TACT,>=75,decay,100.0,PASS
+Jun 11 2025 evening,TACT,>=75,state,100.0,PASS
+Feb 21 2026,STRAT,55-70,decay,40.1,FAIL
+Feb 21 2026,STRAT,55-70,state,63.9,PASS
+Feb 27 2026,STRAT,>=70,decay,84.5,PASS
+Feb 27 2026,STRAT,>=70,state,100.0,PASS
+Jul 7 2026,TACT,>=75,decay,87.3,PASS
+Jul 7 2026,TACT,>=75,state,87.3,PASS
+Quiet April 2025 week,STRAT,<15,decay,8.1,PASS
+Quiet April 2025 week,STRAT,<15,state,8.1,PASS
