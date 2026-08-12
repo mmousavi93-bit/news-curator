@@ -362,16 +362,38 @@ clickbait, never fearmongering. Alert level modulates urgency, not volume. Promp
 - [x] Phase 2 built and gate-green 2026-08-13. See Status. Three review rounds, 2 CRITICAL
       + 3 MAJOR + 1 new-defect-inside-a-fix + 1 dependency-layering break found after the
       builder's suite was green. The loop is load-bearing; do not shorten it for a later phase.
-- [ ] **NEXT ACTION (2026-08-13) — the repo is NOT on GitHub yet. No git repo exists on the
-      owner's disk at all** (`git rev-parse` fails). Everything downstream is blocked on this:
-      the `ci` feed probe, the Actions cron, and Telegram secrets all need a remote.
-      Order: (1) push to a **public** repo, (2) run `probe-feeds` via workflow_dispatch and
-      download the artifact, (3) merge `local` + `ci` probes, (4) send a Haiku scout after
-      correct URLs for the 11 broken rows + the 19 missing credibility sources, (5) owner
-      prunes to ~25 and pastes his own Telegram handles incl. untrusted `lead` ones —
-      only he can do step 5, it is topic taste, (6) write `config/sources.yaml` from
-      `config/sources.yaml.example`, (7) write `agents/briefs/PHASE_3_BRIEF.md`.
-      Do not prune before step 3.
+- [x] **Repo IS on GitHub — `origin` = `github.com/mmousavi93-bit/news-curator`, public,
+      2 commits (`3121ad4` Phase 1+2, `7622414` probe r1 merge + round-2 candidates).**
+      Supersedes the earlier "no git repo exists" line. Steps 1–4 below are done.
+- [x] **Probe round 1 complete and merged, 2026-08-13.** `config/sources_probe_merged_r1.csv`,
+      38 rows: **17 USE, 12 URL_WRONG, 8 DEAD_OR_BLOCKED, 1 GEOBLOCKED_FROM_CI**.
+      CI verdict distribution: OK 18 / HTTP_ERROR 8 / DNS 7 / NOT_FEED 4 / TLS 1.
+      Confirmed by a second identical CI run the same day — only IranWire changed
+      (TIMEOUT → OK 311 items), so it is **not** geo-blocked, it timed out transiently.
+      Cut it on **staleness** instead: newest item 2026-08-02, 11 days old. Round-2 already
+      carries the corrected `iranwire.com/en/feed/` URL; that one decides.
+      **Reuters and AP are DNS-dead from CI, not blocked — both killed public RSS.** The only
+      candidate paths are the Google News `site:` workarounds in round 2; licence-check
+      before shipping either.
+- [ ] **NEXT ACTION (2026-08-13) — run the round-2 probe. It has never been run.**
+      `config/sources_candidates_round2.csv` (47 rows, written by the scout, `id`-keyed to
+      `credibility.yaml`) is entirely **unverified** — no network was available when it was
+      written, exactly as with round 1 where 12 of 38 URLs turned out wrong.
+      Run `probe-feeds` via workflow_dispatch with
+      `candidates=config/sources_candidates_round2.csv` and **`tag=ci2`**.
+      `tag=ci` would overwrite `config/sources_probe_ci.csv` and destroy the round-1
+      baseline — the workflow names the output `sources_probe_<tag>.csv` with no guard.
+      Then: (5) merge r2, resolve the 7 a/b URL variants (ISW, CENTCOM, UKMTO, Radio Farda,
+      Amwaj — keep the winner, delete the loser), (6) owner prunes to ~25 and pastes his own
+      Telegram handles incl. untrusted `lead` ones — only he can do this, it is topic taste,
+      (7) backfill `credibility.yaml` for the ~10 round-2 ids marked NEEDS credibility entry,
+      (8) write `config/sources.yaml` from `config/sources.yaml.example`,
+      (9) write `agents/briefs/PHASE_3_BRIEF.md`.
+- [ ] **Line-ending churn.** `analysis/backtest_results.csv` and all three
+      `config/sources_probe*.csv` show whole-file diffs (78 changed lines in a 39-line file)
+      after a Windows round-trip — CRLF, not content. Add a `.gitattributes` with
+      `* text=auto` + `*.csv text eol=lf` before the next commit, or every probe diff is
+      unreadable.
 - [x] Owner installed `requests` on Windows 2026-08-13. Offline guarantee is now asserted by
       `tests/integration/test_no_requests.py`, not by the package being absent.
 - [ ] Owner to create accounts per `SETUP_ACCOUNTS.md` and supply secrets.
