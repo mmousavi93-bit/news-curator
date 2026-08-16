@@ -1,0 +1,48 @@
+probe,id,name,type,url,http,items,newest,verdict,detail
+ci2,npr,NPR Middle East,rss,https://feeds.npr.org/1009/rss.xml,200,10,"Wed, 12 Aug 2026 17:14:00 -0400",OK,text/xml
+ci2,france24,France24 Middle East,rss,https://www.france24.com/en/middle-east/rss,200,29,"Wed, 12 Aug 2026 17:48:46 GMT",OK,application/rss+xml
+ci2,mee,Middle East Eye,rss,http://www.middleeasteye.net/rss,200,20,"Wed, 12 Aug 2026 22:01:53 +0100",OK,application/rss+xml
+ci2,iran_international,Iran International,rss,https://www.iranintl.com/en/feed,200,50,"Wed, 12 Aug 2026 20:12:19 GMT",OK,application/xml
+ci2,al_monitor,Al-Monitor General,rss,https://www.al-monitor.com/rss,200,20,2026-08-12T14:30:26-0400,OK,application/rss+xml
+ci2,wotr,War on the Rocks,rss,https://warontherocks.com/feed/,200,100,"Wed, 12 Aug 2026 17:30:08 +0000",OK,application/rss+xml
+ci2,dw,DW English,rss,https://rss.dw.com/rdf/rss-en-all,200,144,2026-08-12T21:34:05Z,OK,text/xml
+ci2,cnbc,CNBC World,rss,https://www.cnbc.com/id/100003114/device/rss/rss.html,200,30,"Wed, 12 Aug 2026 21:30 GMT",OK,application/xml
+ci2,oilprice,OilPrice Main,rss,https://oilprice.com/rss/main,200,15,"Wed, 12 Aug 2026 16:35:00 -0500",OK,rss+xml
+ci2,seeking_alpha,Seeking Alpha,rss,https://seekingalpha.com/feed.xml,200,30,"Wed, 12 Aug 2026 17:29:16 -0400",OK,application/xml
+ci2,irna,IRNA English,rss,https://en.irna.ir/rss,200,30,"Wed, 12 Aug 2026 20:49:02 GMT",OK,application/rss+xml
+ci2,tehran_times,Tehran Times,rss,https://www.tehrantimes.com/rss,200,30,"Tue, 11 Aug 2026 05:47:54 GMT",OK,application/rss+xml
+ci2,mehr,Mehr News Agency,rss,https://en.mehrnews.com/rss,200,30,"Wed, 12 Aug 2026 13:22:07 GMT",OK,application/rss+xml
+ci2,haaretz,Haaretz English,rss,https://www.haaretz.com/srv/israel-news-rss,200,20,"Wed, 12 Aug 2026 22:44:28 +0300",OK,text/xml
+ci2,tg_geopolitics_prime,Geopolitics Prime,telegram,https://t.me/s/geopolitics_prime,200,17,,OK,text/html
+ci2,tg_militarywave,Military Wave,telegram,https://t.me/s/militarywave,200,20,,OK,text/html
+ci2,tg_geopwatch,Geopolitics Watch,telegram,https://t.me/s/GeoPWatch,200,19,,OK,text/html
+ci2,bbc_en,BBC World News,rss,https://feeds.bbci.co.uk/news/world/rss.xml,200,30,"Wed, 12 Aug 2026 17:47:01 GMT",OK,text/xml
+ci2,bbc_en_me,BBC Middle East,rss,https://feeds.bbci.co.uk/news/world/middle_east/rss.xml,200,42,"Wed, 12 Aug 2026 16:14:08 GMT",OK,text/xml
+ci2,bbc_persian,BBC Persian,rss,https://feeds.bbci.co.uk/persian/rss.xml,200,29,"Wed, 12 Aug 2026 20:56:37 GMT",OK,text/xml
+ci2,al_jazeera,Al Jazeera All,rss,https://www.aljazeera.com/xml/rss/all.xml,200,25,"Wed, 12 Aug 2026 21:07:12 +0000",OK,application/rss+xml
+ci2,times_of_israel,Times of Israel,rss,https://www.timesofisrael.com/feed/,403,0,,HTTP_ERROR,Forbidden
+ci2,ynet,Ynet News,rss,https://www.ynetnews.com/Integration/StoryRss3082.xml,200,30,,OK,application/xml
+ci2,amwaj,Amwaj Media,rss,https://amwaj.media/feed,500,0,,HTTP_ERROR,Internal Server Error
+ci2,amwaj_alt,Amwaj Media alt,rss,https://amwaj.media/rss,429,0,,HTTP_ERROR,Too Many Requests
+ci2,naval_news,Naval News,rss,https://www.navalnews.com/feed/,200,10,"Wed, 12 Aug 2026 09:46:20 +0000",OK,application/rss+xml
+ci2,the_war_zone,The War Zone,rss,https://www.twz.com/feed,200,23,"Wed, 12 Aug 2026 17:25:39 -0400",OK,application/rss+xml
+ci2,aviationist,The Aviationist,rss,https://theaviationist.com/feed/,200,15,"Wed, 12 Aug 2026 21:13:24 +0000",OK,application/rss+xml
+ci2,isw,ISW Publications,rss,https://www.understandingwar.org/feeds/publications.xml,403,0,,HTTP_ERROR,Forbidden
+ci2,isw_alt,ISW alt,rss,https://www.understandingwar.org/rss.xml,403,0,,HTTP_ERROR,Forbidden
+ci2,iaea,IAEA Top News,rss,https://www.iaea.org/feeds/topnews.rss,404,0,,HTTP_ERROR,Not Found
+ci2,centcom,US CENTCOM Releases,rss,https://www.centcom.mil/DesktopModules/ArticleCS/RSS.ashx?ContentType=1&Site=1160&max=25,200,25,"Wed, 12 Aug 2026 18:53:52 GMT",OK,text/xml
+ci2,centcom_alt,US CENTCOM alt,rss,https://www.centcom.mil/NEWS/rss.xml,403,0,,HTTP_ERROR,Forbidden
+ci2,state_dept_travel,State Dept Travel Advisories,rss,https://travel.state.gov/_res/rss/TAsTWs.xml,200,82,"Wed, 12 Aug 2026 21:34:08 GMT",OK,text/xml
+ci2,ukmto,UKMTO Advisories,rss,https://www.ukmto.org/feed,403,0,,HTTP_ERROR,Forbidden
+ci2,ukmto_alt,UKMTO alt,rss,https://www.ukmto.org/rss,403,0,,HTTP_ERROR,Forbidden
+ci2,safeairspace,SafeAirspace Conflict Zones,rss,https://safeairspace.net/feed/,200,0,,EMPTY,application/rss+xml
+ci2,radio_farda,Radio Farda English,rss,https://en.radiofarda.com/api/zrqiteuuir,200,0,,EMPTY,text/xml
+ci2,radio_farda_alt,Radio Farda alt,rss,https://en.radiofarda.com/z/20035/rss.xml,404,0,,HTTP_ERROR,Not Found
+ci2,rferl_iran,RFE/RL main,rss,https://www.rferl.org/api/zkvypeuiiq,200,0,,EMPTY,text/plain
+ci2,press_tv,Press TV,rss,https://www.presstv.ir/rss.xml,,0,,TLS,SSLCertVerificationError: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1010)
+ci2,tasnim,Tasnim News,rss,https://www.tasnimnews.com/en/rss/feed/0/8/0/,,0,,DNS,gaierror: [Errno -2] Name or service not known
+ci2,financial_tribune,Financial Tribune,rss,https://financialtribune.com/rss.xml,200,0,,NOT_FEED,text/html
+ci2,iranwire,IranWire,rss,https://iranwire.com/en/feed/,200,493,"Mon, 13 Jul 2026 15:29:07 +0000",OK,application/rss+xml
+ci2,trading_economics,Trading Economics,rss,https://tradingeconomics.com/rss/news.aspx,403,0,,HTTP_ERROR,Forbidden
+ci2,reuters_gnews,Reuters via Google News,rss,https://news.google.com/rss/search?q=Iran+site%3Areuters.com&hl=en-US&gl=US&ceid=US%3Aen,200,100,"Wed, 12 Aug 2026 19:58:02 GMT",OK,application/xml
+ci2,ap_gnews,AP via Google News,rss,https://news.google.com/rss/search?q=Iran+site%3Aapnews.com&hl=en-US&gl=US&ceid=US%3Aen,200,100,"Wed, 12 Aug 2026 19:21:00 GMT",OK,application/xml

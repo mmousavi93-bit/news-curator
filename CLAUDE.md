@@ -356,6 +356,49 @@ clickbait, never fearmongering. Alert level modulates urgency, not volume. Promp
   session-3 decision 1 removed from v1, and it would block Phase 3 for nothing. The startup
   coverage check ships disabled and turns on in Phase 7.
 
+## Verified facts (session 4, 2026-08-16) — probe round 2
+
+- **A 403 is not a wrong URL, and reading it as one nearly cut six good sources.** 9 of the
+  15 round-2 "broken" rows were 403 Forbidden, including **both** URL variants for ISW and
+  **both** for UKMTO. Two different paths on one host returning the same 403 is a host-level
+  bot filter, not a bad guess. Cause: the probe UA was
+  `Mozilla/5.0 (compatible; news-curator-feedcheck/1.0)` — the `compatible;` crawler form
+  Cloudflare rejects. Classify by **status code**, never by the `broken` bucket the script
+  prints: `403` → retest with real headers, `404`/`NOT_FEED` → URL genuinely wrong.
+- **The header fix belongs to the collector, not the probe.** Whatever gets ISW and UKMTO to
+  answer is what `src/agent/collectors/rss.py` will need in Phase 3. `UA` and `ACCEPT` in
+  `tools/check_feeds.py` are the reference constants — carry them over, do not rediscover
+  nine 403s in production. (Constraint: the collector may import nothing new for this;
+  stdlib headers only.)
+- **The 429 was self-inflicted.** `amwaj.media/feed` → 500 and `amwaj.media/rss` → 429
+  because 8 workers probed both variants of one host at once. Every a/b variant pair shares
+  a host by definition, so this corrupted exactly the rows hardest to read. Fixed: probe
+  buckets by host, serial within a host, parallel across hosts.
+- **EMPTY at HTTP 200 with a feed content-type is usually undeclared gzip.** SafeAirspace
+  returned `application/rss+xml`, Radio Farda `text/xml`, both 0 items. urllib does not
+  decode gzip it did not ask for, so the body stays binary and the item regex misses.
+  `fetch()` now decodes it. Do **not** send `Accept-Encoding: gzip` — the 400 KB partial
+  read cannot be decompressed.
+- **Tier-1 mechanical sources confirmed alive from CI: CENTCOM** (the
+  `DesktopModules/ArticleCS/RSS.ashx` variant, 25 items — `centcom_alt` 403s, delete it)
+  **and State Dept Travel Advisories** (82 items). ISW, UKMTO, SafeAirspace, IAEA still
+  unresolved pending ci3.
+- **Reuters and AP are only reachable via the Google News `site:` proxy** (100 items each,
+  fresh). Marked `USE_CAVEAT`: items are Google snippets, not full text, which is thin for
+  embedding/clustering, and the endpoint can break without notice. Decide before Phase 6.
+- **IranWire cut on staleness, not reachability.** It is not geo-blocked — round 1 timed out
+  transiently. The corrected `iranwire.com/en/feed/` returns 493 items but newest is
+  2026-07-13, 31 days old. Caveat: `DATE_RE` takes the *first* `pubDate` in the body, which
+  is only the newest if the feed is sorted — verify before cutting a source on date alone.
+- **Press TV and Tasnim marked `CUT_UNREACHABLE_CI`, deliberately against the "never cut on
+  TLS/DNS" rule.** That rule exists to stop a feed being killed because *Iran* blocks it.
+  Here the runner cannot reach them in either round, on two different URLs each. CI is the
+  pipeline's own network; unreachable there is unusable. Not a blanket US-IP block on
+  Iranian media — IRNA, Mehr and Tehran Times all answer fine from CI. Owner may overrule.
+- **Sandbox egress is still blocked** (proxy returns `Tunnel connection failed: 403` for
+  every host, browser UA included). Retested 2026-08-16. No agent can verify a feed URL
+  from here; only a CI run decides. Unchanged since session 3.
+
 ## Pending / unresolved
 
 - [ ] Owner to approve `ARCHITECTURE.md`.
@@ -375,25 +418,30 @@ clickbait, never fearmongering. Alert level modulates urgency, not volume. Promp
       **Reuters and AP are DNS-dead from CI, not blocked — both killed public RSS.** The only
       candidate paths are the Google News `site:` workarounds in round 2; licence-check
       before shipping either.
-- [ ] **NEXT ACTION (2026-08-13) — run the round-2 probe. It has never been run.**
-      `config/sources_candidates_round2.csv` (47 rows, written by the scout, `id`-keyed to
-      `credibility.yaml`) is entirely **unverified** — no network was available when it was
-      written, exactly as with round 1 where 12 of 38 URLs turned out wrong.
-      Run `probe-feeds` via workflow_dispatch with
-      `candidates=config/sources_candidates_round2.csv` and **`tag=ci2`**.
-      `tag=ci` would overwrite `config/sources_probe_ci.csv` and destroy the round-1
-      baseline — the workflow names the output `sources_probe_<tag>.csv` with no guard.
-      Then: (5) merge r2, resolve the 7 a/b URL variants (ISW, CENTCOM, UKMTO, Radio Farda,
-      Amwaj — keep the winner, delete the loser), (6) owner prunes to ~25 and pastes his own
-      Telegram handles incl. untrusted `lead` ones — only he can do this, it is topic taste,
-      (7) backfill `credibility.yaml` for the ~10 round-2 ids marked NEEDS credibility entry,
-      (8) write `config/sources.yaml` from `config/sources.yaml.example`,
-      (9) write `agents/briefs/PHASE_3_BRIEF.md`.
-- [ ] **Line-ending churn.** `analysis/backtest_results.csv` and all three
-      `config/sources_probe*.csv` show whole-file diffs (78 changed lines in a 39-line file)
-      after a Windows round-trip — CRLF, not content. Add a `.gitattributes` with
-      `* text=auto` + `*.csv text eol=lf` before the next commit, or every probe diff is
-      unreadable.
+- [x] **Probe round 2 run 2026-08-16, `tag=ci2`.** 47 rows: OK 30 / HTTP_ERROR 11 /
+      EMPTY 3 / NOT_FEED 1 / DNS 1 / TLS 1. Raw at `config/sources_probe_ci2.csv`,
+      classified at **`config/sources_probe_merged_r2.csv`** (decision, id, http, why, url).
+      Decisions: USE 27, USE_CAVEAT 2, RETEST_UA 7, INSPECT_BODY 3, RETEST_SERIAL 2,
+      URL_WRONG 3, CUT_UNREACHABLE_CI 2, CUT_STALE 1.
+- [x] **Line-ending churn fixed.** `.gitattributes` (`* text=auto` + per-type `eol=lf`)
+      committed in `c72cc9e`. Probe diffs are readable again.
+- [ ] **NEXT ACTION (2026-08-16) — commit the `check_feeds.py` header fix, push, re-run
+      `probe-feeds` with `candidates=config/sources_candidates_round2.csv` and `tag=ci3`.**
+      That one run resolves 12 of the 17 open rows. Then: (a) merge r3 over
+      `sources_probe_merged_r2.csv`; (b) scout the residual URL_WRONG rows — only IAEA
+      needs real work if the 403 hypothesis holds; (c) owner prunes to ~25 and pastes his
+      own Telegram handles incl. untrusted `lead` ones — only he can do this, it is topic
+      taste; (d) backfill `credibility.yaml` for the ~10 round-2 ids marked NEEDS
+      credibility entry; (e) write `config/sources.yaml` from `sources.yaml.example`;
+      (f) write `agents/briefs/PHASE_3_BRIEF.md`.
+- [ ] **`tools/check_feeds.py` is 217 lines, over the ~200 cap in constraint 12.** Overage
+      is comment, and it is a dev tool not pipeline code. Owner to decide: trim comments,
+      split the fetch layer into `tools/_fetch.py`, or grant an explicit exception.
+- [ ] **Untracked strays to delete or commit:** `sources_probe_ci.csv` and
+      `sources_probe_ci2.csv` in the **repo root** (artifact downloads landed outside
+      `config/`), and `config/sources_probe_sandboxnet.csv` (a sandbox run where every
+      host was proxy-blocked — no signal, delete it). The agent VM cannot unlink files
+      in the mounted folder; owner must remove them on Windows.
 - [x] Owner installed `requests` on Windows 2026-08-13. Offline guarantee is now asserted by
       `tests/integration/test_no_requests.py`, not by the package being absent.
 - [ ] Owner to create accounts per `SETUP_ACCOUNTS.md` and supply secrets.

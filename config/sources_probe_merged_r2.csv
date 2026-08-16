@@ -1,0 +1,48 @@
+decision,id,name,http,verdict,items,newest,why,url
+CUT_STALE,iranwire,IranWire,200,OK,493,"Mon, 13 Jul 2026 15:29:07 +0000","newest 2026-07-13, 31d old",https://iranwire.com/en/feed/
+CUT_UNREACHABLE_CI,press_tv,Press TV,,TLS,0,,unreachable from runner in BOTH rounds,https://www.presstv.ir/rss.xml
+CUT_UNREACHABLE_CI,tasnim,Tasnim News,,DNS,0,,unreachable from runner in BOTH rounds,https://www.tasnimnews.com/en/rss/feed/0/8/0/
+INSPECT_BODY,radio_farda,Radio Farda English,200,EMPTY,0,,200 + feed content-type but 0 items; gzip or genuinely empty,https://en.radiofarda.com/api/zrqiteuuir
+INSPECT_BODY,rferl_iran,RFE/RL main,200,EMPTY,0,,200 + feed content-type but 0 items; gzip or genuinely empty,https://www.rferl.org/api/zkvypeuiiq
+INSPECT_BODY,safeairspace,SafeAirspace Conflict Zones,200,EMPTY,0,,200 + feed content-type but 0 items; gzip or genuinely empty,https://safeairspace.net/feed/
+RETEST_SERIAL,amwaj,Amwaj Media,500,HTTP_ERROR,0,,self-inflicted by parallel a/b probe of same host,https://amwaj.media/feed
+RETEST_SERIAL,amwaj_alt,Amwaj Media alt,429,HTTP_ERROR,0,,self-inflicted by parallel a/b probe of same host,https://amwaj.media/rss
+RETEST_UA,centcom_alt,US CENTCOM alt,403,HTTP_ERROR,0,,"403 = bot filter, URL likely correct",https://www.centcom.mil/NEWS/rss.xml
+RETEST_UA,isw,ISW Publications,403,HTTP_ERROR,0,,"403 = bot filter, URL likely correct",https://www.understandingwar.org/feeds/publications.xml
+RETEST_UA,isw_alt,ISW alt,403,HTTP_ERROR,0,,"403 = bot filter, URL likely correct",https://www.understandingwar.org/rss.xml
+RETEST_UA,times_of_israel,Times of Israel,403,HTTP_ERROR,0,,"403 = bot filter, URL likely correct",https://www.timesofisrael.com/feed/
+RETEST_UA,trading_economics,Trading Economics,403,HTTP_ERROR,0,,"403 = bot filter, URL likely correct",https://tradingeconomics.com/rss/news.aspx
+RETEST_UA,ukmto,UKMTO Advisories,403,HTTP_ERROR,0,,"403 = bot filter, URL likely correct",https://www.ukmto.org/feed
+RETEST_UA,ukmto_alt,UKMTO alt,403,HTTP_ERROR,0,,"403 = bot filter, URL likely correct",https://www.ukmto.org/rss
+URL_WRONG,financial_tribune,Financial Tribune,200,NOT_FEED,0,,"server answered, feed absent -- needs real lookup",https://financialtribune.com/rss.xml
+URL_WRONG,iaea,IAEA Top News,404,HTTP_ERROR,0,,"server answered, feed absent -- needs real lookup",https://www.iaea.org/feeds/topnews.rss
+URL_WRONG,radio_farda_alt,Radio Farda alt,404,HTTP_ERROR,0,,"server answered, feed absent -- needs real lookup",https://en.radiofarda.com/z/20035/rss.xml
+USE,al_jazeera,Al Jazeera All,200,OK,25,"Wed, 12 Aug 2026 21:07:12 +0000",25 items,https://www.aljazeera.com/xml/rss/all.xml
+USE,al_monitor,Al-Monitor General,200,OK,20,2026-08-12T14:30:26-0400,20 items,https://www.al-monitor.com/rss
+USE,aviationist,The Aviationist,200,OK,15,"Wed, 12 Aug 2026 21:13:24 +0000",15 items,https://theaviationist.com/feed/
+USE,bbc_en,BBC World News,200,OK,30,"Wed, 12 Aug 2026 17:47:01 GMT",30 items,https://feeds.bbci.co.uk/news/world/rss.xml
+USE,bbc_en_me,BBC Middle East,200,OK,42,"Wed, 12 Aug 2026 16:14:08 GMT",42 items,https://feeds.bbci.co.uk/news/world/middle_east/rss.xml
+USE,bbc_persian,BBC Persian,200,OK,29,"Wed, 12 Aug 2026 20:56:37 GMT",29 items,https://feeds.bbci.co.uk/persian/rss.xml
+USE,centcom,US CENTCOM Releases,200,OK,25,"Wed, 12 Aug 2026 18:53:52 GMT",25 items,https://www.centcom.mil/DesktopModules/ArticleCS/RSS.ashx?ContentType=1&Site=1160&max=25
+USE,cnbc,CNBC World,200,OK,30,"Wed, 12 Aug 2026 21:30 GMT",30 items,https://www.cnbc.com/id/100003114/device/rss/rss.html
+USE,dw,DW English,200,OK,144,2026-08-12T21:34:05Z,144 items,https://rss.dw.com/rdf/rss-en-all
+USE,france24,France24 Middle East,200,OK,29,"Wed, 12 Aug 2026 17:48:46 GMT",29 items,https://www.france24.com/en/middle-east/rss
+USE,haaretz,Haaretz English,200,OK,20,"Wed, 12 Aug 2026 22:44:28 +0300",20 items,https://www.haaretz.com/srv/israel-news-rss
+USE,iran_international,Iran International,200,OK,50,"Wed, 12 Aug 2026 20:12:19 GMT",50 items,https://www.iranintl.com/en/feed
+USE,irna,IRNA English,200,OK,30,"Wed, 12 Aug 2026 20:49:02 GMT",30 items,https://en.irna.ir/rss
+USE,mee,Middle East Eye,200,OK,20,"Wed, 12 Aug 2026 22:01:53 +0100",20 items,http://www.middleeasteye.net/rss
+USE,mehr,Mehr News Agency,200,OK,30,"Wed, 12 Aug 2026 13:22:07 GMT",30 items,https://en.mehrnews.com/rss
+USE,naval_news,Naval News,200,OK,10,"Wed, 12 Aug 2026 09:46:20 +0000",10 items,https://www.navalnews.com/feed/
+USE,npr,NPR Middle East,200,OK,10,"Wed, 12 Aug 2026 17:14:00 -0400",10 items,https://feeds.npr.org/1009/rss.xml
+USE,oilprice,OilPrice Main,200,OK,15,"Wed, 12 Aug 2026 16:35:00 -0500",15 items,https://oilprice.com/rss/main
+USE,seeking_alpha,Seeking Alpha,200,OK,30,"Wed, 12 Aug 2026 17:29:16 -0400",30 items,https://seekingalpha.com/feed.xml
+USE,state_dept_travel,State Dept Travel Advisories,200,OK,82,"Wed, 12 Aug 2026 21:34:08 GMT",82 items,https://travel.state.gov/_res/rss/TAsTWs.xml
+USE,tehran_times,Tehran Times,200,OK,30,"Tue, 11 Aug 2026 05:47:54 GMT",30 items,https://www.tehrantimes.com/rss
+USE,tg_geopolitics_prime,Geopolitics Prime,200,OK,17,,17 items,https://t.me/s/geopolitics_prime
+USE,tg_geopwatch,Geopolitics Watch,200,OK,19,,19 items,https://t.me/s/GeoPWatch
+USE,tg_militarywave,Military Wave,200,OK,20,,20 items,https://t.me/s/militarywave
+USE,the_war_zone,The War Zone,200,OK,23,"Wed, 12 Aug 2026 17:25:39 -0400",23 items,https://www.twz.com/feed
+USE,wotr,War on the Rocks,200,OK,100,"Wed, 12 Aug 2026 17:30:08 +0000",100 items,https://warontherocks.com/feed/
+USE,ynet,Ynet News,200,OK,30,,30 items,https://www.ynetnews.com/Integration/StoryRss3082.xml
+USE_CAVEAT,ap_gnews,AP via Google News,200,OK,100,"Wed, 12 Aug 2026 19:21:00 GMT","Google News proxy; snippet-only body, endpoint may break",https://news.google.com/rss/search?q=Iran+site%3Aapnews.com&hl=en-US&gl=US&ceid=US%3Aen
+USE_CAVEAT,reuters_gnews,Reuters via Google News,200,OK,100,"Wed, 12 Aug 2026 19:58:02 GMT","Google News proxy; snippet-only body, endpoint may break",https://news.google.com/rss/search?q=Iran+site%3Areuters.com&hl=en-US&gl=US&ceid=US%3Aen
