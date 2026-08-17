@@ -1,0 +1,48 @@
+decision,id,name,http,verdict,items,newest,ok_c2c3c4,why,url
+CUT_BOT_BLOCKED,centcom_alt,US CENTCOM alt,403,HTTP_ERROR,0,,nnn,"403 on full browser UA from CI; host/IP-level bot filter, not headers",https://www.centcom.mil/NEWS/rss.xml
+CUT_BOT_BLOCKED,isw,ISW Publications,404,HTTP_ERROR,0,,nnn,"403 on full browser UA from CI; host/IP-level bot filter, not headers",https://www.understandingwar.org/feeds/publications.xml
+CUT_BOT_BLOCKED,isw_alt,ISW alt,403,HTTP_ERROR,0,,nnn,"403 on full browser UA from CI; host/IP-level bot filter, not headers",https://www.understandingwar.org/rss.xml
+CUT_BOT_BLOCKED,times_of_israel,Times of Israel,403,HTTP_ERROR,0,,nnn,"403 on full browser UA from CI; host/IP-level bot filter, not headers",https://www.timesofisrael.com/feed/
+CUT_BOT_BLOCKED,trading_economics,Trading Economics,403,HTTP_ERROR,0,,nnn,"403 on full browser UA from CI; host/IP-level bot filter, not headers",https://tradingeconomics.com/rss/news.aspx
+CUT_BOT_BLOCKED,ukmto,UKMTO Advisories,403,HTTP_ERROR,0,,nnn,"403 on full browser UA from CI; host/IP-level bot filter, not headers",https://www.ukmto.org/feed
+CUT_BOT_BLOCKED,ukmto_alt,UKMTO alt,403,HTTP_ERROR,0,,nnn,"403 on full browser UA from CI; host/IP-level bot filter, not headers",https://www.ukmto.org/rss
+CUT_SERVER_ERR,amwaj,Amwaj Media,500,HTTP_ERROR,0,,nnn,"500/429 persists with per-host serial probing; server-side, not self-inflicted",https://amwaj.media/feed
+CUT_SERVER_ERR,amwaj_alt,Amwaj Media alt,429,HTTP_ERROR,0,,nnn,"500/429 persists with per-host serial probing; server-side, not self-inflicted",https://amwaj.media/rss
+CUT_STALE,iranwire,IranWire,200,OK,472,"Thu, 16 Jul 2026 07:38:39 +0000",YYY,"newest 2026-07-13, 31d old",https://iranwire.com/en/feed/
+CUT_UNREACHABLE_CI,press_tv,Press TV,,TLS,0,,nnn,unreachable from runner in BOTH rounds,https://www.presstv.ir/rss.xml
+CUT_UNREACHABLE_CI,tasnim,Tasnim News,,DNS,0,,nnn,unreachable from runner in BOTH rounds,https://www.tasnimnews.com/en/rss/feed/0/8/0/
+NEEDS_BODY_DUMP,radio_farda,Radio Farda English,200,EMPTY,0,,nnn,"200 + feed content-type + 0 items after gzip decode; not gzip, cause unknown",https://en.radiofarda.com/api/zrqiteuuir
+NEEDS_BODY_DUMP,rferl_iran,RFE/RL main,200,EMPTY,0,,nnn,"200 + feed content-type + 0 items after gzip decode; not gzip, cause unknown",https://www.rferl.org/api/zkvypeuiiq
+NEEDS_BODY_DUMP,safeairspace,SafeAirspace Conflict Zones,200,EMPTY,0,,nnn,"200 + feed content-type + 0 items after gzip decode; not gzip, cause unknown",https://safeairspace.net/feed/
+NEEDS_URL_SCOUT,financial_tribune,Financial Tribune,200,NOT_FEED,0,,nnn,404/NOT_FEED unchanged across 3 CI rounds,https://financialtribune.com/rss.xml
+NEEDS_URL_SCOUT,iaea,IAEA Top News,404,HTTP_ERROR,0,,nnn,404/NOT_FEED unchanged across 3 CI rounds,https://www.iaea.org/feeds/topnews.rss
+NEEDS_URL_SCOUT,radio_farda_alt,Radio Farda alt,404,HTTP_ERROR,0,,nnn,404/NOT_FEED unchanged across 3 CI rounds,https://en.radiofarda.com/z/20035/rss.xml
+RETEST_FLAKY,centcom,US CENTCOM Releases,,TIMEOUT,0,,YYn,"was OK in earlier round, TIMEOUT in ci4",https://www.centcom.mil/DesktopModules/ArticleCS/RSS.ashx?ContentType=1&Site=1160&max=25
+USE,al_jazeera,Al Jazeera All,200,OK,25,"Sun, 16 Aug 2026 13:53:20 +0000",YYY,25 items,https://www.aljazeera.com/xml/rss/all.xml
+USE,al_monitor,Al-Monitor General,200,OK,20,2026-08-16T08:46:40-0400,YYY,20 items,https://www.al-monitor.com/rss
+USE,aviationist,The Aviationist,200,OK,15,"Sun, 16 Aug 2026 10:30:42 +0000",YYY,15 items,https://theaviationist.com/feed/
+USE,bbc_en,BBC World News,200,OK,30,"Sun, 16 Aug 2026 10:52:08 GMT",YYY,30 items,https://feeds.bbci.co.uk/news/world/rss.xml
+USE,bbc_en_me,BBC Middle East,200,OK,44,"Sat, 15 Aug 2026 20:21:14 GMT",YYY,42 items,https://feeds.bbci.co.uk/news/world/middle_east/rss.xml
+USE,bbc_persian,BBC Persian,200,OK,29,"Sun, 16 Aug 2026 13:28:50 GMT",YYY,29 items,https://feeds.bbci.co.uk/persian/rss.xml
+USE,cnbc,CNBC World,200,OK,30,"Sun, 16 Aug 2026 13:51 GMT",YYY,30 items,https://www.cnbc.com/id/100003114/device/rss/rss.html
+USE,dw,DW English,200,OK,137,2026-08-16T14:28:54Z,YYY,144 items,https://rss.dw.com/rdf/rss-en-all
+USE,france24,France24 Middle East,200,OK,29,"Sun, 16 Aug 2026 13:00:14 GMT",YYY,29 items,https://www.france24.com/en/middle-east/rss
+USE,haaretz,Haaretz English,200,OK,20,"Sun, 16 Aug 2026 15:18:40 +0300",YYY,20 items,https://www.haaretz.com/srv/israel-news-rss
+USE,iran_international,Iran International,200,OK,50,"Sun, 16 Aug 2026 11:08:00 GMT",YYY,50 items,https://www.iranintl.com/en/feed
+USE,irna,IRNA English,200,OK,30,"Sun, 16 Aug 2026 14:00:15 GMT",YYY,30 items,https://en.irna.ir/rss
+USE,mee,Middle East Eye,200,OK,20,"Sun, 16 Aug 2026 14:18:13 +0100",YnY,20 items,http://www.middleeasteye.net/rss
+USE,mehr,Mehr News Agency,200,OK,30,"Sun, 16 Aug 2026 14:26:57 GMT",YYY,30 items,https://en.mehrnews.com/rss
+USE,naval_news,Naval News,200,OK,10,"Sun, 16 Aug 2026 07:44:52 +0000",YYY,10 items,https://www.navalnews.com/feed/
+USE,npr,NPR Middle East,200,OK,10,"Sat, 15 Aug 2026 14:21:32 -0400",YYY,10 items,https://feeds.npr.org/1009/rss.xml
+USE,oilprice,OilPrice Main,200,OK,15,"Sun, 16 Aug 2026 09:30:10 -0500",YYY,15 items,https://oilprice.com/rss/main
+USE,seeking_alpha,Seeking Alpha,200,OK,30,"Sun, 16 Aug 2026 10:15:00 -0400",YYY,30 items,https://seekingalpha.com/feed.xml
+USE,state_dept_travel,State Dept Travel Advisories,200,OK,87,"Sun, 16 Aug 2026 14:30:06 GMT",YYY,82 items,https://travel.state.gov/_res/rss/TAsTWs.xml
+USE,tehran_times,Tehran Times,200,OK,30,"Sun, 16 Aug 2026 13:48:48 GMT",YYY,30 items,https://www.tehrantimes.com/rss
+USE,tg_geopolitics_prime,Geopolitics Prime,200,OK,13,,YYY,17 items,https://t.me/s/geopolitics_prime
+USE,tg_geopwatch,Geopolitics Watch,200,OK,13,,YYY,19 items,https://t.me/s/GeoPWatch
+USE,tg_militarywave,Military Wave,200,OK,20,,YYY,20 items,https://t.me/s/militarywave
+USE,the_war_zone,The War Zone,200,OK,23,"Fri, 14 Aug 2026 17:55:00 -0400",YYY,23 items,https://www.twz.com/feed
+USE,wotr,War on the Rocks,200,OK,100,"Fri, 14 Aug 2026 07:30:30 +0000",YYY,100 items,https://warontherocks.com/feed/
+USE,ynet,Ynet News,200,OK,30,,YYY,30 items,https://www.ynetnews.com/Integration/StoryRss3082.xml
+USE_CAVEAT,ap_gnews,AP via Google News,200,OK,100,"Sun, 16 Aug 2026 12:45:00 GMT",YYY,"Google News proxy; snippet-only body, endpoint may break",https://news.google.com/rss/search?q=Iran+site%3Aapnews.com&hl=en-US&gl=US&ceid=US%3Aen
+USE_CAVEAT,reuters_gnews,Reuters via Google News,200,OK,100,"Sun, 16 Aug 2026 11:34:57 GMT",YYY,"Google News proxy; snippet-only body, endpoint may break",https://news.google.com/rss/search?q=Iran+site%3Areuters.com&hl=en-US&gl=US&ceid=US%3Aen

@@ -365,11 +365,16 @@ clickbait, never fearmongering. Alert level modulates urgency, not volume. Promp
   `Mozilla/5.0 (compatible; news-curator-feedcheck/1.0)` — the `compatible;` crawler form
   Cloudflare rejects. Classify by **status code**, never by the `broken` bucket the script
   prints: `403` → retest with real headers, `404`/`NOT_FEED` → URL genuinely wrong.
-- **The header fix belongs to the collector, not the probe.** Whatever gets ISW and UKMTO to
-  answer is what `src/agent/collectors/rss.py` will need in Phase 3. `UA` and `ACCEPT` in
-  `tools/check_feeds.py` are the reference constants — carry them over, do not rediscover
-  nine 403s in production. (Constraint: the collector may import nothing new for this;
-  stdlib headers only.)
+- ~~**The header fix belongs to the collector, not the probe.**~~ **FALSIFIED by ci4,
+  2026-08-16.** The full browser UA + per-host serial + gzip decode shipped in `29d116e`
+  and changed **0 of 15** target rows: all 7 403s still 403, all 3 EMPTY still EMPTY, both
+  amwaj still 500/429. Only diffs vs ci3 were flake (`mee` EMPTY→OK 20, `centcom` OK 25→
+  TIMEOUT, `state_dept_travel` 125→87 items). ci4 provably ran the new code — artifact
+  written 14:30 UTC, push landed 14:28 UTC. **Therefore the block is IP-level, not
+  header-level:** GitHub Actions runs on Azure datacenter ranges that Cloudflare/Akamai
+  reject regardless of headers. No header, cookie or retry in `rss.py` will fix it. The new
+  UA/serial/gzip code is still correct and stays — it just is not the cure. Do not spend a
+  fifth probe round on request-shaping.
 - **The 429 was self-inflicted.** `amwaj.media/feed` → 500 and `amwaj.media/rss` → 429
   because 8 workers probed both variants of one host at once. Every a/b variant pair shares
   a host by definition, so this corrupted exactly the rows hardest to read. Fixed: probe
@@ -425,15 +430,26 @@ clickbait, never fearmongering. Alert level modulates urgency, not volume. Promp
       URL_WRONG 3, CUT_UNREACHABLE_CI 2, CUT_STALE 1.
 - [x] **Line-ending churn fixed.** `.gitattributes` (`* text=auto` + per-type `eol=lf`)
       committed in `c72cc9e`. Probe diffs are readable again.
-- [ ] **NEXT ACTION (2026-08-16) — commit the `check_feeds.py` header fix, push, re-run
-      `probe-feeds` with `candidates=config/sources_candidates_round2.csv` and `tag=ci3`.**
-      That one run resolves 12 of the 17 open rows. Then: (a) merge r3 over
-      `sources_probe_merged_r2.csv`; (b) scout the residual URL_WRONG rows — only IAEA
-      needs real work if the 403 hypothesis holds; (c) owner prunes to ~25 and pastes his
-      own Telegram handles incl. untrusted `lead` ones — only he can do this, it is topic
-      taste; (d) backfill `credibility.yaml` for the ~10 round-2 ids marked NEEDS
-      credibility entry; (e) write `config/sources.yaml` from `sources.yaml.example`;
-      (f) write `agents/briefs/PHASE_3_BRIEF.md`.
+- [x] **Probe rounds 3 and 4 run 2026-08-16.** ci3 was wasted — a stale `.git/index.lock`
+      on Windows silently blocked the commit, so CI ran the old script (`git push` said
+      "Everything up-to-date"). Lesson: `HEAD == origin/main` proves nothing; verify the
+      **fix is inside origin** — `git show origin/main:<file> | findstr <marker>`.
+      ci4 ran the real fix and falsified the header hypothesis (see session 4 facts).
+      Merged verdict: **`config/sources_probe_merged_r4.csv`** — USE 26, USE_CAVEAT 2,
+      CUT_BOT_BLOCKED 7, NEEDS_BODY_DUMP 3, NEEDS_URL_SCOUT 3, CUT_SERVER_ERR 2,
+      CUT_UNREACHABLE_CI 2, CUT_STALE 1, RETEST_FLAKY 1.
+- [ ] **NEXT ACTION (2026-08-16) — stop probing, start Phase 3.** 28 usable feeds is
+      already ahead of the 10-source thin slice. Remaining source work, in order:
+      (a) owner prunes the 28 to his ~15–20 and pastes his own Telegram handles incl.
+      untrusted `lead` ones — only he can do this, it is topic taste;
+      (b) backfill `credibility.yaml` for the round-2 ids with no entry;
+      (c) write `config/sources.yaml` from `sources.yaml.example`;
+      (d) write `agents/briefs/PHASE_3_BRIEF.md`.
+      Deferred, not blocking: the 7 CUT_BOT_BLOCKED tier-1 mechanical feeds (ISW, UKMTO ×2,
+      CENTCOM alt, Times of Israel, Trading Economics) are reachable only via the Google
+      News `site:` proxy already used for Reuters/AP — same `USE_CAVEAT`, decide at Phase 6.
+      The 3 NEEDS_BODY_DUMP rows (radio_farda, rferl_iran, safeairspace) need a probe flag
+      that saves raw bytes; one round, worth it only for safeairspace.
 - [ ] **`tools/check_feeds.py` is 217 lines, over the ~200 cap in constraint 12.** Overage
       is comment, and it is a dev tool not pipeline code. Owner to decide: trim comments,
       split the fetch layer into `tools/_fetch.py`, or grant an explicit exception.
