@@ -149,21 +149,149 @@ sources:
   tg_tanker_trackers:
     tier: 3
     group: osint_maritime
+    note: "Handle supplied by owner 2026-08-17: @TankerTrackers. Real OSINT outfit,
+           not an institution, so tier 3. Pending r5 probe."
+  tg_mornovosti:
+    tier: 3
+    group: osint_maritime
+    note: "@mornovosti. Russian-language maritime news. Shares osint_maritime with
+           TankerTrackers deliberately -- both watch the same hulls and republish each
+           other. Pending r5 probe."
+  tg_ukmto_mirror:
+    tier: 3
+    group: ukmto
+    note: "@UK_MTO_TM -- UNOFFICIAL mirror of UKMTO advisories. group=ukmto is
+           load-bearing: without it, UKMTO plus this mirror would satisfy the
+           two-independent-source test on identical copy. It may nominate. It may
+           never confirm UKMTO. Pending r5 probe."
   tg_kpler_public:
     tier: 3
     group: osint_maritime
+    note: "PLACEHOLDER -- no real handle. Slot reserved, not populated."
   tg_flight_osint:
     tier: 3
     group: osint_air
+    note: "PLACEHOLDER -- no real handle. Owner offered @FlightAlerts_Bot, which is a
+           BOT: no t.me/s/ preview exists, and constraint 6 forbids MTProto. Unusable.
+           Airspace coverage is the largest remaining hole in the source set."
   tg_incident_aggregators:
     tier: 3
     group: osint_general
+    note: "PLACEHOLDER -- no real handle."
+
+# --- Owner's channels, CI-probed 2026-08-17 (tag=tg1). 20 of 21 returned posts. ---
+# Groups are `null` (= own id = independent) unless a mirror or shared-origin
+# relationship is actually KNOWN. Per LEAD_HANDLING.md rev 2, config groups are a
+# FALLBACK: real independence is computed from near-duplicate text collapse and
+# forward-from attribution at cluster time. Do not invent groups to look careful --
+# an unjustified group destroys real independence just as surely as a missing one
+# manufactures fake independence.
+  tg_fighter_radar:
+    tier: 3
+    group: null
+  tg_world_newsly:
+    tier: 3
+    group: null
+  tg_wfwitness:
+    tier: 3
+    group: null
+  tg_tabzlive:
+    tier: 3
+    group: null
+  tg_iranian_militarism:
+    tier: 3
+    group: null
+  tg_minas_tirith:
+    tier: 3
+    group: null
+  tg_mes:
+    tier: 3
+    group: null
+  tg_militarywave:
+    tier: 3
+    group: null
+  tg_geopwatch:
+    tier: 3
+    group: null
+  tg_exciton_missile:
+    tier: 3
+    group: null
+    note: "Owner set 2; overridden to 3 on 2026-08-16. Tier 2 would let one anonymous
+           single-author channel satisfy the two-independent-source test alone, which
+           is the exact path DECISION 4 exists to close. Owner may veto."
+  tg_rnintel:
+    tier: 3
+    group: null
+    note: "Owner set 2; overridden to 3 for the same reason as tg_exciton_missile.
+           Tier 2 is for institutions, not anonymous OSINT."
+  tg_defenderdome:
+    tier: 3
+    group: osint_defender
+    note: "Telegram mirror of the @sentdefender Twitter account, which has no legal
+           free collection path (deferred to v2). Grouped so the mirror and any future
+           direct feed cannot corroborate each other."
+  osint613_a:
+    tier: 3
+    group: osint613
+    note: "osint613.com/feed -- 70 items, CI-OK 2026-08-17. Replaces the uncollectable
+           @Osint613 Twitter account. Same group for the same reason as defenderdome."
+
+# --- lead class (weight 0.0). See DECISION 7. ---
+  tg_padeshah_fxn:
+    tier: lead
+    group: null
+  tg_geopolitics_prime:
+    tier: lead
+    group: null
+    note: "Owner downgraded this from candidate source to lead on 2026-08-16."
+  tg_vahid_online:
+    tier: lead
+    group: null
+  tg_tweet_mardomi:
+    tier: lead
+    group: osint_repost
+    note: "Crowd-sourced repost aggregator. Grouped with other aggregators because its
+           content is by definition someone else's."
+  tg_esellco:
+    tier: lead
+    group: null
+    note: "Economy/commerce, not military. Owner kept it against my recommendation and
+           his argument was correct: fuel, currency and strike reporting are genuine
+           early warning for the military feed. Lead class keeps it from becoming fact."
+  tg_vira_university:
+    tier: lead
+    group: null
+    note: "Off-core-topic. Kept on the same argument as tg_esellco."
+  tg_behold_israel:
+    tier: lead
+    group: null
+    note: "Owner set 3; overridden to lead 2026-08-16, and an independent review called
+           tier 3 indefensible. Amir Tsarfati's channel is evangelical prophecy-framed
+           commentary, structurally early on escalation because escalation is the
+           thesis. Useful as a lead. Cannot corroborate anything. Owner may veto."
+  tg_irane_azad_news:
+    tier: lead
+    group: ncri
+    note: "Owner set 3; overridden to lead 2026-08-16. 'Iran Azad' is NCRI/MEK
+           advocacy branding -- an advocacy organisation, not a newsroom. Same
+           structural-bias problem as tg_behold_israel, opposite direction."
+
+# CUT 2026-08-17: tg_parvaz_capital. t.me/s/parvaz_capital returns HTTP 200 with zero
+# posts -- web preview disabled or the channel requires joining. Constraint 6 forbids
+# MTProto, so there is no way to read it. Not a URL error; do not retry.
 
 # ---------------------------------------------------------------------------
 # DEFAULTS for a source not listed above
 # ---------------------------------------------------------------------------
+# CHANGED 2026-08-17 after adversarial review of LEAD_HANDLING.md rev 1.
+# `group: null` here was a live hole: null resolves to "own id", so every unlisted
+# source counted as fully independent. Twelve Telegram channels reposting one original
+# would have registered as twelve independent confirmations -- exactly the failure
+# DECISION 4 was written to prevent, arriving through the defaults block instead.
+# Unlisted sources now SHARE one group, so they can never corroborate each other.
+# Being unknown must fail toward silence, not toward confidence.
 defaults:
   tier: 3                   # unknown sources are assumed weakest, never strongest
-  group: null               # null -> own id -> treated as independent
+  group: unlisted           # shared -> unlisted sources cannot corroborate each other
   warn_on_unlisted: true    # surface unlisted sources in the daily digest so the
                             # owner can tier them deliberately

@@ -405,6 +405,46 @@ clickbait, never fearmongering. Alert level modulates urgency, not volume. Promp
   every host, browser UA included). Retested 2026-08-16. No agent can verify a feed URL
   from here; only a CI run decides. Unchanged since session 3.
 
+## Verified facts (session 5, 2026-08-17) — Telegram probe + live delivery
+
+- **`tg1` probe: 20 of 21 owner channels are readable via `t.me/s/`** (7–20 posts each).
+  Verdict file `config/sources_probe_merged_tg1.csv`. Only cut: `tg_parvaz_capital`,
+  HTTP 200 with **zero posts** — web preview disabled or join required. Constraint 6
+  forbids MTProto, so there is no path to it. Not a URL error, do not retry.
+  `osint613.com/feed` works (70 items) and replaces the uncollectable @Osint613 Twitter
+  account; `/rss` and `/feed.xml` 404.
+- **A `_Bot` handle cannot be collected.** Owner offered `@FlightAlerts_Bot` for the
+  reserved `tg_flight_osint` slot. Bots have no `t.me/s/` preview page, so there is
+  nothing to fetch, and MTProto is forbidden. **Airspace is now the largest coverage
+  hole** — safeairspace is CUT_BOT_BLOCKED and this slot stays a placeholder.
+- **The probe returns an empty `newest` for every Telegram row.** The preview page has no
+  `pubDate`; timestamps live in a `<time datetime=...>` attribute. The Phase 3 collector
+  must parse that — the 30-minute near-duplicate window in `LEAD_HANDLING.md` depends on
+  real post times.
+- **`credibility.yaml` backfilled and validated 2026-08-17.** 53 entries, 26 `tg_`,
+  8 `lead`, 0 invalid tiers. Verified by loading through the real `agent.config.load_all`,
+  not by eye. **`defaults.group` changed `null` → `unlisted`:** null resolved to "own id",
+  so every unlisted source counted as fully independent and twelve reposts of one original
+  would have registered as twelve confirmations — DECISION 4's exact failure arriving
+  through the defaults block. Unlisted sources now share one group and cannot corroborate
+  each other. `tg_ukmto_mirror` carries `group: ukmto` for the same reason.
+- **Live Telegram delivery CONFIRMED from a US runner 2026-08-17** via new
+  `.github/workflows/send-test.yml`. Owner's local `getMe` returned 404 on three separate
+  fresh tokens because `api.telegram.org` is filtered from Iran — **his machine cannot
+  test any Telegram credential and never will.** CI is the only valid test bed. The
+  workflow greps its own log and fails on `send failed` or `mock mode`, because
+  `run_send_test` deliberately always exits 0.
+- **A private channel's ID cannot be read in the Telegram app and `getUpdates` is
+  unreachable from Iran.** Working method: forward one channel message to `@JsonDumpBot`
+  and read `forward_from_chat.id`. Entirely in-app, no API, no VPN.
+- Owner's secrets were initially invisible to Actions — they had not been saved as
+  **repository** secrets under Settings → Secrets and variables → Actions → Secrets.
+  Resolved. `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHANNEL_ID` confirmed working.
+- **Composition gaps, from adversarial review:** zero Arabic and zero Hebrew sources
+  against the project's own en/fa/ar/he spec. `config/sources_candidates_r5.csv` (13 rows:
+  3 owner Telegram + 6 Arabic RSS + 4 Hebrew RSS) addresses it. **Ten of those URLs are
+  unverified guesses** — no agent can check them from the sandbox. Pending `tag=r5`.
+
 ## Pending / unresolved
 
 - [ ] Owner to approve `ARCHITECTURE.md`.
