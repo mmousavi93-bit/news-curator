@@ -1,0 +1,14 @@
+probe,id,name,type,url,http,items,newest,verdict,detail
+r5,tg_tanker_trackers,TankerTrackers,telegram,https://t.me/s/TankerTrackers,200,17,,OK,text/html
+r5,tg_ukmto_mirror,UKMTO mirror (unofficial),telegram,https://t.me/s/UK_MTO_TM,200,20,,OK,text/html
+r5,tg_mornovosti,Mornovosti (maritime news),telegram,https://t.me/s/mornovosti,200,14,,OK,text/html
+r5,ajar,Al Jazeera Arabic,rss,https://www.aljazeera.net/aljazeerarss/a7c186be-1baa-4bd4-9d80-a84db769f779/73d0e1b4-532f-45ef-b135-bfdff8b8cab9,200,25,"Mon, 17 Aug 2026 14:03:17 +0300",OK,application/rss+xml
+r5,al_arabiya,Al Arabiya,rss,https://www.alarabiya.net/.mrss/ar.xml,403,0,,HTTP_ERROR,Forbidden
+r5,sky_news_arabia,Sky News Arabia,rss,https://www.skynewsarabia.com/rss,200,66,"Mon, 17 Aug 2026 13:44:32 GMT",OK,application/rss+xml
+r5,al_mayadeen,Al Mayadeen,rss,https://www.almayadeen.net/rss/all,403,0,,HTTP_ERROR,Forbidden
+r5,al_manar,Al Manar,rss,https://almanar.com.lb/rss,200,10,"Mon, 17 Aug 2026 14:35:22 +0000",OK,application/rss+xml
+r5,aawsat,Asharq Al-Awsat,rss,https://aawsat.com/feed,200,300,"Mon, 17 Aug 2026 15:32:08 +0100",OK,application/rss+xml
+r5,ynet_he,Ynet Hebrew,rss,https://www.ynet.co.il/Integration/StoryRss2.xml,200,30,,OK,application/xml
+r5,walla,Walla News,rss,https://rss.walla.co.il/feed/1?type=main,200,30,"Mon, 17 Aug 2026 16:59:00 GMT",OK,text/xml
+r5,maariv,Maariv breaking news,rss,https://www.maariv.co.il/Rss/RssFeedsMivzakiChadashot,200,20,"Mon, 17 Aug 2026 14:24:33 GMT",OK,application/xml
+r5,israel_hayom,Israel Hayom,rss,https://www.israelhayom.co.il/rss.xml,403,0,,HTTP_ERROR,Forbidden

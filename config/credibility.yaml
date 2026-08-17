@@ -141,6 +141,142 @@ sources:
     note: "Opposition-aligned, Saudi-funded. Independent OF state media, but carries
            its own directional bias. Tier 2 with the group kept separate is correct."
 
+# --- Arabic and Hebrew sources, CI-probed 2026-08-17 (tag=r5). Closes the ar/he
+# --- coverage hole: the project spec says sources in en/fa/ar/he and there were zero
+# --- of the last two. 10 of 13 guessed URLs returned a live feed.
+  ajar:
+    tier: 2
+    group: al_jazeera       # AJ Arabic and AJ English are one newsroom. Cannot
+                            # corroborate each other, by construction.
+  sky_news_arabia:
+    tier: 2
+    group: sky_news_arabia
+    note: "Abu Dhabi based. Gulf editorial line. Genuinely separate newsroom from
+           aawsat, so the groups stay separate — but on Iran topics both are
+           Gulf-state-aligned, so convergence between them is weak evidence, not
+           strong. Read a sky+aawsat pair as one directional bloc reporting twice."
+  aawsat:
+    tier: 2
+    group: saudi_press
+    note: "Saudi-owned (SRMG) pan-Arab daily. VOLUME RISK: the feed returned 300
+           items on first probe — it is a general newspaper, not a security wire.
+           Needs a topic prefilter before Phase 6 clustering or it will dominate
+           every run's cluster budget on its own."
+  al_manar:
+    tier: 3
+    group: al_manar
+    note: "Hezbollah-owned. A party organ, not a newsroom — so it nominates and
+           never corroborates. Tier 3 rather than `lead` because it is an
+           attributable institution with a masthead, unlike an anonymous channel.
+           Kept because it is first on the Lebanon front and carries
+           resistance-axis framing before Western wires pick it up."
+  ynet_he:
+    tier: 2
+    group: israeli_press    # same newsroom as `ynet`, two languages
+  walla:
+    tier: 2
+    group: israeli_press
+  maariv:
+    tier: 2
+    group: israeli_press
+    note: "Breaking-news-only feed — good shape for a curator, low noise.
+           KNOWN CONSEQUENCE of grouping all six Israeli outlets together: an
+           Israel-sourced event can never reach the >=2-independent-groups bar on
+           Israeli reporting alone, so it stays RUMOUR until a non-Israeli group
+           confirms. That is deliberate. On military matters these outlets
+           overwhelmingly relay the same IDF Spokesperson copy under the same
+           military censor, so treating them as independent would manufacture
+           confirmations. Failing toward silence is the project's stated bias."
+
+# --- Round-4 ids that were USE in the probe but had NO entry here, added 2026-08-17.
+# --- Found by joining every USE row across merged_r4 + merged_tg1 + merged_r5 against
+# --- these keys: 13 usable sources were silently resolving to `defaults: tier 3,
+# --- group unlisted`. That is the "Reuters scored as an anonymous channel" failure the
+# --- session-3 notes warned about, and it was live for Reuters, AP, BBC ME, DW, France24,
+# --- NPR, Haaretz and Mehr simultaneously. A missing key does not error — it degrades.
+# --- ROOT CAUSE, same shape as the session-3 name-vs-id finding: the probe CSVs invent
+# --- per-URL ids (`reuters_gnews`, `bbc_en_me`) that do not match the newsroom ids here
+# --- (`reuters`, `bbc_en`). Every id a collector will use must exist as a key here.
+  reuters_gnews:
+    tier: 2
+    group: wire_west        # SAME newsroom as `reuters`. Not a second confirmation.
+    note: "Google News `site:` proxy — the only reachable path since Reuters killed public
+           RSS. Body is a Google snippet, not full text, which is thin for embedding and
+           clustering. USE_CAVEAT: decide at Phase 6 whether snippets cluster usefully."
+  ap_gnews:
+    tier: 2
+    group: wire_west        # same group as `ap` AND `reuters` — identical wire copy
+    note: "Same Google News proxy caveat as reuters_gnews."
+  bbc_en_me:
+    tier: 2
+    group: bbc              # BBC Middle East is not independent of BBC English
+  haaretz:
+    tier: 2
+    group: israeli_press
+    note: "Added here deliberately rather than left to the defaults. Haaretz operates
+           under the same military censor as Ynet/Walla/Maariv, so by this file's own
+           rationale it belongs in `israeli_press`. Had it stayed unlisted it would have
+           landed in `unlisted` — a DIFFERENT group — and haaretz + any one of the other
+           five would have cleared min_independent_sources: 2 on Israeli press alone,
+           silently voiding the whole point of the israeli_press group."
+  mehr:
+    tier: 2
+    group: iran_state       # same state ownership/editorial line as irna, press_tv
+  dw:
+    tier: 2
+    group: dw
+  france24:
+    tier: 2
+    group: france24
+  npr:
+    tier: 2
+    group: npr
+    note: "US public radio. Largely rewrites wire copy on Middle East breaking news, so
+           an npr + wire_west pair is weak convergence. Kept separate because it does run
+           its own correspondents; revisit if it proves to be a pure wire echo."
+  cnbc:
+    tier: 2
+    group: cnbc
+  mee:
+    tier: 2
+    group: mee
+    note: "Middle East Eye. A real newsroom with a distinctly Qatar-aligned,
+           anti-Gulf-monarchy editorial line. Tier 2 for reporting, but read a
+           mee + al_jazeera agreement as one directional bloc, not independent
+           corroboration — same as the aawsat/sky_news_arabia pairing."
+  wotr:
+    tier: 2
+    group: wotr
+    note: "War on the Rocks — analysis and commentary, NOT breaking news. 100 items on
+           probe. Valuable for interpretation, near-useless for event detection, and it
+           must never be what makes an event 'confirmed': it comments on reports rather
+           than witnessing anything. Candidate for a low priority weight at Phase 6."
+  oilprice:
+    tier: 3
+    group: oilprice
+    note: "Tier 3, not 2. Commodity trade press that aggregates and re-reports heavily
+           with thin sourcing. Useful as a market-signal tripwire, not as an event
+           witness — which is exactly what tier 3 encodes: nominates, never corroborates."
+  seeking_alpha:
+    tier: 3
+    group: seeking_alpha
+    note: "Tier 3. Contributor-written financial commentary, not a newsroom with editorial
+           control. Market colour only."
+
+# CUT 2026-08-17 (tag=r5), all three on HTTP 403 from the GitHub US runner:
+#   al_arabiya    https://www.alarabiya.net/.mrss/ar.xml
+#   al_mayadeen   https://www.almayadeen.net/rss/all
+#   israel_hayom  https://www.israelhayom.co.il/rss.xml
+# Classified CUT_BOT_BLOCKED, not URL_WRONG, per the session-4 rule: a 403 means the
+# server answered and refused, which is a block, not a bad path. ci4 already falsified
+# the header hypothesis — a full browser UA changed 0 of 15 blocked rows — so the
+# refusal is IP-level (Azure datacenter ranges) and no request-shaping in the
+# collector will recover them. Weaker evidence than ISW/UKMTO had (one URL variant
+# each, not two), but not worth a sixth probe round.
+# Coverage cost is absorbed: the Gulf counterweight survives via aawsat +
+# sky_news_arabia, resistance-axis framing survives via al_manar, and three Hebrew
+# feeds remain. Only the right-leaning Israeli line (israel_hayom) has no substitute.
+
 # ---------------------------------------------------------------------------
 # TIER 3 — OSINT. Nominates, never corroborates. (scoring.tier3_can_corroborate)
 # Groups still matter: they prevent one rumour echoing across five channels from

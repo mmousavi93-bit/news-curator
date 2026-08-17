@@ -442,8 +442,86 @@ clickbait, never fearmongering. Alert level modulates urgency, not volume. Promp
   Resolved. `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHANNEL_ID` confirmed working.
 - **Composition gaps, from adversarial review:** zero Arabic and zero Hebrew sources
   against the project's own en/fa/ar/he spec. `config/sources_candidates_r5.csv` (13 rows:
-  3 owner Telegram + 6 Arabic RSS + 4 Hebrew RSS) addresses it. **Ten of those URLs are
-  unverified guesses** — no agent can check them from the sandbox. Pending `tag=r5`.
+  3 owner Telegram + 6 Arabic RSS + 4 Hebrew RSS) addresses it.
+- **`tag=r5` RUN AND MERGED 2026-08-17. The ar/he hole is closed.** 13 rows → OK 10,
+  HTTP_ERROR 3. Raw `config/sources_probe_r5.csv`, verdict
+  **`config/sources_probe_merged_r5.csv`**: USE 9, USE_CAVEAT 1, CUT_BOT_BLOCKED 3.
+  **10 of 13 blind URL guesses were correct** — a far better hit rate than round 1's 11-of-38
+  wrong, because these were guessed against known publisher CMS conventions rather than
+  invented. Confirmed a CI verdict, not a local one: the candidates CSV is committed so the
+  runner checked it out, and ynet/walla/maariv answered 200, which never happens from Iran.
+  New live: `ajar` 25, `sky_news_arabia` 66, `al_manar` 10, `aawsat` 300, `ynet_he` 30,
+  `walla` 30, `maariv` 20, `tg_tanker_trackers` 17, `tg_ukmto_mirror` 20, `tg_mornovosti` 14.
+- **Cut on 403: `al_arabiya`, `al_mayadeen`, `israel_hayom`.** Classified CUT_BOT_BLOCKED per
+  the session-4 rule, not URL_WRONG. Weaker evidence than ISW/UKMTO had (one URL variant
+  each, not two) but ci4 already falsified header-shaping, so a sixth round buys nothing.
+  Editorial coverage survives the cuts: Gulf counterweight via `aawsat` + `sky_news_arabia`,
+  resistance-axis framing via `al_manar`, three Hebrew feeds remain. **Only the right-leaning
+  Israeli line has no substitute left.**
+- **`tg_ukmto_mirror` is now the only live path to UKMTO advisories** — both official URLs
+  are CUT_BOT_BLOCKED. It is tier 3 and carries `group: ukmto`, so UKMTO content can no
+  longer corroborate anything or score. Maritime B-class signals are effectively
+  single-sourced through an unofficial mirror. Accept or find another path at Phase 6.
+- **56 unique usable sources** (r4 28 + tg1 21 + r5 10, minus 3 ids appearing in both r4 and
+  tg1). Against a 10-source thin slice that is 5.6x. **The source problem is now oversupply,
+  not scarcity** — see the volume risk below.
+- **VOLUME RISK, new and unbudgeted.** Constraint 2 caps ~40 LLM calls/run and the LLM sees
+  25–40 clusters. 56 feeds at observed item counts is **1,984 items per full sweep**; at
+  10–15% new per 3-hour run that is **~200–300 items** to cluster into ≤40 clusters.
+  `aawsat` alone returned **300 items** — 15% of the entire corpus from one general pan-Arab
+  daily, not a security wire. It needs a topic prefilter before Phase 6 or it dominates the
+  cluster budget by itself; marked USE_CAVEAT for that reason. Next worst: `dw` 137,
+  `wotr` 100, `reuters_gnews` 100, `ap_gnews` 100, `state_dept_travel` 87.
+- **`credibility.yaml` extended and re-validated 2026-08-17: 73 entries** (53 → 60 for r5,
+  → 73 after the gap below), 0 invalid tiers, tier dist 1:9 / 2:34 / 3:22 / lead:8. Verified
+  by loading through the real `agent.config.load_all`, not by eye. r5 assignments: `ajar`
+  tier 2 `group: al_jazeera`; `sky_news_arabia` tier 2 own group; `aawsat` tier 2
+  `group: saudi_press`; `al_manar` **tier 3** (party organ, not a newsroom — nominates,
+  never corroborates); `ynet_he` / `walla` / `maariv` tier 2 `group: israeli_press`.
+- **DEFECT FOUND AND FIXED 2026-08-17 — 13 usable sources had no `credibility.yaml` entry
+  and were silently resolving to `defaults: tier 3, group unlisted`.** This voids the earlier
+  claim in this file that the round-2 backfill was complete; it was not, and eyeballing the
+  file would never have caught it. Affected: `reuters_gnews`, `ap_gnews`, `bbc_en_me`,
+  `haaretz`, `mehr`, `dw`, `france24`, `npr`, `cnbc`, `mee`, `wotr`, `oilprice`,
+  `seeking_alpha` — i.e. Reuters, AP, BBC Middle East and Haaretz were all being scored as
+  anonymous channels at once. **Root cause is the session-3 name-vs-id finding recurring in a
+  new form:** the probe CSVs invent per-URL ids (`reuters_gnews`, `bbc_en_me`) that do not
+  match the newsroom ids in `credibility.yaml` (`reuters`, `bbc_en`). A missing key does not
+  error, it degrades.
+  **Standing rule, now proven twice: never verify this file by reading it. Join every USE row
+  across all merged probe CSVs against the loaded keys and assert the difference is empty.**
+- **All six Israeli outlets share `group: israeli_press`, deliberately.** Consequence: an
+  Israel-sourced event can never clear `min_independent_sources: 2` on Israeli reporting
+  alone and stays RUMOUR until a non-Israeli group confirms. Correct on the merits — on
+  military matters these outlets relay the same IDF Spokesperson copy under the same military
+  censor, so treating them as independent would manufacture confirmations. Accepted cost: the
+  Israeli civilian press leads international wires by 30–120 min on home-front events
+  (impact sites, mobilisation, hospital surge), and those now wait for pickup.
+  **`haaretz` was the sixth and was missing** — had it stayed unlisted it would have landed in
+  group `unlisted`, a *different* group, so `haaretz` + any one of the other five would have
+  cleared the two-group bar on Israeli press alone and voided this entire grouping. The
+  documented consequence was only true by accident until 2026-08-17.
+- **UNRESOLVED CONTRADICTION, surfaced 2026-08-17, currently inert — owner must decide.**
+  Two blocks of `credibility.yaml` written the same day take opposite positions on the same
+  question. The `defaults` block says an unknown source shares `group: unlisted` because
+  "being unknown must fail toward silence, not toward confidence." The tg1 block sets
+  `group: null` on 17 listed channels, and null resolves to own-id = fully independent,
+  which fails toward confidence. **Inert today** because `tier3_can_corroborate: false` and
+  all 17 are tier 3 or `lead`, so none can satisfy Step 1 regardless of group. **More inert
+  than first written: no code consumes `group` at all yet** — grep of `src/agent/` finds it
+  only in `config.py` (load, validate, store) — so this is currently a contradiction between
+  two comments, and "null resolves to own id" is itself only a comment, not code. Two effects
+  once Phases 6–7 build: (a) the RUMOUR/watchlist display would count one rumour echoing
+  across five channels as five groups, which the tier-3 section header of that same file says
+  groups exist to prevent; (b) it is the fallback path when LEAD_HANDLING rev 2's
+  evidence-computed `G` fails to detect a paraphrased repost with no forward header.
+  Cheapest fix is therefore one line in the future loader (apply `defaults` per-field for
+  listed sources), not 17 edits. **It becomes a live
+  fabricated-signal path the moment any of the 17 is promoted to tier 2** — and the file
+  records that the owner already wanted exactly that for `tg_exciton_missile` and
+  `tg_rnintel`, both overridden to 3. Options: leave as-is; give the 17 a shared
+  `unlisted_tg` group; or make the loader apply `defaults` per-field for listed sources.
+  Not changed unilaterally — the `group: null` choice was argued explicitly last session.
 
 ## Pending / unresolved
 
@@ -479,13 +557,33 @@ clickbait, never fearmongering. Alert level modulates urgency, not volume. Promp
       Merged verdict: **`config/sources_probe_merged_r4.csv`** — USE 26, USE_CAVEAT 2,
       CUT_BOT_BLOCKED 7, NEEDS_BODY_DUMP 3, NEEDS_URL_SCOUT 3, CUT_SERVER_ERR 2,
       CUT_UNREACHABLE_CI 2, CUT_STALE 1, RETEST_FLAKY 1.
-- [ ] **NEXT ACTION (2026-08-16) — stop probing, start Phase 3.** 28 usable feeds is
-      already ahead of the 10-source thin slice. Remaining source work, in order:
-      (a) owner prunes the 28 to his ~15–20 and pastes his own Telegram handles incl.
-      untrusted `lead` ones — only he can do this, it is topic taste;
-      (b) backfill `credibility.yaml` for the round-2 ids with no entry;
-      (c) write `config/sources.yaml` from `sources.yaml.example`;
-      (d) write `agents/briefs/PHASE_3_BRIEF.md`.
+- [x] **Probe round 5 run and merged 2026-08-17, `tag=r5`.** Closes the Arabic/Hebrew hole.
+      13 rows → USE 9, USE_CAVEAT 1, CUT_BOT_BLOCKED 3. See session-5 facts.
+      **Source discovery is now CLOSED at 56 usable feeds. No further probe rounds.**
+- [x] Owner supplied his Telegram handles (tg1, 21 usable incl. `lead`) and the r5 additions.
+      Supersedes the old "owner to paste his own channel handles" and "initial 40-source list
+      not compiled" items — the list is oversupplied, not missing.
+- [x] `credibility.yaml` backfilled for round-2 and r5 ids. 60 entries, validated through
+      `agent.config.load_all` 2026-08-17.
+- [ ] **NEXT ACTION (2026-08-17) — Phase 3, and prune on the way in.** Two items only:
+      (a) **owner prunes 56 → ~20–25 and decides the volume question.** This is now a cost
+      decision, not a coverage decision: 56 feeds cannot fit the ≤40-cluster LLM budget
+      without either pruning or a topic prefilter. `aawsat` (300 items) is the worst offender
+      and must be prefiltered or dropped. Only the owner can make the topic-taste call.
+      (b) write `config/sources.yaml` from `sources.yaml.example`, then
+      `agents/briefs/PHASE_3_BRIEF.md`.
+- [ ] **Owner decision — the `group: null` contradiction** (session-5 facts, last bullet).
+      Inert today, live the moment any owner-channel goes tier 2. Three options on record.
+- [ ] **Make the credibility join a test, not a habit.** The 13-missing-entry defect was
+      invisible to reading and took one 10-line join to find. Phase 3 must add a check that
+      every id a collector loads exists as a `credibility.yaml` key, failing loudly instead
+      of degrading to tier 3. Same shape as the `signals_covered` coverage check that ships
+      disabled until Phase 7.
+- [ ] **Phase 3 collector — `DATE_RE` does not match Ynet's date format.** Both `ynet` and
+      `ynet_he` return 30 items with an empty `newest`, so neither can be staleness-checked.
+      Related and already known: the `t.me/s/` preview has no `pubDate` at all — post times
+      live in a `<time datetime=...>` attribute, and the 30-minute near-duplicate window in
+      `LEAD_HANDLING.md` depends on parsing it.
       Deferred, not blocking: the 7 CUT_BOT_BLOCKED tier-1 mechanical feeds (ISW, UKMTO ×2,
       CENTCOM alt, Times of Israel, Trading Economics) are reachable only via the Google
       News `site:` proxy already used for Reuters/AP — same `USE_CAVEAT`, decide at Phase 6.

@@ -1,0 +1,14 @@
+decision,id,name,type,lang,http,items,verdict,why,url
+USE,tg_tanker_trackers,TankerTrackers,telegram,en,200,17,OK,Fills the reserved tg_tanker_trackers slot. Tier 3 - real OSINT outfit not an institution.,https://t.me/s/TankerTrackers
+USE,tg_ukmto_mirror,UKMTO mirror (unofficial),telegram,en,200,20,OK,Carries group=ukmto so it can never corroborate UKMTO independently. Only live path to UKMTO advisories since both official URLs are CUT_BOT_BLOCKED.,https://t.me/s/UK_MTO_TM
+USE,tg_mornovosti,Mornovosti (maritime news),telegram,ru,200,14,OK,Adds Russian as a 5th source language beyond the en/fa/ar/he spec. Gemini handles ru so no capability issue.,https://t.me/s/mornovosti
+USE,ajar,Al Jazeera Arabic,rss,ar,200,25,OK,group=al_jazeera - one newsroom with AJ English so the two cannot corroborate each other.,https://www.aljazeera.net/aljazeerarss/a7c186be-1baa-4bd4-9d80-a84db769f779/73d0e1b4-532f-45ef-b135-bfdff8b8cab9
+USE,sky_news_arabia,Sky News Arabia,rss,ar,200,66,OK,Abu Dhabi based. Gulf editorial line. Separate group from aawsat but read the pair as one directional bloc on Iran.,https://www.skynewsarabia.com/rss
+USE_CAVEAT,aawsat,Asharq Al-Awsat,rss,ar,200,300,OK,VOLUME RISK - 300 items on first probe. General pan-Arab daily not a security wire. Needs a topic prefilter before Phase 6 or it dominates the cluster budget alone.,https://aawsat.com/feed
+USE,al_manar,Al Manar,rss,ar,200,10,OK,Hezbollah-owned party organ. Tier 3 - nominates never corroborates. First on the Lebanon front.,https://almanar.com.lb/rss
+USE,ynet_he,Ynet Hebrew,rss,he,200,30,OK,group=israeli_press - same newsroom as ynet English. FRESHNESS UNVERIFIED - probe returned an empty newest date on an RSS row; ynet English shows the identical blank in r4 with the same 30 items so this is a DATE_RE format miss not a stale feed. Phase 3 collector must parse ynet date format.,https://www.ynet.co.il/Integration/StoryRss2.xml
+USE,walla,Walla News,rss,he,200,30,OK,group=israeli_press.,https://rss.walla.co.il/feed/1?type=main
+USE,maariv,Maariv breaking news,rss,he,200,20,OK,Breaking-news-only feed - low noise good shape for a curator. group=israeli_press.,https://www.maariv.co.il/Rss/RssFeedsMivzakiChadashot
+CUT_BOT_BLOCKED,al_arabiya,Al Arabiya,rss,ar,403,0,HTTP_ERROR,403 = server answered and refused = block not bad path. ci4 falsified the header hypothesis so no collector-side fix exists. Gulf counterweight survives via aawsat + sky_news_arabia.,https://www.alarabiya.net/.mrss/ar.xml
+CUT_BOT_BLOCKED,al_mayadeen,Al Mayadeen,rss,ar,403,0,HTTP_ERROR,Same 403 reasoning. Loss of the pro-resistance-axis early-framing source is absorbed by al_manar.,https://www.almayadeen.net/rss/all
+CUT_BOT_BLOCKED,israel_hayom,Israel Hayom,rss,he,403,0,HTTP_ERROR,Same 403 reasoning. The only r5 cut with no substitute - no other right-leaning Israeli feed in the set.,https://www.israelhayom.co.il/rss.xml
