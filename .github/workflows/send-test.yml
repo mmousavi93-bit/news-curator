@@ -1,0 +1,100 @@
+name: send-test
+
+# Manual only. Proves the live Telegram delivery path from the SAME environment
+# the pipeline will run in -- a GitHub US runner -- not from the owner's browser
+# in Iran, where api.telegram.org is filtered and every local getMe returned 404.
+# This is the authoritative test of TELEGRAM_BOT_TOKEN and TELEGRAM_CHANNEL_ID.
+#
+# Sends one fixed diagnostic message built by agent.run._send_test_message().
+# It invents no content (constraint 11) and reads no feeds.
+#
+# Secrets are passed via `env:`, never interpolated into a `run:` line, so they
+# cannot land in the command echo. All application logging goes through the
+# redaction filter in util/logging.py (constraint 9 -- public repo, every log
+# line is world-readable).
+
+on:
+  workflow_dispatch:
+
+jobs:
+  send-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install package
+        run: pip install -e .
+
+      # Fails loudly if a secret is missing, instead of silently falling through
+      # to mock mode and reporting success. Prints only lengths, never values.
+      - name: Check secrets are present
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
+        run: |
+          fail=0
+          if [ -z "$TELEGRAM_BOT_TOKEN" ]; then
+            echo "MISSING: TELEGRAM_BOT_TOKEN is empty or unset"; fail=1
+          else
+            echo "TELEGRAM_BOT_TOKEN present, length ${#TELEGRAM_BOT_TOKEN}"
+            case "$TELEGRAM_BOT_TOKEN" in
+              *:*) echo "  shape ok: contains a colon" ;;
+              *)   echo "  WARNING: no colon -- this is not a bot token"; fail=1 ;;
+            esac
+          fi
+          if [ -z "$TELEGRAM_CHANNEL_ID" ]; then
+            echo "MISSING: TELEGRAM_CHANNEL_ID is empty or unset"; fail=1
+          else
+            echo "TELEGRAM_CHANNEL_ID present, length ${#TELEGRAM_CHANNEL_ID}"
+          fi
+          exit $fail
+
+      # Independent of our code: asks Telegram who the bot is. Confirms the token
+      # itself, so a failure here separates "bad token" from "bad channel id".
+      - name: Verify token with getMe
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: |
+          code=$(curl -s -o /tmp/getme.json -w '%{http_code}' \
+            "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getMe")
+          echo "getMe HTTP $code"
+          if [ "$code" != "200" ]; then
+            echo "Token rejected by Telegram from a US runner. The token is wrong,"
+            echo "not the network. Regenerate via @BotFather and update the secret."
+            exit 1
+          fi
+          python - <<'PY'
+          import json
+          d = json.load(open("/tmp/getme.json"))["result"]
+          print("bot ok: @%s (id %s)" % (d.get("username"), d.get("id")))
+          PY
+
+      # run_send_test() deliberately never raises and always exits 0 -- an
+      # unattended run must not die because Telegram was down (Phase 2 decision).
+      # That makes a green tick meaningless here, so this step reads the log and
+      # fails the workflow itself on a failed or mock-mode send.
+      - name: Send the diagnostic message
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
+        run: |
+          set -o pipefail
+          python -m agent.run --send-test 2>&1 | tee /tmp/send.log
+          if grep -q "send-test: send failed" /tmp/send.log; then
+            echo "::error::Telegram rejected the send. See the status/description above."
+            exit 1
+          fi
+          if grep -q "send-test: mock mode" /tmp/send.log; then
+            echo "::error::Fell through to mock mode -- credentials not visible to the process."
+            exit 1
+          fi
+          if ! grep -q "send-test: sent" /tmp/send.log; then
+            echo "::error::No confirmation line found. Delivery unproven."
+            exit 1
+          fi
+          echo "Delivered. Check the channel on your phone."

@@ -1,0 +1,25 @@
+decision,id,name,type,http,items,verdict,note,url,why
+CUT_NO_PREVIEW,tg_parvaz_capital,Parvaz Capital (گروه پرواز),telegram,200,0,NOT_FEED,owner trust=lead (owner: surfaced real leads). Macro/trading; lead class only,https://t.me/s/parvaz_capital,HTTP 200 but 0 posts parsed - web preview disabled or channel requires join; t.me/s/ cannot read it (constraint 6 forbids MTProto)
+CUT_URL_WRONG,osint613_b,OSINT 613 site (rss),rss,404,0,HTTP_ERROR,variant b of osint613 - probe only one of a/b/c survives,https://osint613.com/rss,HTTP_ERROR 404
+CUT_URL_WRONG,osint613_c,OSINT 613 site (feed.xml),rss,404,0,HTTP_ERROR,variant c of osint613,https://osint613.com/feed.xml,HTTP_ERROR 404
+USE,osint613_a,OSINT 613 site (feed),rss,200,70,OK,owner trust=3. Replaces the uncollectable @Osint613 Twitter account. URL is a GUESS - probe decides,https://osint613.com/feed,CI-OK 70 posts
+USE,tg_padeshah_fxn,Padeshah FXN (king/پادشاه),telegram,200,20,OK,owner trust=lead. Untrusted early-warning only; cannot corroborate,https://t.me/s/Padeshah_FXN,CI-OK 20 posts
+USE,tg_world_newsly,World Newsly (اخبار نظامی ایران و جهان),telegram,200,20,OK,owner trust=3,https://t.me/s/World_Newsly,CI-OK 20 posts
+USE,tg_irane_azad_news,Irane Azad News (اخبار ایران آزاد),telegram,200,20,OK,"owner trust=3. DISPUTED - ""Iran Azad"" is NCRI/MEK advocacy branding; advocacy org not newsroom. Recommend lead",https://t.me/s/IraneAzad_News,CI-OK 20 posts
+USE,tg_wfwitness,Warfront Witness,telegram,200,20,OK,owner trust=3,https://t.me/s/wfwitness,CI-OK 20 posts
+USE,tg_mes,Middle East Spectator,telegram,200,20,OK,owner trust=3,https://t.me/s/Middle_East_Spectator,CI-OK 20 posts
+USE,tg_vira_university,Vira University (ویرا),telegram,200,20,OK,owner trust=lead (owner: surfaced real leads). Off-core-topic; lead class only,https://t.me/s/virauniversitycom,CI-OK 20 posts
+USE,tg_militarywave,Military Wave,telegram,200,20,OK,pre-existing candidate. CI-OK 20 posts r2. Owner has not set trust,https://t.me/s/militarywave,CI-OK 20 posts
+USE,tg_tweet_mardomi,Tweet Mardomi,telegram,200,19,OK,owner trust=lead. Crowd-sourced repost aggregator,https://t.me/s/tweetmardomi,CI-OK 19 posts
+USE,tg_fighter_radar,Fighter Radar (فایتر رادار),telegram,200,18,OK,owner trust=3. Aircraft movement claims; verify against tier 1/2,https://t.me/s/fighter_radar,CI-OK 18 posts
+USE,tg_tabzlive,Tabzlive,telegram,200,18,OK,owner trust=3,https://t.me/s/tabzlive,CI-OK 18 posts
+USE,tg_behold_israel,Behold Israel (Amir Tsarfati),telegram,200,18,OK,owner trust=3. DISPUTED - evangelical prophecy commentary not OSINT; systematic framing bias. Recommend lead or cut,https://t.me/s/beholdisraelchannel,CI-OK 18 posts
+USE,tg_minas_tirith,Minas Tirith 2024,telegram,200,17,OK,owner trust=3,https://t.me/s/Minas_Tirith2024,CI-OK 17 posts
+USE,tg_rnintel,Rerum Novarum Intel,telegram,200,17,OK,owner trust=2. DISPUTED - anonymous OSINT channel; recommend 3,https://t.me/s/rnintel,CI-OK 17 posts
+USE,tg_defenderdome,DefenderDome (OSINTdefender mirror),telegram,200,17,OK,owner trust=3. Replaces the uncollectable @sentdefender Twitter account,https://t.me/s/DefenderDome,CI-OK 17 posts
+USE,tg_geopwatch,Geopolitics Watch,telegram,200,17,OK,pre-existing candidate. CI-OK 19 posts r2. Owner has not set trust,https://t.me/s/GeoPWatch,CI-OK 17 posts
+USE,tg_exciton_missile,Exciton Missile Program (Mohsen Riyahi),telegram,200,15,OK,owner trust=2. DISPUTED - single-author channel at tier 2 can satisfy the 2-independent-source test alone. Recommend 3,https://t.me/s/Exciton_missile_program,CI-OK 15 posts
+USE,tg_esellco,Esellco (اقتصاد و تجارت),telegram,200,13,OK,owner trust=lead (owner: surfaced real leads). Economy/commerce; lead class only,https://t.me/s/esellco,CI-OK 13 posts
+USE,tg_iranian_militarism,Iranian Militarism,telegram,200,12,OK,owner trust=3,https://t.me/s/Iranian_Militarism,CI-OK 12 posts
+USE,tg_geopolitics_prime,Geopolitics Prime,telegram,200,10,OK,owner trust=lead (DOWNGRADED from earlier candidate status). CI-OK 17 posts r2,https://t.me/s/geopolitics_prime,CI-OK 10 posts
+USE,tg_vahid_online,VahidOnline,telegram,200,7,OK,owner trust=lead,https://t.me/s/VahidOnline,CI-OK 7 posts

@@ -1,0 +1,25 @@
+probe,id,name,type,url,http,items,newest,verdict,detail
+tg1,tg_padeshah_fxn,Padeshah FXN (king/پادشاه),telegram,https://t.me/s/Padeshah_FXN,200,20,,OK,text/html
+tg1,tg_fighter_radar,Fighter Radar (فایتر رادار),telegram,https://t.me/s/fighter_radar,200,18,,OK,text/html
+tg1,tg_world_newsly,World Newsly (اخبار نظامی ایران و جهان),telegram,https://t.me/s/World_Newsly,200,20,,OK,text/html
+tg1,tg_irane_azad_news,Irane Azad News (اخبار ایران آزاد),telegram,https://t.me/s/IraneAzad_News,200,20,,OK,text/html
+tg1,tg_wfwitness,Warfront Witness,telegram,https://t.me/s/wfwitness,200,20,,OK,text/html
+tg1,tg_tabzlive,Tabzlive,telegram,https://t.me/s/tabzlive,200,18,,OK,text/html
+tg1,tg_iranian_militarism,Iranian Militarism,telegram,https://t.me/s/Iranian_Militarism,200,12,,OK,text/html
+tg1,tg_exciton_missile,Exciton Missile Program (Mohsen Riyahi),telegram,https://t.me/s/Exciton_missile_program,200,15,,OK,text/html
+tg1,tg_geopolitics_prime,Geopolitics Prime,telegram,https://t.me/s/geopolitics_prime,200,10,,OK,text/html
+tg1,tg_minas_tirith,Minas Tirith 2024,telegram,https://t.me/s/Minas_Tirith2024,200,17,,OK,text/html
+tg1,tg_behold_israel,Behold Israel (Amir Tsarfati),telegram,https://t.me/s/beholdisraelchannel,200,18,,OK,text/html
+tg1,tg_tweet_mardomi,Tweet Mardomi,telegram,https://t.me/s/tweetmardomi,200,19,,OK,text/html
+tg1,tg_rnintel,Rerum Novarum Intel,telegram,https://t.me/s/rnintel,200,17,,OK,text/html
+tg1,tg_mes,Middle East Spectator,telegram,https://t.me/s/Middle_East_Spectator,200,20,,OK,text/html
+tg1,tg_vahid_online,VahidOnline,telegram,https://t.me/s/VahidOnline,200,7,,OK,text/html
+tg1,tg_esellco,Esellco (اقتصاد و تجارت),telegram,https://t.me/s/esellco,200,13,,OK,text/html
+tg1,tg_parvaz_capital,Parvaz Capital (گروه پرواز),telegram,https://t.me/s/parvaz_capital,200,0,,NOT_FEED,text/html
+tg1,tg_vira_university,Vira University (ویرا),telegram,https://t.me/s/virauniversitycom,200,20,,OK,text/html
+tg1,tg_defenderdome,DefenderDome (OSINTdefender mirror),telegram,https://t.me/s/DefenderDome,200,17,,OK,text/html
+tg1,tg_militarywave,Military Wave,telegram,https://t.me/s/militarywave,200,20,,OK,text/html
+tg1,tg_geopwatch,Geopolitics Watch,telegram,https://t.me/s/GeoPWatch,200,17,,OK,text/html
+tg1,osint613_a,OSINT 613 site (feed),rss,https://osint613.com/feed,200,70,"Mon, 17 Aug 2026 13:06:52 +0000",OK,application/rss+xml
+tg1,osint613_b,OSINT 613 site (rss),rss,https://osint613.com/rss,404,0,,HTTP_ERROR,Not Found
+tg1,osint613_c,OSINT 613 site (feed.xml),rss,https://osint613.com/feed.xml,404,0,,HTTP_ERROR,Not Found

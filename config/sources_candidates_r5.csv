@@ -1,0 +1,14 @@
+id,name,url,type,lang,topic,note
+tg_tanker_trackers,TankerTrackers,https://t.me/s/TankerTrackers,telegram,en,maritime,owner-supplied. Fills the reserved tg_tanker_trackers slot in credibility.yaml. Tier 3 - real OSINT outfit but not an institution
+tg_ukmto_mirror,UKMTO mirror (unofficial),https://t.me/s/UK_MTO_TM,telegram,en,maritime,owner-supplied. UNOFFICIAL mirror of UKMTO advisories. MUST share group=ukmto in credibility.yaml so it can never corroborate UKMTO independently. Tier 3 max
+tg_mornovosti,Mornovosti (maritime news),https://t.me/s/mornovosti,telegram,ru,maritime,owner-supplied. Russian-language maritime news. Adds a 5th source language beyond the en/fa/ar/he spec - Gemini handles ru so no capability issue
+ajar,Al Jazeera Arabic,https://www.aljazeera.net/aljazeerarss/a7c186be-1baa-4bd4-9d80-a84db769f779/73d0e1b4-532f-45ef-b135-bfdff8b8cab9,rss,ar,regional,GUESS URL. Arabic gap fill. Must share group=al_jazeera - not independent of AJ English
+al_arabiya,Al Arabiya,https://www.alarabiya.net/.mrss/ar.xml,rss,ar,regional,GUESS URL. Saudi-owned - Gulf editorial line. Counterweight to Iranian state media
+sky_news_arabia,Sky News Arabia,https://www.skynewsarabia.com/rss,rss,ar,regional,GUESS URL. UAE-based
+al_mayadeen,Al Mayadeen,https://www.almayadeen.net/rss/all,rss,ar,regional,GUESS URL. Pro-resistance-axis editorial line. Tier 3. Valuable precisely because it carries Hezbollah/IRGC-adjacent framing early
+al_manar,Al Manar,https://almanar.com.lb/rss,rss,ar,regional,GUESS URL. Hezbollah-owned. Tier 3 or lead - it is a party organ not a newsroom - but it is first on the Lebanon front
+aawsat,Asharq Al-Awsat,https://aawsat.com/feed,rss,ar,regional,GUESS URL. Saudi-owned pan-Arab daily
+ynet_he,Ynet Hebrew,https://www.ynet.co.il/Integration/StoryRss2.xml,rss,he,israel,GUESS URL. MUST share group=israeli_press with ynet English - one newsroom two languages
+walla,Walla News,https://rss.walla.co.il/feed/1?type=main,rss,he,israel,GUESS URL
+maariv,Maariv breaking news,https://www.maariv.co.il/Rss/RssFeedsMivzakiChadashot,rss,he,israel,GUESS URL. Breaking-news-only feed - good shape for a curator
+israel_hayom,Israel Hayom,https://www.israelhayom.co.il/rss.xml,rss,he,israel,GUESS URL. Right-leaning editorial line
