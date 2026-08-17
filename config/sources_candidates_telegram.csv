@@ -1,0 +1,25 @@
+id,name,url,type,lang,topic,note
+tg_padeshah_fxn,Padeshah FXN (king/پادشاه),https://t.me/s/Padeshah_FXN,telegram,fa,military,owner trust=lead. Untrusted early-warning only; cannot corroborate
+tg_fighter_radar,Fighter Radar (فایتر رادار),https://t.me/s/fighter_radar,telegram,fa,military,owner trust=3. Aircraft movement claims; verify against tier 1/2
+tg_world_newsly,World Newsly (اخبار نظامی ایران و جهان),https://t.me/s/World_Newsly,telegram,fa,military,owner trust=3
+tg_irane_azad_news,Irane Azad News (اخبار ایران آزاد),https://t.me/s/IraneAzad_News,telegram,fa,iran_politics,owner trust=3. DISPUTED - "Iran Azad" is NCRI/MEK advocacy branding; advocacy org not newsroom. Recommend lead
+tg_wfwitness,Warfront Witness,https://t.me/s/wfwitness,telegram,en,military,owner trust=3
+tg_tabzlive,Tabzlive,https://t.me/s/tabzlive,telegram,fa,military,owner trust=3
+tg_iranian_militarism,Iranian Militarism,https://t.me/s/Iranian_Militarism,telegram,en,military,owner trust=3
+tg_exciton_missile,Exciton Missile Program (Mohsen Riyahi),https://t.me/s/Exciton_missile_program,telegram,en,military,owner trust=2. DISPUTED - single-author channel at tier 2 can satisfy the 2-independent-source test alone. Recommend 3
+tg_geopolitics_prime,Geopolitics Prime,https://t.me/s/geopolitics_prime,telegram,en,military,owner trust=lead (DOWNGRADED from earlier candidate status). CI-OK 17 posts r2
+tg_minas_tirith,Minas Tirith 2024,https://t.me/s/Minas_Tirith2024,telegram,en,military,owner trust=3
+tg_behold_israel,Behold Israel (Amir Tsarfati),https://t.me/s/beholdisraelchannel,telegram,en,israel,owner trust=3. DISPUTED - evangelical prophecy commentary not OSINT; systematic framing bias. Recommend lead or cut
+tg_tweet_mardomi,Tweet Mardomi,https://t.me/s/tweetmardomi,telegram,fa,iran_politics,owner trust=lead. Crowd-sourced repost aggregator
+tg_rnintel,Rerum Novarum Intel,https://t.me/s/rnintel,telegram,en,military,owner trust=2. DISPUTED - anonymous OSINT channel; recommend 3
+tg_mes,Middle East Spectator,https://t.me/s/Middle_East_Spectator,telegram,en,military,owner trust=3
+tg_vahid_online,VahidOnline,https://t.me/s/VahidOnline,telegram,fa,iran_politics,owner trust=lead
+tg_esellco,Esellco (اقتصاد و تجارت),https://t.me/s/esellco,telegram,fa,macro,owner trust=lead (owner: surfaced real leads). Economy/commerce; lead class only
+tg_parvaz_capital,Parvaz Capital (گروه پرواز),https://t.me/s/parvaz_capital,telegram,fa,macro,owner trust=lead (owner: surfaced real leads). Macro/trading; lead class only
+tg_vira_university,Vira University (ویرا),https://t.me/s/virauniversitycom,telegram,fa,other,owner trust=lead (owner: surfaced real leads). Off-core-topic; lead class only
+tg_defenderdome,DefenderDome (OSINTdefender mirror),https://t.me/s/DefenderDome,telegram,en,military,owner trust=3. Replaces the uncollectable @sentdefender Twitter account
+osint613_a,OSINT 613 site (feed),https://osint613.com/feed,rss,en,military,owner trust=3. Replaces the uncollectable @Osint613 Twitter account. URL is a GUESS - probe decides
+osint613_b,OSINT 613 site (rss),https://osint613.com/rss,rss,en,military,variant b of osint613 - probe only one of a/b/c survives
+osint613_c,OSINT 613 site (feed.xml),https://osint613.com/feed.xml,rss,en,military,variant c of osint613
+tg_militarywave,Military Wave,https://t.me/s/militarywave,telegram,en,military,pre-existing candidate. CI-OK 20 posts r2. Owner has not set trust
+tg_geopwatch,Geopolitics Watch,https://t.me/s/GeoPWatch,telegram,en,military,pre-existing candidate. CI-OK 19 posts r2. Owner has not set trust
