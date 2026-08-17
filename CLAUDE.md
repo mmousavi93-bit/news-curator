@@ -592,11 +592,14 @@ clickbait, never fearmongering. Alert level modulates urgency, not volume. Promp
 - [ ] **`tools/check_feeds.py` is 217 lines, over the ~200 cap in constraint 12.** Overage
       is comment, and it is a dev tool not pipeline code. Owner to decide: trim comments,
       split the fetch layer into `tools/_fetch.py`, or grant an explicit exception.
-- [ ] **Untracked strays to delete or commit:** `sources_probe_ci.csv` and
-      `sources_probe_ci2.csv` in the **repo root** (artifact downloads landed outside
-      `config/`), and `config/sources_probe_sandboxnet.csv` (a sandbox run where every
-      host was proxy-blocked — no signal, delete it). The agent VM cannot unlink files
-      in the mounted folder; owner must remove them on Windows.
+- [x] **Untracked strays — already gone, item was stale.** Checked 2026-08-17: no CSV in the
+      repo root, no `config/sources_probe_sandboxnet.csv`. All 12 probe CSVs are in `config/`.
+- [x] **The agent VM CAN delete files in the mounted folder** — it needs delete permission
+      granted once per folder, which was done 2026-08-17. The earlier "cannot unlink" note was
+      wrong. Relevant because `git commit` from the VM leaves stale `.git/index.lock`,
+      `.git/HEAD.lock` and `.git/objects/maintenance.lock` behind, and a stale `index.lock`
+      is what silently ate probe round ci3. Clear them after any VM-side commit and confirm
+      with `git status -sb` before trusting the result.
 - [x] Owner installed `requests` on Windows 2026-08-13. Offline guarantee is now asserted by
       `tests/integration/test_no_requests.py`, not by the package being absent.
 - [ ] Owner to create accounts per `SETUP_ACCOUNTS.md` and supply secrets.
