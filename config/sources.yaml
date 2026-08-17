@@ -1,0 +1,462 @@
+# sources.yaml -- THE one file you edit to add or remove a feed.
+#
+# GENERATED 2026-08-17 from the merged probe verdicts (r4 + tg1 + r5). Every url here
+# was answered 200 with parseable items by a GitHub US runner -- the same network the
+# pipeline runs on. Do not hand-edit a url without re-probing it.
+#
+# 51 sources staged, 10 ENABLED. Phase 3 is the THIN SLICE: ARCHITECTURE.md gates it at
+# "10 sources, 200 real items", and Phase 8 is "widen sources". The other 41 are staged
+# with enabled: false so Phase 8 is flipping flags, not redoing five rounds of probing.
+#
+# The 10 enabled deliberately span every axis the collectors must handle: rss + telegram,
+# en/fa/ar/he, and tier 1/2/3/lead. Two are included BECAUSE they are known-broken:
+# ynet_he (probe returns no date -- DATE_RE does not match Ynet's format) and the two
+# telegram feeds (t.me/s/ has no pubDate at all; times live in <time datetime=...>).
+# Phase 3 must fix both or the 30-minute near-duplicate window cannot work.
+#
+# CUT 2026-08-17, owner-approved: seeking_alpha, cnbc, oilprice, npr, wotr. Market colour
+# and commentary, not event detection. See config/source_prune_sheet.csv.
+#
+# ---------------------------------------------------------------------------
+# THE JOIN RULE -- read this before typing anything.
+#
+#   `id` here MUST match a key under `sources:` in config/credibility.yaml.
+#
+# That is the only link between "where do I fetch" (this file) and "how much do
+# I trust it" (credibility.yaml). A typo does not error -- it silently falls
+# through to credibility.yaml `defaults:` (tier 3, own group), which means a
+# Reuters wire report gets scored as an anonymous OSINT channel. Every id you
+# write here must already exist there, or you add it there in the same edit.
+# ---------------------------------------------------------------------------
+
+
+version: 1
+
+sources:
+
+  # ======== ENABLED: Phase 3 thin slice (10 sources, ~328 items/sweep) ========
+
+  - id: ajar
+    name: Al Jazeera Arabic
+    url: https://www.aljazeera.net/aljazeerarss/a7c186be-1baa-4bd4-9d80-a84db769f779/73d0e1b4-532f-45ef-b135-bfdff8b8cab9
+    type: rss
+    lang: ar
+    topic: regional
+    enabled: true
+
+  - id: bbc_en_me
+    name: BBC Middle East
+    url: https://feeds.bbci.co.uk/news/world/middle_east/rss.xml
+    type: rss
+    lang: en
+    topic: regional
+    enabled: true
+
+  - id: bbc_persian
+    name: BBC Persian
+    url: https://feeds.bbci.co.uk/persian/rss.xml
+    type: rss
+    lang: fa
+    topic: iran_domestic
+    enabled: true
+
+  - id: irna
+    name: IRNA English
+    url: https://en.irna.ir/rss
+    type: rss
+    lang: en
+    topic: iran_domestic
+    enabled: true
+
+  - id: state_dept_travel
+    name: State Dept Travel Advisories
+    url: https://travel.state.gov/_res/rss/TAsTWs.xml
+    type: rss
+    lang: en
+    topic: regional
+    enabled: true
+    max_items: 30
+    # TOPIC-GATE at Phase 6: 87 items/sweep, general-interest feed
+
+  - id: tg_militarywave
+    name: Military Wave
+    url: https://t.me/s/militarywave
+    type: telegram
+    lang: en
+    topic: military
+    enabled: true
+
+  - id: tg_padeshah_fxn
+    name: Padeshah FXN (king/پادشاه)
+    url: https://t.me/s/Padeshah_FXN
+    type: telegram
+    lang: fa
+    topic: iran_domestic
+    enabled: true
+
+  - id: tg_ukmto_mirror
+    name: UKMTO mirror (unofficial)
+    url: https://t.me/s/UK_MTO_TM
+    type: telegram
+    lang: en
+    topic: military
+    enabled: true
+
+  - id: the_war_zone
+    name: The War Zone
+    url: https://www.twz.com/feed
+    type: rss
+    lang: en
+    topic: military
+    enabled: true
+
+  - id: ynet_he
+    name: Ynet Hebrew
+    url: https://www.ynet.co.il/Integration/StoryRss2.xml
+    type: rss
+    lang: he
+    topic: regional
+    enabled: true
+
+
+  # ======== STAGED, enabled: false -- turn on at Phase 8 ========
+
+  - id: aawsat
+    name: Asharq Al-Awsat
+    url: https://aawsat.com/feed
+    type: rss
+    lang: ar
+    topic: regional
+    enabled: false
+    # TOPIC-GATE at Phase 6: 300 items/sweep, general-interest feed
+
+  - id: al_jazeera
+    name: Al Jazeera All
+    url: https://www.aljazeera.com/xml/rss/all.xml
+    type: rss
+    lang: en
+    topic: regional
+    enabled: false
+
+  - id: al_manar
+    name: Al Manar
+    url: https://almanar.com.lb/rss
+    type: rss
+    lang: ar
+    topic: regional
+    enabled: false
+
+  - id: al_monitor
+    name: Al-Monitor General
+    url: https://www.al-monitor.com/rss
+    type: rss
+    lang: en
+    topic: regional
+    enabled: false
+
+  - id: ap_gnews
+    name: AP via Google News
+    url: https://news.google.com/rss/search?q=Iran+site%3Aapnews.com&hl=en-US&gl=US&ceid=US%3Aen
+    type: rss
+    lang: en
+    topic: regional
+    enabled: false
+    # TOPIC-GATE at Phase 6: 100 items/sweep, general-interest feed
+
+  - id: aviationist
+    name: The Aviationist
+    url: https://theaviationist.com/feed/
+    type: rss
+    lang: en
+    topic: military
+    enabled: false
+
+  - id: bbc_en
+    name: BBC World News
+    url: https://feeds.bbci.co.uk/news/world/rss.xml
+    type: rss
+    lang: en
+    topic: regional
+    enabled: false
+
+  - id: dw
+    name: DW English
+    url: https://rss.dw.com/rdf/rss-en-all
+    type: rss
+    lang: en
+    topic: regional
+    enabled: false
+    # TOPIC-GATE at Phase 6: 137 items/sweep, general-interest feed
+
+  - id: france24
+    name: France24 Middle East
+    url: https://www.france24.com/en/middle-east/rss
+    type: rss
+    lang: en
+    topic: regional
+    enabled: false
+    # TOPIC-GATE at Phase 6: 29 items/sweep, general-interest feed
+
+  - id: haaretz
+    name: Haaretz English
+    url: https://www.haaretz.com/srv/israel-news-rss
+    type: rss
+    lang: en
+    topic: regional
+    enabled: false
+
+  - id: iran_international
+    name: Iran International
+    url: https://www.iranintl.com/en/feed
+    type: rss
+    lang: en
+    topic: iran_domestic
+    enabled: false
+
+  - id: maariv
+    name: Maariv breaking news
+    url: https://www.maariv.co.il/Rss/RssFeedsMivzakiChadashot
+    type: rss
+    lang: he
+    topic: regional
+    enabled: false
+
+  - id: mee
+    name: Middle East Eye
+    # CHANGED http -> https 2026-08-17, UNVERIFIED. All four probe rounds carried the
+    # plaintext url unnoticed. Plaintext transport means any hop can inject arbitrary
+    # content into a feed whose body is fed to an LLM -- see ARCHITECTURE.md on scraped
+    # content as untrusted input. This is the one source where the transport itself is
+    # unauthenticated. Failing to https is the safe direction: if the host does not
+    # serve it, the feed errors loudly at Phase 8 instead of silently carrying the
+    # vector into production. MUST be confirmed by a probe before enabling.
+    url: https://www.middleeasteye.net/rss
+    type: rss
+    lang: en
+    topic: regional
+    enabled: false
+
+  - id: mehr
+    name: Mehr News Agency
+    url: https://en.mehrnews.com/rss
+    type: rss
+    lang: en
+    topic: iran_domestic
+    enabled: false
+
+  - id: naval_news
+    name: Naval News
+    url: https://www.navalnews.com/feed/
+    type: rss
+    lang: en
+    topic: military
+    enabled: false
+
+  - id: osint613_a
+    name: OSINT 613 site (feed)
+    url: https://osint613.com/feed
+    type: rss
+    lang: en
+    topic: military
+    enabled: false
+
+  - id: reuters_gnews
+    name: Reuters via Google News
+    url: https://news.google.com/rss/search?q=Iran+site%3Areuters.com&hl=en-US&gl=US&ceid=US%3Aen
+    type: rss
+    lang: en
+    topic: regional
+    enabled: false
+    # TOPIC-GATE at Phase 6: 100 items/sweep, general-interest feed
+
+  - id: sky_news_arabia
+    name: Sky News Arabia
+    url: https://www.skynewsarabia.com/rss
+    type: rss
+    lang: ar
+    topic: regional
+    enabled: false
+
+  - id: tehran_times
+    name: Tehran Times
+    url: https://www.tehrantimes.com/rss
+    type: rss
+    lang: en
+    topic: iran_domestic
+    enabled: false
+
+  - id: tg_behold_israel
+    name: Behold Israel (Amir Tsarfati)
+    url: https://t.me/s/beholdisraelchannel
+    type: telegram
+    lang: en
+    topic: military
+    enabled: false
+
+  - id: tg_defenderdome
+    name: DefenderDome (OSINTdefender mirror)
+    url: https://t.me/s/DefenderDome
+    type: telegram
+    lang: en
+    topic: military
+    enabled: false
+
+  - id: tg_esellco
+    name: Esellco (اقتصاد و تجارت)
+    url: https://t.me/s/esellco
+    type: telegram
+    lang: fa
+    topic: macro
+    enabled: false
+
+  - id: tg_exciton_missile
+    name: Exciton Missile Program (Mohsen Riyahi)
+    url: https://t.me/s/Exciton_missile_program
+    type: telegram
+    lang: en
+    topic: military
+    enabled: false
+
+  - id: tg_fighter_radar
+    name: Fighter Radar (فایتر رادار)
+    url: https://t.me/s/fighter_radar
+    type: telegram
+    lang: fa
+    topic: military
+    enabled: false
+
+  - id: tg_geopolitics_prime
+    name: Geopolitics Prime
+    url: https://t.me/s/geopolitics_prime
+    type: telegram
+    lang: en
+    topic: military
+    enabled: false
+
+  - id: tg_geopwatch
+    name: Geopolitics Watch
+    url: https://t.me/s/GeoPWatch
+    type: telegram
+    lang: en
+    topic: military
+    enabled: false
+
+  - id: tg_irane_azad_news
+    name: Irane Azad News (اخبار ایران آزاد)
+    url: https://t.me/s/IraneAzad_News
+    type: telegram
+    lang: fa
+    topic: iran_domestic
+    enabled: false
+
+  - id: tg_iranian_militarism
+    name: Iranian Militarism
+    url: https://t.me/s/Iranian_Militarism
+    type: telegram
+    lang: en
+    topic: military
+    enabled: false
+
+  - id: tg_mes
+    name: Middle East Spectator
+    url: https://t.me/s/Middle_East_Spectator
+    type: telegram
+    lang: en
+    topic: military
+    enabled: false
+
+  - id: tg_minas_tirith
+    name: Minas Tirith 2024
+    url: https://t.me/s/Minas_Tirith2024
+    type: telegram
+    lang: en
+    topic: military
+    enabled: false
+
+  - id: tg_mornovosti
+    name: Mornovosti (maritime news)
+    url: https://t.me/s/mornovosti
+    type: telegram
+    lang: ru
+    topic: military
+    enabled: false
+
+  - id: tg_rnintel
+    name: Rerum Novarum Intel
+    url: https://t.me/s/rnintel
+    type: telegram
+    lang: en
+    topic: military
+    enabled: false
+
+  - id: tg_tabzlive
+    name: Tabzlive
+    url: https://t.me/s/tabzlive
+    type: telegram
+    lang: en
+    topic: military
+    enabled: false
+
+  - id: tg_tanker_trackers
+    name: TankerTrackers
+    url: https://t.me/s/TankerTrackers
+    type: telegram
+    lang: en
+    topic: military
+    enabled: false
+
+  - id: tg_tweet_mardomi
+    name: Tweet Mardomi
+    url: https://t.me/s/tweetmardomi
+    type: telegram
+    lang: fa
+    topic: iran_domestic
+    enabled: false
+
+  - id: tg_vahid_online
+    name: VahidOnline
+    url: https://t.me/s/VahidOnline
+    type: telegram
+    lang: fa
+    topic: iran_domestic
+    enabled: false
+
+  - id: tg_vira_university
+    name: Vira University (ویرا)
+    url: https://t.me/s/virauniversitycom
+    type: telegram
+    lang: fa
+    topic: iran_domestic
+    enabled: false
+
+  - id: tg_wfwitness
+    name: Warfront Witness
+    url: https://t.me/s/wfwitness
+    type: telegram
+    lang: en
+    topic: military
+    enabled: false
+
+  - id: tg_world_newsly
+    name: World Newsly (اخبار نظامی ایران و جهان)
+    url: https://t.me/s/World_Newsly
+    type: telegram
+    lang: fa
+    topic: military
+    enabled: false
+
+  - id: walla
+    name: Walla News
+    url: https://rss.walla.co.il/feed/1?type=main
+    type: rss
+    lang: he
+    topic: regional
+    enabled: false
+
+  - id: ynet
+    name: Ynet News
+    url: https://www.ynetnews.com/Integration/StoryRss3082.xml
+    type: rss
+    lang: en
+    topic: regional
+    enabled: false

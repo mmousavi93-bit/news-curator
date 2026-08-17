@@ -1,0 +1,57 @@
+my_call,id,name,tier,group,items,probe,why
+PREFILTER,aawsat,Asharq Al-Awsat,2,saudi_press,300,USE_CAVEAT,"300 items, 15% of the whole corpus, general pan-Arab daily. KEEP for Gulf counterweight but it MUST be topic-gated before embed."
+PREFILTER,dw,DW English,2,dw,137,USE,"137 items, general German world service. Topic-gate."
+PREFILTER,ap_gnews,AP via Google News,2,wire_west,100,USE_CAVEAT,"100 items, same proxy caveat as reuters_gnews."
+PREFILTER,reuters_gnews,Reuters via Google News,2,wire_west,100,USE_CAVEAT,"100 items via Google News proxy, snippet-only bodies. Gate + decide at Phase 6 whether snippets cluster."
+CUT,wotr,War on the Rocks,2,wotr,100,USE,"War on the Rocks - 100 items of analysis, zero event detection. Comments on reports rather than witnessing. Read it as a human, do not feed it to a curator."
+PREFILTER,state_dept_travel,State Dept Travel Advisories,1,us_govt,87,USE,"87 items, mostly irrelevant countries. Gate to the region."
+KEEP,osint613_a,OSINT 613 site (feed),3,osint613,70,USE,
+KEEP,sky_news_arabia,Sky News Arabia,2,sky_news_arabia,66,USE,
+KEEP,iran_international,Iran International,2,iran_intl,50,USE,
+KEEP,bbc_en_me,BBC Middle East,2,bbc,44,USE,
+KEEP,bbc_en,BBC World News,2,bbc,30,USE,
+CUT,cnbc,CNBC World,2,cnbc,30,USE,US business TV. Iran coverage is derivative of wires you already have.
+KEEP,irna,IRNA English,2,iran_state,30,USE,
+KEEP,mehr,Mehr News Agency,2,iran_state,30,USE,
+CUT,seeking_alpha,Seeking Alpha,3,seeking_alpha,30,USE,"Contributor stock commentary. Not news, not events. Tier 3 market colour the curator does not need."
+KEEP,tehran_times,Tehran Times,2,iran_state,30,USE,
+KEEP,walla,Walla News,2,israeli_press,30,USE,
+KEEP,ynet,Ynet News,2,israeli_press,30,USE,
+KEEP,ynet_he,Ynet Hebrew,2,israeli_press,30,USE,
+KEEP,bbc_persian,BBC Persian,2,bbc,29,USE,
+PREFILTER,france24,France24 Middle East,2,france24,29,USE,General world service. Topic-gate.
+KEEP,ajar,Al Jazeera Arabic,2,al_jazeera,25,USE,
+KEEP,al_jazeera,Al Jazeera All,2,al_jazeera,25,USE,
+KEEP,the_war_zone,The War Zone,2,naval_trade,23,USE,
+KEEP,al_monitor,Al-Monitor General,2,al_monitor,20,USE,
+KEEP,haaretz,Haaretz English,2,israeli_press,20,USE,
+KEEP,maariv,Maariv breaking news,2,israeli_press,20,USE,
+KEEP,mee,Middle East Eye,2,mee,20,USE,
+KEEP,tg_irane_azad_news,Irane Azad News (اخبار ایران آزاد),lead,ncri,20,USE,
+KEEP,tg_mes,Middle East Spectator,3,(null-see-open-question),20,USE,
+KEEP,tg_militarywave,Military Wave,3,(null-see-open-question),20,USE,
+KEEP,tg_padeshah_fxn,Padeshah FXN (king/پادشاه),lead,(null-see-open-question),20,USE,
+KEEP,tg_ukmto_mirror,UKMTO mirror (unofficial),3,ukmto,20,USE,
+KEEP,tg_vira_university,Vira University (ویرا),lead,(null-see-open-question),20,USE,
+KEEP,tg_wfwitness,Warfront Witness,3,(null-see-open-question),20,USE,
+KEEP,tg_world_newsly,World Newsly (اخبار نظامی ایران و جهان),3,(null-see-open-question),20,USE,
+KEEP,tg_tweet_mardomi,Tweet Mardomi,lead,osint_repost,19,USE,
+KEEP,tg_behold_israel,Behold Israel (Amir Tsarfati),lead,(null-see-open-question),18,USE,
+KEEP,tg_fighter_radar,Fighter Radar (فایتر رادار),3,(null-see-open-question),18,USE,
+KEEP,tg_tabzlive,Tabzlive,3,(null-see-open-question),18,USE,
+KEEP,tg_defenderdome,DefenderDome (OSINTdefender mirror),3,osint_defender,17,USE,
+KEEP,tg_geopwatch,Geopolitics Watch,3,(null-see-open-question),17,USE,
+KEEP,tg_minas_tirith,Minas Tirith 2024,3,(null-see-open-question),17,USE,
+KEEP,tg_rnintel,Rerum Novarum Intel,3,(null-see-open-question),17,USE,
+KEEP,tg_tanker_trackers,TankerTrackers,3,osint_maritime,17,USE,
+KEEP,aviationist,The Aviationist,2,naval_trade,15,USE,
+CUT,oilprice,OilPrice Main,3,oilprice,15,USE,"Trade press, thin sourcing. Oil PRICE is already covered by stooq market series - you need the number, not the commentary."
+KEEP,tg_exciton_missile,Exciton Missile Program (Mohsen Riyahi),3,(null-see-open-question),15,USE,
+KEEP,tg_mornovosti,Mornovosti (maritime news),3,osint_maritime,14,USE,
+KEEP,tg_esellco,Esellco (اقتصاد و تجارت),lead,(null-see-open-question),13,USE,
+KEEP,tg_iranian_militarism,Iranian Militarism,3,(null-see-open-question),12,USE,
+KEEP,al_manar,Al Manar,3,al_manar,10,USE,
+KEEP,naval_news,Naval News,2,naval_trade,10,USE,
+CUT,npr,NPR Middle East,2,npr,10,USE,"Rewrites wire copy on Middle East. Adds volume, not independence."
+KEEP,tg_geopolitics_prime,Geopolitics Prime,lead,(null-see-open-question),10,USE,
+KEEP,tg_vahid_online,VahidOnline,lead,(null-see-open-question),7,USE,

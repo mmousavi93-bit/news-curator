@@ -142,7 +142,8 @@ clickbait, never fearmongering. Alert level modulates urgency, not volume. Promp
 |---|---|
 | `ARCHITECTURE.md` | Full design, diagrams, free-tier analysis, failure modes, phases. Source of truth. |
 | `SETUP_ACCOUNTS.md` | Owner-facing signup walkthrough for every external service. |
-| `config/sources.yaml` | The one file the owner edits to add a feed. |
+| `config/sources.yaml` | The one file the owner edits to add a feed. **Written 2026-08-17: 51 staged, 10 enabled.** Generated from probe verdicts — do not hand-edit a url without re-probing. |
+| `config/source_prune_sheet.csv` | All 56 usable sources with tier, group, items/sweep and a keep/prefilter/cut call. Basis for session-5 decision 2. |
 | `config/settings.yaml` | Thresholds, schedules, feature flags. |
 | `config/credibility.yaml` | Source → credibility tier. Drives confidence scoring. |
 | `config/risk_weights.yaml` | Signal → indicator weight matrix. Drives risk scoring. |
@@ -275,6 +276,44 @@ clickbait, never fearmongering. Alert level modulates urgency, not volume. Promp
   Loop: brief → build → attack → gate review → commit → discard Implementer context.
   Estimated one-time build cost ~$50 at these tiers; cost is driven by context reuse, not
   model tier.
+
+## Session 5 decisions (2026-08-17) — owner-confirmed, these override earlier text
+
+1. **Volume control = enforced hard cap + topic prefilter. NOT source pruning.** An earlier
+   line in this file said "56 feeds cannot fit the ≤40-cluster LLM budget without pruning"
+   and told the owner to cut to ~20–25. **That framing was wrong and is withdrawn.**
+   Embedding is *local* (MiniLM on CPU, ARCHITECTURE.md line 238) — zero API cost, no rate
+   limit — so raw item volume costs nothing at the embed stage. The chain that actually
+   binds is narrower: more items → more distinct stories → more clusters → **one Gemini
+   call per cluster**. The funnel assumes 800 raw → 120 unseen → ~25 clusters → 25 calls;
+   at 1,984 raw it is ~300 unseen and plausibly 40–60 clusters, i.e. ~55–75 calls/run
+   against a hard cap of 40.
+   **The real defect: constraint 2's ~40 calls/run is an estimate in prose, enforced by no
+   code.** Same class as constraint 15, which already demanded a hard counter for metered
+   providers. Pruning does not fix it — it makes the overrun rarer, which is worse, because
+   a fault that only fires on the busiest news day is discovered unattended during exactly
+   the event this system exists for. Phase 6 must enforce a cluster/call cap that truncates
+   by priority, and topic-gate the six feeds marked `TOPIC-GATE` in `sources.yaml`
+   (`aawsat` 300, `dw` 137, `reuters_gnews` 100, `ap_gnews` 100, `state_dept_travel` 87,
+   `france24` 29 — 753 items, 37% of the corpus, reduced reversibly instead of deleted).
+2. **5 sources cut, owner-approved: `seeking_alpha`, `cnbc`, `oilprice`, `npr`, `wotr`.**
+   Off-mission rather than merely noisy — market colour and commentary, not event detection.
+   `oilprice` is redundant because the oil *number* comes from stooq; `wotr` is 100 items
+   that comment on reports rather than witnessing anything. 185 items removed, zero unique
+   regional or language coverage lost. Rationale per source in
+   `config/source_prune_sheet.csv`. 56 usable → **51 in `sources.yaml`**.
+3. **`mee` was plaintext `http://` through all four probe rounds.** Changed to `https://`
+   **unverified** — it is `enabled: false` and must be probed before Phase 8 enables it.
+   Matters because plaintext transport lets any network hop inject content into a body that
+   is fed to an LLM, and this was the only source whose transport was unauthenticated.
+   Failing to https is the safe direction: a wrong scheme errors loudly at Phase 8 instead
+   of carrying the vector into production. `sources.yaml` now asserts the scheme.
+4. **The probe UA and the collector UA do not match — this will burn Phase 3 if missed.**
+   All 51 urls were verified with the full browser UA in `tools/check_feeds.py` line 48,
+   after the `Mozilla/5.0 (compatible; …)` crawler form was found to draw Cloudflare 403s.
+   `config/settings.yaml` line 47 still sends
+   `user_agent: "news-curator/1.0 (personal research agent)"`. **A source that answered 200
+   to the probe may 403 the collector.** Align settings.yaml to the probe UA in Phase 3.
 
 ## Session 3 decisions (2026-08-12) — owner-confirmed, these override earlier text
 
@@ -565,13 +604,21 @@ clickbait, never fearmongering. Alert level modulates urgency, not volume. Promp
       not compiled" items — the list is oversupplied, not missing.
 - [x] `credibility.yaml` backfilled for round-2 and r5 ids. 60 entries, validated through
       `agent.config.load_all` 2026-08-17.
-- [ ] **NEXT ACTION (2026-08-17) — Phase 3, and prune on the way in.** Two items only:
-      (a) **owner prunes 56 → ~20–25 and decides the volume question.** This is now a cost
-      decision, not a coverage decision: 56 feeds cannot fit the ≤40-cluster LLM budget
-      without either pruning or a topic prefilter. `aawsat` (300 items) is the worst offender
-      and must be prefiltered or dropped. Only the owner can make the topic-taste call.
-      (b) write `config/sources.yaml` from `sources.yaml.example`, then
-      `agents/briefs/PHASE_3_BRIEF.md`.
+- [x] **`config/sources.yaml` WRITTEN 2026-08-17. 51 sources staged, 10 enabled.**
+      Generated from the merged probe verdicts, not hand-typed. Validated: join rule holds
+      (every id exists in `credibility.yaml`), all urls https, telegram urls all `/s/` form,
+      no `signals_covered`. The thin slice deliberately spans every axis the collectors must
+      handle — rss + telegram, en/fa/ar/he, tier 1/2/3/lead — and includes two known-broken
+      sources on purpose (`ynet_he` for the `DATE_RE` miss, two telegram feeds for the
+      missing `pubDate`) so Phase 3 is forced to fix them:
+      `state_dept_travel`(1,en) `bbc_en_me`(2,en) `irna`(2,en) `bbc_persian`(2,fa)
+      `ajar`(2,ar) `ynet_he`(2,he) `the_war_zone`(2,en) `tg_militarywave`(3,en)
+      `tg_ukmto_mirror`(3,en) `tg_padeshah_fxn`(lead,fa) — ~328 items/sweep, clears the
+      200-item gate. **Do not enable more before Phase 8.**
+- [x] **`agents/briefs/PHASE_3_BRIEF.md` written 2026-08-17.** Ready for an Implementer.
+- [ ] **NEXT ACTION — build Phase 3 from the brief.** Collectors only. Gate is owner-run on
+      Windows plus a `--collect-only` CI run; the owner's Iran network cannot verify most of
+      these feeds and would give a false verdict.
 - [ ] **Owner decision — the `group: null` contradiction** (session-5 facts, last bullet).
       Inert today, live the moment any owner-channel goes tier 2. Three options on record.
 - [ ] **Make the credibility join a test, not a habit.** The 13-missing-entry defect was
