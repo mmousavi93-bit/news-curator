@@ -315,6 +315,80 @@ clickbait, never fearmongering. Alert level modulates urgency, not volume. Promp
    `user_agent: "news-curator/1.0 (personal research agent)"`. **A source that answered 200
    to the probe may 403 the collector.** Align settings.yaml to the probe UA in Phase 3.
 
+## Session 6 (2026-08-18) — Fable review of the committed state and the Phase 3 brief
+
+Two independent Fable verifiers, one on the committed config, one on the forward plan.
+
+**State: clean. All 10 attacked claims VERIFIED, 0 CRITICAL, 0 new MAJOR.** 73 credibility
+entries, tier dist 1:9/2:34/3:22/lead:8, 0 duplicate YAML keys; the sources→credibility
+join is empty-diff across all 51; 51 staged / 10 enabled with real bools; 0 non-https urls;
+all 23 telegram urls in `/s/` form; the enabled-10 matrix does span rss+telegram, en/fa/ar/he
+and tier 1/2/3/lead; 328 items/sweep recomputed exactly. Independent checks it added and
+passed: duplicate-url scan, duplicate-channel-under-different-id scan, same-host-different-
+group scan, and a group-name near-duplicate scan across all 35 group values (no
+`israel_press` vs `israeli_press` typo class). 22 credibility ids have no sources.yaml row
+— safe by construction, an id nothing collects cannot fire.
+**Upgraded in urgency, not severity: `tg_militarywave` is `group: null` AND in the enabled
+10.** So the `group: null` contradiction is on the critical path, not hypothetical — it goes
+live with a source that is actually collecting the moment Phase 6/7 reads `group`.
+
+**Plan: 1 CRITICAL + 5 MAJOR in the brief. All fixed 2026-08-18. The brief was wrong, the
+config was not.**
+
+1. **CRITICAL — the gate's two clauses were mutually exclusive.** It demanded "≥200 items
+   across ≥8 of 10 sources", but `max_items_per_source: 20` × 9 + `state_dept_travel`'s
+   `max_items: 30` = a post-cap ceiling of **210**. Losing one source to ordinary flake
+   costs 20 → 190 → fails the floor, so the ≥8/10 tolerance could never fire. A *correct*
+   implementation fails on an average day, and the pressure resolves the worst way: raise
+   the cap to pass. Floor is now **160** (8×20). The ~328 figure is **pre-cap** and was
+   being quoted as a gate number in two files.
+2. **MAJOR — "non-null `published_at`" was passed by the exact bug the brief forbids.**
+   Stamping `datetime.now()` on every Ynet/telegram item satisfies it verbatim. Gate now
+   requires every timestamp to predate workflow start and rejects a source whose items all
+   share one identical timestamp.
+3. **MAJOR — nothing machine-checked the gate.** `run_send_test` deliberately always exits
+   0; an inherited pattern turns a red result into a green tick, and a count table a
+   non-developer eyeballs is not a gate. The workflow must assert and exit non-zero.
+4. **MAJOR — the gate was unrunnable from the deliverables.** `run.py` parses only
+   `--dry-run`/`--send-test` (lines 64–65) and there is no collect workflow, yet the gate
+   required `--collect-only` from `workflow_dispatch`. The file table omitted `run.py`, the
+   workflow, and the `settings.yaml` UA edit req 2 itself demands — i.e. collectors nothing
+   invokes. Added.
+5. **MAJOR — `respect_robots_txt: true` (settings.yaml:46, schema-enforced at
+   settings_schema.py:28) is live config the brief never mentioned.** No probe round ever
+   fetched a robots.txt, so five rounds of verdicts are silent on it, and it is incoherent
+   with req 2's deliberate browser UA. Now a BLOCKING owner decision in the brief, §2b.
+   **This was the highest-risk item and it was on no list anywhere.**
+6. **MAJOR — the telegram forward-from header is destroyed by "strip HTML to text" and is
+   unrecoverable.** It is the only fetch-time-only datum in the phase: `t.me/s/` shows ~20
+   posts, so once a post scrolls off, re-fetching cannot get it back. LEAD_HANDLING rev 2's
+   evidence-computed `G` depends on forward-from collapse; losing it forces the fallback to
+   config `group:` — the exact fabricated-signal path above. Fix costs no `Item` field:
+   preserve as a `"Forwarded from X: "` body prefix.
+
+Also specified because they were absent, each a build round: streamed 400 KB cap (not
+`resp.content`, which buffers first) plus a **wall** deadline (requests' timeout is
+between-bytes — one byte per 9s under a 10s timeout never fires, and per-host serialisation
+then queues every sibling behind it, ending at GitHub's 6h kill); explicit charset
+precedence (windows-1256 is live for Arabic; a wrong decode is silent mojibake into
+embeddings and prompts plus an unstable `raw_hash`); zero-parse distinguishable from empty
+(30 items, 0 parsed must not read as an empty feed — `degraded_after_empty_runs: 3` needs
+it); truncation by `published_at` desc (feeds are not reliably date-sorted, so "first 20 of
+87" can drop today's State Dept advisory); `raw_hash` over **raw bytes, pre-normalisation**
+(post-strip hashing means changing a strip rule invalidates every stored hash); and the
+join check explicitly covering `enabled: false` entries.
+
+Two false claims in the brief, corrected: the undeclared-gzip diagnosis for the three
+0-item feeds was a **hypothesis that ci4 falsified** (decode shipped in `29d116e`, all
+three still EMPTY, still `NEEDS_BODY_DUMP`) — a wrong first guess to hand an Implementer;
+and `ynet`/`ynet_he` are **different hosts** (`ynetnews.com` / `ynet.co.il`), so they are
+not a per-host serialisation case. `ARCHITECTURE.md` line 404 said the Phase 3 gate is
+"200 real items collected **locally**" — impossible from Iran, now corrected to the CI
+assertion.
+
+**Standing lesson: the config was verified by joins and held; the brief was verified by
+reading and did not.** Prose with numbers in it needs the same mechanical check as YAML.
+
 ## Session 3 decisions (2026-08-12) — owner-confirmed, these override earlier text
 
 1. **v1 scope = curator, not scorer.** Owner chose "curator now, scoring later". Ship
@@ -616,9 +690,21 @@ clickbait, never fearmongering. Alert level modulates urgency, not volume. Promp
       `tg_ukmto_mirror`(3,en) `tg_padeshah_fxn`(lead,fa) — ~328 items/sweep, clears the
       200-item gate. **Do not enable more before Phase 8.**
 - [x] **`agents/briefs/PHASE_3_BRIEF.md` written 2026-08-17.** Ready for an Implementer.
-- [ ] **NEXT ACTION — build Phase 3 from the brief.** Collectors only. Gate is owner-run on
-      Windows plus a `--collect-only` CI run; the owner's Iran network cannot verify most of
-      these feeds and would give a false verdict.
+- [ ] **BLOCKING BEFORE PHASE 3 CODE — owner to decide `respect_robots_txt`.**
+      `settings.yaml:46` says `true`, schema-enforced. No probe round ever fetched a
+      robots.txt, and honouring it would mean the five rounds of verdicts do not transfer
+      and is incoherent with the browser UA req 2 mandates. Three options written out in
+      `PHASE_3_BRIEF.md` §2b. Whichever is chosen, config and code must agree — leaving
+      `true` and ignoring it in code is rejected on a public repo.
+- [ ] **NEXT ACTION — build Phase 3 from the brief** (revised 2026-08-18 after the Fable
+      review: 1 CRITICAL + 5 MAJOR fixed). Collectors only. Gate is owner-run pytest on
+      Windows plus a `--collect-only` CI run asserting **≥160 post-cap items**; the owner's
+      Iran network cannot verify most of these feeds and would give a false verdict.
+      Deliverables now include `run.py --collect-only`, `.github/workflows/collect-test.yml`
+      and the `settings.yaml` UA edit — without them the gate cannot be run at all.
+- [ ] **Re-scope or close "owner to approve ARCHITECTURE.md".** Open since session 1 while
+      three phases were built against it. Stale bookkeeping at the top of the list masks
+      real blockers like the robots.txt one, which was on no list anywhere.
 - [ ] **Owner decision — the `group: null` contradiction** (session-5 facts, last bullet).
       Inert today, live the moment any owner-channel goes tier 2. Three options on record.
 - [ ] **Make the credibility join a test, not a habit.** The 13-missing-entry defect was

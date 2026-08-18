@@ -401,7 +401,7 @@ seen. So: prove the pipe end-to-end on 10 sources, then widen.
 |---|---|---|---|
 | 1 | Skeleton ✅ | folders, config loader, logging, CI, dry-run harness | tests green on empty pipeline |
 | 2 | Telegram out | bot, private-channel delivery, formatter, 4,096-char budgeting, retries | a real message arrives on your phone |
-| 3 | Collectors (thin) | RSS + web + `t.me/s/`, **10** sources only | 200 real items collected locally |
+| 3 | Collectors (thin) | RSS + web + `t.me/s/`, **10** sources only | ≥160 items post-cap from a **CI runner**, ≥8/10 sources, asserted by the workflow |
 | 4 | Storage | SQLite schema (incl. scheduled-event registry + market_metrics), hash dedup, retention, age encryption | state survives a simulated restart; the same story twice is sent once |
 | 5 | LLM router | Gemini + Groq + OpenRouter, backoff, circuit breaker, mock mode | passes with every provider force-failed |
 | 6 | Understand | embeddings, clustering, cluster summarisation, clickbait/irrelevance filter | ten articles about one event become one event |

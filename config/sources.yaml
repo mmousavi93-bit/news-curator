@@ -4,15 +4,19 @@
 # was answered 200 with parseable items by a GitHub US runner -- the same network the
 # pipeline runs on. Do not hand-edit a url without re-probing it.
 #
-# 51 sources staged, 10 ENABLED. Phase 3 is the THIN SLICE: ARCHITECTURE.md gates it at
-# "10 sources, 200 real items", and Phase 8 is "widen sources". The other 41 are staged
-# with enabled: false so Phase 8 is flipping flags, not redoing five rounds of probing.
+# 51 sources staged, 10 ENABLED. Phase 3 is the THIN SLICE; Phase 8 is "widen sources".
+# The other 41 are staged with enabled: false so Phase 8 is flipping flags, not redoing
+# five rounds of probing. The join check in Phase 3 covers all 51, disabled included.
 #
 # The 10 enabled deliberately span every axis the collectors must handle: rss + telegram,
-# en/fa/ar/he, and tier 1/2/3/lead. Two are included BECAUSE they are known-broken:
-# ynet_he (probe returns no date -- DATE_RE does not match Ynet's format) and the two
+# en/fa/ar/he, and tier 1/2/3/lead. Four are included BECAUSE they are known-broken:
+# ynet_he (probe returns no date -- DATE_RE does not match Ynet's format) and all THREE
 # telegram feeds (t.me/s/ has no pubDate at all; times live in <time datetime=...>).
 # Phase 3 must fix both or the 30-minute near-duplicate window cannot work.
+#
+# ITEM COUNTS BELOW AND IN THE PROBE CSVs ARE PRE-CAP. collection.max_items_per_source is
+# 20, so the 10 enabled sources yield a post-cap ceiling of 210, not the ~328 they return.
+# The Phase 3 gate floor is 160. Do not quote 328 as a gate number.
 #
 # CUT 2026-08-17, owner-approved: seeking_alpha, cnbc, oilprice, npr, wotr. Market colour
 # and commentary, not event detection. See config/source_prune_sheet.csv.

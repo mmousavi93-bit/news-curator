@@ -29,10 +29,21 @@ Three collectors behind one interface, plus a fetch layer they share.
 | `src/agent/collectors/rss.py` | RSS/Atom parsing → `Item` list |
 | `src/agent/collectors/telegram_web.py` | `t.me/s/<channel>` preview scraping → `Item` list |
 | `src/agent/collectors/registry.py` | reads `sources.yaml`, dispatches by `type`, aggregates |
+| `src/agent/run.py` | **edit** — add `--collect-only` and the per-source count table |
+| `config/settings.yaml` | **edit** — `collection.user_agent` aligned to the probe UA (req 2) |
+| `.github/workflows/collect-test.yml` | **new** — `workflow_dispatch` run of `--collect-only`, asserts the gate and exits non-zero on miss |
 | `tests/…` | one test module per collector, all against **saved fixtures** |
+
+The last three were missing from the first draft of this brief. Without them the phase
+delivers collectors that nothing invokes and a gate that cannot be run: `run.py` parses
+only `--dry-run` and `--send-test` today (lines 64–65).
 
 `Item` fields: `source_id`, `url`, `title`, `body`, `published_at` (aware UTC datetime or
 `None`), `lang`, `raw_hash`. Nothing else. Resist adding fields Phase 4 will need.
+
+`raw_hash` is over the **raw entry bytes, pre-normalisation** — not over the stripped
+text. Hashing post-strip means every future change to the strip rules silently changes
+every hash, which breaks Phase 4's dedup against already-stored rows.
 
 ## Requirements
 
@@ -48,6 +59,18 @@ So: on load, assert the id set difference is empty and **raise**, naming every o
 id. This is the same shape as the `signals_covered` coverage check that ships disabled
 until Phase 7 — but this one ships **enabled**. Add a test that a sources entry with an
 unknown id fails loudly rather than degrading.
+
+**Check all 51 entries, including `enabled: false` ones.** The natural code path in
+`registry.py` filters to `enabled: true` before doing anything, and checking only those is
+a defensible misreading of this requirement — so it is spelled out here. Enabled-only
+checking means a typo in any of the 41 staged entries survives until Phase 8's flag-flip,
+which the non-developer owner performs, possibly during exactly the news event the
+widening exists for, after which every unattended run crashes until someone edits YAML.
+All-51 keeps the two files in lockstep continuously and turns the same typo into a red
+suite today. The cost — an owner edit to a *disabled* entry can halt collection — is the
+right direction under constraint 14: loud beats silent. Both files validate green as of
+2026-08-17, so there is no migration cost to adopting this. Include a fixture with a bad
+id on a **disabled** entry.
 
 ### 2. Send the same headers the probe sent, or the verdicts do not transfer
 
@@ -65,11 +88,40 @@ is load-bearing and matched to the probe.
 Carry over the other two probe lessons, both already proven:
 - **Decode gzip you did not ask for.** Do *not* send `Accept-Encoding: gzip` (a truncated
   gzip stream cannot be decompressed), but *do* decode a body whose `Content-Encoding`
-  says gzip. Three feeds returned 200 with a feed content-type and zero items purely
-  because of this.
+  says gzip. Correct instruction, but **do not inherit the diagnosis**: undeclared gzip was
+  the *hypothesis* for three 200-with-zero-items feeds (radio_farda, rferl_iran,
+  safeairspace), the decode shipped in `29d116e`, and ci4 left all three still EMPTY. They
+  remain `NEEDS_BODY_DUMP`. So gzip is a real case to handle and a **wrong** first guess
+  when a feed returns 200 and no items.
 - **Serialise per host, parallelise across hosts.** Probing two paths on one host
   concurrently produced a self-inflicted 429. Several ids share a host — all three BBC
-  feeds, both Ynet feeds, every `t.me` channel.
+  feeds and every `t.me` channel. (Not the Ynet pair: `ynet` is `ynetnews.com`, `ynet_he`
+  is `ynet.co.il` — different hosts. An earlier draft of this brief said otherwise.)
+
+### 2b. BLOCKING DECISION — `respect_robots_txt`
+
+`config/settings.yaml` line 46 sets `respect_robots_txt: true` and
+`settings_schema.py` line 28 enforces it as a bool. **No probe round ever fetched a
+robots.txt**, so five rounds of verdicts are silent on whether honouring it changes
+anything, and the sandbox has no egress to find out.
+
+Do not decide this alone inside the code. The three positions:
+
+1. **Honour it.** Then the probe verdicts do not transfer — a source that answered 200
+   may still be disallowed — and it adds an unbudgeted per-host request with its own
+   403/timeout/missing-file modes. It is also incoherent with req 2, which deliberately
+   presents a full browser User-Agent: robots.txt governs crawlers, and req 2 already
+   declares this client is not one. Would likely require a sixth probe round, which
+   session 5 closed.
+2. **Set it `false`** with the justification written into the file: single-user personal
+   reader, ≤20 items per source, ≥3h interval, and the RSS endpoints are published for
+   machine consumption. Residual risk is a block, which surfaces as a 403 and is handled
+   exactly like the existing `CUT_BOT_BLOCKED` sources.
+3. **Leave `true` and ignore it in code.** Rejected. A config key that claims a behaviour
+   the code does not implement is worse than either real choice, and this is a public repo.
+
+Whichever the owner picks, `settings.yaml` and the code must agree, and the comment in
+`settings.yaml` must say which. Do not start coding `fetch.py` before this is answered.
 
 ### 3. Dates — two known-broken cases, both in the thin slice on purpose
 
@@ -84,12 +136,50 @@ Carry over the other two probe lessons, both already proven:
 substitute "now" for a missing date — that silently makes stale items look fresh, and
 staleness is how IranWire was correctly cut.
 
+### 3b. Preserve the Telegram forward-from attribution — it is destroyed otherwise
+
+This is the one piece of information that exists **only** at fetch time and cannot be
+recovered later. `analysis/LEAD_HANDLING.md` rev 2's load-bearing mechanism is
+evidence-computed independence: `G` = origins surviving near-duplicate collapse **and
+forward-from collapse**. That attribution lives only in the `t.me/s/` HTML, and the
+preview page shows roughly the last 20 posts — so by the time Phase 6 wants it, the post
+has scrolled off and re-fetching cannot get it back.
+
+Requirement 4 says strip HTML to text, which would delete it. So: the telegram collector
+**preserves the attribution as a text prefix on `body`** — `"Forwarded from <name>: "`.
+Text, not a new `Item` field, so the shape in §Deliverable stands.
+
+If this is lost, Phase 6 falls back to the config `group:` values — which is precisely the
+unresolved `group: null` path CLAUDE.md flags as a future fabricated-signal vector, and
+`tg_militarywave` (tier 3, `group: null`) is already in the enabled 10.
+
 ### 4. Untrusted input, from the first byte
 
 Feed bodies are hostile until proven otherwise and will eventually reach an LLM prompt.
-- Cap response size (the probe reads 400 KB; match or better) and cap items per source
-  via `max_items` / `collection.max_items_per_source`.
-- Strip HTML to text. Do not preserve tags, scripts, or comments.
+- **Cap bytes read from the wire, not bytes already in memory.** The probe reads 400 KB;
+  match or better. `resp.content` buffers the entire body before any cap can apply, so the
+  cap must be enforced on a streamed read.
+- **Add a per-request wall deadline.** `per_source_timeout_seconds: 10` maps to requests'
+  timeout, which is *between-bytes*, not wall-clock: a server dripping one byte every nine
+  seconds never times out, and per-host serialisation then queues every sibling feed behind
+  it. On an unattended job that ends at GitHub's 6-hour kill. Enforce a wall deadline per
+  request and a ceiling for the whole collect stage.
+- **Resolve charset explicitly.** Sources are fa / ar / he / ru. HTTP-header charset, the
+  XML prolog encoding, and the actual bytes disagree routinely on regional CMSes
+  (windows-1256 is live in the wild for Arabic). Fix and document the precedence order.
+  A wrong decode is silent mojibake into `body` — wrong data into embeddings and prompts,
+  an unstable `raw_hash`, and no error raised anywhere.
+- Cap items per source via `max_items` / `collection.max_items_per_source`. **Truncate by
+  `published_at` descending where dates exist, document order otherwise** — feeds in this
+  set are not reliably date-sorted (that is the IranWire `DATE_RE` caveat), so "first 20 of
+  87" can keep old State Dept advisories and drop today's.
+- **Distinguish zero-parse from empty.** A 200 response carrying 30 `<item>` elements of
+  which 0 parse must not look identical in the count table to a genuinely empty feed.
+  Report raw entries seen, items parsed, and items kept after the cap, separately per
+  source. `collection.degraded_after_empty_runs: 3` will need that distinction, and a
+  per-item parse failure should be skipped and counted, never abort the source.
+- Strip HTML to text. Do not preserve tags, scripts, or comments. One exception, §3b: the
+  Telegram forward-from attribution is kept as a body prefix.
 - No url in `sources.yaml` may be plaintext `http://`. `mee` was `http://` through all
   four probe rounds and was changed to `https://` **unverified** on 2026-08-17 — it is
   `enabled: false` and must be probed before Phase 8 turns it on. Assert the scheme.
@@ -117,9 +207,35 @@ Run by the **owner on Windows**, not by any agent:
 2. `python -m agent.run --dry-run` — still the single summary line, still zero network.
 3. A new `python -m agent.run --collect-only` against the 10 enabled sources, from a US
    runner via `workflow_dispatch` (the owner's network in Iran cannot reach most of these
-   and will produce a false verdict). Expect **≥200 items** across ≥8 of 10 sources,
-   with a per-source count table and non-null `published_at` on the telegram and Ynet
-   rows.
+   and will produce a false verdict).
+
+**The item floor is 160, not 200.** The first draft of this brief said "≥200 items across
+≥8 of 10 sources" and those two clauses are mutually exclusive under the cap this brief
+itself mandates. `max_items_per_source: 20` × 9 sources + `state_dept_travel`'s
+`max_items: 30` = a post-cap ceiling of **210**. Losing one source to ordinary flake costs
+20 and lands on 190, so the "≥8 of 10" tolerance could never be used without failing the
+item floor — and probe history shows single-source flake is routine (`centcom` OK→TIMEOUT
+between ci3 and ci4, `mee` EMPTY→OK). A correct implementation would fail this gate on an
+average day, and the pressure resolves in the worst possible direction: raise the cap to
+pass. The "~328 items/sweep" figure in `sources.yaml` is a **pre-cap** number and does not
+apply here.
+
+Pass conditions, all four:
+
+- **≥160 items post-cap** (8 × 20, consistent with the tolerance below).
+- **≥8 of 10 sources return >0 items**, and `ynet_he` plus all three telegram sources are
+  among them. A source missing from the table does not pass by absence.
+- **Every `published_at` predates the workflow start timestamp, and no source returns
+  items that all share one identical timestamp.** Without this the gate is passed by the
+  exact bug §3 forbids — stamping `datetime.now()` on every Ynet and telegram item
+  satisfies "non-null" perfectly.
+- **The workflow asserts these conditions itself and exits non-zero on a miss**, the same
+  pattern as `send-test.yml`, which greps its own log because `run_send_test` always exits
+  0. A table a non-developer owner has to eyeball is not a gate, and an inherited
+  always-exit-0 turns a red result into a green checkmark.
+
+Print both the raw-parsed and the post-cap count per source, so a cap doing the work is
+distinguishable from a feed doing it.
 
 ## Out of scope — do not build
 
