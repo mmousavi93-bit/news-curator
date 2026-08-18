@@ -690,12 +690,28 @@ reading and did not.** Prose with numbers in it needs the same mechanical check 
       `tg_ukmto_mirror`(3,en) `tg_padeshah_fxn`(lead,fa) — ~328 items/sweep, clears the
       200-item gate. **Do not enable more before Phase 8.**
 - [x] **`agents/briefs/PHASE_3_BRIEF.md` written 2026-08-17.** Ready for an Implementer.
-- [ ] **BLOCKING BEFORE PHASE 3 CODE — owner to decide `respect_robots_txt`.**
-      `settings.yaml:46` says `true`, schema-enforced. No probe round ever fetched a
-      robots.txt, and honouring it would mean the five rounds of verdicts do not transfer
-      and is incoherent with the browser UA req 2 mandates. Three options written out in
-      `PHASE_3_BRIEF.md` §2b. Whichever is chosen, config and code must agree — leaving
-      `true` and ignoring it in code is rejected on a public repo.
+- [x] **`respect_robots_txt` RESOLVED 2026-08-18 → `false`.** Owner delegated the call.
+      Reasoning is written into `settings.yaml` inline and summarised in
+      `PHASE_3_BRIEF.md` §2b; it is not "we ignore robots.txt", it is that this client is a
+      feed reader, not a crawler — fixed curated URL list, no link discovery, no traversal,
+      RSS endpoints published expressly for machine reading, and a browser UA that says so.
+      **The obligation moved rather than vanished, and the replacement is binding:** 20
+      items/source, ≥3h interval, per-host serialisation, and **a 403/429 is a definitive
+      refusal — mark the source dead, never retry with different headers, a different path,
+      a proxy, or an archive mirror.** Already demonstrated behaviour: ci4 cut seven sources
+      instead of working around them. Rejected honour-everywhere (sixth probe round,
+      reopens closed source discovery, drops the UA that earned the verdicts) and rejected
+      the honour-only-for-`t.me` split (adds a branch plus a per-host robots request on the
+      one host carrying 23 of 51 sources, so a robots timeout on a CI runner either kills
+      all Telegram collection or falls open — the same setting with extra failure modes).
+      `fetch.py` implements no robots fetch.
+- [ ] **Answer whether `telegram.org/robots.txt` disallows `/s/` — in `tools/check_feeds.py`,
+      not in the collector.** The one genuinely open fact behind the decision above. Cheap:
+      a one-line fetch added to the probe tool on whatever CI round happens next. Kept out
+      of the pipeline deliberately — a robots fetch failing on that host would take out 23
+      of 51 sources. If it *is* disallowed, that is a real input to whether `t.me/s/`
+      scraping stays the Telegram path, and constraint 6 leaves no alternative, so the
+      answer would be a scope question, not a code change.
 - [ ] **NEXT ACTION — build Phase 3 from the brief** (revised 2026-08-18 after the Fable
       review: 1 CRITICAL + 5 MAJOR fixed). Collectors only. Gate is owner-run pytest on
       Windows plus a `--collect-only` CI run asserting **≥160 post-cap items**; the owner's

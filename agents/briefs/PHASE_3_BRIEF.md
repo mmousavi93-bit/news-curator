@@ -98,7 +98,25 @@ Carry over the other two probe lessons, both already proven:
   feeds and every `t.me` channel. (Not the Ynet pair: `ynet` is `ynetnews.com`, `ynet_he`
   is `ynet.co.il` — different hosts. An earlier draft of this brief said otherwise.)
 
-### 2b. BLOCKING DECISION — `respect_robots_txt`
+### 2b. RESOLVED 2026-08-18 — `respect_robots_txt: false`
+
+**Decided, do not relitigate.** `settings.yaml` now sets `false` and carries the full
+reasoning inline; read it there before writing `fetch.py`. Summary: this client does not
+discover or traverse links, it fetches a fixed curated list, and the RSS endpoints exist to
+be machine-read — a feed reader is a user agent, not a crawler, which is also what the
+browser UA in req 2 declares. The obligation moves to the rate discipline rather than
+disappearing: 20 items/source, ≥3h interval, per-host serialisation, and **a 403 or 429 is
+a definitive refusal — mark the source dead, never retry it with different headers, a
+different path, a proxy, or an archive mirror.** That rule is not optional and it is
+already this project's behaviour: ci4 cut seven sources rather than work around them.
+
+Implement no robots.txt fetch in `fetch.py`. The open question of whether `telegram.org`
+disallows `/s/` is answered once by `tools/check_feeds.py`, not by pipeline code — a
+failure mode on that host would take out 23 of 51 sources.
+
+The original three-way framing is kept below for the record.
+
+### 2b-history — the decision as it was posed
 
 `config/settings.yaml` line 46 sets `respect_robots_txt: true` and
 `settings_schema.py` line 28 enforces it as a bool. **No probe round ever fetched a

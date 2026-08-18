@@ -43,7 +43,41 @@ collection:
   max_items_per_source: 20
   concurrency: 8
   per_source_timeout_seconds: 10
-  respect_robots_txt: true
+  # DECIDED 2026-08-18. Was `true` from the first draft, but nothing implemented it and
+  # no probe round ever fetched a robots.txt, so all 51 source verdicts were earned
+  # without it. Set false deliberately, and the reasoning is load-bearing, not a shrug:
+  #
+  # robots.txt is a convention for crawlers that DISCOVER and TRAVERSE links. This client
+  # does neither. It fetches a fixed, hand-curated list of URLs, the RSS/Atom ones being
+  # endpoints their publishers created expressly to be read by machines. No feed reader
+  # checks robots.txt -- not Feedly, Inoreader, NetNewsWire or Thunderbird -- because a
+  # feed reader is a user agent, not a crawler. Collector requests also present a browser
+  # User-Agent (see the note below), which states the same thing. A config key claiming
+  # crawler etiquette while the client is not a crawler was incoherent in both directions.
+  #
+  # THE OBLIGATION DOES NOT DISAPPEAR, IT MOVES. What makes `false` defensible is the
+  # rate discipline below, which is therefore not tunable for convenience:
+  #   - max_items_per_source: 20, and >=3h between runs (8/day). ~1 request per source
+  #     per 3 hours is below any published crawl-delay in normal use.
+  #   - Serialised per host, so no host ever sees concurrent requests from this system.
+  #   - A 403 or 429 is a DEFINITIVE REFUSAL. Mark the source dead and stop. Never retry
+  #     it with different headers, a different path, a proxy, or an archive mirror.
+  # That last rule is already this project's demonstrated behaviour: when ci4 falsified
+  # the header hypothesis, seven sources were cut rather than worked around. Honouring a
+  # refusal actually issued matters more than pre-reading a file about hypothetical ones,
+  # and the CUT_BOT_BLOCKED path has been exercised across five probe rounds.
+  #
+  # Rejected: honouring it everywhere (needs a sixth probe round to learn which of the 51
+  # are disallowed, reopening closed source discovery, and means dropping the UA that
+  # earned the verdicts). Also rejected: honouring it only for the t.me/s/ HTML pages.
+  # That sounds more careful and delivers less -- it adds a branch plus a per-host robots
+  # request on the ONE host carrying 23 of 51 sources, so a robots.txt timeout on a CI
+  # runner either kills all Telegram collection or falls open, which is this setting with
+  # extra failure modes. See the pending item: whether telegram.org disallows /s/ is a
+  # real question, and it gets answered by the PROBE TOOL once, not by pipeline code.
+  #
+  # Key kept rather than deleted so the decision stays visible, typed and reversible.
+  respect_robots_txt: false
   user_agent: "news-curator/1.0 (personal research agent)"
 
   # A source that yields zero parseable items this many runs in a row is marked
