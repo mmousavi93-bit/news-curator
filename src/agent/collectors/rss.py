@@ -11,10 +11,9 @@ these same 51 URLs, so this mirrors it rather than reinventing parsing.
 from __future__ import annotations
 
 import re
-from datetime import datetime, timedelta, timezone
-from email.utils import parsedate_to_datetime
 
 from agent.collectors.base import Item, SourceResult, SourceSpec, decode_body, hash_raw, strip_html
+from agent.collectors.dates import ISRAEL_WALL_CLOCK_SOURCE_IDS, parse_date
 
 _ENTRY_RE = re.compile(rb"<(item|entry)[\s>].*?</\1\s*>", re.I | re.S)
 
@@ -25,66 +24,6 @@ _DESC_RE = re.compile(
 _DATE_RE = re.compile(r"<(pubDate|published|updated|dc:date)[^>]*>(.*?)</\1>", re.I | re.S)
 _LINK_HREF_RE = re.compile(r"<link[^>]+href=[\"']([^\"']+)[\"']", re.I)
 _LINK_TEXT_RE = re.compile(r"<link[^>]*>([^<]*)</link>", re.I)
-
-# Ynet's date has no RFC-822/ISO form the probe's DATE_RE (or
-# email.utils.parsedate_to_datetime) matches at all -- both ynet and
-# ynet_he return items with an empty parsed date today. Best-effort format,
-# UNVERIFIED against a live fetch (sandbox has no network egress): a
-# no-timezone "M/D/YYYY H:MM:SS AM/PM" reading as Israel local time. The
-# month-based +2/+3 split below is a deliberate approximation, not a real
-# DST calendar -- zoneinfo/tzdata is not an approved dependency (not
-# guaranteed present on the owner's clean Windows Python), so this only
-# risks mis-bucketing items published within a few days of the actual
-# IST/IDT transition, not silently fabricating a date.
-_YNET_DATE_RE = re.compile(
-    r"(\d{1,2})/(\d{1,2})/(\d{4})\s+(\d{1,2}):(\d{2}):(\d{2})\s*(AM|PM)?", re.I
-)
-
-
-def _israel_utc_offset_hours(month: int) -> int:
-    return 3 if 4 <= month <= 9 else 2
-
-
-def _parse_date(raw: str) -> datetime | None:
-    text = raw.strip()
-    if not text:
-        return None
-    try:
-        dt = parsedate_to_datetime(text)
-        if dt.tzinfo is None:
-            return dt.replace(tzinfo=timezone.utc)
-        return dt.astimezone(timezone.utc)
-    except (TypeError, ValueError, IndexError):
-        pass
-    try:
-        # A trailing 'Z' is the canonical Atom-spec example
-        # (<updated>2003-12-13T18:30:02Z</updated>) and is common on RSS
-        # dc:date too. datetime.fromisoformat() only accepts it from
-        # Python 3.11 -- normalise it explicitly rather than depending on
-        # the interpreter version the collector happens to run under.
-        iso_text = text[:-1] + "+00:00" if text.endswith(("Z", "z")) else text
-        dt = datetime.fromisoformat(iso_text)
-        if dt.tzinfo is None:
-            return dt.replace(tzinfo=timezone.utc)
-        return dt.astimezone(timezone.utc)
-    except ValueError:
-        pass
-    match = _YNET_DATE_RE.match(text)
-    if match:
-        month, day, year, hour, minute, second, ampm = match.groups()
-        hour_i = int(hour)
-        if ampm:
-            if ampm.upper() == "PM" and hour_i != 12:
-                hour_i += 12
-            elif ampm.upper() == "AM" and hour_i == 12:
-                hour_i = 0
-        try:
-            naive = datetime(int(year), int(month), int(day), hour_i, int(minute), int(second))
-        except ValueError:
-            return None
-        offset = _israel_utc_offset_hours(naive.month)
-        return (naive - timedelta(hours=offset)).replace(tzinfo=timezone.utc)
-    return None
 
 
 def _extract_link(text: str) -> str | None:
@@ -110,7 +49,11 @@ def _parse_entry(spec: SourceSpec, entry_bytes: bytes, content_type: str) -> Ite
         return None  # nothing usable parsed out of this entry -- counted, not raised
 
     date_m = _DATE_RE.search(text)
-    published_at = _parse_date(date_m.group(2)) if date_m else None
+    published_at = (
+        parse_date(date_m.group(2), israel_local=spec.id in ISRAEL_WALL_CLOCK_SOURCE_IDS)
+        if date_m
+        else None
+    )
 
     url = _extract_link(text) or spec.url
 

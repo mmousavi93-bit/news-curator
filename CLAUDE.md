@@ -274,8 +274,9 @@ clickbait, never fearmongering. Alert level modulates urgency, not volume. Promp
   `.github/workflows/collect-test.yml`, 5 fixtures, 5 test modules.
   Routing: Sonnet Implementer from the brief → fresh Sonnet Verifier → fix round → second
   fresh Verifier → Architect (Opus) gate review. No agent reviewed its own output.
-  **Predicted pytest count 165** (100 Phase-2 baseline + 65), computed independently three
-  times by different routes and agreeing each time. `pytest` is NOT installed in the agent
+  **Pytest 165 — predicted then CONFIRMED on the owner's Windows 2026-08-18: `165 passed`.**
+  (100 Phase-2 baseline + 65.) Predicted independently three times by different routes,
+  agreeing each time, and matched the real run exactly, so no phantom collection. `pytest` is NOT installed in the agent
   sandbox (contradicts the session-3 note claiming it is) — so 165 is a prediction, and
   the owner's Windows run is the only real verification. Reconcile against 165 exactly.
   Verified mechanically here: `Item` is exactly the 7 specified fields; zero
@@ -317,6 +318,41 @@ clickbait, never fearmongering. Alert level modulates urgency, not volume. Promp
   reporting a phase as built, state explicitly which test modules were actually run and
   which were only written**, because "my harness passed" silently excluded 4 of 9 modules
   here. Fourth consecutive phase in which the owner's real gate found what no sandbox could.
+  (e) **Found by the first real `collect-test.yml` run 2026-08-19 — the CI gate did its job
+      on the first attempt.** It failed with `ynet_he: published_at 2026-08-19T17:11:47+00:00
+      does not predate workflow start 2026-08-19T14:20:12+00:00` — an item published 2h51m
+      in the FUTURE. **Ynet emits Israel wall-clock time while declaring GMT**; true
+      publication was 14:11:47Z, nine minutes before the run. This also settles the
+      long-standing open question in this file: **Ynet's date format is ordinary RFC-822 and
+      parses fine — only its declared zone lies.** `_YNET_DATE_RE` (now `_US_STYLE_DATE_RE`)
+      is therefore dead code against the live feed and is kept only for regression.
+      Fix: source-id-keyed `ISRAEL_WALL_CLOCK_SOURCE_IDS = {ynet, ynet_he}`; for those the
+      declared tzinfo is discarded and the wall-clock digits reinterpreted as Israel local.
+      Format-agnostic by construction — naive or falsely-GMT, the digits and the corrected
+      instant are identical, so this did not require knowing the wire format.
+      **Deliberately NOT a generic "reject future timestamps" guard:** silently repairing any
+      future-dated item would mask exactly the class of feed lie the gate exists to surface.
+      A fresh adversarial Verifier then found 2 real defects **in that fix**, both accepted:
+      **CRITICAL** — the US-style fallback branch applied the Israel offset *unconditionally*,
+      so any source emitting `M/D/YYYY H:MM:SS AM/PM` (plausible for `state_dept_travel` or
+      `the_war_zone`) was silently shifted 2–3h, falsifying the fix's own "keyed on source id,
+      never sniffed" guarantee. Now gated on the flag; untagged → naive UTC.
+      **MAJOR** — the month-based DST approximation (+3 for months 4–9) was wrong for ~30
+      days/year (**Mar 27–31 and Oct 1–25**) and wrong in the dangerous direction: one hour
+      too little subtracted, i.e. a timestamp up to 1h in the future, re-creating this very
+      gate failure at reduced magnitude. Replaced with the real Israeli rule (IDT from 02:00
+      the Friday before the last Sunday of March to 02:00 the last Sunday of October),
+      computed per year in ~10 lines of stdlib — **no zoneinfo/tzdata**, which is not an
+      approved dependency and is not guaranteed on the owner's Windows or a bare CI runner.
+      Date logic moved to new **`src/agent/collectors/dates.py`** (141 lines) with tests in
+      `tests/unit/test_dates.py`; the DST rule pushed `rss.py` past the 200-line cap, and
+      `rss.py` is now 103 lines. `dates.py` added to `OFFLINE_MODULES`.
+      **Count 165 → 171 → 174**, verified by AST parametrize-expansion, not by counting `def`s.
+      Every test in `test_dates.py` and `test_rss.py` was EXECUTED here under a stubbed
+      `pytest` (27 funcs, 0 failures, 1 fixture-skipped) — per the standing rule from (d).
+      **Standing lesson, and the first time the loop caught itself: the fix for a gate failure
+      is exactly as likely to contain a defect as the original code, and here it contained two.
+      Never ship a gate fix without an adversarial pass on the fix itself.**
 - Phases 4–10 — not started.
 - Build-agent roster written 2026-08-01 (`agents/`). Four roles: Architect (strongest model,
   brief + gate review only, never writes code), Implementer (mid-tier for phases 4–8,
@@ -772,19 +808,16 @@ reading and did not.** Prose with numbers in it needs the same mechanical check 
       of 51 sources. If it *is* disallowed, that is a real input to whether `t.me/s/`
       scraping stays the Telegram path, and constraint 6 leaves no alternative, so the
       answer would be a scope question, not a code change.
-- [ ] **NEXT ACTION — owner runs the Phase 3 gate.** Code is built and reviewed (see Status).
-      Three steps, in order: (1) delete `.git\index.lock` on Windows — a stale lock is
-      present and the agent VM cannot unlink it, and this exact file silently ate probe
-      round ci3; (2) `set PYTHONPATH=src` then `python -m pytest -q`, **expect exactly 165**,
-      then `python -m agent.run --dry-run` for the single summary line; (3) commit, push,
+- [ ] **NEXT ACTION — owner re-runs the Phase 3 gate after the timezone fix.**
+      `python -m pytest -q`, **expect exactly 174** (165 → 171 → 174, see finding (e)),
+      then `python -m agent.run --dry-run` for the single summary line; then commit, push,
       verify the fix is inside origin (`git show origin/main:...`, not `HEAD == origin/main`),
-      then run `collect-test.yml` from the Actions tab. **Do not run `--collect-only`
+      then re-run `collect-test.yml` from the Actions tab. **Do not run `--collect-only`
       locally** — the Iran network fails feeds CI reaches and would produce a false verdict
-      that cuts good sources. Two things still unverifiable from any sandbox and decided only
-      by that CI run: whether Ynet's date format actually parses, and whether the
-      `t.me/s/` class names and `<time datetime=...>` selectors match the live page. Both are
-      marked UNVERIFIED in `telegram_web.py`'s header comment; the new required-source
-      timestamp assertion is what turns a wrong guess into a red gate instead of silent nulls.
+      that cuts good sources. Still unverifiable from any sandbox and decided only by that
+      CI run: whether the `t.me/s/` class names and `<time datetime=...>` selectors match
+      the live page, marked UNVERIFIED in `telegram_web.py`'s header comment. Ynet's date
+      is no longer open — the failed gate run answered it (finding (e)).
 - [x] ~~build Phase 3 from the brief~~ (revised 2026-08-18 after the Fable
       review: 1 CRITICAL + 5 MAJOR fixed). Collectors only. Gate is owner-run pytest on
       Windows plus a `--collect-only` CI run asserting **≥160 post-cap items**; the owner's
@@ -801,7 +834,13 @@ reading and did not.** Prose with numbers in it needs the same mechanical check 
       every id a collector loads exists as a `credibility.yaml` key, failing loudly instead
       of degrading to tier 3. Same shape as the `signals_covered` coverage check that ships
       disabled until Phase 7.
-- [ ] **Phase 3 collector — `DATE_RE` does not match Ynet's date format.** Both `ynet` and
+- [x] **RESOLVED 2026-08-19 by the failed CI gate — the Ynet date premise below was WRONG.**
+      `DATE_RE` matches Ynet fine and the date parses fine; the feed declares GMT and emits
+      Israel local time. See Status finding (e). Kept below for the record because the wrong
+      premise shaped `_YNET_DATE_RE`, which turned out to be dead code against the live feed.
+      **Still open from the original item: the `t.me/s/` `<time datetime=...>` parsing is
+      UNVERIFIED** and only the next `collect-test` run decides it.
+- [ ] ~~**Phase 3 collector — `DATE_RE` does not match Ynet's date format.**~~ Both `ynet` and
       `ynet_he` return 30 items with an empty `newest`, so neither can be staleness-checked.
       Related and already known: the `t.me/s/` preview has no `pubDate` at all — post times
       live in a `<time datetime=...>` attribute, and the 30-minute near-duplicate window in

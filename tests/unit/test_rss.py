@@ -120,41 +120,25 @@ def test_collect_isolates_one_bad_entry_from_the_rest(monkeypatch):
 
 
 # ---------------------------------------------------------------------------
-# _parse_date -- direct tests of the date-parsing fallback chain.
+# Date parsing itself lives in collectors/dates.py and is tested in
+# test_dates.py. What belongs HERE is the wiring: _parse_entry deciding
+# which sources get the Israel correction. That wiring is what actually
+# broke -- parse_date was never wrong in isolation, _parse_entry simply
+# never told it which source it was on.
 # ---------------------------------------------------------------------------
 
-def test_parse_date_rfc822():
-    dt = rss._parse_date("Tue, 16 Aug 2026 08:00:00 GMT")
-    assert dt == datetime(2026, 8, 16, 8, 0, 0, tzinfo=timezone.utc)
+def test_collect_applies_israel_offset_for_ynet_source_id_end_to_end():
+    body = (
+        b"<rss><channel><item><title>Ynet item</title>"
+        b"<description>body text</description>"
+        b"<pubDate>Tue, 19 Aug 2026 17:11:47 GMT</pubDate>"
+        b"</item></channel></rss>"
+    )
+    ynet = rss.collect(_spec(id="ynet_he", lang="he"), body, "application/rss+xml", max_items=20)
+    assert ynet.items[0].published_at == datetime(2026, 8, 19, 14, 11, 47, tzinfo=timezone.utc)
 
-
-def test_parse_date_iso8601():
-    dt = rss._parse_date("2026-08-17T09:30:00+00:00")
-    assert dt == datetime(2026, 8, 17, 9, 30, 0, tzinfo=timezone.utc)
-
-
-def test_parse_date_ynet_format_summer_offset():
-    # Ynet's undocumented format, no RFC-822/ISO form at all. April-Sept -> UTC+3 (IDT).
-    dt = rss._parse_date("8/16/2026 11:00:00 AM")
-    assert dt == datetime(2026, 8, 16, 8, 0, 0, tzinfo=timezone.utc)
-
-
-def test_parse_date_ynet_format_winter_offset():
-    # Nov-Feb -> UTC+2 (IST, no DST).
-    dt = rss._parse_date("12/16/2026 11:00:00 AM")
-    assert dt == datetime(2026, 12, 16, 9, 0, 0, tzinfo=timezone.utc)
-
-
-def test_parse_date_ynet_format_pm_and_midnight_edge_cases():
-    noon = rss._parse_date("1/1/2026 12:00:00 PM")
-    assert noon.hour == 12 - 2  # noon IST -> 10:00 UTC (winter offset)
-    midnight = rss._parse_date("1/1/2026 12:00:00 AM")
-    assert midnight.hour == (0 - 2) % 24  # 12 AM -> hour 0 local -> wraps to prior day
-
-
-def test_parse_date_empty_or_garbage_returns_none_never_fabricates_now():
-    assert rss._parse_date("") is None
-    assert rss._parse_date("not a date at all") is None
+    other = rss.collect(_spec(id="bbc_en_me"), body, "application/rss+xml", max_items=20)
+    assert other.items[0].published_at == datetime(2026, 8, 19, 17, 11, 47, tzinfo=timezone.utc)
 
 
 def test_extract_link_prefers_href_attribute_over_text_form():

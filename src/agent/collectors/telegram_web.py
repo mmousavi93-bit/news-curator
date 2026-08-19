@@ -44,7 +44,7 @@ _LINK_RE = re.compile(r'<a class="tgme_widget_message_date"[^>]*href="([^"]+)"',
 
 
 def _parse_iso(raw: str) -> datetime | None:
-    # Same 'Z'-suffix normalisation as rss.py's _parse_date -- fromisoformat()
+    # Same 'Z'-suffix normalisation as collectors/dates.py -- fromisoformat()
     # only accepts a trailing 'Z' from Python 3.11 onward, and this collector
     # must not depend on which interpreter it happens to run under.
     text = raw[:-1] + "+00:00" if raw.endswith(("Z", "z")) else raw

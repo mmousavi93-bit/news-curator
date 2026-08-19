@@ -37,6 +37,7 @@ OFFLINE_MODULES = (
     "agent.delivery.credentials",
     "agent.config",
     "agent.collectors.base",
+    "agent.collectors.dates",
     "agent.collectors.fetch",
     "agent.collectors.rss",
     "agent.collectors.telegram_web",
