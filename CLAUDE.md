@@ -353,6 +353,66 @@ clickbait, never fearmongering. Alert level modulates urgency, not volume. Promp
       **Standing lesson, and the first time the loop caught itself: the fix for a gate failure
       is exactly as likely to contain a defect as the original code, and here it contained two.
       Never ship a gate fix without an adversarial pass on the fix itself.**
+  (f) **GATE GREEN 2026-08-19 14:55 UTC. Phase 3 is complete.** `174 passed` on the owner's
+      Windows (165 → 171 → 174, matched the prediction exactly) and `collect-test.yml`
+      printed `GATE PASSED`: `total_kept: 204`, **10/10** enabled sources returned items,
+      all four `required_source_ids` present with real timestamps, no source stamping one
+      identical time. The Israel correction is confirmed against the live feed —
+      `ynet_he` newest is now `2026-08-19T14:11:47+00:00`, i.e. exactly the raw
+      `17:11:47` minus the 3h IDT offset that finding (e) predicted.
+      **This also closes the last UNVERIFIED item in `telegram_web.py`'s header:** the
+      `t.me/s/` class names and `<time datetime=...>` selectors DO match the live page.
+      All three Telegram sources parsed real, distinct, plausible post times.
+      Per-source kept: `state_dept_travel` 30, `ajar`/`bbc_en_me`/`bbc_persian`/`irna`/
+      `the_war_zone`/`ynet_he`/`tg_padeshah_fxn`/`tg_ukmto_mirror` 20 each,
+      `tg_militarywave` 14 (15 raw, 1 unparsed — media-only post, not an error).
+      9 of 10 sources hit their cap, so 204 sits just under the 210 post-cap ceiling and
+      raw volume (356 entries) far exceeds what is kept. Confirms the session-5 volume
+      finding at thin-slice scale.
+      **The green run was reached only after a wasted round: the 14:43:55 UTC run failed
+      with the IDENTICAL ynet timestamp because "Re-run jobs" was clicked on the failed
+      14:20 run. `actions/checkout` then replays the run's ORIGINAL recorded SHA
+      (`92dbf33`), not the branch head — so the fix, pushed at 14:39:10, was in origin and
+      still did not execute.** Diagnosed by timeline, not by reading logs: the item
+      timestamp was byte-identical across both failures, which correct code cannot produce.
+      **Standing lesson, fifth instance of the verify-the-artifact-not-the-intent class,
+      and the one the existing ci3 rule does NOT cover.** That rule says `HEAD ==
+      origin/main` proves nothing, verify the fix is inside origin. Here the fix WAS inside
+      origin and old code ran anyway. Extend to: **verify the SHA the workflow actually
+      executed. Never validate a gate fix with "Re-run jobs" — always a fresh
+      `workflow_dispatch` on `main`.** `collect-test.yml` now echoes `${{ github.sha }}`
+      immediately after checkout so its log is self-identifying and this is one grep, not
+      a timeline reconstruction.
+  (g) **Two real defects were INSIDE the green report, and the gate could not see either.**
+      Green means the assertions passed, not that the data is sound — read the JSON.
+      **g1 — `state_dept_travel`: 122 parsed, 30 kept, `published_at: []`. Every timestamp
+      is null.** It is the only tier-1 source in the thin slice and 30 of 204 items, so
+      **15% of the corpus is undated and the gate said PASSED.** Cause of the blind spot:
+      the null-date assertion added by the Architect as finding (c) was scoped to
+      `required_source_ids` only, so it caught the four sources it was aimed at and missed
+      the fifth. Same defect class, one source to the left.
+      **The feed is not dateless** — the probe read `"Sun, 16 Aug 2026 14:30:06 GMT"` off it
+      in ci2, ci3 and ci4, ordinary RFC-822 that `parsedate_to_datetime` handles. Two
+      candidate causes, UNRESOLVED and not distinguishable without a body dump: channel-level
+      `<pubDate>` only with genuinely undated `<item>`s, or a per-item tag `_DATE_RE` misses.
+      **Standing lesson: the probe's `newest` column proves a feed has A date, not that its
+      ITEMS do.** The probe takes the first `pubDate` in the whole body; the collector takes
+      one per entry slice. Never read `newest` as evidence of per-item dates again.
+      Impact if unfixed: `rss.py` sorts undated items last in original feed order, so
+      "first 30 of 122" is taken blind — the IranWire failure its own comment warns about,
+      on the one source that exists to deliver timely advisories.
+      **g2 — `tg_ukmto_mirror` is DORMANT. Newest post 2026-07-14T14:59:57Z: 36 calendar
+      days, 35 elapsed — the gate reports 35 because it truncates elapsed time, not dates.**
+      All 20
+      items are June–July. IranWire was CUT at 31 days; this is worse and passed, because
+      the gate had no staleness check at all.
+      **Corrects the session-5 claim at line ~670: maritime coverage is not "single-sourced
+      through an unofficial mirror", it is ZERO.** Both official UKMTO URLs are
+      CUT_BOT_BLOCKED and the only remaining path has published nothing in five weeks.
+      Systemic part: **the probe returns an empty `newest` for EVERY Telegram row, so none
+      of the 23 Telegram sources have ever been staleness-checked.** The collector can now
+      read their dates; the first three tested split 2 live / 1 dead. The other 20 are
+      unaudited and must be checked as they are enabled at Phase 8.
 - Phases 4–10 — not started.
 - Build-agent roster written 2026-08-01 (`agents/`). Four roles: Architect (strongest model,
   brief + gate review only, never writes code), Implementer (mid-tier for phases 4–8,
@@ -667,10 +727,14 @@ reading and did not.** Prose with numbers in it needs the same mechanical check 
   Editorial coverage survives the cuts: Gulf counterweight via `aawsat` + `sky_news_arabia`,
   resistance-axis framing via `al_manar`, three Hebrew feeds remain. **Only the right-leaning
   Israeli line has no substitute left.**
-- **`tg_ukmto_mirror` is now the only live path to UKMTO advisories** — both official URLs
-  are CUT_BOT_BLOCKED. It is tier 3 and carries `group: ukmto`, so UKMTO content can no
-  longer corroborate anything or score. Maritime B-class signals are effectively
-  single-sourced through an unofficial mirror. Accept or find another path at Phase 6.
+- ~~**`tg_ukmto_mirror` is now the only live path to UKMTO advisories**~~ — **SUPERSEDED
+  2026-08-19 by Status finding (g2): the mirror is DORMANT, newest post 2026-07-14, 36 days
+  stale. Maritime coverage is ZERO, not single-sourced.** Both official URLs remain
+  CUT_BOT_BLOCKED. Original note kept for the reasoning: it is tier 3 and carries
+  `group: ukmto`, so even when it was live it could never corroborate UKMTO or score.
+  The staleness was invisible because the probe emits an empty `newest` for every Telegram
+  row — see (g2). Owner decision open: cut per the IranWire precedent, or keep as a
+  placeholder. Either way maritime is an open coverage hole and must be recorded as one.
 - **56 unique usable sources** (r4 28 + tg1 21 + r5 10, minus 3 ids appearing in both r4 and
   tg1). Against a 10-source thin slice that is 5.6x. **The source problem is now oversupply,
   not scarcity** — see the volume risk below.
@@ -808,16 +872,39 @@ reading and did not.** Prose with numbers in it needs the same mechanical check 
       of 51 sources. If it *is* disallowed, that is a real input to whether `t.me/s/`
       scraping stays the Telegram path, and constraint 6 leaves no alternative, so the
       answer would be a scope question, not a code change.
-- [ ] **NEXT ACTION — owner re-runs the Phase 3 gate after the timezone fix.**
-      `python -m pytest -q`, **expect exactly 174** (165 → 171 → 174, see finding (e)),
-      then `python -m agent.run --dry-run` for the single summary line; then commit, push,
-      verify the fix is inside origin (`git show origin/main:...`, not `HEAD == origin/main`),
-      then re-run `collect-test.yml` from the Actions tab. **Do not run `--collect-only`
-      locally** — the Iran network fails feeds CI reaches and would produce a false verdict
-      that cuts good sources. Still unverifiable from any sandbox and decided only by that
-      CI run: whether the `t.me/s/` class names and `<time datetime=...>` selectors match
-      the live page, marked UNVERIFIED in `telegram_web.py`'s header comment. Ynet's date
-      is no longer open — the failed gate run answered it (finding (e)).
+- [x] **Phase 3 gate PASSED 2026-08-19 14:55 UTC — `174 passed` local + `GATE PASSED` in CI,
+      `total_kept: 204`, 10/10 sources. See Status finding (f). Phase 3 is closed.**
+      The `t.me/s/` selector question is answered (they match the live page) and the Ynet
+      date question is answered (finding (e)). Both are off the open list.
+- [ ] **NEXT ACTION — harden the gate against what finding (g) proved it cannot see.**
+      Workflow-file only, no `src/` change, so it costs one commit and one dispatch:
+      (a) extend the null-`published_at` assertion from `required_source_ids` to **every**
+      source — g1 slipped through purely because that check was scoped to four ids;
+      (b) add a staleness assertion failing any source whose newest item is **>14 days**
+      old — g2 slipped through because no staleness check exists. 14 days, not 7: State
+      Dept advisories are legitimately infrequent and a tighter bound manufactures false
+      failures, which is how a gate gets ignored.
+      Verify with a **fresh `workflow_dispatch`**, never "Re-run jobs" — see finding (f).
+      Expect it to FAIL on `state_dept_travel` (g1) and `tg_ukmto_mirror` (g2) on first run.
+      **That failure is the acceptance test for the assertions themselves** — per the
+      standing lesson, a gate that is only read passes; it must be attacked with the
+      specific bug it exists to catch, and here both bugs are already known and live.
+- [ ] **Diagnose g1 — why `state_dept_travel` yields zero per-item dates.** One CI round
+      with a raw-body dump (add a `--dump-body` flag to `tools/check_feeds.py`, not to the
+      pipeline). Decides between channel-level-`<pubDate>`-only (a feed property; needs a
+      policy for genuinely undated items) and a per-item tag `_DATE_RE` misses (a collector
+      bug). **Do not guess between them** — the undeclared-gzip hypothesis was guessed in
+      session 4 and ci4 falsified it after a wasted round.
+      Same round can answer the open `telegram.org/robots.txt` question below, since both
+      are one-line additions to the same tool.
+- [ ] **Owner decision — cut or keep `tg_ukmto_mirror` (g2).** Cutting matches the IranWire
+      staleness precedent. Ongoing cost of keeping it is low once Phase 4 dedup suppresses
+      the 20 stale items by `raw_hash`; the real cost is believing maritime is covered when
+      it is not.
+- [ ] **Staleness-audit the other 20 Telegram sources before enabling them at Phase 8.**
+      Never checked by any probe round — the probe cannot read `t.me/s/` post times (g2).
+      Mechanical, delegate to a Haiku subagent once a collector run can emit per-source
+      newest for all 51.
 - [x] ~~build Phase 3 from the brief~~ (revised 2026-08-18 after the Fable
       review: 1 CRITICAL + 5 MAJOR fixed). Collectors only. Gate is owner-run pytest on
       Windows plus a `--collect-only` CI run asserting **≥160 post-cap items**; the owner's
@@ -838,8 +925,11 @@ reading and did not.** Prose with numbers in it needs the same mechanical check 
       `DATE_RE` matches Ynet fine and the date parses fine; the feed declares GMT and emits
       Israel local time. See Status finding (e). Kept below for the record because the wrong
       premise shaped `_YNET_DATE_RE`, which turned out to be dead code against the live feed.
-      **Still open from the original item: the `t.me/s/` `<time datetime=...>` parsing is
-      UNVERIFIED** and only the next `collect-test` run decides it.
+      ~~**Still open from the original item: the `t.me/s/` `<time datetime=...>` parsing is
+      UNVERIFIED**~~ — **CLOSED 2026-08-19 by the green gate run.** All three Telegram
+      sources returned real, distinct, plausible post times, so the class names and the
+      `<time datetime=...>` selector match the live page. Remove the UNVERIFIED note from
+      `telegram_web.py`'s header comment. Nothing about Ynet or `t.me` date parsing is open.
 - [ ] ~~**Phase 3 collector — `DATE_RE` does not match Ynet's date format.**~~ Both `ynet` and
       `ynet_he` return 30 items with an empty `newest`, so neither can be staleness-checked.
       Related and already known: the `t.me/s/` preview has no `pubDate` at all — post times

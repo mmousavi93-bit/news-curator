@@ -25,6 +25,15 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      # A failed run re-run via "Re-run jobs" replays the run's ORIGINAL recorded
+      # SHA, not the branch head, so a pushed fix silently does not execute. That
+      # cost a round on 2026-08-19: the gate failed twice with a byte-identical
+      # ynet timestamp while the fix sat in origin. Printing the SHA makes that
+      # one grep instead of a timeline reconstruction. Validate a gate fix with a
+      # fresh workflow_dispatch, never a re-run.
+      - name: Identify the commit under test
+        run: echo "running ${{ github.sha }}"
+
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
@@ -50,6 +59,18 @@ jobs:
       #   4. No source's kept items all share one identical published_at --
       #      the exact signature of substituting datetime.now() for a
       #      missing date, which requirement 3 forbids.
+      #   5. No source returns items with EVERY published_at null. Added
+      #      2026-08-19; conditions 1-4 all passed while state_dept_travel
+      #      contributed 30 undated items.
+      #   6. No source's newest item is more than 14 days old. Added
+      #      2026-08-19; conditions 1-4 all passed while tg_ukmto_mirror had
+      #      been dormant since 2026-07-14 and is the only path to UKMTO.
+      #      Age is elapsed time truncated to whole days, so a 36-calendar-day
+      #      gap reports as 35. Do not reconcile the two numbers by eye.
+      #
+      # 5 and 6 are expected to FAIL on their first dispatch, on exactly those
+      # two sources. That failure is their acceptance test -- a gate that is
+      # only read passes; it must be attacked with the bug it exists to catch.
       - name: Assert the Phase 3 gate
         env:
           WORKFLOW_STARTED_AT: ${{ steps.started.outputs.at }}
@@ -59,6 +80,8 @@ jobs:
           import os
           import sys
           from datetime import datetime
+
+          STALE_AFTER_DAYS = 14
 
           with open("/tmp/collect_report.json", encoding="utf-8") as fh:
               report = json.load(fh)
@@ -88,9 +111,15 @@ jobs:
           # skips and all_timestamps_identical reports False. Without this check the
           # gate greenlights total date failure on exactly the sources chosen to
           # prevent it, and Phase 6's 30-minute near-duplicate window silently dies.
-          for sid in sorted(required):
-              s = sources.get(sid)
-              if s and s["kept"] > 0 and not s["published_at"]:
+          # Scoped to EVERY source, not just `required`. It was scoped to the four
+          # required ids until 2026-08-19, and the first green run hid exactly the
+          # bug it was written for one source to the left: state_dept_travel kept
+          # 30 items with published_at == [] -- the only tier-1 source in the slice,
+          # 15% of the corpus, entirely undated, reported as PASSED. The check was
+          # right; its scope was not.
+          for sid in sorted(sources):
+              s = sources[sid]
+              if s["kept"] > 0 and not s["published_at"]:
                   failures.append(f"{sid}: {s['kept']} items kept but every published_at is null -- date parsing failed")
 
           for sid, s in sources.items():
@@ -100,6 +129,28 @@ jobs:
                       break
               if s.get("all_timestamps_identical"):
                   failures.append(f"{sid}: all kept items share one identical published_at")
+
+              # Staleness. There was no such check until 2026-08-19, so
+              # tg_ukmto_mirror passed while dormant since 2026-07-14 -- 36 days,
+              # worse than the 31 that got IranWire cut -- and it is the ONLY
+              # remaining path to UKMTO advisories, so maritime coverage read as
+              # present while being zero. The probe cannot catch this: it emits an
+              # empty `newest` for every t.me row, so no Telegram source has ever
+              # been staleness-checked by any probe round.
+              #
+              # 14 days, not 7: State Dept advisories are legitimately infrequent
+              # and a tighter bound manufactures failures on healthy sources, which
+              # is how a gate stops being read. Sources with no dates at all are
+              # skipped here -- the null check above already owns that case and one
+              # defect should produce one failure line, not two.
+              if s["published_at"]:
+                  newest = max(datetime.fromisoformat(ts) for ts in s["published_at"])
+                  age_days = (started - newest).days
+                  if age_days > STALE_AFTER_DAYS:
+                      failures.append(
+                          f"{sid}: newest item {newest.isoformat()} is {age_days} days old "
+                          f"(> {STALE_AFTER_DAYS}) -- source is dormant, not merely quiet"
+                      )
 
           print(json.dumps(report, indent=2))
           if failures:
