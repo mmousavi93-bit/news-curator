@@ -1,0 +1,5 @@
+probe,id,name,type,url,http,items,newest,verdict,detail
+r6,marad_msci,MARAD MSCI Advisories,rss,https://www.maritime.dot.gov/msci-advisories/rss.xml,403,0,,HTTP_ERROR,Forbidden
+r6,marad_msci_b,MARAD MSCI Advisories alt,rss,https://www.maritime.dot.gov/rss.xml,403,0,,HTTP_ERROR,Forbidden
+r6,marad_govdelivery,MARAD GovDelivery bulletins,rss,https://content.govdelivery.com/accounts/USDOTMARAD/bulletins.rss,406,0,,HTTP_ERROR,Not Acceptable
+r6,marad_alt_host,MARAD advisories on marad.dot.gov,rss,https://www.marad.dot.gov/rss.xml,403,0,,HTTP_ERROR,Forbidden

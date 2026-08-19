@@ -68,10 +68,14 @@ DATEISH_RE = re.compile(
 )
 
 
-def fetch(url: str) -> tuple[int, bytes, str]:
+def fetch(url: str, accept: str = ACCEPT) -> tuple[int, bytes, str]:
+    # `accept` is overridable ONLY for the 406 case. A 406 is content
+    # negotiation -- the server parsed the request and refused the media type --
+    # which is categorically different from the 403s that ci4 proved are
+    # IP-level and unfixable by request-shaping. Do not reach for this on a 403.
     req = urllib.request.Request(
         url,
-        headers={"User-Agent": UA, "Accept": ACCEPT,
+        headers={"User-Agent": UA, "Accept": accept,
                  "Accept-Language": "en-US,en;q=0.9"},
     )
     ctx = ssl.create_default_context()
@@ -146,11 +150,16 @@ def main(argv: list[str] | None = None) -> int:
                         "Upload as a CI artifact; never commit a feed body.")
     p.add_argument("--sample", type=int, default=3,
                    help="how many item slices to inventory (default 3)")
+    p.add_argument("--accept", default=ACCEPT,
+                   help="override the Accept header. For 406 Not Acceptable "
+                        "only -- try '*/*'. Never for a 403.")
     args = p.parse_args(argv)
 
     print(f"fetching {args.url}")
+    if args.accept != ACCEPT:
+        print(f"  with overridden Accept: {args.accept}")
     try:
-        status, body, ctype = fetch(args.url)
+        status, body, ctype = fetch(args.url, args.accept)
     except urllib.error.HTTPError as exc:
         print(f"HTTP {exc.code} {exc.reason or ''}", file=sys.stderr)
         return 1

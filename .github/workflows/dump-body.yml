@@ -29,6 +29,10 @@ on:
         description: "How many item slices to inventory"
         required: false
         default: "3"
+      accept:
+        description: "Accept header override. For a 406 only (try */*), never a 403"
+        required: false
+        default: ""
 
 jobs:
   dump:
@@ -48,9 +52,14 @@ jobs:
 
       - name: Analyse the feed body
         run: |
+          ACCEPT_ARG=""
+          if [ -n "${{ inputs.accept }}" ]; then
+            ACCEPT_ARG="--accept=${{ inputs.accept }}"
+          fi
           python tools/dump_body.py \
             --url "${{ inputs.url }}" \
             --sample "${{ inputs.sample }}" \
+            $ACCEPT_ARG \
             --out "config/_body_dump.bin"
 
       # The last genuinely open fact behind the respect_robots_txt: false
