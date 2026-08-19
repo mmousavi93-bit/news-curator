@@ -14,11 +14,18 @@ from typing import Mapping
 from agent.collectors.base import SourceSpec
 from agent.collectors.registry import CollectReport
 
-# The Phase 3 gate (PHASE_3_BRIEF.md, Gate section) requires these four
-# specifically -- ynet_he for the DATE_RE fix, all three telegram ids for
-# the no-pubDate fix. A source missing from the results table does not
-# pass by absence.
-REQUIRED_SOURCE_IDS = ("ynet_he", "tg_militarywave", "tg_padeshah_fxn", "tg_ukmto_mirror")
+# The Phase 3 gate (PHASE_3_BRIEF.md, Gate section) requires these
+# specifically -- ynet_he for the DATE_RE fix, the telegram ids for the
+# no-pubDate fix. A source missing from the results table does not pass
+# by absence.
+#
+# tg_ukmto_mirror was the fourth entry and was REMOVED 2026-08-19 when it
+# was disabled in sources.yaml for dormancy (last post 2026-07-14). Leaving
+# it here would have made the gate demand items from a source deliberately
+# switched off -- a permanent red with no defect behind it, which is how a
+# gate stops being read. Two telegram ids still cover the <time datetime=...>
+# parsing this list exists to force, so nothing is lost by dropping to three.
+REQUIRED_SOURCE_IDS = ("ynet_he", "tg_militarywave", "tg_padeshah_fxn")
 
 
 def build_json_report(report: CollectReport, sources_by_id: Mapping[str, SourceSpec]) -> dict:

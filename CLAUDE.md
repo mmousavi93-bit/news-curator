@@ -142,7 +142,8 @@ clickbait, never fearmongering. Alert level modulates urgency, not volume. Promp
 |---|---|
 | `ARCHITECTURE.md` | Full design, diagrams, free-tier analysis, failure modes, phases. Source of truth. |
 | `SETUP_ACCOUNTS.md` | Owner-facing signup walkthrough for every external service. |
-| `config/sources.yaml` | The one file the owner edits to add a feed. **Written 2026-08-17: 51 staged, 10 enabled.** Generated from probe verdicts — do not hand-edit a url without re-probing. |
+| `config/sources.yaml` | The one file the owner edits to add a feed. **Written 2026-08-17: 51 staged. 9 enabled as of 2026-08-19** — `tg_ukmto_mirror` disabled for dormancy. Generated from probe verdicts — do not hand-edit a url without re-probing. |
+| `config/sources_candidates_r6.csv` | 4 MARAD MSCI url guesses staged 2026-08-19 to replace the dead UKMTO mirror. UNVERIFIED, awaiting a probe round. |
 | `config/source_prune_sheet.csv` | All 56 usable sources with tier, group, items/sweep and a keep/prefilter/cut call. Basis for session-5 decision 2. |
 | `config/settings.yaml` | Thresholds, schedules, feature flags. |
 | `config/credibility.yaml` | Source → credibility tier. Drives confidence scoring. |
@@ -833,7 +834,10 @@ reading and did not.** Prose with numbers in it needs the same mechanical check 
       CUT_UNREACHABLE_CI 2, CUT_STALE 1, RETEST_FLAKY 1.
 - [x] **Probe round 5 run and merged 2026-08-17, `tag=r5`.** Closes the Arabic/Hebrew hole.
       13 rows → USE 9, USE_CAVEAT 1, CUT_BOT_BLOCKED 3. See session-5 facts.
-      **Source discovery is now CLOSED at 56 usable feeds. No further probe rounds.**
+      ~~**Source discovery is now CLOSED at 56 usable feeds. No further probe rounds.**~~
+      **One narrow exception granted 2026-08-19: round r6, MARAD MSCI only, because the
+      UKMTO mirror died and maritime coverage went to zero. See the r6 item below. Not a
+      general reopening.**
 - [x] Owner supplied his Telegram handles (tg1, 21 usable incl. `lead`) and the r5 additions.
       Supersedes the old "owner to paste his own channel handles" and "initial 40-source list
       not compiled" items — the list is oversupplied, not missing.
@@ -910,10 +914,52 @@ reading and did not.** Prose with numbers in it needs the same mechanical check 
       session 4 and ci4 falsified it after a wasted round.
       Same round can answer the open `telegram.org/robots.txt` question below, since both
       are one-line additions to the same tool.
-- [ ] **Owner decision — cut or keep `tg_ukmto_mirror` (g2).** Cutting matches the IranWire
-      staleness precedent. Ongoing cost of keeping it is low once Phase 4 dedup suppresses
-      the 20 stale items by `raw_hash`; the real cost is believing maritime is covered when
-      it is not.
+- [x] **RESOLVED 2026-08-19 — `tg_ukmto_mirror` DISABLED, MARAD MSCI staged to replace it.**
+      Owner chose substitution over repair. **The staleness was NOT a quiet-event-feed false
+      positive, which was the live alternative hypothesis and was checked before acting.**
+      UKMTO published continuously through the dormant window: WARNING 080-26 (tanker hit
+      8NM E of Limah, 6 Jul), the 20 Jul Houthi blockade declaration against Saudi-affiliated
+      shipping, an explosion 95nm SE of Aden 5 Aug, WARNING 110-26 (cargo vessel struck off
+      Al Mokha, 11 Aug), JMIC advisory updates 082/083, and the 14 Aug VRA overview assessing
+      Hormuz SEVERE. **The mirror's last post is 2026-07-14 — the same day the US naval
+      blockade of Iranian ports took effect at 2000Z.** It went dark on the day the maritime
+      picture became most active, while still returning 20 well-formed items.
+      **This is the strongest argument yet for the staleness check: it would have fired on
+      2026-07-28, three weeks before the defect was found by hand.** First real firing is a
+      true positive on a tier-1 blind spot, not a nuisance failure.
+      Changes: `sources.yaml` → `enabled: false` with the full reasoning inline, row kept so
+      a revival is one flag; **`report.py` `REQUIRED_SOURCE_IDS` cut from four ids to three**
+      — leaving it in would have made the gate demand items from a source deliberately
+      switched off, i.e. a permanent red with no defect behind it. Two telegram ids still
+      force the `<time datetime=...>` parsing the list exists for. Enabled sources 10 → 9,
+      expected `total_kept` ~184 against the 160 floor, so the floor still tolerates one
+      source flaking.
+      **`credibility.yaml` now has `marad_msci` (74 entries, tier dist 1:10/2:34/3:22/lead:8,
+      validated through `agent.config.load_all`, join to `sources.yaml` empty-diff).** Entered
+      before it is ever collected, deliberately — the 2026-08-17 defect was 13 sources
+      silently degrading to `defaults: tier 3` because a missing key does not error.
+      `group: us_govt`, matching the existing `state_dept_travel`/`centcom` convention.
+      **Recorded open risk rather than silently created:** MSCI relays UKMTO/JMIC copy, so if
+      a UKMTO path is ever restored, `marad_msci` + `ukmto` would read as two independent
+      groups on partly identical copy — the DECISION 4 failure. Not put in `group: ukmto`
+      because MARAD also carries independent US Navy/ONI assessment. Inert today: no UKMTO
+      path exists. Decide at Phase 7.
+- [ ] **Probe round r6 — `config/sources_candidates_r6.csv`, 4 MARAD variants, ALL UNVERIFIED.**
+      **This reopens source discovery, which session 5 declared CLOSED at 56 feeds.** The
+      exception is deliberate and narrow: a tier-1 domain went to ZERO coverage during an
+      active maritime conflict, which is not the same as wanting more feeds. Do not treat it
+      as licence for a general round.
+      **No MARAD RSS endpoint is documented anywhere** — MSCI is distributed by GovDelivery
+      email and NGA broadcast. All four urls are CMS-convention guesses (Drupal view feed,
+      site-wide Drupal, GovDelivery per-account bulletins, alternate MARAD host), i.e. the r5
+      class that hit 10 of 13, not the r1 class that missed 11 of 38. Still guesses.
+      `marad_msci` and `marad_msci_b` share a host — probe serially, per the self-inflicted
+      429 lesson. If all four fail, MSCI has no machine-readable route and maritime stays at
+      zero until a replacement mirror channel is found.
+      Optional one-row add-on, not yet staged: retest `ukmto.org` on the **static** path class
+      (`/-/media/ukmto/products/*.pdf`). ci4 proved host-level 403s but only on `/feed` and
+      `/rss`, both dynamic; static assets are sometimes served under different rules. Low
+      odds, one row, and it is the only route to the primary source.
 - [ ] **Staleness-audit the other 20 Telegram sources before enabling them at Phase 8.**
       Never checked by any probe round — the probe cannot read `t.me/s/` post times (g2).
       Mechanical, delegate to a Haiku subagent once a collector run can emit per-source

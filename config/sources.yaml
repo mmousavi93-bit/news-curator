@@ -98,13 +98,32 @@ sources:
     topic: iran_domestic
     enabled: true
 
+  # DISABLED 2026-08-19. The channel is dormant -- newest post 2026-07-14 -- and
+  # it went dark on the exact day the maritime picture became most active: the US
+  # naval blockade of Iranian ports took effect 2026-07-14 2000Z. UKMTO itself has
+  # published continuously since (WARNING 080-26, the 20 Jul Houthi blockade
+  # declaration, the 5 Aug Aden explosion, WARNING 110-26 off Al Mokha, JMIC
+  # updates 082/083, the 14 Aug VRA overview assessing Hormuz SEVERE). So this is
+  # not a quiet event feed correctly reporting nothing -- it is a source that
+  # failed silently while returning 20 well-formed items, during the exact event
+  # this project exists to watch.
+  #
+  # Not a collector bug and not fixable in code: the channel simply stopped
+  # posting. Cut per the IranWire staleness precedent (31 days; this is 36).
+  # Row kept rather than deleted so the reasoning survives and so a future
+  # revival is one flag, not a re-derivation.
+  #
+  # CONSEQUENCE, recorded so nobody assumes otherwise: maritime coverage is now
+  # ZERO. Both official ukmto.org URLs are CUT_BOT_BLOCKED at IP level from CI.
+  # Replacement candidates are staged in config/sources_candidates_r6.csv
+  # (MARAD MSCI) and must clear a probe round before being enabled.
   - id: tg_ukmto_mirror
     name: UKMTO mirror (unofficial)
     url: https://t.me/s/UK_MTO_TM
     type: telegram
     lang: en
     topic: military
-    enabled: true
+    enabled: false
 
   - id: the_war_zone
     name: The War Zone

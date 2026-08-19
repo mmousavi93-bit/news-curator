@@ -58,6 +58,24 @@ sources:
   state_dept_travel:
     tier: 1
     group: us_govt          # same government, NOT independent of embassy alerts
+  marad_msci:
+    tier: 1
+    group: us_govt
+    note: "MARAD MSCI maritime advisories. Staged 2026-08-19 to replace the dead
+           tg_ukmto_mirror; url still UNVERIFIED, see sources_candidates_r6.csv.
+           Entered here BEFORE it is collected, deliberately -- the 2026-08-17
+           defect was 13 usable sources silently resolving to defaults tier 3
+           because a missing key degrades instead of erroring.
+           group=us_govt is institutionally correct and matches the existing
+           convention for state_dept_travel / centcom / us_embassy_alerts.
+           OPEN RISK for Phase 7, recorded rather than silently created: MSCI
+           advisories frequently RELAY UKMTO and JMIC reporting, so if a working
+           UKMTO source is ever restored, marad_msci + ukmto would read as two
+           independent groups on what is partly identical copy -- the DECISION 4
+           failure mode. It is not put in group=ukmto because MARAD also carries
+           independent US Navy/ONI assessment, and that would throw away its real
+           value. Decide the split when a UKMTO path actually exists; today
+           there is none, so the risk is inert."
   centcom:
     tier: 1
     group: us_govt
