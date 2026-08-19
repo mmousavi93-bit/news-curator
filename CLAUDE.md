@@ -278,9 +278,9 @@ Do not re-add that content here — this file loads on every turn.
 ## Pending / unresolved
 
 - [ ] Owner to approve `ARCHITECTURE.md`.
-- [ ] **Answer whether `telegram.org/robots.txt` disallows `/s/`. WIRED 2026-08-19 as a step
-      in `dump-body.yml`, awaiting the same dispatch as g1 — still outside the pipeline,
-      which was the whole point.** The one genuinely open fact behind the decision above. Cheap:
+- [ ] **Answer whether `t.me/robots.txt` disallows `/s/`. Round 1 checked `telegram.org`
+      by mistake — robots.txt is per-host and the collector fetches `t.me`. Fixed in
+      `dump-body.yml`; rides along with the g1 re-dispatch.** The one genuinely open fact behind the decision above. Cheap:
       a one-line fetch added to the probe tool on whatever CI round happens next. Kept out
       of the pipeline deliberately — a robots fetch failing on that host would take out 23
       of 51 sources. If it *is* disallowed, that is a real input to whether `t.me/s/`
@@ -299,22 +299,11 @@ Do not re-add that content here — this file loads on every turn.
       **That failure is the acceptance test for the assertions themselves** — per the
       standing lesson, a gate that is only read passes; it must be attacked with the
       specific bug it exists to catch, and here both bugs are already known and live.
-- [ ] **Diagnose g1 — why `state_dept_travel` yields zero per-item dates. TOOLING BUILT
-      2026-08-19, awaiting one dispatch.** `tools/dump_body.py` + `.github/workflows/
-      dump-body.yml`. Dispatch with the default url; the run prints one of three verdicts.
-      Put the diagnosis in a NEW tool rather than a `--dump-body` flag on `check_feeds.py`
-      as originally planned — that file is already 217 lines, over the constraint-12 cap,
-      and "is it alive" and "why is its data shaped wrong" are different jobs.
-      **Verified offline against three synthetic bodies before it goes near CI**, per the
-      standing lesson that a gate/diagnostic which is only read is worthless: channel-level
-      date only → `CAUSE (a)`; item carrying `<a10:updated>` which `DATE_RE` omits →
-      `CAUSE (b)` naming the tag; ordinary per-item `<pubDate>` → "dates exist, look at
-      parse_date". All three correct.
-      Next decision depends on which verdict comes back: (a) is a POLICY question for
-      undated items and NOT a code fix; (b) is a one-line `_DATE_RE` addition in `rss.py`.
-      **Do not pre-judge** — the undeclared-gzip hypothesis was guessed in session 4 and
-      ci4 falsified it after a wasted round.
-      The same dispatch answers the `telegram.org/robots.txt` question below.
+- [ ] **Diagnose g1 — `state_dept_travel` yields zero per-item dates. Round 1 was
+      INCONCLUSIVE because of a defect in the diagnostic itself; tool fixed, needs ONE more
+      `dump-body` dispatch with defaults.** Forensics in `POSTMORTEMS.md`. Live hypotheses,
+      **do not pre-judge**: empty `<pubDate></pubDate>` elements, or CDATA-wrapped values.
+      The re-run prints raw values via `repr()` and will say which.
 - [ ] **Staleness-audit the other 20 Telegram sources before enabling them at Phase 8.**
       Never checked by any probe round — the probe cannot read `t.me/s/` post times (g2).
       Mechanical, delegate to a Haiku subagent once a collector run can emit per-source
@@ -339,7 +328,9 @@ Do not re-add that content here — this file loads on every turn.
       News `site:` proxy already used for Reuters/AP — same `USE_CAVEAT`, decide at Phase 6.
       The 3 NEEDS_BODY_DUMP rows (radio_farda, rferl_iran, safeairspace) need a probe flag
       that saves raw bytes; one round, worth it only for safeairspace.
-- [ ] **`tools/check_feeds.py` is 217 lines, over the ~200 cap in constraint 12.** Overage
+- [ ] **Two dev tools now exceed the ~200-line cap in constraint 12: `tools/check_feeds.py`
+      at 217 and `tools/dump_body.py` at 213.** One owner decision covers both. Overage in
+      each is comment, not logic, and neither is pipeline code. Overage
       is comment, and it is a dev tool not pipeline code. Owner to decide: trim comments,
       split the fetch layer into `tools/_fetch.py`, or grant an explicit exception.
 - [ ] Owner to create accounts per `SETUP_ACCOUNTS.md` and supply secrets.

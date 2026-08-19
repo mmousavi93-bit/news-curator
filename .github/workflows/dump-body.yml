@@ -1,6 +1,9 @@
 name: dump-body
 
-# Manual only. Diagnostic, not a gate -- it asserts nothing and always exits 0.
+# Manual only. Diagnostic, not a gate -- it asserts nothing about the DATA.
+# It DOES exit non-zero if the fetch itself fails (the 2026-08-19 GovDelivery
+# 406 run went red for that reason). A red run here means "could not fetch",
+# never "the feed is wrong" -- read the log, not the tick.
 # Fetches one URL from a US runner and reports how its dates are laid out.
 #
 # Exists to settle g1 (CLAUDE.md Status, Phase 3): state_dept_travel parses
@@ -69,23 +72,32 @@ jobs:
       # collection or fall open. If /s/ turns out to be disallowed that is a
       # scope question -- constraint 6 forbids MTProto, so there is no
       # alternative path -- not a code change.
-      - name: Answer the open telegram.org/robots.txt question
+      - name: Answer the open robots.txt question
         run: |
           python - <<'PY'
           import urllib.request
+          # robots.txt is PER-HOST. The 2026-08-19 run checked telegram.org and
+          # got a 404, which says nothing at all -- the pages the collector
+          # actually fetches are served by t.me. CLAUDE.md named the wrong host
+          # and it was copied here unexamined. t.me is the authoritative answer;
+          # telegram.org is kept only as context.
           UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
                 "(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36")
-          req = urllib.request.Request("https://telegram.org/robots.txt",
-                                       headers={"User-Agent": UA})
-          try:
-              body = urllib.request.urlopen(req, timeout=20).read(64_000)
-              text = body.decode("utf-8", "replace")
-              print(text)
+          for host in ("https://t.me/robots.txt", "https://telegram.org/robots.txt"):
               print("=" * 60)
-              hits = [l for l in text.splitlines() if "/s/" in l or l.strip() == "Disallow: /"]
-              print("lines mentioning /s/ or a blanket disallow:", hits or "NONE")
-          except Exception as exc:
-              print(f"robots.txt fetch failed: {type(exc).__name__}: {exc}")
+              print(host, "  <-- AUTHORITATIVE" if "t.me" in host else "")
+              req = urllib.request.Request(host, headers={"User-Agent": UA})
+              try:
+                  text = urllib.request.urlopen(req, timeout=20).read(64_000).decode("utf-8", "replace")
+                  print(text[:2000])
+                  hits = [l for l in text.splitlines()
+                          if "/s/" in l or l.strip().lower() == "disallow: /"]
+                  print("--> lines mentioning /s/ or a blanket disallow:", hits or "NONE")
+              except Exception as exc:
+                  # A 404 means NO robots.txt exists, which means nothing is
+                  # disallowed. That is a real answer, not a failed check.
+                  print(f"--> fetch failed: {type(exc).__name__}: {exc}")
+                  print("    (404 = no robots.txt on this host = nothing disallowed)")
           PY
 
       - uses: actions/upload-artifact@v5

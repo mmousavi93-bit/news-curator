@@ -1,5 +1,47 @@
 # POSTMORTEMS.md — News Curator build history
 
+## Round 1 of dump-body, 2026-08-19 — two tool defects, one real answer
+
+Three questions asked, one answered, and **two of the three failures were in the
+diagnostic tool, not in the thing being diagnosed.**
+
+**g1 — INCONCLUSIVE, and the tool is why.** Verdict came back "per-item dates DO exist
+and DATE_RE matches them ... check the value format below". There was no value format
+below: `analyse()` printed channel-level values and item tag *names*, never the per-item
+date *values*. The verdict named a next step the tool did not supply.
+Worse, the count was misleading. `DATE_RE`'s value group is `(.*?)`, which matches the
+**empty string**, so `<pubDate></pubDate>` registers as a hit while `parse_date`
+correctly returns None. "Dates exist" was therefore not a safe reading of that number.
+Fixed both: non-empty values are counted separately, up to 5 raw per-item values print
+via `repr()` (so CDATA wrappers, stray whitespace and empty strings are visible), and a
+new **CAUSE (c) — EMPTY DATE TAGS** verdict fires when hits exist but all are blank.
+Re-verified offline against four synthetic bodies: empty tags → (c); CDATA-wrapped →
+"dates exist, check format" with the wrapper visible in the output; ordinary → same
+verdict with a clean value; no date tag → (a). All four correct.
+**Standing lesson: a regex hit count is not evidence that a value is present. Any
+diagnostic that reports "N matches" must also report what matched.**
+
+**robots.txt — asked of the wrong host, answer worthless.** The step fetched
+`telegram.org/robots.txt` and got 404. robots.txt is **per-host**, and the collector
+fetches `t.me`, not `telegram.org`. CLAUDE.md had named the wrong host since the question
+was first raised and it was copied into the workflow unexamined. Now checks
+`t.me/robots.txt` first as authoritative, `telegram.org` as context only, and states
+explicitly that a 404 means no robots.txt exists, i.e. nothing disallowed — which is a
+real answer rather than a failed check.
+
+**GovDelivery 406 — CONCLUSIVE, and negative.** `Accept: */*` still returned 406. `*/*`
+satisfies any genuine content negotiation, so a 406 against it is a WAF using a
+nonstandard status code, not media-type refusal. This closes r6: **all four MARAD paths
+are dead** (3 × 403 IP-level, 1 × 406 WAF). MSCI has no machine-readable route from a
+GitHub runner. Maritime coverage is confirmed ZERO with no substitution path found.
+Remaining options are a Google News `site:` proxy (existing USE_CAVEAT pattern) or an
+owner-supplied replacement mirror channel.
+
+Side note: `dump-body.yml`'s header claimed the job "always exits 0". False — the 406 run
+went red because `dump_body.py` returns 1 on a fetch failure. Comment corrected rather
+than the behaviour: a red run here means "could not fetch", never "the feed is wrong".
+
+
 Split out of CLAUDE.md 2026-08-19. CLAUDE.md loads into context on every turn of every
 session; this file does not. Nothing here is deleted or condensed — it is the forensic
 record of what broke, why, and what rule came out of it. Read it when working on the

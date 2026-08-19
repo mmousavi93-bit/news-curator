@@ -101,16 +101,40 @@ def analyse(body: bytes, sample: int) -> None:
 
     in_hits = DATE_RE.findall(bytes(inside))
     out_hits = DATE_RE.findall(outside)
-    print(f"DATE_RE matches INSIDE item slices : {len(in_hits)}")
+
+    # Count NON-EMPTY separately. DATE_RE's value group is `(.*?)`, which
+    # happily matches the empty string, so <pubDate></pubDate> registers as a
+    # hit here while parse_date correctly returns None. Reporting only the hit
+    # count would have said "dates exist" about a feed with no date values at
+    # all -- the 2026-08-19 g1 run did exactly that and sent the diagnosis
+    # nowhere.
+    in_nonempty = [(t, v) for t, v in in_hits if v.strip()]
+    print(f"DATE_RE matches INSIDE item slices : {len(in_hits)} "
+          f"({len(in_nonempty)} with a non-empty value)")
     print(f"DATE_RE matches OUTSIDE (channel)  : {len(out_hits)}")
     for tag, val in out_hits[:3]:
         print(f"    channel-level <{tag.decode('ascii','replace')}> = "
               f"{val.decode('utf-8','replace').strip()[:50]}")
 
+    # repr(), not str(): the whole point is to expose CDATA wrappers, stray
+    # whitespace, entities and empty strings, all of which print as nothing
+    # useful unquoted. This is the line the g1 run needed and did not have.
+    if in_hits:
+        print("  sample per-item date VALUES, raw:")
+        for tag, val in in_hits[:5]:
+            print(f"    <{tag.decode('ascii','replace')}> = "
+                  f"{val.decode('utf-8','replace')[:80]!r}")
+
     print()
     if not entries:
         print("VERDICT: no item slices at all -- not an RSS/Atom body, or ENTRY_RE is wrong.")
-    elif in_hits:
+    elif in_hits and not in_nonempty:
+        print("VERDICT: CAUSE (c) -- EMPTY DATE TAGS. Items carry the right tag")
+        print("         names but the values are blank, so DATE_RE 'matches' and")
+        print("         parse_date correctly returns None. Not a regex bug and not")
+        print("         a parse_date bug: the feed ships empty elements. Same policy")
+        print("         question as CAUSE (a) -- what to do with undated items.")
+    elif in_nonempty:
         print("VERDICT: per-item dates DO exist and DATE_RE matches them. If the")
         print("         collector still yields None, the bug is in parse_date, not")
         print("         in tag selection -- check the value format below.")
