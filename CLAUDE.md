@@ -401,9 +401,10 @@ clickbait, never fearmongering. Alert level modulates urgency, not volume. Promp
       Impact if unfixed: `rss.py` sorts undated items last in original feed order, so
       "first 30 of 122" is taken blind — the IranWire failure its own comment warns about,
       on the one source that exists to deliver timely advisories.
-      **g2 — `tg_ukmto_mirror` is DORMANT. Newest post 2026-07-14T14:59:57Z: 36 calendar
-      days, 35 elapsed — the gate reports 35 because it truncates elapsed time, not dates.**
-      All 20
+      **g2 — `tg_ukmto_mirror` is DORMANT. Newest post 2026-07-14T14:59:57Z.** The gate
+      reports its age as 35 or 36 depending on the hour the run fires — age is elapsed
+      time truncated to whole days, not a date subtraction. A changed number is not a
+      changed feed. All 20
       items are June–July. IranWire was CUT at 31 days; this is worse and passed, because
       the gate had no staleness check at all.
       **Corrects the session-5 claim at line ~670: maritime coverage is not "single-sourced
@@ -876,7 +877,19 @@ reading and did not.** Prose with numbers in it needs the same mechanical check 
       `total_kept: 204`, 10/10 sources. See Status finding (f). Phase 3 is closed.**
       The `t.me/s/` selector question is answered (they match the live page) and the Ynet
       date question is answered (finding (e)). Both are off the open list.
-- [ ] **NEXT ACTION — harden the gate against what finding (g) proved it cannot see.**
+- [x] **DONE 2026-08-19 15:08 UTC — gate hardened and the hardening itself gate-tested.**
+      Conditions 5 and 6 shipped and the first fresh dispatch failed on **exactly** the two
+      predicted sources and nothing else: `state_dept_travel: 30 items kept but every
+      published_at is null` and `tg_ukmto_mirror: newest item 2026-07-14T14:59:57+00:00 is
+      36 days old`. Predicted red, came back red, correct two lines — the assertions were
+      attacked with the bugs they exist to catch before being trusted, per the standing
+      lesson. Also pre-verified locally against four fixtures (real defect shape, both
+      repaired, exactly-14-days, 15-days) by extracting the script back out of the YAML
+      rather than reading it.
+      **`collect-test.yml` is now RED ON `main` BY DESIGN.** It is tracking two known open
+      defects, g1 and g2 below. It is not a Phase 3 regression — Phase 3 is closed and its
+      own gate passed at 14:55 UTC. Do not "fix" the red by relaxing conditions 5 or 6.
+- [ ] ~~NEXT ACTION — harden the gate against what finding (g) proved it cannot see.~~
       Workflow-file only, no `src/` change, so it costs one commit and one dispatch:
       (a) extend the null-`published_at` assertion from `required_source_ids` to **every**
       source — g1 slipped through purely because that check was scoped to four ids;

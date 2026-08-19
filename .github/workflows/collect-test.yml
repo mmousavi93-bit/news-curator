@@ -65,8 +65,9 @@ jobs:
       #   6. No source's newest item is more than 14 days old. Added
       #      2026-08-19; conditions 1-4 all passed while tg_ukmto_mirror had
       #      been dormant since 2026-07-14 and is the only path to UKMTO.
-      #      Age is elapsed time truncated to whole days, so a 36-calendar-day
-      #      gap reports as 35. Do not reconcile the two numbers by eye.
+      #      Age is ELAPSED time truncated to whole days, not a date subtraction,
+      #      so the same dormant source reports 35 or 36 depending on the hour
+      #      the run fires. Do not treat a changed number as a changed feed.
       #
       # 5 and 6 are expected to FAIL on their first dispatch, on exactly those
       # two sources. That failure is their acceptance test -- a gate that is
