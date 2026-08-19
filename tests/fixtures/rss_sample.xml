@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+<channel>
+  <title>Sample Feed</title>
+  <link>https://example.test/</link>
+  <description>Fixture for tests/unit/test_rss.py</description>
+
+  <item>
+    <title>Item one, RFC-822 date</title>
+    <description>&lt;p&gt;Body one with &amp; an entity and &lt;b&gt;markup&lt;/b&gt;.&lt;/p&gt;</description>
+    <link>https://example.test/item-one</link>
+    <pubDate>Tue, 16 Aug 2026 08:00:00 GMT</pubDate>
+    <guid>item-one</guid>
+  </item>
+
+  <item>
+    <title>Item two, dc:date and content:encoded, namespaced</title>
+    <content:encoded><![CDATA[<p>Body two, from a content:encoded block.</p>]]></content:encoded>
+    <link href="https://example.test/item-two" />
+    <dc:date>2026-08-17T09:30:00Z</dc:date>
+    <guid>item-two</guid>
+  </item>
+
+  <item>
+    <title>Item three, no date at all</title>
+    <guid>item-three</guid>
+  </item>
+</channel>
+</rss>

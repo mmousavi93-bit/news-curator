@@ -13,6 +13,7 @@ it here than to hunt it down later.
 from __future__ import annotations
 
 import argparse
+import json
 import logging
 import os
 from dataclasses import dataclass, field
@@ -20,6 +21,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Sequence
 
+from agent.collectors import registry, report
 from agent.config import Config, ConfigError, load_all
 from agent.delivery.credentials import TelegramConfigError
 from agent.delivery.formatter import format_single
@@ -63,6 +65,8 @@ def _parse_args(argv: Sequence[str] | None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(prog="agent.run")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--send-test", action="store_true")
+    parser.add_argument("--collect-only", action="store_true")
+    parser.add_argument("--report-path", type=Path, default=None)
     parser.add_argument("--config-dir", type=Path, default=None)
     parser.add_argument("--log-level", default="INFO")
     return parser.parse_args(argv)
@@ -113,6 +117,40 @@ def run_send_test(logger: logging.Logger) -> int:
     return 0
 
 
+def run_collect_only(
+    config: Config, now: datetime, logger: logging.Logger,
+    report_path: Path | None, config_dir: Path | None,
+) -> int:
+    """Fetches every ENABLED source in config/sources.yaml, prints the
+    per-source raw/parsed/kept table, and optionally writes a JSON report
+    for .github/workflows/collect-test.yml to assert against. Storage,
+    dedupe, clustering and LLM calls are out of scope for Phase 3 -- this
+    stops at collection, on purpose.
+
+    The credibility join (requirement 1) is checked before anything is
+    fetched: a missing id must halt loudly, never degrade silently to
+    `defaults: tier 3, group unlisted`."""
+    try:
+        sources = registry.load_sources(base=config_dir)
+    except registry.SourcesError as exc:
+        logger.error("collect-only: %s", exc)
+        return 1
+    try:
+        registry.validate_join(sources, config.credibility)
+    except registry.SourcesError as exc:
+        logger.error("collect-only: %s", exc)
+        return 1
+
+    collect_report = registry.collect_all(sources, config.settings, now)
+    sources_by_id = {s.id: s for s in sources}
+    print(report.format_table(collect_report, sources_by_id))
+
+    if report_path is not None:
+        report_path.write_text(json.dumps(report.build_json_report(collect_report, sources_by_id), indent=2))
+        logger.info("collect-only: wrote report to %s", report_path)
+    return 0
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     args = _parse_args(argv)
     logger = get_logger("agent.run")
@@ -127,6 +165,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     except ConfigError as exc:
         logger.error("config load failed: %s", exc)
         return 1
+
+    if args.collect_only:
+        return run_collect_only(config, datetime.now(timezone.utc), logger, args.report_path, args.config_dir)
 
     ctx = RunContext(config=config, dry_run=args.dry_run, now=datetime.now(timezone.utc))
     run_pipeline(ctx, _build_stages(), logger)

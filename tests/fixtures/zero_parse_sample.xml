@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+<channel>
+  <title>Feed with entries but nothing parseable</title>
+  <link>https://example.test/</link>
+  <description>Three item wrappers, none carrying a title or description --
+  raw_entries must be 3, parsed and kept must be 0. This is the case
+  degraded_after_empty_runs needs to distinguish from empty_sample.xml's
+  genuine zero.</description>
+
+  <item>
+    <guid>no-title-1</guid>
+    <pubDate>Tue, 16 Aug 2026 08:00:00 GMT</pubDate>
+  </item>
+  <item>
+    <guid>no-title-2</guid>
+  </item>
+  <item>
+    <guid>no-title-3</guid>
+  </item>
+</channel>
+</rss>

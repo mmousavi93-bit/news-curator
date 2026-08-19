@@ -1,0 +1,111 @@
+name: collect-test
+
+# Manual only. Runs the Phase 3 collectors from a GitHub US runner -- the
+# same network the pipeline actually runs on. The owner's network is in
+# Iran and cannot reach most of these sources either way (TLS failures on
+# western feeds, possible geoblocks on Iranian state media the other
+# direction), so a local run would produce a false verdict regardless of
+# outcome. See agents/briefs/PHASE_3_BRIEF.md, Gate section.
+#
+# agent.run --collect-only deliberately never raises on a single source
+# failing -- one bad feed must never abort the run. Which means, exactly
+# like send-test.yml's own lesson, a green job here would be meaningless
+# unless the WORKFLOW ITSELF asserts pass/fail. This parses the structured
+# JSON report rather than grepping log text, because the gate conditions
+# (timestamp comparisons, per-source counts, an identical-timestamp check)
+# are not reliably greppable the way send-test.yml's simpler string match is.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  collect-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install package
+        run: pip install -e .
+
+      - name: Record workflow start (UTC)
+        id: started
+        run: echo "at=$(date -u +%Y-%m-%dT%H:%M:%S+00:00)" >> "$GITHUB_OUTPUT"
+
+      - name: Run collectors
+        run: python -m agent.run --collect-only --report-path /tmp/collect_report.json
+
+      # Pass conditions, all four (PHASE_3_BRIEF.md Gate section):
+      #   1. total_kept >= 160 (8 x 20, the corrected floor -- NOT 200, which
+      #      is mathematically unreachable together with the >=8/10 clause
+      #      under a 210-item post-cap ceiling).
+      #   2. >=8 of the 10 enabled sources returned items, AND ynet_he plus
+      #      all three telegram sources are among them.
+      #   3. Every kept item's published_at predates this workflow's own
+      #      start timestamp.
+      #   4. No source's kept items all share one identical published_at --
+      #      the exact signature of substituting datetime.now() for a
+      #      missing date, which requirement 3 forbids.
+      - name: Assert the Phase 3 gate
+        env:
+          WORKFLOW_STARTED_AT: ${{ steps.started.outputs.at }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import sys
+          from datetime import datetime
+
+          with open("/tmp/collect_report.json", encoding="utf-8") as fh:
+              report = json.load(fh)
+          started = datetime.fromisoformat(os.environ["WORKFLOW_STARTED_AT"])
+
+          failures = []
+
+          total_kept = report["total_kept"]
+          if total_kept < 160:
+              failures.append(f"total_kept {total_kept} < 160")
+
+          sources = report["sources"]
+          with_items = {sid for sid, s in sources.items() if s["kept"] > 0}
+          if len(with_items) < 8:
+              failures.append(f"only {len(with_items)}/10 enabled sources returned items, need >=8")
+
+          required = set(report["required_source_ids"])
+          missing_required = required - with_items
+          if missing_required:
+              failures.append(f"required sources missing from results: {sorted(missing_required)}")
+
+          # The four required ids are in the thin slice specifically to force date
+          # parsing: ynet_he's format defeated the probe's DATE_RE, and t.me/s/ has
+          # no pubDate at all (times live in a <time datetime=...> attribute).
+          # build_json_report drops None dates, so a source whose parser yields None
+          # for EVERY item emits published_at == [] -- which the predates-start loop
+          # skips and all_timestamps_identical reports False. Without this check the
+          # gate greenlights total date failure on exactly the sources chosen to
+          # prevent it, and Phase 6's 30-minute near-duplicate window silently dies.
+          for sid in sorted(required):
+              s = sources.get(sid)
+              if s and s["kept"] > 0 and not s["published_at"]:
+                  failures.append(f"{sid}: {s['kept']} items kept but every published_at is null -- date parsing failed")
+
+          for sid, s in sources.items():
+              for ts in s["published_at"]:
+                  if datetime.fromisoformat(ts) >= started:
+                      failures.append(f"{sid}: published_at {ts} does not predate workflow start {started.isoformat()}")
+                      break
+              if s.get("all_timestamps_identical"):
+                  failures.append(f"{sid}: all kept items share one identical published_at")
+
+          print(json.dumps(report, indent=2))
+          if failures:
+              print("\nGATE FAILED:")
+              for f in failures:
+                  print(f"  - {f}")
+              sys.exit(1)
+          print("\nGATE PASSED.")
+          PY

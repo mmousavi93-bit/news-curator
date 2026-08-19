@@ -36,6 +36,12 @@ OFFLINE_MODULES = (
     "agent.delivery.formatter",
     "agent.delivery.credentials",
     "agent.config",
+    "agent.collectors.base",
+    "agent.collectors.fetch",
+    "agent.collectors.rss",
+    "agent.collectors.telegram_web",
+    "agent.collectors.registry",
+    "agent.collectors.report",
 )
 
 
@@ -100,6 +106,28 @@ def test_send_test_mock_mode_exits_zero_without_requests(monkeypatch, caplog):
     messages = [r.getMessage() for r in caplog.records if r.name == "agent.run"]
     assert exit_code == 0
     assert any("mock mode" in m for m in messages), messages
+
+
+def test_collect_only_exits_zero_without_requests(tmp_path, caplog):
+    """`fetch.py` lazy-imports requests exactly like transport.py -- this is
+    the collectors-side twin of test_dry_run_exits_zero_without_requests.
+    Every enabled source will fail with FetchError("... requests package is
+    required ..."), which registry.py must record as a per-source failure,
+    never a crash. Deliberately uses the real config/sources.yaml (no
+    --config-dir override), same convention as test_dry_run_exits_zero_
+    without_requests -- the point of this test is that the real 51-row
+    config imports and dispatches cleanly with requests unimportable, not
+    that requests is avoided by pointing at a fixture instead."""
+    report_path = tmp_path / "report.json"
+    with requests_unimportable():
+        run = importlib.import_module("agent.run")
+        with caplog.at_level(logging.INFO, logger="agent.run"):
+            exit_code = run.main([
+                "--collect-only",
+                "--report-path", str(report_path),
+            ])
+    assert exit_code == 0
+    assert report_path.exists()
 
 
 def test_requests_transport_construction_fails_with_actionable_message():

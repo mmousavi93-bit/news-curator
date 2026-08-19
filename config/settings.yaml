@@ -78,7 +78,18 @@ collection:
   #
   # Key kept rather than deleted so the decision stays visible, typed and reversible.
   respect_robots_txt: false
-  user_agent: "news-curator/1.0 (personal research agent)"
+  # LOAD-BEARING, Phase 3 req 2 (agents/briefs/PHASE_3_BRIEF.md). Matches
+  # tools/check_feeds.py's `UA` (line 48-49) EXACTLY -- every url in
+  # sources.yaml was verified to answer 200 against this specific string,
+  # after the old "compatible; ...-feedcheck/1.0" crawler form was found to
+  # draw Cloudflare 403s on nine round-2 rows, including both ISW and both
+  # UKMTO url variants. The previous value here, "news-curator/1.0 (personal
+  # research agent)", never earned any verdict at all -- a source that
+  # answered 200 to the probe UA can still 403 a collector sending a
+  # different one. Do not change this without re-probing every source with
+  # the new UA first; a mismatch here silently reopens sources that were
+  # already fixed.
+  user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
 
   # A source that yields zero parseable items this many runs in a row is marked
   # degraded and reported in the daily digest. It is not silently dropped.

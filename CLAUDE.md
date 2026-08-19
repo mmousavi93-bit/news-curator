@@ -268,7 +268,56 @@ clickbait, never fearmongering. Alert level modulates urgency, not volume. Promp
   exit 0, and `RequestsTransport()` failing at construction with a `pip install requests`
   hint. **Gate re-confirmed on owner's Windows 2026-08-13: `100 passed`** (95 → 100).
   Any future phase adding a dependency adds its module to `OFFLINE_MODULES` there.
-- Phases 3–10 — not started.
+- **Phase 3 (collectors) — BUILT 2026-08-18, AWAITING OWNER GATE. Not yet gate-green.**
+  Brief: `agents/briefs/PHASE_3_BRIEF.md`. New: `src/agent/collectors/{base,fetch,rss,
+  telegram_web,registry,report}.py`, `run.py --collect-only`,
+  `.github/workflows/collect-test.yml`, 5 fixtures, 5 test modules.
+  Routing: Sonnet Implementer from the brief → fresh Sonnet Verifier → fix round → second
+  fresh Verifier → Architect (Opus) gate review. No agent reviewed its own output.
+  **Predicted pytest count 165** (100 Phase-2 baseline + 65), computed independently three
+  times by different routes and agreeing each time. `pytest` is NOT installed in the agent
+  sandbox (contradicts the session-3 note claiming it is) — so 165 is a prediction, and
+  the owner's Windows run is the only real verification. Reconcile against 165 exactly.
+  Verified mechanically here: `Item` is exactly the 7 specified fields; zero
+  `bs4`/`numpy`/`lxml`/`feedparser` anywhere in `src/`; no top-level `import requests`;
+  no `datetime.now`/`utcnow` in `collectors/`; `.content` appears only in a docstring
+  explaining why it is not used; all 6 collector files under 200 lines; the
+  sources→credibility join asserts across all 51 including `enabled: false` and raises.
+  **`settings.yaml` `user_agent` is now byte-identical to `tools/check_feeds.py:48`**,
+  verified by AST-parsing the probe constant and comparing to the loaded YAML — not by
+  eye. This was the brief's "most likely to burn this phase" item.
+  Review findings, all fixed: (a) MAJOR — `telegram_web.py` hashed a decode→slice→re-encode
+  round trip, so `raw_hash` was a function of charset-resolution behaviour rather than of
+  the wire bytes, which would have silently invalidated Phase 4's dedup on any future
+  decode change. Now slices post blocks out of the raw bytes like `rss.py` already did,
+  with a regression test that fails against the old path. (b) Constraint 12 — `registry.py`
+  was 207 lines; report/table formatting split into `report.py` (165 + 61).
+  (c) **Found by the Architect after three agents missed it — the gate could not detect the
+  one failure `ynet_he` was enabled to force.** `build_json_report` drops `None` dates, so
+  a source whose parser yields `None` for every item emits `published_at: []`; the
+  predates-workflow-start loop then never executes and `all_timestamps_identical` is
+  False, so total date failure passed as green. `collect-test.yml` now asserts that each of
+  the four `REQUIRED_SOURCE_IDS` (`ynet_he` + the three `t.me` sources) with `kept > 0` has
+  at least one non-null timestamp. **Standing lesson, third instance of the same class:
+  a gate that is only read passes; a gate must be attacked with the specific bug it exists
+  to catch.**
+  (d) **Found by the owner's real pytest run 2026-08-18 — `1 failed, 164 passed` — after
+  the build, two Verifier rounds and an Architect review all passed it.** `fetch.py`'s
+  `_maybe_gunzip` caught `except OSError`, but `gzip.decompress` on a stream truncated at
+  `MAX_BYTES` raises **`EOFError`, which derives from `Exception`, not `OSError`** — so the
+  handler missed the exact case its own comment said it existed for, and the exception would
+  have escaped `fetch()` and killed a source on the path the 400 KB cap makes routine. Now
+  `except (OSError, EOFError, zlib.error)`; all four arms verified by hand against truncated,
+  bad-magic, corrupt-deflate and CRC-mismatch bodies plus the happy path. Note `zlib.error`
+  is also not an `OSError`; only `gzip.BadGzipFile` is.
+  **Why every sandbox missed it: the agent sandbox has no `pytest`, so the Implementer's
+  stdlib fallback harness covered only `test_telegram_web/report/registry/collectors_base`
+  — `test_fetch.py` was written and never executed by anyone.** The test was correct and
+  the production code was wrong. **Standing rule: an unexecuted test is not evidence. When
+  reporting a phase as built, state explicitly which test modules were actually run and
+  which were only written**, because "my harness passed" silently excluded 4 of 9 modules
+  here. Fourth consecutive phase in which the owner's real gate found what no sandbox could.
+- Phases 4–10 — not started.
 - Build-agent roster written 2026-08-01 (`agents/`). Four roles: Architect (strongest model,
   brief + gate review only, never writes code), Implementer (mid-tier for phases 4–8,
   light for 1/2/3/9/10, fresh context per phase), Verifier (light, adversarial, never the
@@ -433,9 +482,20 @@ reading and did not.** Prose with numbers in it needs the same mechanical check 
   Python 3.10.12, stdlib `unittest`. That covers config, HTTP client, HTML parsing and
   cosine clustering — so phases 3/4/6 are still developable here.
 - **The owner can run the real gate himself on Windows** (Python installed 2026-08-12,
-  repo is on his disk). Escalate to him for any true `pytest` run:
-  `cd` to the repo, `set PYTHONPATH=src`, `python -m pytest -q`. Do not let an agent claim
+  repo is on his disk). Escalate to him for any true `pytest` run. Do not let an agent claim
   a green suite it never ran — this is now cheap to falsify.
+  **The owner's shell is PowerShell, not cmd.exe.** `set PYTHONPATH=src` is cmd syntax and
+  fails SILENTLY in PowerShell — it sets nothing, and every test module then dies at import
+  with `ModuleNotFoundError: No module named 'agent'` before a single test runs. That
+  happened 2026-08-18 and cost a gate round: 16 collection errors that looked like a Phase 3
+  break but hit `test_budget`/`test_config`/`test_telegram` too, i.e. modules that had
+  already passed 100/100. **Diagnostic rule: if ALL test modules fail at import, it is the
+  path, not the code.**
+  Correct invocation, and the one to use from now on: **`pip install -e ".[dev]"` once**,
+  then plain `python -m pytest -q` and `python -m agent.run --dry-run` with no env var.
+  This is exactly what `ci.yml:20` and `collect-test.yml:33` do (`pip install -e .`), so
+  local and CI stop diverging. PowerShell fallback if the install is ever unavailable:
+  `$env:PYTHONPATH = "src"`. Never write `set PYTHONPATH=src` in an instruction to the owner.
 - `config/sources_candidates.csv` written 2026-08-12 (38 rows: 11 tier-1, 13 tier-2,
   10 tier-3, 4 lead; 35 RSS, 3 Telegram, 4 UNVERIFIED). **Candidates only, not pruned, not
   yet `sources.yaml`.** Telegram coverage is thin at 3 — the owner is supplying his own
@@ -712,7 +772,20 @@ reading and did not.** Prose with numbers in it needs the same mechanical check 
       of 51 sources. If it *is* disallowed, that is a real input to whether `t.me/s/`
       scraping stays the Telegram path, and constraint 6 leaves no alternative, so the
       answer would be a scope question, not a code change.
-- [ ] **NEXT ACTION — build Phase 3 from the brief** (revised 2026-08-18 after the Fable
+- [ ] **NEXT ACTION — owner runs the Phase 3 gate.** Code is built and reviewed (see Status).
+      Three steps, in order: (1) delete `.git\index.lock` on Windows — a stale lock is
+      present and the agent VM cannot unlink it, and this exact file silently ate probe
+      round ci3; (2) `set PYTHONPATH=src` then `python -m pytest -q`, **expect exactly 165**,
+      then `python -m agent.run --dry-run` for the single summary line; (3) commit, push,
+      verify the fix is inside origin (`git show origin/main:...`, not `HEAD == origin/main`),
+      then run `collect-test.yml` from the Actions tab. **Do not run `--collect-only`
+      locally** — the Iran network fails feeds CI reaches and would produce a false verdict
+      that cuts good sources. Two things still unverifiable from any sandbox and decided only
+      by that CI run: whether Ynet's date format actually parses, and whether the
+      `t.me/s/` class names and `<time datetime=...>` selectors match the live page. Both are
+      marked UNVERIFIED in `telegram_web.py`'s header comment; the new required-source
+      timestamp assertion is what turns a wrong guess into a red gate instead of silent nulls.
+- [x] ~~build Phase 3 from the brief~~ (revised 2026-08-18 after the Fable
       review: 1 CRITICAL + 5 MAJOR fixed). Collectors only. Gate is owner-run pytest on
       Windows plus a `--collect-only` CI run asserting **≥160 post-cap items**; the owner's
       Iran network cannot verify most of these feeds and would give a false verdict.
