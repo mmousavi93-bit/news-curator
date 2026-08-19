@@ -1,5 +1,59 @@
 # POSTMORTEMS.md — News Curator build history
 
+## g1 SOLVED 2026-08-19 — date-only RFC-822, plus the Tehran display decision
+
+**Cause: `state_dept_travel` emits `'Wed, 19 Aug 2026'` — a valid RFC-822 date with NO
+time component — on 95 of 95 items.** Reproduced against the real code:
+`parsedate_to_datetime` RAISES `ValueError`, `parsedate_tz` returns `None`,
+`fromisoformat` raises, `_US_STYLE_DATE_RE` does not match. `parse_date` returned `None`
+for the entire feed, correctly.
+
+Not a regex bug — `DATE_RE` matched all 95. A `parse_date` gap.
+
+**The channel-level date on that same feed is full** (`'Sun, 16 Aug 2026 14:30:06 GMT'`).
+That single fact explains the whole three-round confusion: `check_feeds.py` reads the
+first date anywhere in the body and got the channel one; the collector reads per-item and
+got time-less strings. Neither tool was wrong; they were reading different elements.
+**Standing lesson, now twice-earned: the probe's `newest` column proves a feed has A
+date. It proves nothing about the items.**
+
+**Fix and the decision inside it.** Parsing date-only to midnight UTC is the only sensible
+choice, but it creates a fiction that is invisible downstream — and the owner's request to
+display Tehran time is what made that unacceptable rather than merely untidy.
+**00:00Z renders as 03:30 IRST.** An advisory whose publication time is genuinely unknown
+would print as "19 Aug, 03:30", presenting an invented moment as fact — hard constraints
+10 and 11. So `date_only: bool` is carried on `Item` from collection, because it cannot be
+recovered later: once the raw string is gone, `00:00:00Z` is indistinguishable from a real
+midnight publication.
+Two consumers must honour it: the composer (print the date, say the time was not stated)
+and Phase 6's 30-minute near-duplicate window (which would otherwise treat every same-day
+advisory from such a feed as simultaneous).
+
+`israel_local` is deliberately NOT applied to a date-only value — shifting a placeholder
+midnight by −3h lands on 21:00 the *previous day*, inventing a date error on top of an
+unknown time. No Israeli source is date-only today; the guard exists so that stays true by
+construction. Covered by a test.
+
+**Tehran: fixed UTC+3:30, no tzdata needed.** Iran abolished DST 2022-09-21 (Parliament
+2022-03-15, communicated 2022-05-22) and has rejected reinstatement bills since; verified
+2026-08-19. So it is a constant, not a rule — which matters because `dates.py` deliberately
+carries no `zoneinfo` dependency. Residual risk recorded in the code: if Iran ever restores
+DST this goes silently wrong by one hour for half the year, showing up as skewed digest
+timestamps rather than a crash.
+**Storage stays UTC; conversion happens at composition only.** Converting earlier makes
+dedupe windows and trend deltas depend on a display preference, which is how a timezone
+bug becomes a data bug.
+
+**robots.txt CLOSED, favourably.** No `robots.txt` exists on `t.me` *or* `telegram.org` —
+both 404. Nothing is disallowed, so `t.me/s/` conflicts with no directive and
+`respect_robots_txt: false` is vindicated rather than assumed. Open since session 4.
+Round 1 asked `telegram.org` and got a meaningless 404; robots.txt is per-host and the
+collector fetches `t.me`. CLAUDE.md had named the wrong host from the start.
+
+Tests: 9 added to `tests/unit/test_dates.py`, all 23 in that file executed and passing,
+including the pre-existing 14 (no regression). Expected full suite **174 → 183**.
+
+
 ## Round 1 of dump-body, 2026-08-19 — two tool defects, one real answer
 
 Three questions asked, one answered, and **two of the three failures were in the

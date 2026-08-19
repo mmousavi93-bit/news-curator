@@ -299,11 +299,30 @@ Do not re-add that content here — this file loads on every turn.
       **That failure is the acceptance test for the assertions themselves** — per the
       standing lesson, a gate that is only read passes; it must be attacked with the
       specific bug it exists to catch, and here both bugs are already known and live.
-- [ ] **Diagnose g1 — `state_dept_travel` yields zero per-item dates. Round 1 was
-      INCONCLUSIVE because of a defect in the diagnostic itself; tool fixed, needs ONE more
-      `dump-body` dispatch with defaults.** Forensics in `POSTMORTEMS.md`. Live hypotheses,
-      **do not pre-judge**: empty `<pubDate></pubDate>` elements, or CDATA-wrapped values.
-      The re-run prints raw values via `repr()` and will say which.
+- [x] **g1 SOLVED 2026-08-19.** `state_dept_travel` emits date-only RFC-822
+      (`'Wed, 19 Aug 2026'`), which every parser rejects. Fixed via `parse_date_ex` →
+      midnight UTC + a `date_only` flag on `Item`. Forensics in `POSTMORTEMS.md`.
+- [x] **`t.me/robots.txt` question CLOSED 2026-08-19 — no robots.txt exists on either host
+      (404), so nothing is disallowed and `respect_robots_txt: false` is vindicated.**
+- [ ] **`date_only` has two unbuilt consumers. Both are REQUIRED, not optional.**
+      (a) The composer must print the date and state that the time was not given — never a
+      clock time. Midnight UTC renders as **03:30 Tehran**, so printing it invents a
+      publication moment (constraints 10 and 11). Owner chose Tehran display 2026-08-19;
+      `dates.to_tehran()` exists, fixed UTC+3:30, no tzdata.
+      (b) Phase 6's 30-minute near-duplicate window must not treat same-day date-only items
+      as simultaneous.
+- [ ] **PREDICTED gate false-positive: condition 4, `all_timestamps_identical`.** Now that
+      date-only items resolve to midnight, a run where all 30 kept `state_dept_travel`
+      items share one date makes them byte-identical, and the gate reports "substituting
+      `datetime.now()`" when nothing of the sort happened. Low odds while advisories span
+      days, certain eventually. Fix is to carry a `date_only` count into the JSON report and
+      exempt those sources from condition 4. Not built — flagged before it fires.
+- [ ] **`src/agent/collectors/dates.py` is 211 lines, over the ~200 cap in constraint 12,
+      and unlike the two dev tools this IS pipeline code.** It is now doing two jobs:
+      timezone rules (Israel DST, Tehran) and date parsing. Suggested split: move `TEHRAN`,
+      `to_tehran`, `israel_*` and `ISRAEL_WALL_CLOCK_SOURCE_IDS` to
+      `src/agent/collectors/tz.py` (~70 lines), leaving `dates.py` ~165. Owner decision —
+      it touches gate-green Phase 3 code, so it is flagged rather than done unilaterally.
 - [ ] **Staleness-audit the other 20 Telegram sources before enabling them at Phase 8.**
       Never checked by any probe round — the probe cannot read `t.me/s/` post times (g2).
       Mechanical, delegate to a Haiku subagent once a collector run can emit per-source

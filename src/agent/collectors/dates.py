@@ -88,6 +88,41 @@ def israel_wall_clock_to_utc(dt: datetime) -> datetime:
     return (naive - timedelta(hours=israel_utc_offset_hours(naive))).replace(tzinfo=timezone.utc)
 
 
+# An RFC-822 date with NO time component: 'Wed, 19 Aug 2026'.
+# This is what state_dept_travel actually emits, confirmed 2026-08-19 by
+# dump_body.py: 95 of 95 items, every one time-less. All three parsers reject
+# it -- parsedate_to_datetime RAISES, parsedate_tz returns None,
+# fromisoformat raises -- so parse_date correctly returned None for the whole
+# feed and 15% of the corpus arrived undated.
+#
+# Note the channel-level date on that same feed IS full ('Sun, 16 Aug 2026
+# 14:30:06 GMT'), which is why check_feeds.py read a date off it in ci2/ci3/ci4
+# while the collector got nothing. Neither was wrong; they read different
+# elements. That is the whole g1 confusion in one line.
+_DATE_ONLY_RE = re.compile(r"^(?:[A-Za-z]{3,9},\s*)?\d{1,2}\s+[A-Za-z]{3,9}\s+\d{2,4}$")
+
+# Iran is UTC+3:30 ALL YEAR. DST was abolished 2022-09-21 (approved by
+# Parliament 2022-03-15, communicated 2022-05-22) and reinstatement bills have
+# been rejected since. Verified 2026-08-19. So this is a constant, not a rule,
+# and needs no tzdata -- which matters because this module deliberately has no
+# zoneinfo dependency.
+#
+# If Iran ever restores DST this becomes silently wrong by one hour for half
+# the year. It would show up as timestamps an hour off in the digest, not as a
+# crash. Recheck if the owner ever reports that.
+TEHRAN = timezone(timedelta(hours=3, minutes=30), "IRST")
+
+
+def to_tehran(dt: datetime) -> datetime:
+    """UTC -> Tehran wall clock, for DISPLAY ONLY.
+
+    Everything is stored in UTC. Converting at storage time makes deltas,
+    dedupe windows and trend comparisons depend on a display preference, which
+    is how timezone bugs become data bugs. Convert at composition, never before.
+    """
+    return dt.astimezone(TEHRAN)
+
+
 def _finish(dt: datetime, israel_local: bool) -> datetime:
     if israel_local:
         return israel_wall_clock_to_utc(dt)
@@ -97,15 +132,50 @@ def _finish(dt: datetime, israel_local: bool) -> datetime:
 
 
 def parse_date(raw: str, *, israel_local: bool = False) -> datetime | None:
-    """Returns an aware UTC datetime, or None. Never fabricates `now`."""
+    """Returns an aware UTC datetime, or None. Never fabricates `now`.
+
+    Thin wrapper over parse_date_ex for callers that do not care about
+    precision. New code should prefer parse_date_ex -- a date-only value
+    silently looks like midnight here, and midnight is a real publication
+    time for some feeds.
+    """
+    return parse_date_ex(raw, israel_local=israel_local)[0]
+
+
+def parse_date_ex(raw: str, *, israel_local: bool = False) -> tuple[datetime | None, bool]:
+    """Returns (aware UTC datetime or None, is_date_only). Never fabricates `now`.
+
+    `is_date_only` True means the source gave a DAY and no time, and the
+    returned datetime is midnight UTC -- a placeholder, not an observation.
+    It must not be rendered as a clock time: 00:00Z displays as 03:30 in
+    Tehran, which would present an invented time as fact and break hard
+    constraints 10 and 11. The composer prints the date and says the time was
+    not stated.
+    """
     text = raw.strip()
     if not text:
-        return None
+        return None, False
 
     try:
-        return _finish(parsedate_to_datetime(text), israel_local)
+        return _finish(parsedate_to_datetime(text), israel_local), False
     except (TypeError, ValueError, IndexError):
         pass
+
+    if _DATE_ONLY_RE.match(text):
+        try:
+            # Delegate to the same battle-tested RFC-822 parser rather than
+            # hand-rolling a month-name table: append the time it is missing.
+            midnight = parsedate_to_datetime(text + " 00:00:00 +0000")
+        except (TypeError, ValueError, IndexError):
+            pass
+        else:
+            # israel_local is deliberately NOT applied. Shifting a placeholder
+            # midnight by -3h lands on 21:00 the PREVIOUS DAY -- inventing a
+            # date error on top of an unknown time. A value with no time has no
+            # meaningful wall clock to reinterpret. No Israeli source is
+            # date-only today; this guard is here so that stays true by
+            # construction rather than by luck.
+            return midnight.replace(tzinfo=timezone.utc), True
 
     try:
         # A trailing 'Z' is the canonical Atom-spec example
@@ -114,7 +184,7 @@ def parse_date(raw: str, *, israel_local: bool = False) -> datetime | None:
         # 3.11 -- normalise explicitly rather than depending on whichever
         # interpreter the collector happens to run under.
         iso_text = text[:-1] + "+00:00" if text.endswith(("Z", "z")) else text
-        return _finish(datetime.fromisoformat(iso_text), israel_local)
+        return _finish(datetime.fromisoformat(iso_text), israel_local), False
     except ValueError:
         pass
 
@@ -130,12 +200,12 @@ def parse_date(raw: str, *, israel_local: bool = False) -> datetime | None:
         try:
             naive = datetime(int(year), int(month), int(day), hour_i, int(minute), int(second))
         except ValueError:
-            return None
+            return None, False
         # This branch carries no timezone at all, so israel_local decides.
         # Before 2026-08-19 it applied the Israel offset unconditionally --
         # meaning ANY source emitting a US-style stamp was silently shifted
         # 2-3 hours, which is a plausible format for state_dept_travel or
         # the_war_zone and would have been invisible.
-        return _finish(naive, israel_local)
+        return _finish(naive, israel_local), False
 
-    return None
+    return None, False

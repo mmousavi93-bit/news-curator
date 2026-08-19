@@ -13,7 +13,7 @@ from __future__ import annotations
 import re
 
 from agent.collectors.base import Item, SourceResult, SourceSpec, decode_body, hash_raw, strip_html
-from agent.collectors.dates import ISRAEL_WALL_CLOCK_SOURCE_IDS, parse_date
+from agent.collectors.dates import ISRAEL_WALL_CLOCK_SOURCE_IDS, parse_date_ex
 
 _ENTRY_RE = re.compile(rb"<(item|entry)[\s>].*?</\1\s*>", re.I | re.S)
 
@@ -49,10 +49,10 @@ def _parse_entry(spec: SourceSpec, entry_bytes: bytes, content_type: str) -> Ite
         return None  # nothing usable parsed out of this entry -- counted, not raised
 
     date_m = _DATE_RE.search(text)
-    published_at = (
-        parse_date(date_m.group(2), israel_local=spec.id in ISRAEL_WALL_CLOCK_SOURCE_IDS)
+    published_at, date_only = (
+        parse_date_ex(date_m.group(2), israel_local=spec.id in ISRAEL_WALL_CLOCK_SOURCE_IDS)
         if date_m
-        else None
+        else (None, False)
     )
 
     url = _extract_link(text) or spec.url
@@ -63,6 +63,7 @@ def _parse_entry(spec: SourceSpec, entry_bytes: bytes, content_type: str) -> Ite
         title=title,
         body=body,
         published_at=published_at,
+        date_only=date_only,
         lang=spec.lang,
         raw_hash=hash_raw(entry_bytes),
     )

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from agent.collectors import dates
 
@@ -120,3 +120,71 @@ def test_israel_dst_rule_is_computed_per_year_not_pinned_to_2026():
     assert dates.israel_utc_offset_hours(datetime(2027, 3, 27, 12, 0)) == 3
     assert dates.israel_utc_offset_hours(datetime(2027, 10, 30, 12, 0)) == 3
     assert dates.israel_utc_offset_hours(datetime(2027, 11, 1, 12, 0)) == 2
+
+
+# --- date-only values (g1, 2026-08-19) -------------------------------------
+# state_dept_travel emits 'Wed, 19 Aug 2026' with no time on 95 of 95 items.
+# Every parser rejected it, so parse_date returned None for the whole feed and
+# 15% of the corpus arrived undated while the collect-test gate said PASSED.
+
+def test_date_only_rfc822_parses_to_midnight_utc_and_is_flagged():
+    dt, date_only = dates.parse_date_ex("Wed, 19 Aug 2026")
+    assert dt == datetime(2026, 8, 19, 0, 0, tzinfo=timezone.utc)
+    assert date_only is True
+
+
+def test_date_only_without_weekday_also_parses():
+    dt, date_only = dates.parse_date_ex("19 Aug 2026")
+    assert dt == datetime(2026, 8, 19, 0, 0, tzinfo=timezone.utc)
+    assert date_only is True
+
+
+def test_full_rfc822_is_not_flagged_date_only():
+    dt, date_only = dates.parse_date_ex("Sun, 16 Aug 2026 14:30:06 GMT")
+    assert dt == datetime(2026, 8, 16, 14, 30, 6, tzinfo=timezone.utc)
+    assert date_only is False
+
+
+def test_israel_offset_is_not_applied_to_a_date_only_value():
+    # Shifting a placeholder midnight by -3h lands on 21:00 the PREVIOUS DAY,
+    # inventing a date error on top of an unknown time.
+    dt, date_only = dates.parse_date_ex("Wed, 19 Aug 2026", israel_local=True)
+    assert dt == datetime(2026, 8, 19, 0, 0, tzinfo=timezone.utc)
+    assert date_only is True
+
+
+def test_israel_offset_still_applies_to_a_full_value():
+    dt, date_only = dates.parse_date_ex("Wed, 19 Aug 2026 17:11:47 GMT", israel_local=True)
+    assert dt == datetime(2026, 8, 19, 14, 11, 47, tzinfo=timezone.utc)
+    assert date_only is False
+
+
+def test_parse_date_wrapper_still_returns_a_bare_datetime():
+    assert dates.parse_date("Sun, 16 Aug 2026 14:30:06 GMT") == datetime(
+        2026, 8, 16, 14, 30, 6, tzinfo=timezone.utc
+    )
+    assert dates.parse_date("") is None
+    assert dates.parse_date("garbage") is None
+
+
+def test_garbage_is_not_swept_into_the_date_only_branch():
+    # The date-only regex is anchored; it must not rescue unparseable text.
+    for bad in ("garbage", "Aug 2026", "19 2026", "Wed, 19 Aug"):
+        assert dates.parse_date_ex(bad) == (None, False), bad
+
+
+# --- Tehran display ---------------------------------------------------------
+
+def test_tehran_is_fixed_utc_plus_3_30_year_round():
+    # Iran abolished DST 2022-09-21 and has rejected reinstatement since,
+    # so this must NOT vary by season.
+    for month in (1, 4, 7, 10):
+        dt = datetime(2026, month, 15, 12, 0, tzinfo=timezone.utc)
+        assert dates.to_tehran(dt).utcoffset() == timedelta(hours=3, minutes=30)
+
+
+def test_midnight_utc_displays_as_0330_in_tehran():
+    # The reason date_only exists: this 03:30 is a fabricated clock time and
+    # the composer must never print it as one.
+    dt = datetime(2026, 8, 19, 0, 0, tzinfo=timezone.utc)
+    assert dates.to_tehran(dt).strftime("%Y-%m-%d %H:%M") == "2026-08-19 03:30"

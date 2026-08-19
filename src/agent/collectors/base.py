@@ -110,6 +110,23 @@ class Item:
     published_at: datetime | None
     lang: str
     raw_hash: str
+    # True when the source gave a DAY and no time, so published_at is midnight
+    # UTC as a placeholder rather than an observation. state_dept_travel is the
+    # live case: 95 of 95 items emit 'Wed, 19 Aug 2026' with no time (g1,
+    # 2026-08-19). Carried from collection because it CANNOT be recovered
+    # later -- 00:00:00Z is indistinguishable from a real midnight publication
+    # once the raw string is gone.
+    #
+    # Two consumers must respect it:
+    #  - the composer, which renders Tehran time. 00:00Z is 03:30 IRST, so
+    #    printing it as a clock time invents a publication moment that never
+    #    happened (hard constraints 10 and 11). Print the date, say the time
+    #    was not stated.
+    #  - Phase 6's 30-minute near-duplicate window, which would otherwise treat
+    #    every same-day advisory from such a feed as simultaneous.
+    #
+    # Defaulted so existing construction sites and tests stay valid.
+    date_only: bool = False
 
 
 @dataclass(frozen=True, slots=True)
