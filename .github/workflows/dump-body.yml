@@ -1,0 +1,86 @@
+name: dump-body
+
+# Manual only. Diagnostic, not a gate -- it asserts nothing and always exits 0.
+# Fetches one URL from a US runner and reports how its dates are laid out.
+#
+# Exists to settle g1 (CLAUDE.md Status, Phase 3): state_dept_travel parses
+# 89-122 items and yields ZERO per-item timestamps, while check_feeds.py has
+# read an ordinary RFC-822 date off the same feed in ci2/ci3/ci4. The probe
+# takes the first date ANYWHERE in the body; the collector takes one per <item>
+# slice. tools/dump_body.py counts dates inside vs outside item slices and so
+# distinguishes "channel-level date only" (a feed property) from "per-item tag
+# rss.py misses" (a collector bug) mechanically, rather than by guessing --
+# the undeclared-gzip hypothesis was guessed in session 4 and cost a round.
+#
+# Must run from CI, not the owner's PC: an Iran-side fetch measures Iran's
+# network. Same reason probe-feeds.yml is CI-only.
+#
+# No secrets. Stdlib only, no pip install -- dump_body.py shares check_feeds.py's
+# contract. The raw body comes back as an artifact and is NEVER committed.
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: "URL to fetch and analyse"
+        required: true
+        default: "https://travel.state.gov/_res/rss/TAsTWs.xml"
+      sample:
+        description: "How many item slices to inventory"
+        required: false
+        default: "3"
+
+jobs:
+  dump:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+
+      # Re-running a dispatch replays the recorded SHA, not the branch head.
+      # That cost a round on 2026-08-19; every workflow here says what it ran.
+      - name: Identify the commit under test
+        run: echo "running ${{ github.sha }}"
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Analyse the feed body
+        run: |
+          python tools/dump_body.py \
+            --url "${{ inputs.url }}" \
+            --sample "${{ inputs.sample }}" \
+            --out "config/_body_dump.bin"
+
+      # The last genuinely open fact behind the respect_robots_txt: false
+      # decision (CLAUDE.md, resolved 2026-08-18). Deliberately asked HERE and
+      # never in the pipeline: t.me carries 23 of 51 sources, so a robots fetch
+      # failing on that host inside fetch.py would either kill all Telegram
+      # collection or fall open. If /s/ turns out to be disallowed that is a
+      # scope question -- constraint 6 forbids MTProto, so there is no
+      # alternative path -- not a code change.
+      - name: Answer the open telegram.org/robots.txt question
+        run: |
+          python - <<'PY'
+          import urllib.request
+          UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                "(KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36")
+          req = urllib.request.Request("https://telegram.org/robots.txt",
+                                       headers={"User-Agent": UA})
+          try:
+              body = urllib.request.urlopen(req, timeout=20).read(64_000)
+              text = body.decode("utf-8", "replace")
+              print(text)
+              print("=" * 60)
+              hits = [l for l in text.splitlines() if "/s/" in l or l.strip() == "Disallow: /"]
+              print("lines mentioning /s/ or a blanket disallow:", hits or "NONE")
+          except Exception as exc:
+              print(f"robots.txt fetch failed: {type(exc).__name__}: {exc}")
+          PY
+
+      - uses: actions/upload-artifact@v5
+        with:
+          name: body-dump
+          path: config/_body_dump.bin
+          if-no-files-found: warn

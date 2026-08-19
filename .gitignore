@@ -37,3 +37,8 @@ models/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Diagnostic feed-body dumps from tools/dump_body.py. Artifact-only, never
+# committed: a public repo should not carry mirrored third-party feed content,
+# and the file is regenerated on every dump-body run anyway.
+config/_body_dump.bin

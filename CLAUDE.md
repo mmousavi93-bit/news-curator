@@ -161,8 +161,9 @@ clickbait, never fearmongering. Alert level modulates urgency, not volume. Promp
 | `deep-research-report.md` | Other-AI report. Contains factual errors (see §7 of ESCALATION_SCORING.md); do not backtest against its timeline. |
 | `agents/` | Build-agent roster: `implementer.md`, `verifier.md`, `scout.md` (Claude Code copies live in `.claude/agents/`), plus `PORTABLE_AGENT_PACK.md` — tool-agnostic prompts incl. the Architect role and the phase-brief template. |
 | `agents/briefs/` | One Architect brief per phase. `PHASE_1_BRIEF.md` (2026-08-01), `PHASE_2_BRIEF.md` (2026-08-12). An Implementer runs only from a brief. |
-| `tools/` | Dev utilities, stdlib-only, never imported by the pipeline. `check_feeds.py` probes every URL in `sources_candidates.csv`. |
-| `.github/workflows/probe-feeds.yml` | Manual `workflow_dispatch` run of `check_feeds.py --tag ci` from a US runner. Authoritative feed-liveness verdict. Uploads artifact, commits nothing. |
+| `tools/` | Dev utilities, stdlib-only, never imported by the pipeline. `check_feeds.py` probes every URL in `sources_candidates.csv`. **`dump_body.py`** (180 lines, added 2026-08-19) answers *why* a live feed's data is shaped wrong: counts `DATE_RE` hits inside vs outside `<item>` slices and inventories item tag names, so cause (a) channel-level-date-only is distinguished from cause (b) collector-regex-miss mechanically. Its `ENTRY_RE`/`DATE_RE` are copied verbatim from `rss.py` and CAN drift — it prints both patterns every run so a diff is one glance. |
+| `.github/workflows/probe-feeds.yml` | Manual `workflow_dispatch` run of `check_feeds.py --tag ci` from a US runner. Authoritative feed-liveness verdict. Uploads artifact, commits nothing. Already takes `candidates` + `tag` inputs, so a new probe round needs **zero code**. |
+| `.github/workflows/dump-body.yml` | Manual `workflow_dispatch` run of `dump_body.py`. Diagnostic, asserts nothing, always exits 0. Also fetches `telegram.org/robots.txt` and greps it for `/s/`. Body returns as an artifact; `config/_body_dump.bin` is gitignored and must never be committed. |
 | `config/sources_probe_<tag>.csv` | Probe output, one file per environment (`local` = owner's PC in Iran, `ci` = GitHub US runner). |
 | `src/agent/collectors/` | One file per source type, all implement `base.py`. |
 | `src/agent/pipeline/` | Linear stages: filter → vision → embed → cluster → understand → validate → compose. |
@@ -870,8 +871,9 @@ reading and did not.** Prose with numbers in it needs the same mechanical check 
       one host carrying 23 of 51 sources, so a robots timeout on a CI runner either kills
       all Telegram collection or falls open — the same setting with extra failure modes).
       `fetch.py` implements no robots fetch.
-- [ ] **Answer whether `telegram.org/robots.txt` disallows `/s/` — in `tools/check_feeds.py`,
-      not in the collector.** The one genuinely open fact behind the decision above. Cheap:
+- [ ] **Answer whether `telegram.org/robots.txt` disallows `/s/`. WIRED 2026-08-19 as a step
+      in `dump-body.yml`, awaiting the same dispatch as g1 — still outside the pipeline,
+      which was the whole point.** The one genuinely open fact behind the decision above. Cheap:
       a one-line fetch added to the probe tool on whatever CI round happens next. Kept out
       of the pipeline deliberately — a robots fetch failing on that host would take out 23
       of 51 sources. If it *is* disallowed, that is a real input to whether `t.me/s/`
@@ -906,14 +908,22 @@ reading and did not.** Prose with numbers in it needs the same mechanical check 
       **That failure is the acceptance test for the assertions themselves** — per the
       standing lesson, a gate that is only read passes; it must be attacked with the
       specific bug it exists to catch, and here both bugs are already known and live.
-- [ ] **Diagnose g1 — why `state_dept_travel` yields zero per-item dates.** One CI round
-      with a raw-body dump (add a `--dump-body` flag to `tools/check_feeds.py`, not to the
-      pipeline). Decides between channel-level-`<pubDate>`-only (a feed property; needs a
-      policy for genuinely undated items) and a per-item tag `_DATE_RE` misses (a collector
-      bug). **Do not guess between them** — the undeclared-gzip hypothesis was guessed in
-      session 4 and ci4 falsified it after a wasted round.
-      Same round can answer the open `telegram.org/robots.txt` question below, since both
-      are one-line additions to the same tool.
+- [ ] **Diagnose g1 — why `state_dept_travel` yields zero per-item dates. TOOLING BUILT
+      2026-08-19, awaiting one dispatch.** `tools/dump_body.py` + `.github/workflows/
+      dump-body.yml`. Dispatch with the default url; the run prints one of three verdicts.
+      Put the diagnosis in a NEW tool rather than a `--dump-body` flag on `check_feeds.py`
+      as originally planned — that file is already 217 lines, over the constraint-12 cap,
+      and "is it alive" and "why is its data shaped wrong" are different jobs.
+      **Verified offline against three synthetic bodies before it goes near CI**, per the
+      standing lesson that a gate/diagnostic which is only read is worthless: channel-level
+      date only → `CAUSE (a)`; item carrying `<a10:updated>` which `DATE_RE` omits →
+      `CAUSE (b)` naming the tag; ordinary per-item `<pubDate>` → "dates exist, look at
+      parse_date". All three correct.
+      Next decision depends on which verdict comes back: (a) is a POLICY question for
+      undated items and NOT a code fix; (b) is a one-line `_DATE_RE` addition in `rss.py`.
+      **Do not pre-judge** — the undeclared-gzip hypothesis was guessed in session 4 and
+      ci4 falsified it after a wasted round.
+      The same dispatch answers the `telegram.org/robots.txt` question below.
 - [x] **RESOLVED 2026-08-19 — `tg_ukmto_mirror` DISABLED, MARAD MSCI staged to replace it.**
       Owner chose substitution over repair. **The staleness was NOT a quiet-event-feed false
       positive, which was the live alternative hypothesis and was checked before acting.**
