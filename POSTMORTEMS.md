@@ -1,6 +1,17 @@
 # POSTMORTEMS.md — News Curator build history
 
+Split out of CLAUDE.md 2026-08-19. CLAUDE.md loads into context on every turn of every
+session; this file does not. Nothing here is deleted or condensed — it is the forensic
+record of what broke, why, and what rule came out of it. Read it when working on the
+phase or subsystem it covers. CLAUDE.md keeps the operational core and points here.
+
 ## g1 SOLVED 2026-08-19 — date-only RFC-822, plus the Tehran display decision
+
+**PHASE 3 CLOSED. collect-test GREEN 2026-08-19 after this fix.** All six gate conditions
+pass: >=160 items, >=8 sources, required ids present, every timestamp predates run start,
+no all-null date source (condition 5, added same day), no source stale >14 days
+(condition 6, added same day). Conditions 5 and 6 were each proven by failing on the
+real defect they were written for before going green.
 
 **Cause: `state_dept_travel` emits `'Wed, 19 Aug 2026'` — a valid RFC-822 date with NO
 time component — on 95 of 95 items.** Reproduced against the real code:
@@ -94,12 +105,6 @@ owner-supplied replacement mirror channel.
 Side note: `dump-body.yml`'s header claimed the job "always exits 0". False — the 406 run
 went red because `dump_body.py` returns 1 on a fetch failure. Comment corrected rather
 than the behaviour: a red run here means "could not fetch", never "the feed is wrong".
-
-
-Split out of CLAUDE.md 2026-08-19. CLAUDE.md loads into context on every turn of every
-session; this file does not. Nothing here is deleted or condensed — it is the forensic
-record of what broke, why, and what rule came out of it. Read it when working on the
-phase or subsystem it covers. CLAUDE.md keeps the operational core and points here.
 
 ## Status
 

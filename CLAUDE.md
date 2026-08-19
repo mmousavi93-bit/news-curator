@@ -299,11 +299,6 @@ Do not re-add that content here — this file loads on every turn.
       **That failure is the acceptance test for the assertions themselves** — per the
       standing lesson, a gate that is only read passes; it must be attacked with the
       specific bug it exists to catch, and here both bugs are already known and live.
-- [x] **g1 SOLVED 2026-08-19.** `state_dept_travel` emits date-only RFC-822
-      (`'Wed, 19 Aug 2026'`), which every parser rejects. Fixed via `parse_date_ex` →
-      midnight UTC + a `date_only` flag on `Item`. Forensics in `POSTMORTEMS.md`.
-- [x] **`t.me/robots.txt` question CLOSED 2026-08-19 — no robots.txt exists on either host
-      (404), so nothing is disallowed and `respect_robots_txt: false` is vindicated.**
 - [ ] **`date_only` has two unbuilt consumers. Both are REQUIRED, not optional.**
       (a) The composer must print the date and state that the time was not given — never a
       clock time. Midnight UTC renders as **03:30 Tehran**, so printing it invents a
