@@ -168,7 +168,7 @@ clickbait, never fearmongering. Alert level modulates urgency, not volume. Promp
 | `config/sources_probe_<tag>.csv` | Probe output, one file per environment (`local` = owner's PC in Iran, `ci` = GitHub US runner). |
 | `src/agent/collectors/` | One file per source type, all implement `base.py`. |
 | `src/agent/pipeline/` | Linear stages: filter → vision → embed → cluster → understand → validate → compose. |
-| `src/agent/memory/` | SQLite schema, models, retention pruning. |
+| `src/agent/memory/` | **Phase 4, built 2026-08-19, awaiting owner gate.** `schema.sql` (12 tables, `SCHEMA_VERSION = 1`), `db.py`, `models.py`, `dedup.py` (layers 1–3 only), `retention.py`, `crypto.py`. Journal mode is DELETE not WAL, on purpose. `open_db` refuses to create by default — that default IS constraint 14. Layer 4 (cosine) is Phase 6. Rationale in `POSTMORTEMS.md`. |
 | `src/agent/risk/` | Deterministic scoring. No LLM calls permitted in this package. |
 | `src/agent/llm/` | Provider router, backoff, circuit breaker, mock mode. |
 | `src/agent/delivery/` | Telegram client and message formatter. |
@@ -275,8 +275,37 @@ Do not re-add that content here — this file loads on every turn.
    `user_agent: "news-curator/1.0 (personal research agent)"`. **A source that answered 200
    to the probe may 403 the collector.** Align settings.yaml to the probe UA in Phase 3.
 
+## Provider economics — settled 2026-08-21 (session 7). Do not re-litigate.
+
+- **Runtime is $0/day.** ~315 calls/day = 21% of Gemini's 1,500 RPD; Groq behind it has
+  45x the daily volume. Volume model reproduces the rate card above to the dollar.
+- **~97% of the noise reduction is LLM-free** (800 raw → ~120 unseen via SQLite dedup →
+  ~25 clusters via local MiniLM). Provider loss costs summary prose, not the product.
+- **No consumer subscription grants API access** — Claude Pro, ChatGPT, and notably
+  Google AI Pro, whose higher quotas apply to AI Studio Playground/Build while raw API
+  keys follow Cloud Billing tiers. Asked and answered; do not revisit.
+- **A paid account is worse for stability here**: international card (the standing
+  blocker) plus a KYC/sanctions surface tied to the owner. Free key from a US runner wins.
+- **Decision: buy nothing for runtime.** Run the Phase 7 accuracy gate before paying any
+  adjudicator. Rationale and the estimate post-mortem are in `POSTMORTEMS.md § Session 7`.
+
 ## Pending / unresolved
 
+- [ ] **Ask DeepSeek whether cached reads count against the 5M free tokens/30d.** The
+      cached fresh-token load is ~3.3M/month, so the answer decides whether DeepSeek is a
+      **second zero-cost provider** or a $5/mo one. One support ticket. Highest
+      value-per-effort item on this list.
+
+- [ ] **Phase 4 owner gate — run `python -m pytest -q` on Windows. Expected `274 passed`
+      (183 baseline + 91 new). Reconcile before accepting.** Baseline verified as
+      167 unit + 16 integration, so a mismatch means phantom collection, not rounding.
+      Also run `python -m agent.run --collect-only --db state.db --init-db` once, then
+      the same command WITHOUT `--init-db` against a path that does not exist: it must
+      exit 1 and create no file. That second run is the constraint-14 gate.
+- [ ] **Phase 6 decision deferred by Phase 4: does the `items` table survive?** It is not
+      in `ARCHITECTURE.md` §11 — it exists because gate 1 needed somewhere to write raw
+      items. If clustering makes `events` the owner of raw text, delete `items`; do not
+      write a second raw tier alongside it.
 - [ ] Owner to approve `ARCHITECTURE.md`.
 - [ ] **Answer whether `t.me/robots.txt` disallows `/s/`. Round 1 checked `telegram.org`
       by mistake — robots.txt is per-host and the collector fetches `t.me`. Fixed in

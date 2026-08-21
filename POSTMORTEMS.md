@@ -334,7 +334,60 @@ than the behaviour: a red run here means "could not fetch", never "the feed is w
       of the 23 Telegram sources have ever been staleness-checked.** The collector can now
       read their dates; the first three tested split 2 live / 1 dead. The other 20 are
       unaudited and must be checked as they are enabled at Phase 8.
-- Phases 4–10 — not started.
+- **Phase 4 (storage) — BUILT 2026-08-19, AWAITING OWNER GATE.** Brief:
+  `agents/briefs/PHASE_4_BRIEF.md`. Files: `src/agent/memory/{schema.sql,db,models,dedup,
+  retention,crypto}.py` (198/165/140/199/105/151 lines, all under the cap) + five
+  `tests/unit/test_memory_*.py`. `run.py` gains `--db` and `--init-db` and stays at 200.
+  **Expected count on the owner's Windows: 274 = 183 baseline + 91 new.** State that
+  number before running, then reconcile — the baseline itself was reconciled here as
+  167 unit + 16 integration, which is what makes 274 falsifiable rather than a guess.
+  Decisions made inside the brief's silences, each one a place a later phase could be
+  broken by a different choice:
+  (a) **An `items` table exists that ARCHITECTURE §11 does not list.** Gate 1 says "write
+      N items, read N items back", and there was nowhere to write them — §11 jumps
+      straight to `events`, which is Phase 6. `items` is the raw tier, pruned on the same
+      `events_days` window. If Phase 6 decides clusters own the raw text, this table is
+      the thing to delete, not to work around.
+  (b) **Journal mode left at DELETE, not WAL.** WAL is the reflex and it is wrong here:
+      `-wal`/`-shm` sidecars would break both the "no new file exists after a halt"
+      assertion and Phase 7's single-file encrypt. A `.db.age` restored without its WAL
+      is a database missing its most recent committed writes — silent, and exactly the
+      class of loss constraint 14 exists to prevent.
+  (c) **`open_db(create_if_absent=False)` by default.** The one line that makes constraint
+      14 real: a failed Phase 7 decrypt leaves no file, and any default that creates one
+      turns a restore failure into a silent fresh start. Creation requires the explicit
+      `--init-db` flag, and the two gate tests deliberately pass `create_if_absent=True`
+      while still asserting the halt — permission to create is not permission to discard.
+  (d) **A zero-byte file is a VALID empty SQLite database and `PRAGMA integrity_check`
+      passes on it.** So integrity is not the guard; the missing `schema_version` row is.
+      Tested explicitly, because this is the failure that looks healthiest.
+  (e) **`market_metrics` has no retention key in `settings.yaml`** but §11 specifies 30
+      days. Bound to `events_days` rather than hardcoded, per "do not hardcode any of
+      them". If the two ever need to differ, that needs a new key, not a literal.
+  (f) **`source_health` is deliberately absent from the prune table** and asserted so.
+      ~51 rows, one per source; pruning it erases the only record that answers "how long
+      has this feed been dead?" — the exact question g2 took three probe rounds to reach.
+  (g) **The age private key never enters argv.** Written to a `mkstemp` file at 0600,
+      passed via `-i`, unlinked in `finally`. `/proc/<pid>/cmdline` is world-readable and
+      this is a shared runner. `age` stderr is scrubbed before it becomes an exception
+      message, because the binary echoes what it failed to parse.
+  Three test failures on the first run, all real and all fixed on the source side rather
+  than by relaxing the assertion:
+  (h) two hygiene greps caught their own docstrings — `models.py` named the display
+      timezone and `retention.py` spelled out the forbidden wall-clock call while
+      explaining that it must not appear. Reworded to describe rather than name. A grep
+      rule that its own file violates gets deleted by the next person; this was worth two
+      minutes to keep strict.
+  (i) `read_schema_version` raised "no readable meta table" where the test expected the
+      message to name `schema_version`. The test was right: all four halt messages now
+      name the thing that could not be read, so a world-readable log line is
+      self-explanatory to an owner who is not holding this file open.
+  Verified beyond the unit suite: the CLI creates all 12 tables with `schema_version=1`
+  and **no `-wal`/`-shm` sidecars**, logs one storage line, and — run without `--init-db`
+  against an absent path — exits 1, creates nothing, and says why. Semantic dedup
+  (layer 4, cosine) is NOT here; it is Phase 6, and `embeddings` is created empty so that
+  phase needs no migration against encrypted state.
+- Phases 5–10 — not started.
 - Build-agent roster written 2026-08-01 (`agents/`). Four roles: Architect (strongest model,
   brief + gate review only, never writes code), Implementer (mid-tier for phases 4–8,
   light for 1/2/3/9/10, fresh context per phase), Verifier (light, adversarial, never the
@@ -342,6 +395,82 @@ than the behaviour: a red run here means "could not fetch", never "the feed is w
   Loop: brief → build → attack → gate review → commit → discard Implementer context.
   Estimated one-time build cost ~$50 at these tiers; cost is driven by context reuse, not
   model tier.
+
+## Session 7 (2026-08-21) — provider economics, and an estimate that was wrong
+
+Owner asked what the project costs to finish and to run. Four findings, one of which
+closes a recurring question permanently.
+
+**1. Runtime is $0/day and the number has 4.8x headroom.** ~35 calls/run x 9 runs =
+~315 calls/day at ~3,050 in / 400 out, i.e. ~0.96M in / 0.13M out daily. That model
+reproduces the rate card in CLAUDE.md exactly (DeepSeek $5.09/mo vs the recorded "~$5";
+Haiku 4.5 $47.70 vs "~$38-60"), so the volume figures are sound. 315 against Gemini's
+1,500 RPD is 21%. Embedding is local, Actions is free on public repos, Telegram is free.
+The LLM is the only variable cost line and it is zero.
+Minor inconsistency found in the verified-facts block: it states "~288/day" (36 x 8) while
+the rate card assumes 9 runs. 324 is the right figure. Immaterial to dollars.
+
+**2. The noise reduction is LLM-free, and this is the strongest fact in the design.**
+800 raw -> ~120 unseen (SQLite dedup, Phase 4) -> ~25 clusters (MiniLM on CPU) is a **97%
+reduction with zero LLM calls**. The LLM writes summary prose and extracts signals. If
+every provider went dark the owner still receives deduplicated, clustered, source-tiered,
+rumour-labelled items. **Provider loss is a quality-of-prose risk, not an availability
+risk.** Reach for this whenever provider anxiety resurfaces; it reframes the whole
+purchasing question.
+
+**3. Consumer AI subscriptions do not provide API access. Closed, do not re-litigate.**
+Owner asked about Claude Pro, ChatGPT Pro, Google AI Pro, DeepSeek and Kimi. Claude Pro
+and ChatGPT: no API, separate billing product. **Google AI Pro is the trap** — its higher
+quotas apply to the AI Studio Playground and Build mode, while raw API keys follow Cloud
+Billing tiers, a separate system. Gemini CLI has exactly this friction, reading the key's
+billing status (Free) rather than the account's subscription. DeepSeek and Kimi have no
+relevant subscription tier, only metered API.
+Two further reasons a subscription is the wrong instrument here: driving one from CI needs
+consumer session credentials in a public repo's Actions, which is the same failure class
+constraint 6 already rejected for Telethon but with a payment relationship attached; and
+the owner's PC being always off rules out the legitimate local path.
+
+**4. A paid account is WORSE for stability in this jurisdiction, not better.** Every paid
+option needs an international card (the standing blocker) and creates a KYC and sanctions
+surface tied to the owner's identity — an account terminable with money in it. A free key
+called from a US runner has the smaller attack surface. On the axis the owner actually
+cares about, free is the more stable configuration.
+
+**Decision on record: buy nothing for runtime.** Chain stays Gemini (1,500 RPD) -> Groq
+(14,400 RPD, 45x daily volume) -> OpenRouter -> degrade. Two independent free providers,
+either sufficient alone.
+
+**New high-value open question.** DeepSeek gives 5M free tokens/30d and the cached
+fresh-token load is ~3.3M/month, so it may be a **second zero-cost provider** rather than
+a $5/mo one. UNVERIFIED whether cached reads count against the allotment — already flagged
+in the rate card, now promoted to an action. One support ticket, worth more than any
+provider comparison in this section.
+
+**The estimate I got wrong, recorded because the error is systematic.** First remaining-
+build figure was $70-125. It modelled clean phases: build once, gate once, done. The owner
+asked whether it was real and whether it included AI-caused bugs and wrong turns. It did
+not, and the evidence against it was already in this file: Phase 2 took three review
+rounds plus an owner gate that found a fourth defect and two cascading ones; Phase 3 took
+four probe rounds, two gate failures and a diagnostic tool built mid-phase; Phase 4 had
+two constraint-12 violations, a frozen-dataclass error and a self-inflicted tooling
+failure that cost calls to diagnose. **Observed rework on this project is 2-4x nominal on
+every phase without exception.** Revised remaining: **~$160-290**, total ~$230-390 at
+Opus 5 list ($5/$25 per MTok, thinking billed as output, ~30% heavier tokenization on
+4.7+).
+Also missed on the first pass: **phases 7 and 10 are clock-bound, not effort-bound.**
+Their gates are "three consecutive unattended runs" (9h minimum per attempt at a 3-hour
+cadence) and "one week unattended". No amount of spend compresses those, and each failed
+attempt costs a full cycle.
+Standing rule from this: any estimate for this project states base, rework multiplier with
+its evidence, and which components are clock-bound. Never the happy path alone.
+
+**Build-cost restructure recommended, not yet adopted.** The roster in `agents/` already
+specifies Implementer = mid-tier and Architect = strongest model for briefs and gate
+reviews only. Phases 1-4 ran the Implementer role on Opus in chat, which is roughly 3x the
+plan the repo already wrote down (`~$50 at these tiers`). Proposal: Opus writes the brief
+and reviews the gate, Sonnet builds from it in Claude Code, Haiku does source audits.
+Claude Pro at $20/mo includes Claude Code and is a defensible BUILD purchase — never a
+runtime one.
 
 ## Session 6 (2026-08-18) — Fable review of the committed state and the Phase 3 brief
 
@@ -829,6 +958,14 @@ reading and did not.** Prose with numbers in it needs the same mechanical check 
       `.git/HEAD.lock` and `.git/objects/maintenance.lock` behind, and a stale `index.lock`
       is what silently ate probe round ci3. Clear them after any VM-side commit and confirm
       with `git status -sb` before trusting the result.
+      **Sharpened 2026-08-21: it is not only `git commit`. A read-only `git status` from the
+      VM creates `index.lock` too** (status refreshes the index), and the VM cannot always
+      unlink it — the output says `unable to unlink ... Operation not permitted`. This
+      recurred live this session: the owner cleared the lock, an agent ran `git status` to
+      check the remote, and the owner's next `git add` failed with "File exists".
+      **Standing rule: agents run NO git command in this repo, not even status. Read state
+      with `ls`/`cat`; the owner runs git.** Given this, ci3's cause was almost certainly
+      the agent VM rather than Windows.
 - [x] Owner installed `requests` on Windows 2026-08-13. Offline guarantee is now asserted by
       `tests/integration/test_no_requests.py`, not by the package being absent.
 - [x] Warning-fatigue under sustained conflict — RESOLVED 2026-08-01: WARTIME alert regime
