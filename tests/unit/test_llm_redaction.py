@@ -40,8 +40,10 @@ class _LeakyQueryAdapter:
 
 
 def _capture(caplog, level=logging.DEBUG):
-    caplog.at_level(level, logger="agent.llm.router")
-    return caplog
+    # Returns the at_level() context manager -- the pytest-supported form.
+    # `with caplog:` (the fixture itself) is NOT a context manager in real
+    # pytest; a shim that allowed it masked this and CI caught it.
+    return caplog.at_level(level, logger="agent.llm.router")
 
 
 def test_key_in_exception_message_is_redacted(caplog):

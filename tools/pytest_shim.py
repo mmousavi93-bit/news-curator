@@ -203,11 +203,11 @@ class Caplog:
     def clear(self):
         self.records.clear()
 
-    def __enter__(self):
-        return self
-
-    def __exit__(self, *exc_info):
-        return False
+    # Deliberately NO __enter__/__exit__ here: real pytest's
+    # LogCaptureFixture is not a context manager, and a shim that is one
+    # masks the exact misuse (with caplog:) that CI then rejects. The
+    # supported context-manager form is `with caplog.at_level(...)`, which
+    # returns a _LevelContext. Learned 2026-08-29 from a red CI run.
 
     @property
     def text(self):

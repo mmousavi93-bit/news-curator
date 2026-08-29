@@ -515,6 +515,18 @@ than the behaviour: a red run here means "could not fetch", never "the feed is w
 - **v1.5 (Phase 11, risk engine) — NOT STARTED, per session-3 scope cut.** The
   extraction accuracy gate is re-filed there: the extraction prompt and scorer do
   not exist in v1, and a gate for code that does not exist measures nothing.
+- **First red CI run (owner's push, 2026-08-29): 6 failures, all in
+  test_llm_redaction.py — `'LogCaptureFixture' object does not support the
+  context manager protocol`.** The suite was shim-green 464/464. Root cause: the
+  shim's Caplog implemented `__enter__`/`__exit__`, so `with caplog:` passed in
+  the sandbox; real pytest's LogCaptureFixture has no such protocol, so CI
+  rejected it. The shim had become a SUPERSET of pytest — the exact failure mode
+  the shim discipline exists to prevent, now proven able to happen. Fix on both
+  sides: tests use `with caplog.at_level(...)` (the pytest-supported form),
+  and the shim's Caplog deliberately implements NO context-manager protocol,
+  with a comment saying why. **Standing rule: the shim may only implement what
+  the suite uses AND real pytest supports. When in doubt, the shim must be
+  STRICTER than pytest, never looser.**
 - Build-agent roster written 2026-08-01 (`agents/`). Four roles: Architect (strongest model,
   brief + gate review only, never writes code), Implementer (mid-tier for phases 4–8,
   light for 1/2/3/9/10, fresh context per phase), Verifier (light, adversarial, never the
