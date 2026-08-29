@@ -68,6 +68,16 @@ def test_no_events_produces_honest_one_liner():
     assert ctx.counters["compose"] == 0
 
 
+def test_llm_failed_flag_swaps_one_liner_for_ai_unavailable():
+    # ARCHITECTURE.md §8: total LLM loss says "AI unavailable", never
+    # "nothing new" -- the world did change, we just could not read it.
+    ctx = _Ctx(config=_config())
+    ctx.llm_failed = True
+    ComposeStage(_Log()).run(ctx)
+    assert "AI unavailable" in ctx.message
+    assert "Nothing new" not in ctx.message
+
+
 def test_events_become_items_in_priority_order():
     events = [
         _event("a" * 16, summary="Alpha event. Alpha detail."),

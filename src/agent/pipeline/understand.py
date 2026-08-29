@@ -75,6 +75,7 @@ class UnderstandStage:
     def run(self, ctx) -> None:
         clusters = list(getattr(ctx, "clusters", None) or [])
         events: list[Event] = []
+        saw_success = False
         for cluster in clusters:
             result = ctx.router.complete(
                 render_prompt(self._template, cluster, self._body_chars),
@@ -95,6 +96,7 @@ class UnderstandStage:
                     "understand: cluster %s skipped (status=%s)", cluster.key, result.status
                 )
                 continue
+            saw_success = True  # the AI answered; parse quality is separate
 
             try:
                 parsed = _extract_json(result.text)
@@ -116,6 +118,10 @@ class UnderstandStage:
             events.append(self._build_event(cluster, parsed, ctx.now))
 
         ctx.events = events
+        # Honesty flag for the composer: clusters existed but NO LLM call
+        # succeeded. "Nothing new" would be a lie about the world -- the
+        # truth is "the AI was unavailable" (ARCHITECTURE.md §8).
+        ctx.llm_failed = bool(clusters) and not saw_success
         if events:
             self._logger.info("understand: %d events from %d clusters", len(events), len(clusters))
         if getattr(ctx, "db", None) is not None and events:

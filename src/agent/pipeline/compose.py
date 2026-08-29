@@ -55,7 +55,16 @@ class ComposeStage:
         clusters = {c.key: c for c in getattr(ctx, "clusters", None) or []}
 
         if not events:
-            ctx.message = _NOTHING_NEW
+            # ARCHITECTURE.md §8: total LLM loss degrades to a one-line
+            # "AI unavailable" notice -- "nothing new" would be a lie about
+            # the world when the truth is "we could not read it".
+            if getattr(ctx, "llm_failed", False):
+                ctx.message = (
+                    "AI unavailable this run -- items were collected and stored, "
+                    "but nothing could be summarised."
+                )
+            else:
+                ctx.message = _NOTHING_NEW
             ctx.counters["compose"] = 0
             self._logger.info("compose: no events -- honest one-liner")
             return

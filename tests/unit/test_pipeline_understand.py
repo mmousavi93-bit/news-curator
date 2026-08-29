@@ -155,6 +155,8 @@ def test_unavailable_skips_without_raising():
     stage.run(ctx)  # must not raise
     assert ctx.events == []
     assert any("skipped" in m for m in log.messages)
+    # The honesty flag: clusters existed, no LLM call succeeded.
+    assert ctx.llm_failed is True
 
 
 def test_events_persisted_when_db_present(tmp_path):
