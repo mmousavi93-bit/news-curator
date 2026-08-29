@@ -1,14 +1,13 @@
-"""The compose stage: ctx.events become ONE budgeted Telegram message, or
-an honest one-liner when nothing changed (constraint 11).
+"""The compose stage: ranked events become one or more budgeted Telegram
+messages, or an honest one-liner.
 
-Tone contract (CLAUDE.md): calm, factual, no drama -- the message text this
-stage builds IS the tone surface, alongside config/prompts. Alert tiers are
-the scorer's job (v1.5); v1 framing is the run date and, on the 07:00 run,
-the daily digest marker.
-
-Dates are Tehran wall-clock, display-only, and date_only is respected: when
-every member of a cluster is date-only, the time is stated as unknown --
-never a midnight placeholder rendered as 03:30 Tehran (constraints 10, 11).
+Owner's output contract (2026-08-29): Persian, informative headlines (the
+reader decides from the headline whether to read on), concise details,
+category symbols, importance-sorted, multi-message when the day is busy,
+and never "news anchor" dramatisation. Tone lives in config/prompts; this
+stage owns ORDER, LABELS and BUDGET. Order comes from pipeline/rank.py
+(deterministic -- NOT the Phase-11 risk engine). Dates are Jalali, Tehran
+wall-clock, display-only; date_only items say the time was not stated.
 """
 
 from __future__ import annotations
@@ -16,34 +15,40 @@ from __future__ import annotations
 import logging
 
 from agent.collectors.tz import to_tehran
-from agent.delivery.formatter import format_single
+from agent.delivery.formatter import format_split
 from agent.delivery.message import Item, Message
-
-_NOTHING_NEW = "Nothing new since the last run."
+from agent.pipeline.labels import category_icon, category_name, labels_for
+from agent.pipeline.rank import rank_events
+from agent.util.jalali import format_jalali
 
 
 def _headline(summary: str) -> str:
-    """First sentence of the summary, capped -- a headline, not a cut."""
+    """First sentence of the summary, capped -- informative, not truncated
+    into nonsense: the cap cuts at a word boundary near 140 chars."""
     first = summary.split(". ")[0].strip(" .")
-    return first if len(first) <= 120 else first[:117] + "..."
+    if len(first) <= 140:
+        return first
+    cut = first[:137].rsplit(" ", 1)[0]
+    return cut + "…"
 
 
-def _when_text(cluster) -> str:
-    """Tehran display for the event's latest time. If EVERY member is
+def _when_text(cluster, labels) -> str:
+    """Jalali display of the event's latest time. If EVERY member is
     date_only, the feed gave no time -- say so rather than invent one."""
     dated = [m for m in cluster.members if m.published_at is not None]
     if not dated:
-        return "date unknown"
+        return labels["date_unknown"]
     latest = max(m.published_at for m in dated)
     shown = to_tehran(latest)
+    when = format_jalali(shown, with_time=True)
     if all(m.date_only for m in dated):
-        return f"{shown:%Y-%m-%d} (time not stated)"
-    return f"{shown:%Y-%m-%d %H:%M} Tehran"
+        return f"{when.split(' — ')[0]} ({labels['time_not_stated']})"
+    return when
 
 
 class ComposeStage:
-    """Writes ctx.message (the formatted, budgeted text) and sets the
-    `compose` counter to the number of events included."""
+    """Writes ctx.messages (formatted, budgeted, ranked) and the optional
+    lead message; `compose` counter = events included."""
 
     name = "compose"
 
@@ -51,70 +56,92 @@ class ComposeStage:
         self._logger = logger
 
     def run(self, ctx) -> None:
+        settings = ctx.config.settings
+        labels = labels_for(settings.delivery.output_language)
         events = list(getattr(ctx, "events", None) or [])
         clusters = {c.key: c for c in getattr(ctx, "clusters", None) or []}
 
         if not events:
-            # ARCHITECTURE.md §8: total LLM loss degrades to a one-line
-            # "AI unavailable" notice -- "nothing new" would be a lie about
-            # the world when the truth is "we could not read it".
-            if getattr(ctx, "llm_failed", False):
-                ctx.message = (
-                    "AI unavailable this run -- items were collected and stored, "
-                    "but nothing could be summarised."
-                )
-            else:
-                ctx.message = _NOTHING_NEW
+            text = (
+                labels["ai_unavailable"] if getattr(ctx, "llm_failed", False)
+                else labels["nothing_new"]
+            )
+            ctx.messages = [text]
             ctx.counters["compose"] = 0
             self._logger.info("compose: no events -- honest one-liner")
             return
 
-        marker = " — daily digest" if getattr(ctx, "daily_digest", False) else ""
-        header = f"News Curator — {to_tehran(ctx.now):%Y-%m-%d %H:%M} Tehran{marker}"
+        kept, _dropped = rank_events(
+            events, clusters, ctx.config.credibility, settings, ctx.now, self._logger
+        )
+
+        if not kept:
+            # Everything fell below the importance threshold: the honest
+            # one-liner, never a bare header with nothing under it.
+            text = (
+                labels["ai_unavailable"] if getattr(ctx, "llm_failed", False)
+                else labels["nothing_new"]
+            )
+            ctx.messages = [text]
+            ctx.counters["compose"] = 0
+            self._logger.info(
+                "compose: all %d event(s) below min_score -- honest one-liner", len(events)
+            )
+            return
+
+        now_tehran = to_tehran(ctx.now)
+        marker = (
+            f" — {labels['digest_marker']}"
+            if getattr(ctx, "daily_digest", False) else ""
+        )
+        header = (
+            f"{labels['header']} — {format_jalali(now_tehran, with_time=True)}"
+            f" {labels['tehran']}{marker}"
+        )
 
         items = []
-        for index, event in enumerate(events):
-            # ctx.events is already in cluster-priority order (tier, then
-            # recency); enumerate keeps that order as explicit priorities.
+        for index, event in enumerate(kept):
             cluster = clusters.get(event.event_key)
-            when = _when_text(cluster) if cluster is not None else ""
-            detail = f"{when} — {event.summary}" if when else event.summary
-            # Constraint 10, made visible: a single-source event is labelled
-            # RUMOUR in the message itself, not just in the database.
-            headline = _headline(event.summary)
+            when = _when_text(cluster, labels) if cluster is not None else ""
+            name = category_name(settings.delivery.output_language, event.category)
+            # The LLM's own informative headline is the title; the summary
+            # is the detail BEYOND it. Fallback (no headline field): the
+            # summary's first sentence, as before.
+            headline = event.headline.strip() if event.headline else _headline(event.summary)
             if event.claim_status == "rumour":
-                headline = f"[RUMOUR] {headline}"
+                headline = f"{labels['rumour']} · {headline}"
+            headline = f"{category_icon(event.category)} {headline}"
+            detail_bits = [name, when, event.summary] if when else [name, event.summary]
             items.append(Item(
                 headline=headline,
                 priority=index,
-                detail=detail,
+                detail=" · ".join(detail_bits),
             ))
 
         message = Message(header=header, items=tuple(items), footer=None)
-        # format_single budgets internally (Phase 2): truncation by
-        # priority, never mid-tag, capped at Telegram's own limit.
-        max_units = ctx.config.settings.delivery.telegram_max_chars
-        ctx.message = format_single(message, max_units=max_units)
-        ctx.counters["compose"] = len(events)
-        self._logger.info("compose: %d events -> message (%d chars)",
-                          len(events), len(ctx.message))
+        max_units = settings.delivery.telegram_max_chars
+        # format_split budgets and splits by priority; the digest may span
+        # up to digest_rank.max_messages messages (owner decision).
+        ctx.messages = format_split(
+            message, max_units=max_units, max_messages=settings.digest_rank.max_messages
+        )
+        ctx.counters["compose"] = len(kept)
+        self._logger.info(
+            "compose: %d event(s) -> %d message(s)", len(kept), len(ctx.messages)
+        )
 
-        # Lead channel (optional, LEAD_HANDLING.md v1): only when the
-        # owner configured TELEGRAM_LEADS_CHANNEL_ID. Lead-only events never
-        # reach the MAIN message -- the validate stage split them out.
         lead_events = list(getattr(ctx, "lead_events", None) or [])
-        if lead_events and ctx.leads_channel_id:
+        if lead_events and getattr(ctx, "leads_channel_id", None):
             lead_items = []
             for index, event in enumerate(lead_events):
                 lead_items.append(Item(
-                    headline=f"[LEAD] {_headline(event.summary)}",
+                    headline=f"📡 {labels['lead_prefix']} · {_headline(event.summary)}",
                     priority=index,
-                    detail=f"{event.summary}",
+                    detail=event.summary,
                 ))
             lead_message = Message(
-                header="News Curator — lead channel (unverified, weight 0)",
-                items=tuple(lead_items),
-                footer=None,
+                header=labels["lead_header"], items=tuple(lead_items), footer=None
             )
-            ctx.lead_message = format_single(lead_message, max_units=max_units)
-            self._logger.info("compose: %d lead event(s) -> lead message", len(lead_events))
+            ctx.lead_message = format_split(
+                lead_message, max_units=max_units, max_messages=1
+            )[0]

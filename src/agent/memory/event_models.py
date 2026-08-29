@@ -49,7 +49,17 @@ class Event:
 
     event_key: str
     summary: str
+    # The LLM's own informative one-liner (owner contract 2026-08-29: the
+    # reader decides from the headline alone). In-memory only, like
+    # category: not persisted, the events table predates both.
+    headline: str = ""
     entities: tuple[str, ...] = ()
+    # Digest-ranking category (owner decision 2026-08-29): military |
+    # security | politics | economy | other. In-memory only -- NOT
+    # persisted: the events table predates it and additive schema changes
+    # are frozen at CREATE IF NOT EXISTS. Persist when Phase 11's scorer
+    # arrives, if it still matters then.
+    category: str = "other"
     claim_status: str = "unconfirmed"
     source_count: int = 0
     independent_count: int = 0
@@ -126,3 +136,17 @@ def read_events(
         sql += " LIMIT ?"
         return [row_to_event(r) for r in conn.execute(sql, (limit,)).fetchall()]
     return [row_to_event(r) for r in conn.execute(sql).fetchall()]
+
+
+def read_recent_events(
+    conn: sqlite3.Connection, *, hours: int, now: datetime
+) -> list[Event]:
+    """Events whose last_updated_at falls within `hours` of the injected
+    `now` (the clock-read rule: callers pass ctx.now, nothing here reads
+    the wall clock). Used by the validate stage's anti-repetition
+    matching."""
+    from datetime import timedelta
+
+    cutoff = (now - timedelta(hours=hours)).isoformat()
+    sql = _SELECT_SQL + " WHERE last_updated_at >= ? ORDER BY last_updated_at DESC"
+    return [row_to_event(r) for r in conn.execute(sql, (cutoff,)).fetchall()]

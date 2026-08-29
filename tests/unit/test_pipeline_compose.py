@@ -1,6 +1,10 @@
-"""Unit tests for pipeline/compose.py: events -> one budgeted message (or
-the honest one-liner), priority ordering, date_only handling, digest marker
-and the 4,096-char ceiling."""
+"""Unit tests for pipeline/compose.py: ranked, Persian, multi-message
+digests (owner output contract 2026-08-29), the honest one-liners, the
+شایعه label, date_only handling and the char ceiling.
+
+Every event carries its cluster (as in production): without one, the
+ranker has no tier/recency signal and most test events would fall below
+min_score -- which is itself correct behaviour, tested separately."""
 
 from __future__ import annotations
 
@@ -20,6 +24,8 @@ from agent.settings import Settings
 _FIXTURE = Path(__file__).parent.parent / "fixtures" / "settings_minimal.yaml"
 NOW = datetime(2026, 8, 20, 12, 0, tzinfo=timezone.utc)
 
+NOTHING_NEW_FA = "چیز تازهای نسبت به اجرای قبلی نیامده."
+
 
 class _Log:
     def __init__(self) -> None:
@@ -37,7 +43,11 @@ class _Log:
 
 def _config() -> Config:
     settings = Settings.from_dict(yaml.safe_load(_FIXTURE.read_text(encoding="utf-8")))
-    return Config(settings=settings, credibility={})
+    return Config(settings=settings, credibility={
+        "t1": SourceCredibility(tier=1, group="g1"),
+        "t2": SourceCredibility(tier=2, group="g2"),
+        "t3": SourceCredibility(tier=3, group="g3"),
+    })
 
 
 @dataclass
@@ -50,79 +60,153 @@ class _Ctx:
     counters: dict = field(default_factory=dict)
 
 
-def _cluster(key: str, members: list[Item]) -> Cluster:
-    cluster = Cluster(key=key)
-    for item in members:
-        cluster.add(item, [1.0])  # dummy unit vector; centroid irrelevant here
-    return cluster
+def _member(source_id: str, date_only: bool = False) -> Item:
+    return Item(source_id=source_id, url=f"https://x/{source_id}/{date_only}",
+                title="t", body="b", published_at=NOW, lang="en",
+                raw_hash="h" * 8, date_only=date_only)
 
 
-def _event(key: str, summary: str = "First sentence. More detail.") -> Event:
-    return Event(event_key=key, summary=summary, entities=("Iran",), source_count=2)
+def _with_cluster(ctx: _Ctx, event: Event, source_id: str = "t2",
+                  date_only: bool = False) -> Event:
+    """Attach a cluster (like production always has) and return the event."""
+    cluster = Cluster(key="")
+    cluster.add(_member(source_id, date_only=date_only), [1.0])
+    ctx.clusters.append(cluster)
+    return Event(event_key=cluster.key, summary=event.summary,
+                 headline=event.headline, entities=event.entities,
+                 category=event.category, claim_status=event.claim_status,
+                 independent_count=event.independent_count,
+                 source_count=event.source_count,
+                 first_seen_at=event.first_seen_at,
+                 last_updated_at=event.last_updated_at)
 
 
-def test_no_events_produces_honest_one_liner():
+def _event(summary: str, category: str = "military", independent: int = 1,
+           claim_status: str = "unconfirmed") -> Event:
+    return Event(event_key="k" * 16, summary=summary, entities=("Iran",),
+                 category=category, independent_count=independent,
+                 claim_status=claim_status, source_count=2,
+                 first_seen_at=NOW, last_updated_at=NOW)
+
+
+def test_no_events_produces_honest_persian_one_liner():
     ctx = _Ctx(config=_config())
     ComposeStage(_Log()).run(ctx)
-    assert ctx.message == "Nothing new since the last run."
+    assert ctx.messages == [NOTHING_NEW_FA]
     assert ctx.counters["compose"] == 0
 
 
 def test_llm_failed_flag_swaps_one_liner_for_ai_unavailable():
-    # ARCHITECTURE.md §8: total LLM loss says "AI unavailable", never
-    # "nothing new" -- the world did change, we just could not read it.
     ctx = _Ctx(config=_config())
     ctx.llm_failed = True
     ComposeStage(_Log()).run(ctx)
-    assert "AI unavailable" in ctx.message
-    assert "Nothing new" not in ctx.message
+    assert "هوش مصنوعی" in ctx.messages[0]
+    assert NOTHING_NEW_FA not in ctx.messages[0]
 
 
-def test_events_become_items_in_priority_order():
-    events = [
-        _event("a" * 16, summary="Alpha event. Alpha detail."),
-        _event("b" * 16, summary="Beta event. Beta detail."),
+def test_header_is_persian_with_jalali_date_and_tehran():
+    ctx = _Ctx(config=_config())
+    ctx.events = [_with_cluster(ctx, _event("خلاصه نظامی."))]
+    ComposeStage(_Log()).run(ctx)
+    assert "مرور اخبار" in ctx.messages[0]
+    assert "تهران" in ctx.messages[0]
+    assert "۱۴۰۵" in ctx.messages[0]  # Jalali year
+
+
+def test_digest_marker_only_when_flagged():
+    ctx = _Ctx(config=_config(), daily_digest=True)
+    ctx.events = [_with_cluster(ctx, _event("خلاصه نظامی."))]
+    ComposeStage(_Log()).run(ctx)
+    assert "مرور روزانه" in ctx.messages[0]
+    ctx2 = _Ctx(config=_config(), daily_digest=False)
+    ctx2.events = [_with_cluster(ctx2, _event("خلاصه نظامی."))]
+    ComposeStage(_Log()).run(ctx2)
+    assert "مرور روزانه" not in ctx2.messages[0]
+
+
+def test_importance_order_military_before_economy():
+    ctx = _Ctx(config=_config())
+    economy = _event("خلاصه اقتصادی.", category="economy")
+    military = _event("خلاصه نظامی.", category="military")
+    ctx.events = [
+        _with_cluster(ctx, economy),
+        _with_cluster(ctx, military),
     ]
-    ctx = _Ctx(config=_config(), events=events)
     ComposeStage(_Log()).run(ctx)
-    assert ctx.counters["compose"] == 2
-    assert "Alpha event" in ctx.message  # headline + detail rendered
-    assert "Beta event" in ctx.message
-    # Priority order (event index order) is preserved in the message.
-    assert ctx.message.index("Alpha") < ctx.message.index("Beta")
+    text = ctx.messages[0]
+    assert text.index("خلاصه نظامی") < text.index("خلاصه اقتصادی")
 
 
-def test_message_stays_within_telegram_char_cap():
-    ctx = _Ctx(config=_config(), events=[
-        _event(f"{i:016x}", summary=f"Event {i}. " + "detail " * 200) for i in range(30)
-    ])
+def test_military_rumour_survives_threshold_with_shaye_label():
+    # Military rumour from a tier-3 channel: 5+0+0+3 = 8 >= min_score.
+    # Softer-category rumours (politics/security) score below and drop --
+    # also asserted below.
+    ctx = _Ctx(config=_config())
+    event = _event("خلاصه نظامی تأییدنشده.", category="military",
+                   independent=0, claim_status="rumour")
+    ctx.events = [_with_cluster(ctx, event, source_id="t3")]
     ComposeStage(_Log()).run(ctx)
-    assert len(ctx.message.encode("utf-16-le")) // 2 <= 4096
+    assert "شایعه" in ctx.messages[0]
+
+
+def test_soft_category_rumour_drops_below_threshold():
+    ctx = _Ctx(config=_config())
+    event = _event("شایعه سیاسی.", category="politics",
+                   independent=0, claim_status="rumour")
+    ctx.events = [_with_cluster(ctx, event, source_id="t3")]
+    ComposeStage(_Log()).run(ctx)
+    assert ctx.messages == [NOTHING_NEW_FA]  # 3+0+0+3 = 6 < 8
 
 
 def test_date_only_cluster_says_time_not_stated():
-    member = Item(source_id="s", url="https://x/1", title="t", body="b",
-                  published_at=NOW, lang="en", raw_hash="h" * 8, date_only=True)
-    cluster = _cluster("", [member])  # Cluster.add() computes the real key
-    ctx = _Ctx(config=_config(), events=[_event(cluster.key)], clusters=[cluster])
+    ctx = _Ctx(config=_config())
+    event = _event("خلاصه نظامی.", category="security")
+    ctx.events = [_with_cluster(ctx, event, date_only=True)]
     ComposeStage(_Log()).run(ctx)
-    assert "time not stated" in ctx.message
-    assert "03:30" not in ctx.message  # midnight placeholder never rendered
+    assert "زمان اعلام نشده" in ctx.messages[0]
+    assert "۰۳:۳۰" not in ctx.messages[0]  # midnight placeholder never rendered
 
 
-def test_normal_cluster_shows_tehran_clock_time():
-    member = Item(source_id="s", url="https://x/1", title="t", body="b",
-                  published_at=NOW, lang="en", raw_hash="h" * 8)
-    cluster = _cluster("", [member])
-    ctx = _Ctx(config=_config(), events=[_event(cluster.key)], clusters=[cluster])
+def test_llm_headline_is_the_title_summary_is_detail():
+    ctx = _Ctx(config=_config())
+    event = _event("جزئیات تکمیلی ماجرا.", category="security")
+    event = Event(event_key="h" * 16, summary=event.summary,
+                  headline="تیتر اطلاع‌رسان اصلی", category="security",
+                  independent_count=1, source_count=2,
+                  first_seen_at=NOW, last_updated_at=NOW)
+    ctx.events = [_with_cluster(ctx, event)]
     ComposeStage(_Log()).run(ctx)
-    assert "Tehran" in ctx.message
+    text = ctx.messages[0]
+    assert "تیتر اطلاع‌رسان اصلی" in text  # the LLM headline is the title
+    assert "جزئیات تکمیلی ماجرا" in text   # the summary is the detail
 
 
-def test_digest_marker_in_header_only_when_flagged():
-    ctx = _Ctx(config=_config(), events=[_event("d" * 16)], daily_digest=True)
+def test_category_icons_render():
+    ctx = _Ctx(config=_config())
+    ctx.events = [
+        _with_cluster(ctx, _event("خلاصه نظامی.", category="military")),
+        _with_cluster(ctx, _event("خلاصه سیاسی.", category="politics")),
+    ]
     ComposeStage(_Log()).run(ctx)
-    assert "daily digest" in ctx.message
-    ctx2 = _Ctx(config=_config(), events=[_event("d" * 16)], daily_digest=False)
-    ComposeStage(_Log()).run(ctx2)
-    assert "daily digest" not in ctx2.message
+    assert "⚔️" in ctx.messages[0]
+    assert "🏛️" in ctx.messages[0]
+
+
+def test_below_threshold_events_never_reach_the_message():
+    ctx = _Ctx(config=_config())
+    event = _event("مطلب غیرمرتبط.", category="other", independent=0)
+    ctx.events = [_with_cluster(ctx, event, source_id="t3")]
+    ComposeStage(_Log()).run(ctx)
+    assert "مطلب غیرمرتبط" not in ctx.messages[0]
+    assert ctx.messages == [NOTHING_NEW_FA]  # everything dropped -> honest line
+
+
+def test_busy_day_splits_into_multiple_messages_within_char_cap():
+    ctx = _Ctx(config=_config())
+    for i in range(25):
+        event = _event(f"خبر شماره {i}. " + "جزئیات " * 40, category="security")
+        ctx.events.append(_with_cluster(ctx, event))
+    ComposeStage(_Log()).run(ctx)
+    assert 1 < len(ctx.messages) <= 3  # owner: more than one message allowed
+    for text in ctx.messages:
+        assert len(text.encode("utf-16-le")) // 2 <= 4096

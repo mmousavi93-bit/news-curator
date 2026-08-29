@@ -180,6 +180,79 @@ def test_stage_splits_lead_only_events_out_of_main_feed():
     assert ctx.counters["validate"] == 1
 
 
+class _DictEmbedder:
+    """Maps exact texts to fixed unit vectors -- the anti-repetition
+    matching is what is under test, not the model."""
+
+    def __init__(self, vectors):
+        self._vectors = vectors
+        self.calls = []
+
+    def embed(self, texts):
+        self.calls.append(list(texts))
+        out = []
+        for t in texts:
+            vec = self._vectors.get(t)
+            if vec is None:
+                vec = [0.0, 0.0, 1.0]  # unknown -> distinct
+            out.append(vec)
+        return out
+
+
+def test_repeat_follow_up_is_dropped(tmp_path):
+    """Owner decision 2026-08-29: a follow-up story on an event the owner
+    already saw must not appear again. New event whose summary embeds to
+    the same vector as a recent stored event -> dropped; a distinct one ->
+    kept. Local embedder, zero LLM calls."""
+    credibility = _cred(t2=SourceCredibility(tier=2, group="g"))
+    conn = memory_db.open_db(tmp_path / "state.db", create_if_absent=True)
+    from agent.memory.event_models import insert_events
+    insert_events(conn, [Event(event_key="o" * 16, summary="old summary",
+                               category="politics", source_count=1,
+                               first_seen_at=NOW, last_updated_at=NOW)])
+    conn.close()
+
+    cluster_same = _cluster([_item("t2", "https://x/followup")])
+    cluster_diff = _cluster([_item("t2", "https://x/genuinely-new")])
+    embedder = _DictEmbedder({
+        "old summary": [1.0, 0.0, 0.0],
+        "follow-up on the same event": [1.0, 0.0, 0.0],   # identical -> repeat
+        "a different event entirely": [0.0, 1.0, 0.0],    # orthogonal -> kept
+    })
+    ctx = _Ctx(
+        clusters=[cluster_same, cluster_diff],
+        events=[
+            Event(event_key=cluster_same.key, summary="follow-up on the same event",
+                  category="politics", source_count=1,
+                  first_seen_at=NOW, last_updated_at=NOW),
+            Event(event_key=cluster_diff.key, summary="a different event entirely",
+                  category="politics", source_count=1,
+                  first_seen_at=NOW, last_updated_at=NOW),
+        ],
+    )
+    ctx.db = memory_db.open_db(tmp_path / "state.db", create_if_absent=False)
+    ctx.embedder = embedder
+    ctx.config = _ctx_config()
+    try:
+        _stage(credibility).run(ctx)
+    finally:
+        ctx.db.close()
+
+    kept_summaries = [e.summary for e in ctx.events]
+    assert "follow-up on the same event" not in kept_summaries
+    assert "a different event entirely" in kept_summaries
+
+
+def _ctx_config():
+    from agent.config import Config
+    from agent.settings import Settings
+    import yaml as _yaml
+    from pathlib import Path
+    fixture = Path(__file__).parent.parent / "fixtures" / "settings_minimal.yaml"
+    settings = Settings.from_dict(_yaml.safe_load(fixture.read_text(encoding="utf-8")))
+    return Config(settings=settings, credibility={})
+
+
 def test_stage_persists_validation_and_lead_outcomes(tmp_path):
     credibility = _cred(
         a=SourceCredibility(tier=1, group="ga"),

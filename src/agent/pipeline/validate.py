@@ -16,7 +16,7 @@ import logging
 from dataclasses import replace
 from typing import Mapping, Sequence
 
-from agent.memory.event_models import Event, update_validation
+from agent.memory.event_models import Event, read_recent_events, update_validation
 from agent.memory.lead_models import LeadOutcome, insert_lead_outcomes
 from agent.pipeline.cluster import Cluster
 
@@ -68,8 +68,9 @@ def classify_event(
 
 class ValidateStage:
     """Splits ctx.clusters' events: validated events into ctx.events,
-    lead-only into ctx.lead_events; persists claim_status/independent_count
-    and lead_outcomes when ctx.db is present."""
+    lead-only into ctx.lead_events; drops repeat follow-ups (owner decision
+    2026-08-29); persists claim_status/independent_count and lead_outcomes
+    when ctx.db is present."""
 
     name = "validate"
 
@@ -77,10 +78,43 @@ class ValidateStage:
         self._credibility = credibility
         self._logger = logger
 
+    @staticmethod
+    def _cosine(a, b) -> float:
+        # Vectors are unit-normalised upstream (same contract as
+        # pipeline/cluster.py) -- cosine is the dot product.
+        return sum(x * y for x, y in zip(a, b))
+
+    def _drop_repeats(self, ctx, events: list[Event]) -> list[Event]:
+        """Anti-repetition: a follow-up story on an event the owner already
+        saw must not appear again. Match each new event's summary against
+        recent stored events' summaries with the LOCAL embedder (zero LLM
+        calls, zero quota); drop matches at/above event_match_threshold.
+        Skipped when the db or embedder is absent (dry-run / mock)."""
+        if getattr(ctx, "db", None) is None or getattr(ctx, "embedder", None) is None:
+            return events
+        window = ctx.config.settings.digest_rank.repeat_window_hours
+        recent = read_recent_events(ctx.db, hours=window, now=ctx.now)
+        if not recent or not events:
+            return events
+        threshold = ctx.config.settings.pipeline.event_match_threshold
+        new_vectors = ctx.embedder.embed([e.summary for e in events])
+        old_vectors = ctx.embedder.embed([e.summary for e in recent])
+        kept: list[Event] = []
+        for event, vector in zip(events, new_vectors):
+            best = max((self._cosine(vector, old) for old in old_vectors), default=0.0)
+            if best >= threshold:
+                self._logger.info(
+                    "validate: %s dropped as a repeat (sim %.2f)", event.event_key[:8], best
+                )
+                continue
+            kept.append(event)
+        return kept
+
     def run(self, ctx) -> None:
         clusters = list(getattr(ctx, "clusters", None) or [])
         events = list(getattr(ctx, "events", None) or [])
         by_key = {c.key: c for c in clusters}
+        events = self._drop_repeats(ctx, events)
 
         kept: list[Event] = []
         lead_events: list[Event] = []

@@ -132,9 +132,15 @@ and deception constants. They are backtested 5/5. Changing one without re-runnin
 
 ## Tone contract for generated output
 
-Calm, knowledgeable friend. Lightly humorous. Never sensational, never dramatic, never
-clickbait, never fearmongering. Alert level modulates urgency, not volume. Prompts live in
-`config/prompts/*.txt` — edit those, never hardcode prompt text in Python.
+**Revised 2026-08-29 by the owner** (supersedes the earlier "lightly humorous" line):
+Persian output, Jalali dates. Informative, never news-anchor drama: the headline is a
+complete factual one-liner the reader can judge from; the detail is 1–2 sentences beyond
+it; category icons for scannability (⚔️ نظامی / 🛡️ امنیتی / 🏛️ سیاسی / 💰 اقتصادی /
+🌐 سایر); «شایعه» labels visible; digest sorted by a deterministic importance score
+(`pipeline/rank.py` -- digest ranking, NOT the Phase-11 risk engine) with a min-score
+threshold and multi-message splits (`digest_rank:` in settings.yaml, owner-editable);
+repeat follow-ups dropped by local semantic matching (`validate` stage, zero LLM calls).
+Prompts live in `config/prompts/*.txt` — edit those, never hardcode prompt text in Python.
 
 ## File map
 

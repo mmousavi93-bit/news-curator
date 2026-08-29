@@ -105,6 +105,25 @@ class LlmSettings:
 
 
 @dataclass(frozen=True, slots=True)
+class DigestRankSettings:
+    """Digest ranking -- NOT the risk engine (Phase 11). This scores "what
+    should the owner read first" from what the run already knows:
+    category, corroboration, source tier, recency, volume. Owner-editable;
+    deterministic (constraint 3)."""
+
+    category_weights: Mapping[str, int]
+    corroboration_weight: float
+    tier_bonus: Mapping[int, float]
+    recency_max_bonus: float
+    recency_window_hours: float
+    size_boost_per_member: float
+    size_boost_cap: float
+    min_score: float
+    max_messages: int
+    repeat_window_hours: int
+
+
+@dataclass(frozen=True, slots=True)
 class DeliverySettings:
     telegram_max_chars: int
     char_budget: Mapping[str, int]
@@ -152,6 +171,10 @@ SECTIONS: tuple[tuple[str, type, tuple[str, ...]], ...] = (
      ("fred_api_key_env", "daily_series", "intraday_series", "daily_stale_after_hours",
       "triggers")),
     ("llm", LlmSettings, ("max_calls_per_run", "order", "stages", "providers", "backoff")),
+    ("digest_rank", DigestRankSettings,
+     ("category_weights", "corroboration_weight", "tier_bonus",
+      "recency_max_bonus", "recency_window_hours", "size_boost_per_member",
+      "size_boost_cap", "min_score", "max_messages", "repeat_window_hours")),
     ("delivery", DeliverySettings,
      ("telegram_max_chars", "char_budget", "truncate_priority", "output_language",
       "source_languages")),

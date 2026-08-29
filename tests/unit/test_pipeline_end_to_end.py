@@ -127,7 +127,7 @@ def test_end_to_end_ten_articles_one_event():
     assert sizes == [2, 10]
     # One source family corroborates each event: unconfirmed, not rumour.
     assert all(e.claim_status == "unconfirmed" for e in ctx.events)
-    # The full pipe ends in one composed, budgeted message.
-    assert ctx.message is not None
+    # The full pipe ends in composed, budgeted message(s).
+    assert ctx.messages and ctx.messages[0]
     assert ctx.counters["compose"] == 2
     assert ctx.counters["deliver"] == 0  # dry-run: nothing sent

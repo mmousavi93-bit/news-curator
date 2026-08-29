@@ -26,18 +26,20 @@ class DeliverStage:
         self._logger = logger
 
     def run(self, ctx) -> None:
-        text = getattr(ctx, "message", None)
+        messages = list(getattr(ctx, "messages", None) or [])
         ctx.counters.setdefault("deliver", 0)
-        if not text:
+        if not messages:
             self._logger.info("deliver: nothing to send")
             return
         if getattr(ctx, "dry_run", False):
-            self._logger.info("deliver: dry-run, would have sent:\n%s", text)
+            for text in messages:
+                self._logger.info("deliver: dry-run, would have sent:\n%s", text)
             return
         client = self._client()
         if client is None:
             return
-        self._send(ctx, client, text, is_lead=False)
+        for text in messages:
+            self._send(ctx, client, text, is_lead=False)
 
         lead_text = getattr(ctx, "lead_message", None)
         if lead_text:

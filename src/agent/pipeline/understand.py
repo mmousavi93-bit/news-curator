@@ -133,6 +133,12 @@ class UnderstandStage:
         entities = tuple(str(e) for e in entities_raw if isinstance(e, str))
         published = [m.published_at for m in cluster.members if m.published_at is not None]
         summary = str(parsed.get("summary") or parsed.get("headline") or "")
+        headline = str(parsed.get("headline") or "").strip()
+        # Digest-ranking category, validated to the known set; anything the
+        # model invents falls back to "other" (weight 0 in the ranker).
+        category = str(parsed.get("category") or "other")
+        if category not in ("military", "security", "politics", "economy", "other"):
+            category = "other"
         # When no member carries a date, the run's now is the observation
         # time -- a fact, not an invention (events.first_seen_at is NOT
         # NULL; writing NULL here would make INSERT OR IGNORE drop the row).
@@ -140,7 +146,9 @@ class UnderstandStage:
         return Event(
             event_key=cluster.key,
             summary=summary,
+            headline=headline,
             entities=entities,
+            category=category,
             source_count=len(cluster.members),
             first_seen_at=observed,
             last_updated_at=max(published) if published else observed,

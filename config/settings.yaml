@@ -337,6 +337,32 @@ llm:
 # ---------------------------------------------------------------------------
 # DELIVERY
 # ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# DIGEST RANKING -- "what should I read first", owner decision 2026-08-29.
+# NOT the Phase-11 risk engine: that scores escalation probability from the
+# 36-signal catalog. This scores display order from what the run already
+# knows. Deterministic (constraint 3): identical input -> identical order.
+# score = category_weight + corroboration_weight*min(groups,3) + tier_bonus
+#         + recency bonus (decays to 0 at recency_window_hours) + size boost
+# Arithmetic for min_score (defaults): economy rumour from a tier-3 channel
+# = 2+0+0+3 = 5 -> dropped. "other" from a tier-2 = 0+2+2+3 = 7 -> dropped.
+# military rumour = 5+0+0+3 = 8 -> kept. politics tier-2 fresh = 3+2+2+3 = 10.
+# ---------------------------------------------------------------------------
+digest_rank:
+  # military: 6 (not 5) -- a fresh military RUMOUR from the owner's own
+  # channels is exactly the early warning this system exists for; 6 keeps
+  # it visible for ~4h of recency decay, then it drops out.
+  category_weights: {military: 6, security: 4, politics: 3, economy: 2, other: 0}
+  corroboration_weight: 2        # per independent corroborating group
+  tier_bonus: {1: 3, 2: 2, 3: 0} # best source tier among cluster members
+  recency_max_bonus: 3
+  recency_window_hours: 12
+  size_boost_per_member: 0.1
+  size_boost_cap: 1.0
+  min_score: 8                   # events below this never reach the message
+  max_messages: 3                # one digest may span up to N messages
+  repeat_window_hours: 72        # events matching a recent stored event are repeats
+
 delivery:
   telegram_max_chars: 4096
   # Budget explicitly. Never discover the limit at send time.
@@ -347,7 +373,9 @@ delivery:
     watchlist: 500
     footer: 150
   truncate_priority: ["watchlist", "top_events", "risk_block"]
-  output_language: "en"
+  # Owner decision 2026-08-29: the digest is Persian (headlines, summaries,
+  # labels, Jalali dates).
+  output_language: "fa"
   source_languages: ["en", "fa", "ar", "he"]
 
 # ---------------------------------------------------------------------------

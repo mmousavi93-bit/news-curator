@@ -22,6 +22,7 @@ from agent.settings_schema import (
     AlertingSettings,
     CollectionSettings,
     DeliverySettings,
+    DigestRankSettings,
     LlmSettings,
     MarketsSettings,
     OpsSettings,
@@ -96,6 +97,7 @@ class Settings:
     alerting: AlertingSettings
     markets: MarketsSettings
     llm: LlmSettings
+    digest_rank: DigestRankSettings
     delivery: DeliverySettings
     ops: OpsSettings
 

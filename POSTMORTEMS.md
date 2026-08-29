@@ -546,6 +546,25 @@ than the behaviour: a red run here means "could not fetch", never "the feed is w
   message delivered (the honest "AI unavailable" notice, 92 chars).
   Also: HF Hub warns about unauthenticated requests -- it worked, but an
   HF_TOKEN secret is optional hardening if rate limits ever bite.
+- **Output rework (owner decisions, 2026-08-29) -- Persian, ranked, anti-repetitive.**
+  Built and shim-green (suite 488) in one local iteration per the owner's
+  explicit "make things local, iterate, then update" instruction. Shipments:
+  (a) Persian output with JALALI dates via `util/jalali.py` -- a stdlib port of
+  jalaali-js; **found and fixed the classic porting trap: Python's % and // are
+  floor-semantics, jalaali-js's are truncation-semantics, and the divergence
+  silently broke mid-year dates to month 18 (Nowruz anchors passed by
+  short-circuit -- anchor tests must not all sit on the early-return path).**
+  (b) Deterministic digest ranking (`pipeline/rank.py`): category weight
+  (military 6/security 4/politics 3/economy 2/other 0) + corroboration + best
+  tier + recency decay + size, split at `digest_rank.min_score`, split across
+  up to `max_messages` Telegram messages. Explicitly NOT the Phase-11 risk
+  engine; weights owner-editable. (c) Anti-repetition: validate embeds new
+  event summaries with the LOCAL model and drops matches >= event_match_
+  threshold against the last repeat_window_hours of stored events -- zero LLM
+  calls. (d) The LLM's own `headline` field is now the message title; the
+  summary is detail-only -- the pre-rework composer repeated the same sentence
+  twice per item. (e) Category/headline fields are in-memory only (schema
+  frozen at additive CREATE IF NOT EXISTS; persist with Phase 11 if needed).
 - Build-agent roster written 2026-08-01 (`agents/`). Four roles: Architect (strongest model,
   brief + gate review only, never writes code), Implementer (mid-tier for phases 4–8,
   light for 1/2/3/9/10, fresh context per phase), Verifier (light, adversarial, never the
