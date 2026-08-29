@@ -24,6 +24,8 @@ pipeline:
   cluster_similarity_threshold: 0.62
   event_match_threshold: 0.55
   vision_min_image_bytes: 20000
+  embed_model: "paraphrase-multilingual-MiniLM-L12-v2"
+  item_body_chars: 600
 
 retention:
   url_hashes_days: 7
@@ -79,6 +81,7 @@ markets:
     gold_daily_move_pct: 3.0
 
 llm:
+  max_calls_per_run: 51
   order: ["gemini", "groq", "openrouter"]
   stages:
     vision: { provider: "gemini" }
@@ -86,10 +89,12 @@ llm:
     understand: { provider: "gemini", cascade_enabled: false }
   providers:
     gemini: { model: "gemini-2.5-flash", rpm: 10, rpd: 1500, supports_vision: true }
+    groq: { model: "llama-3.3-70b-versatile", rpm: 30, rpd: 14400, supports_vision: false }
+    openrouter: { model: "meta-llama/llama-3.1-8b-instruct:free", rpm: 20, rpd: 50, supports_vision: false }
   backoff:
     max_retries: 3
     base_delay_seconds: 2
-    circuit_breaker_failures: 5
+    circuit_breaker_failures: 2
 
 delivery:
   telegram_max_chars: 4096

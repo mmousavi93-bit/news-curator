@@ -1,0 +1,77 @@
+# Topic gate for sources marked `topic_gate: true` in sources.yaml
+# (session-5 decision 1: reversible volume reduction, never a deletion).
+#
+# A gated item is KEPT when any keyword below matches its title or body
+# (case-insensitive substring). The item's LANGUAGE selects the list. If the
+# item's language has no list here, the item passes (fail-open -- a gate that
+# silently drops possibly-relevant items is worse than no gate).
+#
+# Non-gated sources are never filtered, whatever their language.
+#
+# Owner-editable: add or remove words freely. Each list must be a YAML list
+# of strings; pipeline/filter.py validates the shape and fails the run on a
+# typo rather than guessing.
+
+version: 1
+
+topics:
+  en:
+    - iran
+    - tehran
+    - khamenei
+    - irgc
+    - sepah
+    - basij
+    - hezbollah
+    - houthi
+    - yemen
+    - lebanon
+    - syria
+    - iraq
+    - persian gulf
+    - strait of hormuz
+    - rial
+    - opec
+    - crude
+    - israel
+    - idf
+    - gaza
+    - sanctions
+    - nuclear
+    - iaea
+    - enrichment
+  fa:
+    - ایران
+    - تهران
+    - خامنه‌ای
+    - سپاه
+    - حزب‌الله
+    - لبنان
+    - اسرائیل
+    - یمن
+    - نفت
+    - ارز
+    - دلار
+    - تحریم
+    - هسته‌ای
+  ar:
+    - إيران
+    - طهران
+    - خامنئي
+    - الحرس
+    - حزب الله
+    - لبنان
+    - اليمن
+    - إسرائيل
+    - غزة
+    - النفط
+    - العقوبات
+  he:
+    - איראן
+    - טהרן
+    - חיזבאללה
+    - לבנון
+    - ישראל
+    - עזה
+    - נפט
+    - גרעין

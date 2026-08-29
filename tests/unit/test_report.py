@@ -38,6 +38,40 @@ def test_build_json_report_does_not_flag_a_single_item_as_identical():
     assert payload["sources"]["s"]["all_timestamps_identical"] is False
 
 
+def _item_date_only(source_id: str, dt) -> Item:
+    return Item(source_id=source_id, url=f"https://x/{source_id}", title="t", body="b",
+                published_at=dt, lang="en", raw_hash="h" * 8, date_only=True)
+
+
+def test_all_date_only_source_is_not_flagged_as_identical():
+    # Date-only items legitimately all resolve to midnight UTC -- the exact
+    # byte-identical signature of a datetime.now() substitution, but a real
+    # feed shape (state_dept_travel: 95/95 items). Condition 4 must not
+    # manufacture a gate failure on healthy sources.
+    midnight = datetime(2026, 8, 1, tzinfo=timezone.utc)
+    result = SourceResult(source_id="s", raw_entries=2, parsed=2, kept=2,
+                           items=[_item_date_only("s", midnight), _item_date_only("s", midnight)])
+    collect_report = registry.CollectReport(datetime.now(timezone.utc), {"s": result}, 2, 1, 1)
+    spec = SourceSpec(id="s", name="S", url="https://x", type="rss", lang="en", enabled=True)
+
+    payload = report.build_json_report(collect_report, {"s": spec})
+    assert payload["sources"]["s"]["all_timestamps_identical"] is False
+    assert payload["sources"]["s"]["date_only_count"] == 2
+
+
+def test_date_only_count_and_identical_flag_on_mixed_source():
+    midnight = datetime(2026, 8, 1, tzinfo=timezone.utc)
+    later = datetime(2026, 8, 2, 12, 0, tzinfo=timezone.utc)
+    result = SourceResult(source_id="s", raw_entries=2, parsed=2, kept=2,
+                           items=[_item_date_only("s", midnight), _item("s", later)])
+    collect_report = registry.CollectReport(datetime.now(timezone.utc), {"s": result}, 2, 1, 1)
+    spec = SourceSpec(id="s", name="S", url="https://x", type="rss", lang="en", enabled=True)
+
+    payload = report.build_json_report(collect_report, {"s": spec})
+    assert payload["sources"]["s"]["date_only_count"] == 1
+    assert payload["sources"]["s"]["all_timestamps_identical"] is False
+
+
 def test_format_table_shows_raw_parsed_kept_and_error_status():
     ok = SourceResult(source_id="ok", raw_entries=5, parsed=4, kept=4, items=[])
     failed = SourceResult(source_id="failed", raw_entries=0, parsed=0, kept=0, items=[], error="HTTP 403")

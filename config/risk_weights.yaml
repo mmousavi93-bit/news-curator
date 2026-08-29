@@ -1,0 +1,72 @@
+# risk_weights.yaml -- the signal catalog and its weights.
+#
+# GENERATED 2026-08-29 from analysis/backtest_weights.py's CAT/TIER/STATEFUL
+# dicts -- the same values the 5/5 backtest passes with. If this file and the
+# backtest drift apart, the Phase 11 gate (identical input -> identical score,
+# backtests hit their bands) is the thing that breaks. Provenance: every value
+# here is copied from ESCALATION_SCORING.md §2/§5, machine-verified against
+# backtest_weights.py at generation time.
+#
+# Consumed by the RISK ENGINE (v1.5, Phase 11), not by the v1 curator. The
+# v1 consumer of this file is the startup coverage check (session-5 decision 6):
+# a signal covered by no enabled source can never fire and nobody would notice.
+#
+# Signals G1/G2 are covered by the markets fetcher (Phase 11), not by any news
+# source -- the coverage check knows this and does not warn for them.
+#
+# Changing any value marked [BACKTESTED] invalidates the only validation the
+# scoring has. Re-run analysis/backtest_weights.py before trusting a change.
+
+version: 1
+
+tier_multipliers: {1: 1.0, 2: 0.8, 3: 0.5}   # [BACKTESTED]
+
+# Stateful posture signals: age counts from state END, not first report
+# (the ~24-point STRAT rule on Feb 21 2026 -- see CLAUDE.md).
+stateful: [A1, A2, A3, A4, A7, H1]            # [BACKTESTED]
+
+signals:
+  # base = contribution at age 0, tier 1, novelty 1.0
+  # half_life_days = age at which the contribution halves.
+  # C1 is special: explicit deadline/ultimatum countdown -- +8 static,
+  # escalating to 20 in the final 72h of the window (ESCALATION_SCORING.md).
+  A1: {base: 18, half_life_days: 14}   # CSG ordered toward/into CENTCOM
+  A2: {base: 22, half_life_days: 14}   # 2+ CSGs simultaneously in theater
+  A3: {base: 20, half_life_days: 10}   # THAAD/Patriot newly emplaced in region
+  A4: {base: 20, half_life_days: 10}   # strategic bombers deployed in range
+  A5: {base: 16, half_life_days: 4}    # tanker-aircraft surge >=10 to theater
+  A6: {base: 14, half_life_days: 10}   # munitions shipments / pre-positioning
+  A7: {base: 12, half_life_days: 14}   # bystander hedging (Gulf states)
+  A8: {base: 10, half_life_days: 14}   # Israeli force regeneration / large exercise
+  A9: {base: 10, half_life_days: 7}    # reserve call-ups / mobilization orders
+  B1: {base: 30, half_life_days: 3}    # ordered departure, US embassy in region
+  B2: {base: 25, half_life_days: 3}    # military-family departures authorized
+  B3: {base: 15, half_life_days: 3}    # UKMTO/JMIC/MARAD escalation language
+  B4: {base: 15, half_life_days: 3}    # airline suspension / war-risk insurance spike
+  B5: {base: 12, half_life_days: 2}    # official event anomaly (cancelled briefing/trip)
+  B6: {base: 18, half_life_days: 2}    # airspace closure / major NOTAM in-theater
+  C1: {base: 8, static: true, final_72h: 20}   # deadline/ultimatum countdown
+  C2: {base: 16, half_life_days: 5}    # final talks: no deal + maximalist demands
+  C3: {base: 20, half_life_days: 4}    # ghost meeting: talks fail to convene
+  C4: {base: 14, half_life_days: 10}   # IAEA censure / non-compliance / snapback
+  C5: {base: 10, half_life_days: 21}   # new legal predicate (FTO, AUMF-analog)
+  C6: {base: 12, half_life_days: 7}    # mediator activity collapse
+  D1: {base: 14, half_life_days: 4}    # head-of-state ultimatum with timeframe/targets
+  D2: {base: 10, half_life_days: 3}    # optimism->pessimism flip on negotiations
+  D3: {base: 12, half_life_days: 4}    # IRGC language shift: route-control -> closure
+  D4: {base: 2, half_life_days: 2}     # chronic existential threats, anonymous stories
+  E1: {base: 35, half_life_days: 3}    # Iranian strike on commercial vessel(s)
+  E2: {base: 15, half_life_days: 3}    # second strike within 7 days of prior
+  E3: {base: 30, half_life_days: 3}    # attack on US base/asset in Gulf
+  E4: {base: 12, half_life_days: 5}    # proxy front widening (PMF/Hezbollah/Houthi)
+  E5: {base: 10, half_life_days: 3}    # interception / near-miss disclosed
+  E6: {base: 8, half_life_days: 4}     # major attributed cyberattack on infra
+  G1: {base: 6, half_life_days: 2}     # oil +5% intraday without supply-side news
+  G2: {base: 4, half_life_days: 3}     # gold record/spike + regional military news
+  H1: {base: 12, half_life_days: 30}   # mass protests + lethal crackdown order
+  H2: {base: 14, half_life_days: 14}   # national internet blackout
+  H3: {base: 8, half_life_days: 14}    # currency collapse (rial >15%/week)
+
+# Coverage check exemptions: signals supplied by components other than
+# sources.yaml entries. G1/G2 arrive via the markets fetcher (Phase 11).
+covered_by_markets_fetcher: [G1, G2]

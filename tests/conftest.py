@@ -44,12 +44,20 @@ def _scrub_secret_env(monkeypatch):
 
 @pytest.fixture
 def tmp_config_dir(tmp_path: Path) -> Path:
-    """A temp config/ directory: the minimal settings fixture + the repo's real
-    credibility.yaml (already hand-authored and expected to validate clean)."""
+    """A temp config/ directory: the minimal settings fixture + the repo's
+    real credibility.yaml, sources.yaml and topics.yaml (hand-authored and
+    expected to validate clean -- build_stages loads all of them)."""
     fixtures_dir = Path(__file__).parent / "fixtures"
     dest = tmp_path / "config"
     dest.mkdir()
     shutil.copy(fixtures_dir / "settings_minimal.yaml", dest / "settings.yaml")
     repo_root = Path(__file__).parent.parent
-    shutil.copy(repo_root / "config" / "credibility.yaml", dest / "credibility.yaml")
+    for name in ("credibility.yaml", "sources.yaml", "topics.yaml", "risk_weights.yaml"):
+        shutil.copy(repo_root / "config" / name, dest / name)
+    prompts_dir = dest / "prompts"
+    prompts_dir.mkdir()
+    shutil.copy(
+        repo_root / "config" / "prompts" / "understand.txt",
+        prompts_dir / "understand.txt",
+    )
     return dest

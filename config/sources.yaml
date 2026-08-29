@@ -4,19 +4,22 @@
 # was answered 200 with parseable items by a GitHub US runner -- the same network the
 # pipeline runs on. Do not hand-edit a url without re-probing it.
 #
-# 51 sources staged, 10 ENABLED. Phase 3 is the THIN SLICE; Phase 8 is "widen sources".
-# The other 41 are staged with enabled: false so Phase 8 is flipping flags, not redoing
-# five rounds of probing. The join check in Phase 3 covers all 51, disabled included.
+# PHASE 8 (2026-08-29): widened -- 50 of 51 ENABLED per source_prune_sheet.csv
+# (KEEP + PREFILTER verdicts). tg_ukmto_mirror stays disabled for dormancy (see its
+# note below); replacement candidates staged in sources_candidates_r6.csv.
 #
-# The 10 enabled deliberately span every axis the collectors must handle: rss + telegram,
-# en/fa/ar/he, and tier 1/2/3/lead. Four are included BECAUSE they are known-broken:
-# ynet_he (probe returns no date -- DATE_RE does not match Ynet's format) and all THREE
-# telegram feeds (t.me/s/ has no pubDate at all; times live in <time datetime=...>).
-# Phase 3 must fix both or the 30-minute near-duplicate window cannot work.
+# `signals_covered` (session-5 decision 6): which of the 35 catalog signals this
+# source can witness -- the startup coverage check warns when a signal is covered
+# by no enabled source or a source covers none. Leads are exempt (decision 7);
+# G1/G2 come from the markets fetcher, not news sources. Initial mapping was a
+# judgement pass per source family; owner-editable.
 #
-# ITEM COUNTS BELOW AND IN THE PROBE CSVs ARE PRE-CAP. collection.max_items_per_source is
-# 20, so the 10 enabled sources yield a post-cap ceiling of 210, not the ~328 they return.
-# The Phase 3 gate floor is 160. Do not quote 328 as a gate number.
+# The 10 original enabled deliberately span every axis the collectors must handle:
+# rss + telegram, en/fa/ar/he, and tier 1/2/3/lead.
+#
+# ITEM COUNTS IN THE PROBE CSVs ARE PRE-CAP. collection.max_items_per_source is 20,
+# so the 50 enabled sources yield a post-cap ceiling of 1,000, not the raw sums.
+# The topic gate trims the six topic_gate: true general-interest feeds first.
 #
 # CUT 2026-08-17, owner-approved: seeking_alpha, cnbc, oilprice, npr, wotr. Market colour
 # and commentary, not event detection. See config/source_prune_sheet.csv.
@@ -38,7 +41,9 @@ version: 1
 
 sources:
 
-  # ======== ENABLED: Phase 3 thin slice (10 sources, ~328 items/sweep) ========
+  # ======== ENABLED (50 of 51; tg_ukmto_mirror disabled for dormancy) ========
+
+
 
   - id: ajar
     name: Al Jazeera Arabic
@@ -47,6 +52,9 @@ sources:
     lang: ar
     topic: regional
     enabled: true
+    signals_covered: [A9, B3, B4, C2, C6, D1, D3, E4, H1, H2, C1]
+
+
 
   - id: bbc_en_me
     name: BBC Middle East
@@ -55,6 +63,9 @@ sources:
     lang: en
     topic: regional
     enabled: true
+    signals_covered: [B1, B2, B3, B4, B6, C2, C4, D2, E1, E3, E5, H1, H2, C1]
+
+
 
   - id: bbc_persian
     name: BBC Persian
@@ -63,6 +74,9 @@ sources:
     lang: fa
     topic: iran_domestic
     enabled: true
+    signals_covered: [A9, B4, C2, C4, D1, D3, H1, H2, H3]
+
+
 
   - id: irna
     name: IRNA English
@@ -71,6 +85,9 @@ sources:
     lang: en
     topic: iran_domestic
     enabled: true
+    signals_covered: [A9, B6, C2, C3, C4, D1, D3, E4, E5, H1, H2, H3, C1]
+
+
 
   - id: state_dept_travel
     name: State Dept Travel Advisories
@@ -80,7 +97,10 @@ sources:
     topic: regional
     enabled: true
     max_items: 30
-    # TOPIC-GATE at Phase 6: 87 items/sweep, general-interest feed
+    topic_gate: true   # Phase 6: 87 items/sweep, general-interest feed
+    signals_covered: [B1, B2, B5]
+
+
 
   - id: tg_militarywave
     name: Military Wave
@@ -89,6 +109,9 @@ sources:
     lang: en
     topic: military
     enabled: true
+    signals_covered: [A3, A4, A5, A6, B3, B6, E1, E2, E3, E4, E5]
+
+
 
   - id: tg_padeshah_fxn
     name: Padeshah FXN (king/پادشاه)
@@ -97,6 +120,7 @@ sources:
     lang: fa
     topic: iran_domestic
     enabled: true
+    signals_covered: []
 
   # DISABLED 2026-08-19. The channel is dormant -- newest post 2026-07-14 -- and
   # it went dark on the exact day the maritime picture became most active: the US
@@ -117,6 +141,8 @@ sources:
   # ZERO. Both official ukmto.org URLs are CUT_BOT_BLOCKED at IP level from CI.
   # Replacement candidates are staged in config/sources_candidates_r6.csv
   # (MARAD MSCI) and must clear a probe round before being enabled.
+
+
   - id: tg_ukmto_mirror
     name: UKMTO mirror (unofficial)
     url: https://t.me/s/UK_MTO_TM
@@ -124,6 +150,9 @@ sources:
     lang: en
     topic: military
     enabled: false
+    signals_covered: [B3]
+
+
 
   - id: the_war_zone
     name: The War Zone
@@ -132,6 +161,9 @@ sources:
     lang: en
     topic: military
     enabled: true
+    signals_covered: [A1, A2, A3, A4, A5, A6, B3, B6, E1, E2, E3]
+
+
 
   - id: ynet_he
     name: Ynet Hebrew
@@ -140,9 +172,12 @@ sources:
     lang: he
     topic: regional
     enabled: true
+    signals_covered: [A8, A9, B3, B4, B6, D2, E1, E2, E3, E5, D4]
 
 
-  # ======== STAGED, enabled: false -- turn on at Phase 8 ========
+  # ======== STAGED, enabled: false (only tg_ukmto_mirror remains) ========
+
+
 
   - id: aawsat
     name: Asharq Al-Awsat
@@ -150,8 +185,11 @@ sources:
     type: rss
     lang: ar
     topic: regional
-    enabled: false
-    # TOPIC-GATE at Phase 6: 300 items/sweep, general-interest feed
+    enabled: true
+    topic_gate: true   # Phase 6: 300 items/sweep, general-interest feed
+    signals_covered: [A7, B3, B4, C2, C6, D1, D2, D3, H1, H3]
+
+
 
   - id: al_jazeera
     name: Al Jazeera All
@@ -159,7 +197,10 @@ sources:
     type: rss
     lang: en
     topic: regional
-    enabled: false
+    enabled: true
+    signals_covered: [B1, B2, B3, B4, B6, C2, C4, C6, D1, E3, E4, H1, H2, C1, D4]
+
+
 
   - id: al_manar
     name: Al Manar
@@ -167,7 +208,10 @@ sources:
     type: rss
     lang: ar
     topic: regional
-    enabled: false
+    enabled: true
+    signals_covered: [A9, B3, B4, C2, D1, D3, E4, H1]
+
+
 
   - id: al_monitor
     name: Al-Monitor General
@@ -175,7 +219,10 @@ sources:
     type: rss
     lang: en
     topic: regional
-    enabled: false
+    enabled: true
+    signals_covered: [B4, C2, C3, C4, C6, D1, D2, D3, H1]
+
+
 
   - id: ap_gnews
     name: AP via Google News
@@ -183,8 +230,11 @@ sources:
     type: rss
     lang: en
     topic: regional
-    enabled: false
-    # TOPIC-GATE at Phase 6: 100 items/sweep, general-interest feed
+    enabled: true
+    topic_gate: true   # Phase 6: 100 items/sweep, general-interest feed
+    signals_covered: [B1, B2, B3, B4, B6, C2, C4, C5, D1, E1, E3, E5, H1, H2, C1, D4]
+
+
 
   - id: aviationist
     name: The Aviationist
@@ -192,7 +242,10 @@ sources:
     type: rss
     lang: en
     topic: military
-    enabled: false
+    enabled: true
+    signals_covered: [A1, A2, A5, A6, B6, E3, E5]
+
+
 
   - id: bbc_en
     name: BBC World News
@@ -200,7 +253,10 @@ sources:
     type: rss
     lang: en
     topic: regional
-    enabled: false
+    enabled: true
+    signals_covered: [C2, C4, C5, D2, H1, H2]
+
+
 
   - id: dw
     name: DW English
@@ -208,8 +264,11 @@ sources:
     type: rss
     lang: en
     topic: regional
-    enabled: false
-    # TOPIC-GATE at Phase 6: 137 items/sweep, general-interest feed
+    enabled: true
+    topic_gate: true   # Phase 6: 137 items/sweep, general-interest feed
+    signals_covered: [B5, C2, C4, C5, D2, H1, H2]
+
+
 
   - id: france24
     name: France24 Middle East
@@ -217,8 +276,11 @@ sources:
     type: rss
     lang: en
     topic: regional
-    enabled: false
-    # TOPIC-GATE at Phase 6: 29 items/sweep, general-interest feed
+    enabled: true
+    topic_gate: true   # Phase 6: 29 items/sweep, general-interest feed
+    signals_covered: [B3, B6, C2, C4, D2, E4, H1]
+
+
 
   - id: haaretz
     name: Haaretz English
@@ -226,7 +288,10 @@ sources:
     type: rss
     lang: en
     topic: regional
-    enabled: false
+    enabled: true
+    signals_covered: [A8, A9, B3, B4, B6, C2, D2, E1, E2, E3, D4]
+
+
 
   - id: iran_international
     name: Iran International
@@ -234,7 +299,10 @@ sources:
     type: rss
     lang: en
     topic: iran_domestic
-    enabled: false
+    enabled: true
+    signals_covered: [A9, B4, C2, C4, D1, D3, E6, H1, H2, H3, C1]
+
+
 
   - id: maariv
     name: Maariv breaking news
@@ -242,7 +310,10 @@ sources:
     type: rss
     lang: he
     topic: regional
-    enabled: false
+    enabled: true
+    signals_covered: [A8, A9, B3, B4, B6, D2, E3, E5, D4]
+
+
 
   - id: mee
     name: Middle East Eye
@@ -257,7 +328,10 @@ sources:
     type: rss
     lang: en
     topic: regional
-    enabled: false
+    enabled: true
+    signals_covered: [B3, B4, C2, C3, C4, C6, D1, D2, E4, H1, H2, C1]
+
+
 
   - id: mehr
     name: Mehr News Agency
@@ -265,7 +339,10 @@ sources:
     type: rss
     lang: en
     topic: iran_domestic
-    enabled: false
+    enabled: true
+    signals_covered: [A9, B4, B6, C2, C3, C4, D3, E4, E5, H1, H3]
+
+
 
   - id: naval_news
     name: Naval News
@@ -273,7 +350,10 @@ sources:
     type: rss
     lang: en
     topic: military
-    enabled: false
+    enabled: true
+    signals_covered: [A1, A2, B3, B6, E1, E2]
+
+
 
   - id: osint613_a
     name: OSINT 613 site (feed)
@@ -281,7 +361,10 @@ sources:
     type: rss
     lang: en
     topic: military
-    enabled: false
+    enabled: true
+    signals_covered: [A3, A4, A5, A6, B6, E1, E2, E3, E5]
+
+
 
   - id: reuters_gnews
     name: Reuters via Google News
@@ -289,8 +372,11 @@ sources:
     type: rss
     lang: en
     topic: regional
-    enabled: false
-    # TOPIC-GATE at Phase 6: 100 items/sweep, general-interest feed
+    enabled: true
+    topic_gate: true   # Phase 6: 100 items/sweep, general-interest feed
+    signals_covered: [B1, B2, B3, B4, B6, C2, C4, C5, D1, D2, E1, E3, E4, E5, H1, H2, C1, D4]
+
+
 
   - id: sky_news_arabia
     name: Sky News Arabia
@@ -298,7 +384,10 @@ sources:
     type: rss
     lang: ar
     topic: regional
-    enabled: false
+    enabled: true
+    signals_covered: [B3, B4, C2, C6, D2, E4, H1, H3, C1]
+
+
 
   - id: tehran_times
     name: Tehran Times
@@ -306,7 +395,10 @@ sources:
     type: rss
     lang: en
     topic: iran_domestic
-    enabled: false
+    enabled: true
+    signals_covered: [A9, B6, C2, C4, D1, D3, E4, H1, H3, C1]
+
+
 
   - id: tg_behold_israel
     name: Behold Israel (Amir Tsarfati)
@@ -314,7 +406,10 @@ sources:
     type: telegram
     lang: en
     topic: military
-    enabled: false
+    enabled: true
+    signals_covered: []
+
+
 
   - id: tg_defenderdome
     name: DefenderDome (OSINTdefender mirror)
@@ -322,7 +417,10 @@ sources:
     type: telegram
     lang: en
     topic: military
-    enabled: false
+    enabled: true
+    signals_covered: [A3, A4, A5, A6, B3, B6, E1, E2, E3, E4, E5]
+
+
 
   - id: tg_esellco
     name: Esellco (اقتصاد و تجارت)
@@ -330,7 +428,10 @@ sources:
     type: telegram
     lang: fa
     topic: macro
-    enabled: false
+    enabled: true
+    signals_covered: []
+
+
 
   - id: tg_exciton_missile
     name: Exciton Missile Program (Mohsen Riyahi)
@@ -338,7 +439,10 @@ sources:
     type: telegram
     lang: en
     topic: military
-    enabled: false
+    enabled: true
+    signals_covered: [A3, A4, A5, A6, B3, B6, E1, E2, E3, E4, E5]
+
+
 
   - id: tg_fighter_radar
     name: Fighter Radar (فایتر رادار)
@@ -346,7 +450,10 @@ sources:
     type: telegram
     lang: fa
     topic: military
-    enabled: false
+    enabled: true
+    signals_covered: [A3, A4, A5, A6, B3, B6, E1, E2, E3, E4, E5]
+
+
 
   - id: tg_geopolitics_prime
     name: Geopolitics Prime
@@ -354,7 +461,10 @@ sources:
     type: telegram
     lang: en
     topic: military
-    enabled: false
+    enabled: true
+    signals_covered: []
+
+
 
   - id: tg_geopwatch
     name: Geopolitics Watch
@@ -362,7 +472,10 @@ sources:
     type: telegram
     lang: en
     topic: military
-    enabled: false
+    enabled: true
+    signals_covered: [A3, A4, A5, A6, B3, B6, E1, E2, E3, E4, E5]
+
+
 
   - id: tg_irane_azad_news
     name: Irane Azad News (اخبار ایران آزاد)
@@ -370,7 +483,10 @@ sources:
     type: telegram
     lang: fa
     topic: iran_domestic
-    enabled: false
+    enabled: true
+    signals_covered: []
+
+
 
   - id: tg_iranian_militarism
     name: Iranian Militarism
@@ -378,7 +494,10 @@ sources:
     type: telegram
     lang: en
     topic: military
-    enabled: false
+    enabled: true
+    signals_covered: [A3, A4, A5, A6, B3, B6, E1, E2, E3, E4, E5]
+
+
 
   - id: tg_mes
     name: Middle East Spectator
@@ -386,7 +505,10 @@ sources:
     type: telegram
     lang: en
     topic: military
-    enabled: false
+    enabled: true
+    signals_covered: [A3, A4, A5, A6, B3, B6, E1, E2, E3, E4, E5]
+
+
 
   - id: tg_minas_tirith
     name: Minas Tirith 2024
@@ -394,7 +516,10 @@ sources:
     type: telegram
     lang: en
     topic: military
-    enabled: false
+    enabled: true
+    signals_covered: [A3, A4, A5, A6, B3, B6, E1, E2, E3, E4, E5]
+
+
 
   - id: tg_mornovosti
     name: Mornovosti (maritime news)
@@ -402,7 +527,10 @@ sources:
     type: telegram
     lang: ru
     topic: military
-    enabled: false
+    enabled: true
+    signals_covered: [A3, A4, A5, A6, B3, B6, E1, E2, E3, E4, E5]
+
+
 
   - id: tg_rnintel
     name: Rerum Novarum Intel
@@ -410,7 +538,10 @@ sources:
     type: telegram
     lang: en
     topic: military
-    enabled: false
+    enabled: true
+    signals_covered: [A3, A4, A5, A6, B3, B6, E1, E2, E3, E4, E5]
+
+
 
   - id: tg_tabzlive
     name: Tabzlive
@@ -418,7 +549,10 @@ sources:
     type: telegram
     lang: en
     topic: military
-    enabled: false
+    enabled: true
+    signals_covered: [A3, A4, A5, A6, B3, B6, E1, E2, E3, E4, E5]
+
+
 
   - id: tg_tanker_trackers
     name: TankerTrackers
@@ -426,7 +560,10 @@ sources:
     type: telegram
     lang: en
     topic: military
-    enabled: false
+    enabled: true
+    signals_covered: [A3, A4, A5, A6, B3, B6, E1, E2, E3, E4, E5]
+
+
 
   - id: tg_tweet_mardomi
     name: Tweet Mardomi
@@ -434,7 +571,10 @@ sources:
     type: telegram
     lang: fa
     topic: iran_domestic
-    enabled: false
+    enabled: true
+    signals_covered: []
+
+
 
   - id: tg_vahid_online
     name: VahidOnline
@@ -442,7 +582,10 @@ sources:
     type: telegram
     lang: fa
     topic: iran_domestic
-    enabled: false
+    enabled: true
+    signals_covered: []
+
+
 
   - id: tg_vira_university
     name: Vira University (ویرا)
@@ -450,7 +593,10 @@ sources:
     type: telegram
     lang: fa
     topic: iran_domestic
-    enabled: false
+    enabled: true
+    signals_covered: []
+
+
 
   - id: tg_wfwitness
     name: Warfront Witness
@@ -458,7 +604,10 @@ sources:
     type: telegram
     lang: en
     topic: military
-    enabled: false
+    enabled: true
+    signals_covered: [A3, A4, A5, A6, B3, B6, E1, E2, E3, E4, E5]
+
+
 
   - id: tg_world_newsly
     name: World Newsly (اخبار نظامی ایران و جهان)
@@ -466,7 +615,10 @@ sources:
     type: telegram
     lang: fa
     topic: military
-    enabled: false
+    enabled: true
+    signals_covered: [A3, A4, A5, A6, B3, B6, E1, E2, E3, E4, E5]
+
+
 
   - id: walla
     name: Walla News
@@ -474,7 +626,10 @@ sources:
     type: rss
     lang: he
     topic: regional
-    enabled: false
+    enabled: true
+    signals_covered: [A8, A9, B3, B4, B6, D2, E1, E2, E3, E5, D4]
+
+
 
   - id: ynet
     name: Ynet News
@@ -482,4 +637,5 @@ sources:
     type: rss
     lang: en
     topic: regional
-    enabled: false
+    enabled: true
+    signals_covered: [A8, A9, B3, B4, B6, D2, E1, E2, E3, E5, D4]

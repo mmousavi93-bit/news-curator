@@ -48,17 +48,23 @@ jobs:
       - name: Run collectors
         run: python -m agent.run --collect-only --report-path /tmp/collect_report.json
 
-      # Pass conditions, all four (PHASE_3_BRIEF.md Gate section):
+      # Pass conditions (PHASE_3_BRIEF.md Gate section; numbers updated for
+      # the Phase 8 widening -- 50 enabled sources, ~1,000-item post-cap
+      # ceiling, so the >=160 floor is a warm-up, not a ceiling test):
       #   1. total_kept >= 160 (8 x 20, the corrected floor -- NOT 200, which
       #      is mathematically unreachable together with the >=8/10 clause
       #      under a 210-item post-cap ceiling).
-      #   2. >=8 of the 10 enabled sources returned items, AND ynet_he plus
+      #   2. >=8 of the enabled sources returned items, AND ynet_he plus
       #      all three telegram sources are among them.
       #   3. Every kept item's published_at predates this workflow's own
       #      start timestamp.
       #   4. No source's kept items all share one identical published_at --
       #      the exact signature of substituting datetime.now() for a
-      #      missing date, which requirement 3 forbids.
+      #      missing date, which requirement 3 forbids. Computed over REAL
+      #      timestamps only (report.py): date-only items legitimately all
+      #      resolve to midnight UTC, so a healthy all-date-only feed would
+      #      otherwise trip this condition every run. `date_only_count` is
+      #      in the report for exactly that audit trail.
       #   5. No source returns items with EVERY published_at null. Added
       #      2026-08-19; conditions 1-4 all passed while state_dept_travel
       #      contributed 30 undated items.

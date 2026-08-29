@@ -99,14 +99,16 @@ collection:
 # PIPELINE BUDGETS
 # ---------------------------------------------------------------------------
 pipeline:
-  # Hard ceiling. Gemini free tier is 10 RPM / 1500 RPD; exceeding this breaks
-  # the run. Overflow clusters are DEFERRED to the next run, never dropped.
-  # Deferral priority: highest candidate signal weight first.
+  # Hard ceiling, enforced in code (session-5 decision 1): cluster.py ranks
+  # by tier-then-recency-then-size and truncates deterministically. Dropped
+  # clusters are logged once; they get no LLM call. The old "deferred to the
+  # next run" comment predated that decision and was wrong -- a budget that
+  # only fires on the busiest day must not rely on tomorrow being quieter.
   max_clusters_per_run: 40
   max_vision_calls_per_run: 10
 
   # Cosine similarity for agglomerative clustering. UNTUNED — placeholder until
-  # Phase 6 measures it on real multilingual data. Expect to change.
+  # Phase 10 measures it on real multilingual data. Expect to change.
   cluster_similarity_threshold: 0.62
 
   # Matching a new cluster to an already-open event in memory.
@@ -114,6 +116,14 @@ pipeline:
 
   # Images below this are logos/avatars, never sent to vision.
   vision_min_image_bytes: 20000
+
+  # Local multilingual MiniLM (ARCHITECTURE.md tech choices). Owner-editable;
+  # only CI loads it (optional [embeddings] extra -- see pyproject.toml).
+  embed_model: "paraphrase-multilingual-MiniLM-L12-v2"
+
+  # Per-item body characters rendered into the understand prompt. Bounds the
+  # per-cluster prompt so token costs stay predictable on busy days.
+  item_body_chars: 600
 
 # ---------------------------------------------------------------------------
 # RETENTION
@@ -250,6 +260,13 @@ markets:
 # text. Do not "upgrade" to a later Haiku without recomputing the table above;
 # headline rate can be unchanged while real cost rises a third.
 llm:
+  # OWNER DECISION 2026-08-29 (session 8): ceiling = 51 -- the worst case
+  # (40 clusters + 10 vision + 1 compose). The owner's rule: keep the
+  # project free, use the free tools' caps. 9 runs/day x 51 = 459 calls vs
+  # Gemini's 1,500 RPD; RPM 10 is paced proactively (llm/limits.py).
+  # Enforcement is real, not advisory: llm/router.py refuses call N+1
+  # before a request is built (CLAUDE.md constraint #2).
+  max_calls_per_run: 51
   order: ["gemini", "groq", "openrouter"]
 
   stages:
@@ -276,6 +293,9 @@ llm:
       rpd: 14400
       supports_vision: false
     openrouter:
+      # Roster rotates weekly; this free model is a placeholder default.
+      # Owner-editable -- the adapter refuses to run without a model line.
+      model: "meta-llama/llama-3.1-8b-instruct:free"
       rpm: 20
       rpd: 50          # emergency parachute, not a real fallback
       supports_vision: false
@@ -284,16 +304,26 @@ llm:
       model: "claude-haiku-4-5"
       supports_vision: true
       prompt_cache: true          # catalog is ~2700 tokens, above the 2048 minimum
-      # CONSTRAINT 15 — an unattended process on a metered API needs a hard stop.
+      # CONSTRAINT 15 -- an unattended process on a metered API needs a hard stop.
       # A retry loop costs nothing on Gemini and a rent payment on Anthropic.
+      # Enforced per-run by llm/limits.py ProviderBudget (cross-run accounting
+      # deliberately not built -- a retry loop is a within-run event).
       max_calls_per_run: 15
       max_spend_usd_per_month: 20
       halt_on_budget_exceeded: true
+      # Rate card verified 2026-08-01 (CLAUDE.md). Used for the spend guard.
+      input_usd_per_mtok: 1.00
+      output_usd_per_mtok: 5.00
 
   backoff:
     max_retries: 3
     base_delay_seconds: 2
-    circuit_breaker_failures: 5   # then degrade: collect + store, deliver a notice
+    # PHASE 6 wiring reconciliation: with max_retries=3 the rotation loop
+    # makes at most 4 attempts, so a threshold of 5 could never open. Two
+    # consecutive failures (schema garbage, repeated 429s) now skip the
+    # provider for the rest of the run -- the mechanism was gate-tested in
+    # Phase 5, only the number changed.
+    circuit_breaker_failures: 2   # then degrade: collect + store, deliver a notice
 
 # ---------------------------------------------------------------------------
 # DELIVERY

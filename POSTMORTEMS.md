@@ -387,7 +387,134 @@ than the behaviour: a red run here means "could not fetch", never "the feed is w
   against an absent path — exits 1, creates nothing, and says why. Semantic dedup
   (layer 4, cosine) is NOT here; it is Phase 6, and `embeddings` is created empty so that
   phase needs no migration against encrypted state.
-- Phases 5–10 — not started.
+  **GATE GREEN, owner-run on Windows 2026-08-21. Phase 4 CLOSED.** `python -m pytest -q`
+  passed; `--collect-only --db state.db --init-db` returned `TOTAL kept=184
+  sources_with_items=9/9`; the same command WITHOUT `--init-db` against an absent path
+  exited 1 with the constraint-14 message and created no file. Shipped in `56e3dda`,
+  content-verified on `origin/main` via `git show origin/main:<file> | findstr` — not by
+  comparing HEAD, per the ci3 lesson below.
+- **Phase 5 (LLM router) — BUILT and gate-green 2026-08-29 (session 8).**
+  Brief: `agents/briefs/PHASE_5_BRIEF.md`. Files: `src/agent/llm/{errors,transport,limits,
+  breaker,call,providers,router,wiring}.py` (all under the 200-line cap) +
+  `src/agent/settings_llm.py` + `src/agent/leaf_types.py` + six test modules.
+  **Owner decision landed: `llm.max_calls_per_run = 51`** — his rule: keep it free, use
+  the free tools' caps (9 runs × 51 = 459/day vs Gemini 1,500 RPD; worst case never
+  truncates). One global per-run counter in `CallBudget`, refusal BEFORE the request is
+  built, logged once, run degrades. Compose can `reserve(1)` so the digest can never be
+  starved. Provider-level constraint-15 guards (`max_calls_per_run`,
+  `max_spend_usd_per_month`, `halt_on_budget_exceeded`, per-MTok prices) enforced
+  generically against a fake metered provider; per-run scope is deliberate — the threat
+  constraint 15 names is a retry loop, a within-run event, and cross-run accounting would
+  have needed a Phase-4-frozen-schema migration.
+  **Suite: 361 (274 baseline + 87 new), predicted 362.** Reconciled before claiming green:
+  one new test miscounted by hand (providers file has 20, not 21) — prediction stated
+  first, so the diff was investigated, per the discipline the baseline itself established.
+  The sandbox has no pytest and no PyPI, so `tools/pytest_shim.py` (stdlib, now a
+  permanent tool) ran the literal suite. Two of my own test-expectation bugs surfaced
+  that way, not router bugs: a provider's FIRST call never sleeps (pacer test expected
+  a sleep), and a canned OpenAI-shaped body given to the Gemini adapter correctly parsed
+  as schema_error (backoff test expected success). Both fixed in the tests.
+  All 10 brief gates pass. The two worth naming: (i) the redaction trap — a simulated
+  provider error echoing the request URL with `?key=<secret>` in it, secret absent from
+  every log line, `REDACTED` present; (ii) `see()` structurally incapable of reaching a
+  text-only provider, asserted by attempting the illegal selection with zero transport
+  calls. No `datetime.now`/`time.time()` under `src/agent/llm/`; no prompt literals;
+  all `agent.llm.*` in `OFFLINE_MODULES`.
+  Structural splits made mid-build, all for constraint 12: router.py (339 draft) →
+  router + call.py (one attempt + structured logging) + wiring.py (construction);
+  limits.py → limits + breaker.py; providers.py → adapters only, factory to wiring.py.
+  Nested llm validation lives in settings_llm.py; the leaf-type checks shared with
+  settings.py moved to leaf_types.py (no import cycle).
+  **Known interaction flagged for Phase 6 wiring: `max_retries: 3` caps the loop at 4
+  attempts, so the breaker at `circuit_breaker_failures: 5` never opens at shipped
+  defaults.** Mechanism is gate-tested; the two numbers must be reconciled when the
+  pipeline is wired. Also: OpenRouter got a placeholder model (roster rotates weekly;
+  the adapter refuses to run without a model line — loud if wrong).
+- **Phase 6 (Understand) — BUILT and gate-green 2026-08-29 (session 8, same day as
+  Phase 5).** Brief: `agents/briefs/PHASE_6_BRIEF.md`. Files:
+  `src/agent/pipeline/{filter,embed,cluster,understand}.py` + `build_stages()` in
+  `pipeline/__init__.py` + `memory/event_models.py` + `config/topics.yaml` +
+  `config/prompts/{understand,vision}.txt` + six test modules.
+  **Suite 415, 0 failed.** Predicted 409 before running; reconciled: the pre-Phase-6
+  baseline was 367, not the 363 I had recorded (my bookkeeping error, +4), and the 48
+  new tests were exactly as predicted. File-level collection table sums to 415
+  exactly, so nothing is phantom and nothing is missing.
+  Decisions that landed, each closing a long-pending item:
+  (a) **Cluster cap enforced** (session-5 decision 1): rank tier→recency→size,
+      truncate at max_clusters_per_run, dropped keys logged once, no LLM call.
+  (b) **Topic gate enforced**: `topic_gate: true` is now a real sources.yaml field on
+      the six general-interest feeds; topics.yaml is owner-editable; unknown-language
+      items fail open.
+  (c) **`circuit_breaker_failures: 5 → 2`** — max_retries=3 caps the loop at 4
+      attempts, so 5 could never open. Mechanism already gate-tested in Phase 5.
+  (d) **`items` table survives**; events are the post-understand store
+      (INSERT OR IGNORE on UNIQUE event_key; claim_status 'unconfirmed' until Phase 9).
+  (e) **sentence-transformers is an optional [embeddings] extra**, lazy-imported.
+      CI's test job does NOT install it (installing it would hide the lazy-import
+      bug, the exact requests lesson); a new `embeddings` CI job installs it, caches
+      the 470 MB model on ~/.cache/huggingface, and smokes the real MiniLM to 384
+      unit dims. NumPy deliberately NOT added: the greedy clusterer over ~120 unseen
+      items runs in well under a second in pure Python.
+  (f) **--dry-run implies mock wiring** (empty router + FakeEmbedder) so the owner's
+      machine exercises the full stage sequence with zero keys and zero downloads.
+  (g) **Vision stays a passthrough** — no collector extracts images in v1.
+  Two build defects found by the suite (mine, both test-side): filter test ctx
+  dataclass missing a default; understand loop continued after REFUSED_CAP instead of
+  breaking (the stage contract said break — fixed in code, test asserted the break).
+  One more: 5 "distinct" 2-D test vectors were not distinct enough ((1,1) merges with
+  (1,0) at threshold 0.62) — moved to 3-D. And a real wiring bug: `_load_prompt`
+  resolved the config dir with parents[2] (src/config) instead of parents[3] (repo
+  root) — caught by the dry-run integration test.
+  Remaining Phase 6 debt, explicit: `cluster_similarity_threshold: 0.62` is still the
+  unmeasured placeholder — Phase 10 tunes it on real data (LEAD_HANDLING.md's own
+  warning about guessing thresholds applies).
+- **Phase 7 (Actions) — BUILT 2026-08-29 (session 8). Suite 429, 0 failed.**
+  Brief: `agents/briefs/PHASE_7_BRIEF.md`. Files: `pipeline/{collect,compose,deliver}.py`,
+  `.github/workflows/pipeline.yml`, four test files. The full pipe now runs as
+  `python -m agent.run --db state.db`: collect (fetch→dedup→store→ctx.items; raises
+  without a db in a real run; skips in dry-run/mock), compose (budgeted message via
+  Phase 2's formatter; honest one-liner when empty; Tehran display; date_only
+  clusters print "time not stated" — the pending composer consumer, closed;
+  digest marker via NEWS_CURATOR_DIGEST env, no new CLI flag), deliver (Phase 2
+  client, mock path without credentials, `deliver` counter honest).
+  Workflow traps caught while writing pipeline.yml, both the class the phase exists
+  to catch: (a) `git add state.db.age` on the state branch would be silently
+  swallowed by the repo's own `*.age` gitignore — fixed with `git add -f`;
+  (b) the digest-vs-pipeline distinction uses `github.event.schedule == '30 3 * * *'`,
+  which is false on workflow_dispatch — documented in the file.
+  Gate (3 consecutive unattended runs) is owner-clock-bound: needs secrets +
+  bootstrapped state branch; runbook is Phase 10's deliverable.
+- **Phase 8 (Widen sources) — BUILT 2026-08-29. Suite 438.** 50/51 sources enabled
+  per the prune sheet (ukmto_mirror stays off -- dormant, MARAD candidates staged);
+  `signals_covered` on every entry (initial judgement mapping; the coverage check
+  itself found the two uncovered signals -- C1 and D4 -- and the mapping was patched);
+  `config/risk_weights.yaml` generated from backtest_weights.py's canonical CAT/TIER/
+  STATEFUL dicts (36 signals, machine-consistent by construction);
+  `agent/coverage.py` startup check (warn by default, promotable to halt).
+- **Phase 9 (Validate) — BUILT 2026-08-29. Suite 464, 0 failed.** Independence by
+  GROUP (decision 4 made executable -- BBC en+fa collapse to one, AP+Reuters share
+  wire_west); claim_status arithmetic (likely/unconfirmed/rumour); lead-only clusters
+  split out of the main feed; [RUMOUR] visible in the digest; lead_outcomes written
+  silently. Two defects found and fixed, both the class the phase exists to catch:
+  (a) **lead_outcomes was promised by LEAD_HANDLING.md rev 2 but absent from the
+  Phase 4 schema** -- fixed with SCHEMA_VERSION 2 + an additive-only upgrade path in
+  db.py (CREATE IF NOT EXISTS only; the rule that keeps it safe is stated in the
+  code). Done pre-production: no encrypted state exists yet, so this is the last
+  moment an additive fix is free. (b) **INSERT OR IGNORE silently dropped events
+  whose first_seen_at was NULL** (undated clusters) -- the understand stage now
+  writes the observation time (ctx.now), which is a fact; a regression test asserts
+  the row persists. (c) Single tier-2 source = unconfirmed, not rumour -- my test
+  expectation was wrong, the rulebook (>=2 independent NON-tier-3) was right.
+- **Phase 10 (Hardening) — BUILT 2026-08-29.** source_health writes + degraded
+  warnings (the IranWire/UKMTO precedent, now persisted instead of remembered);
+  docs/OPERATIONS, ADDING_SOURCES, TROUBLESHOOTING; RUNBOOK.md (go-live sequence,
+  exact Windows commands, index.lock + content-verify traps, cron kill-switch).
+  **v1 CODE COMPLETE. Suite 464, 0 failed, shim-verified.** The remaining gates are
+  owner/clock-bound: 3 consecutive unattended runs (needs secrets + bootstrap) and
+  one week unattended. Threshold tuning (0.62) waits on that week's real data.
+- **v1.5 (Phase 11, risk engine) — NOT STARTED, per session-3 scope cut.** The
+  extraction accuracy gate is re-filed there: the extraction prompt and scorer do
+  not exist in v1, and a gate for code that does not exist measures nothing.
 - Build-agent roster written 2026-08-01 (`agents/`). Four roles: Architect (strongest model,
   brief + gate review only, never writes code), Implementer (mid-tier for phases 4–8,
   light for 1/2/3/9/10, fresh context per phase), Verifier (light, adversarial, never the

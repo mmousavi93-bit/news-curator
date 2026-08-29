@@ -196,3 +196,17 @@ CREATE TABLE IF NOT EXISTS source_health (
     last_error            TEXT,
     updated_at            TEXT
 );
+
+-- ---------------------------------------------------------------------------
+-- Phase 9 (additive, SCHEMA_VERSION 2): lead outcomes, written silently by
+-- pipeline/validate.py so v1.1's earned-trust ladder has data (LEAD_HANDLING.md
+-- "v1 -- ship"). No user-visible effect, no demotion -- the rows are the
+-- measurement, the ladder is the later decision.
+CREATE TABLE IF NOT EXISTS lead_outcomes (
+    id             INTEGER PRIMARY KEY,
+    lead_source_id TEXT NOT NULL,
+    event_key      TEXT NOT NULL,
+    outcome        TEXT NOT NULL,  -- raised | confirmed | unconfirmed
+    observed_at    TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_lead_outcomes_event ON lead_outcomes (event_key);

@@ -75,6 +75,8 @@ def load_sources(*, base: Path | None = None) -> list[SourceSpec]:
             lang=str(row.get("lang", "")),
             enabled=bool(row.get("enabled", False)),
             max_items=row.get("max_items"),
+            topic_gate=bool(row.get("topic_gate", False)),
+            signals_covered=tuple(row.get("signals_covered") or ()),
         ))
     if errors:
         raise SourcesError("; ".join(errors))

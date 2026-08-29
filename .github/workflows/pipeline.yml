@@ -1,0 +1,108 @@
+name: pipeline
+
+# THE unattended run. Public repo -> unlimited minutes. Both schedules are
+# stated in UTC; Tehran is UTC+3:30 fixed (no DST). The 07:00 Tehran digest
+# is the canonical daily run (CLAUDE.md session-2 decision 1).
+#
+# Cron auto-disables after 60 days of repo inactivity: the owner must touch
+# the repo (any commit, or re-enable the workflow in the UI) to keep it
+# alive -- this is in the runbook, not fixable from here.
+on:
+  schedule:
+    - cron: "0 */3 * * *"   # every 3 hours, 8 runs/day
+    - cron: "30 3 * * *"    # 07:00 Asia/Tehran daily digest
+  workflow_dispatch:
+
+concurrency:
+  group: pipeline
+  cancel-in-progress: false  # never kill a run mid state-write
+
+permissions:
+  contents: write            # needed for the state-branch force-push
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-${{ runner.os }}-minilm-v1
+
+      - name: Install package (embeddings included)
+        run: pip install -e ".[embeddings]"
+
+      - name: Install age
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq age
+
+      # Constraint 14: a state file that will not decrypt HALTS. The identity
+      # is written to a 0600 file, never argv (cmdline is world-readable on
+      # a shared runner), and the file is removed immediately after.
+      - name: Decrypt state (halt on failure)
+        env:
+          AGE_SECRET_KEY: ${{ secrets.AGE_SECRET_KEY }}
+        run: |
+          umask 077
+          printf '%s\n' "$AGE_SECRET_KEY" > /tmp/age-key.txt
+          if [ -f state.db.age ]; then
+            age -d -i /tmp/age-key.txt -o state.db state.db.age || {
+              echo "DECRYPT FAILED -- halting (constraint 14: never start from empty memory)"
+              exit 1
+            }
+          else
+            echo "state.db.age not found -- bootstrap with --init-db first (runbook)"
+            exit 1
+          fi
+          rm -f /tmp/age-key.txt
+
+      - name: Run pipeline
+        env:
+          NEWS_CURATOR_DIGEST: ${{ github.event.schedule == '30 3 * * *' }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: python -m agent.run --db state.db
+
+      # A failed encrypt fails the job: losing state is the worst outcome.
+      # The recipient is a PUBLIC key; safe in argv.
+      - name: Encrypt state
+        env:
+          AGE_PUBLIC_KEY: ${{ secrets.AGE_PUBLIC_KEY }}
+        run: age -r "$AGE_PUBLIC_KEY" -o state.db.age.new state.db && mv state.db.age.new state.db.age
+
+      # One revision ever: orphan branch, force-pushed (CLAUDE.md owner
+      # decision). A failed push logs but does not fail the job -- the next
+      # run re-pushes; nothing is lost. `git add -f`: *.age is gitignored
+      # for main, and that ignore would silently swallow the add here.
+      - name: Push state branch
+        run: |
+          git fetch origin state --quiet || true
+          git branch -D state-upload 2>/dev/null || true
+          git checkout --orphan state-upload --quiet
+          git rm -rf . --quiet || true
+          cp state.db.age state-upload.db.age
+          mv state-upload.db.age state.db.age
+          git add -f state.db.age
+          git commit -m "state $(date -u +%Y-%m-%dT%H:%M:%SZ)" --quiet
+          git push -f origin state-upload:state --quiet
+          git checkout -f main --quiet
+          git branch -D state-upload --quiet
+
+      # 90-day backup, independent of the git history.
+      - name: Backup state artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: state-db
+          path: state.db.age
+          retention-days: 90
+          if-no-files-found: error

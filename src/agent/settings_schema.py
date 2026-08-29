@@ -10,6 +10,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Mapping, Sequence
 
+from agent.settings_llm import BackoffSettings, ProviderSettings
+
 
 @dataclass(frozen=True, slots=True)
 class ScheduleSettings:
@@ -37,6 +39,8 @@ class PipelineSettings:
     cluster_similarity_threshold: float
     event_match_threshold: float
     vision_min_image_bytes: int
+    embed_model: str
+    item_body_chars: int
 
 
 @dataclass(frozen=True, slots=True)
@@ -93,10 +97,11 @@ class MarketsSettings:
 
 @dataclass(frozen=True, slots=True)
 class LlmSettings:
+    max_calls_per_run: int
     order: Sequence[str]
     stages: Mapping[str, Any]
-    providers: Mapping[str, Any]
-    backoff: Mapping[str, Any]
+    providers: Mapping[str, ProviderSettings]
+    backoff: BackoffSettings
 
 
 @dataclass(frozen=True, slots=True)
@@ -127,7 +132,8 @@ SECTIONS: tuple[tuple[str, type, tuple[str, ...]], ...] = (
       "respect_robots_txt", "user_agent", "degraded_after_empty_runs")),
     ("pipeline", PipelineSettings,
      ("max_clusters_per_run", "max_vision_calls_per_run", "cluster_similarity_threshold",
-      "event_match_threshold", "vision_min_image_bytes")),
+      "event_match_threshold", "vision_min_image_bytes", "embed_model",
+      "item_body_chars")),
     ("retention", RetentionSettings,
      ("url_hashes_days", "events_days", "embeddings_days", "signal_events_days",
       "speaker_statements_days", "score_history_days", "scheduled_events_days")),
@@ -145,7 +151,7 @@ SECTIONS: tuple[tuple[str, type, tuple[str, ...]], ...] = (
     ("markets", MarketsSettings,
      ("fred_api_key_env", "daily_series", "intraday_series", "daily_stale_after_hours",
       "triggers")),
-    ("llm", LlmSettings, ("order", "stages", "providers", "backoff")),
+    ("llm", LlmSettings, ("max_calls_per_run", "order", "stages", "providers", "backoff")),
     ("delivery", DeliverySettings,
      ("telegram_max_chars", "char_budget", "truncate_priority", "output_language",
       "source_languages")),

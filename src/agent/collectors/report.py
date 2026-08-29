@@ -34,7 +34,18 @@ def build_json_report(report: CollectReport, sources_by_id: Mapping[str, SourceS
     run_collect_only must never be the thing deciding pass/fail)."""
     per_source = {}
     for source_id, res in sorted(report.results.items()):
-        timestamps = [it.published_at.isoformat() for it in res.items if it.published_at is not None]
+        timestamps = []
+        real_timestamps = []
+        date_only_count = 0
+        for item in res.items:
+            if item.published_at is None:
+                continue
+            ts = item.published_at.isoformat()
+            timestamps.append(ts)
+            if item.date_only:
+                date_only_count += 1
+            else:
+                real_timestamps.append(ts)
         per_source[source_id] = {
             "name": sources_by_id[source_id].name if source_id in sources_by_id else source_id,
             "raw_entries": res.raw_entries,
@@ -42,7 +53,17 @@ def build_json_report(report: CollectReport, sources_by_id: Mapping[str, SourceS
             "kept": res.kept,
             "error": res.error,
             "published_at": timestamps,
-            "all_timestamps_identical": len(timestamps) > 1 and len(set(timestamps)) == 1,
+            "date_only_count": date_only_count,
+            # The condition-4 signature (a datetime.now() substitution) can
+            # only exist among REAL timestamps: date-only items legitimately
+            # all resolve to midnight UTC (00:00Z -- displayed 03:30 Tehran,
+            # which is why they must never be rendered as clock times). A
+            # source that is entirely date-only would otherwise trip
+            # all_timestamps_identical on every run -- a gate false positive
+            # flagged in CLAUDE.md before it ever fired.
+            "all_timestamps_identical": (
+                len(real_timestamps) > 1 and len(set(real_timestamps)) == 1
+            ),
         }
     return {
         "generated_at": report.generated_at.isoformat(),

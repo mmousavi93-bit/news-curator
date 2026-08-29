@@ -24,7 +24,27 @@ from pathlib import Path
 from agent.util.logging import get_logger
 
 # Bump ONLY together with a migration. An unrecognised version halts.
-SCHEMA_VERSION = 1
+# 2 = Phase 9 additive lead_outcomes table (no data migration; see
+# _ADDITIVE_UPGRADES -- old databases gain the table on open).
+SCHEMA_VERSION = 2
+
+# Additive-only upgrades, keyed by the version being upgraded FROM. The rule
+# that keeps this safe: every statement must be CREATE TABLE IF NOT EXISTS or
+# otherwise idempotent -- never ALTER, never DROP, never data rewrite. The
+# moment a change needs to touch existing rows, that is a real migration and
+# a new owner decision, not an entry here.
+_ADDITIVE_UPGRADES: dict[int, str] = {
+    1: """
+CREATE TABLE IF NOT EXISTS lead_outcomes (
+    id             INTEGER PRIMARY KEY,
+    lead_source_id TEXT NOT NULL,
+    event_key      TEXT NOT NULL,
+    outcome        TEXT NOT NULL,  -- raised | confirmed | unconfirmed
+    observed_at    TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_lead_outcomes_event ON lead_outcomes (event_key);
+""",
+}
 
 _SCHEMA_PATH = Path(__file__).with_name("schema.sql")
 _VERSION_KEY = "schema_version"
@@ -139,10 +159,24 @@ def open_db(path: Path, *, create_if_absent: bool = False) -> sqlite3.Connection
         _check_integrity(conn, path)
         version = read_schema_version(conn)
         if version != SCHEMA_VERSION:
-            raise StateError(
-                f"state database schema version {version} is not {SCHEMA_VERSION}; "
-                "this code does not know how to read it. Halting rather than guessing."
-            )
+            if version in _ADDITIVE_UPGRADES:
+                # Idempotent CREATE IF NOT EXISTS only: an existing database
+                # gains the new tables and keeps every row (Phase 9, lead_
+                # outcomes -- the spec-vs-build gap found pre-production).
+                conn.executescript(_ADDITIVE_UPGRADES[version])
+                conn.execute(
+                    "UPDATE meta SET value=? WHERE key=?",
+                    (str(SCHEMA_VERSION), _VERSION_KEY),
+                )
+                logger.info(
+                    "upgraded state database schema %d -> %d (additive only)",
+                    version, SCHEMA_VERSION,
+                )
+            else:
+                raise StateError(
+                    f"state database schema version {version} is not {SCHEMA_VERSION}; "
+                    "this code does not know how to read it. Halting rather than guessing."
+                )
     except Exception:
         conn.close()
         raise

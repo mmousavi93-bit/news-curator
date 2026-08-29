@@ -1,7 +1,11 @@
 name: tests
 
-# Phase 1 CI: pytest on push and PR. No secrets referenced -- Phase 1 has no
-# collectors, no LLM calls, no Telegram calls, so nothing needs a key yet.
+# Phase 1 CI: pytest on push and PR. No secrets referenced -- the suite runs
+# offline and keyless. Phase 6 note: the `test` job deliberately does NOT
+# install the [embeddings] extra -- the offline suite must pass without
+# sentence-transformers (the lazy-import guard), and installing it here would
+# hide that bug the same way an installed `requests` once hid a module-level
+# import. The `embeddings` job below exercises the real model instead.
 on:
   push:
   pull_request:
@@ -24,3 +28,38 @@ jobs:
 
       - name: Gate -- dry run offline, no keys
         run: env -i PATH=$PATH HOME=$HOME python -m agent.run --dry-run
+
+  embeddings:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      # The multilingual MiniLM checkpoint is ~470 MB; cache it so the smoke
+      # below is seconds, not minutes, after the first run.
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-${{ runner.os }}-minilm-v1
+
+      - name: Install package + embeddings extra
+        run: pip install -e ".[dev,embeddings]"
+
+      # Smoke, not a quality gate: the REAL model embeds one string to 384
+      # unit dims. Embedding quality tuning is Phase 10; this proves the
+      # wiring (model name, lazy import, normalisation) works on a runner.
+      - name: Smoke -- real MiniLM embeds to 384 dims
+        run: |
+          python -c "
+          from agent.pipeline.embed import MiniLmEmbedder
+          e = MiniLmEmbedder('paraphrase-multilingual-MiniLM-L12-v2')
+          v = e.embed(['iran tehran oil'])
+          assert len(v) == 1 and len(v[0]) == 384, len(v)
+          norm = sum(x * x for x in v[0]) ** 0.5
+          assert abs(norm - 1.0) < 1e-6, norm
+          print('MiniLM smoke ok:', len(v[0]), 'dims')
+          "

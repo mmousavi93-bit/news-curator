@@ -1,13 +1,5 @@
-"""Pipeline entrypoint.
-
-Builds a RunContext, sequences STAGES in declared order, and emits exactly one
-structured summary line. A stage that raises must fail the run loudly -- no
-`try/except` around the stage loop; that is deliberate, not an oversight.
-
-`now` is injected once here and threaded through RunContext. Nothing else in
-the codebase may call datetime.now() -- once the risk engine exists (Phase 8),
-a stray clock read makes scores irreproducible, and it is far cheaper to forbid
-it here than to hunt it down later.
+"""Pipeline entrypoint: RunContext -> stage sequence -> one summary line.
+A stage that raises fails the run loudly. `now` is injected here only.
 """
 
 from __future__ import annotations
@@ -30,8 +22,7 @@ from agent.delivery.credentials import TelegramConfigError
 from agent.delivery.formatter import format_single
 from agent.delivery.message import Item, Message
 from agent.delivery.telegram import SendResult, TelegramClient
-from agent.pipeline import STAGES, Stage
-from agent.pipeline._noop import NoopStage
+from agent.pipeline import Stage, build_stages
 from agent.util.logging import PROCESS_FILTER, get_logger, register_env_secrets
 
 
@@ -41,12 +32,17 @@ class RunContext:
     dry_run: bool
     now: datetime
     counters: dict[str, int] = field(default_factory=dict)
-
-
-def _build_stages() -> tuple[Stage, ...]:
-    # Phase 1: every stage is a no-op. Later phases swap entries here for real
-    # implementations, one at a time, without changing this function's shape.
-    return tuple(NoopStage(name) for name in STAGES)
+    # Pipeline stages read/write these.
+    items: list = field(default_factory=list)       # unseen post-dedup
+    embeddings: list = field(default_factory=list)  # aligned with items
+    clusters: list = field(default_factory=list)    # priority-ordered
+    events: list = field(default_factory=list)      # validated events (main)
+    lead_events: list = field(default_factory=list) # lead-only (never main)
+    router: object | None = None                    # mock in dry-run
+    embedder: object | None = None                  # Embedder protocol
+    db: object | None = None                        # sqlite3 conn
+    daily_digest: bool = False                      # 07:00 canonical run
+    leads_channel_id: str | None = None             # optional lead channel
 
 
 def run_pipeline(ctx: RunContext, stages: Sequence[Stage], logger: logging.Logger) -> None:
@@ -70,36 +66,22 @@ def _parse_args(argv: Sequence[str] | None) -> argparse.Namespace:
     parser.add_argument("--send-test", action="store_true")
     parser.add_argument("--collect-only", action="store_true")
     parser.add_argument("--report-path", type=Path, default=None)
-    parser.add_argument("--db", type=Path, default=None, help="persist collected items here")
-    # Explicit, never a fallback: an absent db may mean a FAILED decrypt (Ph. 7).
+    # Explicit, never a fallback: absent db may mean FAILED decrypt.
+    parser.add_argument("--db", type=Path, default=None, help="state db path")
     parser.add_argument("--init-db", action="store_true")
     parser.add_argument("--config-dir", type=Path, default=None)
     parser.add_argument("--log-level", default="INFO")
     return parser.parse_args(argv)
 
-
 def _sample_message() -> Message:
-    """Fixed message for --send-test. Never invents real content (constraint
-    11) -- it is explicitly labelled a diagnostic, not news."""
-    return Message(
-        header="News Curator -- send-test diagnostic",
-        items=(
-            Item(
-                headline="This is a --send-test message, not a real alert.",
-                priority=0,
-                detail="It proves the delivery path works end to end.",
-            ),
-        ),
-        footer="agent.run --send-test",
-    )
+    item = Item(headline="This is a --send-test message, not a real alert.",
+                priority=0, detail="It proves the delivery path works end to end.")
+    return Message(header="News Curator -- send-test diagnostic",
+                   items=(item,), footer="agent.run --send-test")
 
 
 def run_send_test(logger: logging.Logger) -> int:
-    """Build the fixed sample message and send it -- through the mock
-    transport when credentials are absent, for real when they are present.
-    Never raises: a malformed TELEGRAM_CHANNEL_ID or a failed send is
-    reported and this still returns 0, because --send-test's job is to show
-    the owner what happened, not to crash on them."""
+    """Send the fixed sample (mock when credentials absent); never raises."""
     text = format_single(_sample_message())
     try:
         client = TelegramClient.from_env(os.environ)
@@ -128,11 +110,9 @@ def run_collect_only(
     report_path: Path | None, config_dir: Path | None,
     db_path: Path | None = None, init_db: bool = False,
 ) -> int:
-    """Fetches every ENABLED source, prints the raw/parsed/kept table, writes
-    the JSON report collect-test.yml asserts against, and -- with `--db`
-    (Phase 4) -- persists what survived dedup and prunes aged rows. The
-    credibility join is checked before anything is fetched: a missing id halts
-    loudly rather than degrading to `tier 3, group unlisted`."""
+    """Fetch every enabled source, print the table, write the gate report,
+    and (with --db) persist dedup-survivors + prune. Credibility join is
+    checked BEFORE fetching: a missing id halts loudly."""
     try:
         sources = registry.load_sources(base=config_dir)
     except registry.SourcesError as exc:
@@ -191,8 +171,28 @@ def main(argv: Sequence[str] | None = None) -> int:
             args.config_dir, args.db, args.init_db,
         )
 
-    ctx = RunContext(config=config, dry_run=args.dry_run, now=datetime.now(timezone.utc))
-    run_pipeline(ctx, _build_stages(), logger)
+    stages, router, embedder = build_stages(
+        config, os.environ, base=args.config_dir, force_mock=args.dry_run
+    )
+    db_conn = None
+    if args.db is not None:
+        try:
+            memory_db.assert_halt_flags(config.settings.ops)
+            db_conn = memory_db.open_db(args.db, create_if_absent=args.init_db)
+        except memory_db.StateError as exc:
+            logger.error("run: %s", exc)
+            return 1
+    ctx = RunContext(
+        config=config, dry_run=args.dry_run, now=datetime.now(timezone.utc),
+        router=router, embedder=embedder, db=db_conn,
+        daily_digest=os.environ.get("NEWS_CURATOR_DIGEST") == "true",
+        leads_channel_id=os.environ.get("TELEGRAM_LEADS_CHANNEL_ID") or None,
+    )
+    try:
+        run_pipeline(ctx, stages, logger)
+    finally:
+        if db_conn is not None:
+            db_conn.close()
     return 0
 
 

@@ -142,6 +142,13 @@ class SourceSpec:
     lang: str
     enabled: bool
     max_items: int | None = None
+    # Phase 6: general-interest feeds that flood the funnel are keyword-gated
+    # by pipeline/filter.py using config/topics.yaml. Reversible reduction,
+    # never a deletion (session-5 decision 1).
+    topic_gate: bool = False
+    # Phase 8: which catalog signals this source can witness (session-5
+    # decision 6). Empty for lead sources -- they cannot corroborate.
+    signals_covered: tuple[str, ...] = ()
 
 
 @dataclass

@@ -1,0 +1,25 @@
+rev,2,2026-08-21 after Fable adversarial review. Rev 1 had a 9x understated failure in the OpenRouter row and modelled requests only. All token columns are NEW and are what killed the Groq fallback.
+assumption,token cost per call = 3450 (3050 in + 400 out) per CLAUDE.md; applied to vision and compose too (unmeasured - see gaps)
+assumption,retry factor 1.33 -> attempts = ceil(logical x 1.33); backoff.max_retries is 3 so worst case is 4.0 not 1.33
+quota_status,VERIFIED = owner-checked 2026-08-01 and recorded in CLAUDE.md. DISPUTED = secondary sources contradict it. UNVERIFIED = never checked by anyone.
+,,,,,,,,,,,,,,,,
+scenario,runs_per_day,understand_provider,rpd_limit,rpd_status,tpd_limit,tpd_status,logical_per_run,attempts_per_run,attempts_per_day,pct_of_rpd,tokens_per_run,tokens_per_day,pct_of_tpd,verdict
+GEMINI AT THE RECORDED QUOTA (1500 RPD),,,,,,,,,,,,,,
+normal_3h_scheduled_only,9,gemini,1500,VERIFIED,none published,UNVERIFIED,49,65,585,39.0%,169050,1521450,n/a,OK
+normal_3h_plus_3_manual_dispatch,12,gemini,1500,VERIFIED,none published,UNVERIFIED,49,65,780,52.0%,169050,2028600,n/a,OK
+wartime_1h_flag_unchanged_caps,26,gemini,1500,VERIFIED,none published,UNVERIFIED,49,65,1690,112.7%,169050,4395300,n/a,FAIL - quota dies mid-crisis
+GEMINI AT THE DISPUTED QUOTA (250 RPD),,,,,,,,,,,,,,
+normal_3h_scheduled_only,9,gemini,250,DISPUTED,250k TPM,DISPUTED,49,65,585,234.0%,169050,1521450,n/a,FAIL - baseline does not run at all
+wartime_1h_flag,26,gemini,250,DISPUTED,250k TPM,DISPUTED,49,65,1690,676.0%,169050,4395300,n/a,FAIL
+gemini_vision_and_compose_only,9,groq,250,DISPUTED,250k TPM,DISPUTED,9,12,108,43.2%,31050,279450,n/a,OK on the Gemini side only - see Groq rows
+THE GROQ FALLBACK - FAILS ON TOKENS NOT REQUESTS,,,,,,,,,,,,,,
+groq_understand_requests_axis,9,groq,1000,DISPUTED,100000,DISPUTED,40,53,477,47.7%,138000,1242000,1242.0%,FAIL on tokens while passing on requests
+groq_understand_ONE_RUN_only,1,groq,1000,DISPUTED,100000,DISPUTED,40,53,53,5.3%,138000,138000,138.0%,FAIL - a SINGLE run exceeds the whole daily token quota
+groq_at_the_recorded_rpd,9,groq,14400,VERIFIED-BUT-WRONG-MODEL,100000,DISPUTED,40,53,477,3.3%,138000,1242000,1242.0%,FAIL - 14400 RPD belongs to llama-3.1-8b-instant not 3.3-70b-versatile
+groq_tpm_pacing_effect,n/a,groq,n/a,n/a,12000 TPM,DISPUTED,40,n/a,n/a,n/a,138000,n/a,n/a,TPM caps Groq at ~3.5 calls/min not 30 - a 40-call pass takes 11.5 min not 1.3
+OPENROUTER - REV 1 UNDERSTATED THIS BY 9x,,,,,,,,,,,,,,
+openrouter_as_understand_fallback,9,openrouter,50,VERIFIED,unknown,UNVERIFIED,41,55,495,990.0%,141450,1273050,n/a,FAIL - rev 1 said 110%; correct figure is 990%
+openrouter_ONE_RUN_only,1,openrouter,50,VERIFIED,unknown,UNVERIFIED,41,55,55,110.0%,141450,141450,n/a,FAIL on the first run
+openrouter_restricted_to_compose_only,9,n/a,50,VERIFIED,unknown,UNVERIFIED,1,2,18,36.0%,3450,31050,n/a,OK - the only role it can hold
+THE UNEXPLORED OPTION (Fable),,,,,,,,,,,,,,
+gemini_2p5_flash_lite_understand,9,gemini-2.5-flash-lite,1000,UNVERIFIED,unknown,UNVERIFIED,49,65,585,58.5%,169050,1521450,n/a,PROMISING - same key, 15 RPM, preserves the 40-cluster funnel. Check in the same trip.

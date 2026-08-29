@@ -10,12 +10,22 @@ dependencies = [
     # python-telegram-bot or any async framework -- constraint 6 forbids
     # Telethon/MTProto and the brief calls for a plain synchronous HTTP call.
     "requests>=2.31",
+    # NumPy deliberately NOT added in Phase 6: the greedy clusterer uses
+    # running centroids over ~120 unseen items/run, which pure Python does
+    # in well under a second. Add it only when a profile says so -- an
+    # unused dependency violates constraint 13 harder than a missing one.
 ]
 
 [project.optional-dependencies]
 dev = [
     # Test runner. Required by the Phase 1 gate command (agents/briefs/PHASE_1_BRIEF.md).
     "pytest>=8.0",
+]
+# Phase 6: local multilingual MiniLM embeddings (ARCHITECTURE.md tech
+# choices). Optional because torch is ~2 GB -- the owner's Windows pytest
+# suite and --dry-run must run without it; CI installs `.[embeddings]`.
+embeddings = [
+    "sentence-transformers>=3.0",
 ]
 
 [build-system]

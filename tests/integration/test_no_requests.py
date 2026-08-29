@@ -38,11 +38,36 @@ OFFLINE_MODULES = (
     "agent.config",
     "agent.collectors.base",
     "agent.collectors.dates",
+    "agent.collectors.tz",
     "agent.collectors.fetch",
     "agent.collectors.rss",
     "agent.collectors.telegram_web",
     "agent.collectors.registry",
     "agent.collectors.report",
+    # Phase 5 (LLM router): every llm module must import and function with
+    # no HTTP library present -- mock mode and the whole suite run offline.
+    "agent.llm",
+    "agent.llm.errors",
+    "agent.llm.transport",
+    "agent.llm.limits",
+    "agent.llm.breaker",
+    "agent.llm.call",
+    "agent.llm.providers",
+    "agent.llm.router",
+    "agent.llm.wiring",
+    # Phase 6: the pipeline stages and the event store.
+    "agent.pipeline",
+    "agent.pipeline.filter",
+    "agent.pipeline.embed",
+    "agent.pipeline.cluster",
+    "agent.pipeline.understand",
+    "agent.pipeline.collect",
+    "agent.pipeline.compose",
+    "agent.pipeline.deliver",
+    "agent.pipeline.validate",
+    "agent.memory.event_models",
+    "agent.memory.lead_models",
+    "agent.memory.source_health",
 )
 
 
