@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: actions/setup-python@v5
         with:
@@ -110,6 +110,18 @@ jobs:
           AGE_PUBLIC_KEY: ${{ secrets.AGE_PUBLIC_KEY }}
         run: age -r "$AGE_PUBLIC_KEY" -o state.db.age.new state.db && mv state.db.age.new state.db.age
 
+      # 90-day backup, independent of the git history. Runs BEFORE the
+      # state-branch push on purpose: the push's branch dance (`git
+      # checkout`) deletes files tracked in the orphan branch but not in
+      # main -- first run evidence: state.db.age was gone by upload time.
+      - name: Backup state artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: state-db
+          path: state.db.age
+          retention-days: 90
+          if-no-files-found: error
+
       # One revision ever: orphan branch, force-pushed (CLAUDE.md owner
       # decision). A failed push logs but does not fail the job -- the next
       # run re-pushes; nothing is lost. `git add -f`: *.age is gitignored
@@ -132,12 +144,3 @@ jobs:
           git push -f origin state-upload:state --quiet
           git checkout -f main --quiet
           git branch -D state-upload --quiet
-
-      # 90-day backup, independent of the git history.
-      - name: Backup state artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: state-db
-          path: state.db.age
-          retention-days: 90
-          if-no-files-found: error
