@@ -101,15 +101,21 @@ def attempt(
             usage=usage,
         )
 
-    if status == 429 or status >= 500:
+    if status == 429 or status == 404 or status >= 500:
+        # 404 rotates too: "this provider does not have this model" is
+        # provider-SPECIFIC -- each provider has its own model id, so the
+        # next one may well succeed. Learned 2026-08-29: gemini-2.5-flash
+        # was discontinued (404) and the old fatal treatment cost a full
+        # run while Groq sat unused.
         breaker.failure(name)
         log_call(logger, call_index, stage, provider, prompt_hash,
                  f"status_{status}", latency_ms, None)
         return _ROTATE, LlmResult(ok=False, status=UNAVAILABLE, provider=name)
 
-    # 400/401/403 and anything else non-200: the request or key is wrong,
-    # and it is wrong identically on every provider. Rotating turns one
-    # visible fault into three wasted calls and a misleading log (§3).
+    # 400/401/403 (and any other non-200 we did not classify above): the
+    # request or key is wrong, and it is wrong identically on every
+    # provider. Rotating turns one visible fault into three wasted calls
+    # and a misleading log (§3).
     log_call(logger, call_index, stage, provider, prompt_hash,
              f"status_{status}", latency_ms, None)
     logger.error(

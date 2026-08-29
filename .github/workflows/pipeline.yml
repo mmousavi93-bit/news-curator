@@ -43,6 +43,17 @@ jobs:
       - name: Install age
         run: sudo apt-get update -qq && sudo apt-get install -y -qq age
 
+      # Ground truth for the gemini model id: lists what the API actually
+      # serves. Key goes in a HEADER, never the URL -- curl error strings
+      # echo URLs, and this log is public. Model ids are not secrets.
+      - name: List available Gemini models
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          curl -s -H "x-goog-api-key: $GEMINI_API_KEY" \
+            "https://generativelanguage.googleapis.com/v1beta/models" \
+            | grep -o '"name": *"models/[^"]*"' | head -40 || true
+
       # The checkout above is main only; the encrypted state lives on the
       # orphan `state` branch. Fetch it and materialise the file. Missing
       # branch = never bootstrapped -- halt (constraint 14).

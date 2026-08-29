@@ -120,6 +120,18 @@ def test_401_does_not_rotate():
     assert GEMINI_URL_PREFIX in transport.calls[0]["url"]  # provider 2 never contacted
 
 
+def test_404_rotates_to_next_provider():
+    # "This provider does not have this model" is provider-SPECIFIC -- each
+    # provider has its own model id. Learned 2026-08-29: a discontinued
+    # gemini model 404'd every call and the old fatal treatment cost a full
+    # run while Groq sat unused.
+    transport = MockHttpTransport(responses=[HttpResponse(404, {}), _GROQ_OK])
+    result = _router([_gemini(), _groq()], transport).complete("hello")
+    assert result.ok is True
+    assert result.provider == "groq"
+    assert len(transport.calls) == 2
+
+
 def test_schema_error_retries_same_provider_then_rotates():
     transport = MockHttpTransport(responses=[_SCHEMA_BAD, _SCHEMA_BAD, _GROQ_OK])
     result = _router([_gemini(), _groq()], transport).complete("hello")

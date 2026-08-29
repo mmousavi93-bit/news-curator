@@ -283,7 +283,11 @@ llm:
 
   providers:
     gemini:
-      model: "gemini-2.5-flash"
+      # 2026-08-29: gemini-2.5-flash was discontinued (API 404s, run log
+      # evidence). gemini-3-flash is the current flash family id -- VERIFY
+      # against the pipeline log's "available models" step on the next run;
+      # the router rotates on 404 so a wrong guess costs nothing.
+      model: "gemini-3-flash"
       rpm: 10
       rpd: 1500
       supports_vision: true
