@@ -527,6 +527,25 @@ than the behaviour: a red run here means "could not fetch", never "the feed is w
   with a comment saying why. **Standing rule: the shim may only implement what
   the suite uses AND real pytest supports. When in doubt, the shim must be
   STRICTER than pytest, never looser.**
+- **First live-run outage (2026-08-29): both LLM model ids were dead.** The
+  first real pipeline run 404'd on every call: gemini-2.5-flash is LISTED by
+  the models endpoint but generateContent 404s (discontinued June 2026 per
+  the changelog -- listed-but-dead), and llama-3.3-70b-versatile is gone
+  from Groq's roster entirely. The gemini-3-flash replacement guess did not
+  exist (only -preview). Fixed by: (a) the router now ROTATES on 404
+  (provider-specific, not request-level -- the old fatal treatment cost a
+  full run with Groq sitting unused); (b) model ids replaced with
+  `gemini-flash-latest` (self-healing alias; pin only when v1.5
+  determinism matters) and `qwen/qwen3.8-27b`; (c) the pipeline workflow
+  gained "List available models" probe steps for both providers -- ground
+  truth in the log on every run. **Standing rule: model ids ROT. A pinned
+  model id in an unattended system is a scheduled outage. Aliases for
+  unattended systems; probe steps as the backstop; read them before
+  touching anything else after an LLM outage.** Meanwhile that same run
+  proved the whole pipe: 891 fetched, 875 dup-killed, 13 new, 6 clusters,
+  message delivered (the honest "AI unavailable" notice, 92 chars).
+  Also: HF Hub warns about unauthenticated requests -- it worked, but an
+  HF_TOKEN secret is optional hardening if rate limits ever bite.
 - Build-agent roster written 2026-08-01 (`agents/`). Four roles: Architect (strongest model,
   brief + gate review only, never writes code), Implementer (mid-tier for phases 4–8,
   light for 1/2/3/9/10, fresh context per phase), Verifier (light, adversarial, never the

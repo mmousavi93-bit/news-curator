@@ -283,16 +283,21 @@ llm:
 
   providers:
     gemini:
-      # 2026-08-29: gemini-2.5-flash was discontinued (API 404s, run log
-      # evidence). gemini-3-flash is the current flash family id -- VERIFY
-      # against the pipeline log's "available models" step on the next run;
-      # the router rotates on 404 so a wrong guess costs nothing.
-      model: "gemini-3-flash"
+      # 2026-08-29, run-log evidence: gemini-2.5-flash is LISTED by the API
+      # but generateContent 404s (discontinued June 2026 -- listed-but-dead).
+      # gemini-3-flash does not exist (only -preview). The ALIAS is the
+      # self-healing choice: it always points at the current GA flash and
+      # cannot be retired. Pin a specific model only when v1.5 scoring
+      # arrives and output stability starts to matter; the pipeline log's
+      # "List available Gemini models" step is the ground truth on every run.
+      model: "gemini-flash-latest"
       rpm: 10
       rpd: 1500
       supports_vision: true
     groq:
-      model: "llama-3.3-70b-versatile"
+      # 2026-08-29, run-log evidence: llama-3.3-70b-versatile is gone from
+      # Groq's roster (404). qwen3.8-27b from the live list (probe step).
+      model: "qwen/qwen3.8-27b"
       rpm: 30
       rpd: 14400
       supports_vision: false
