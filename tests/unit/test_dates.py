@@ -188,3 +188,10 @@ def test_midnight_utc_displays_as_0330_in_tehran():
     # the composer must never print it as one.
     dt = datetime(2026, 8, 19, 0, 0, tzinfo=timezone.utc)
     assert dates.to_tehran(dt).strftime("%Y-%m-%d %H:%M") == "2026-08-19 03:30"
+
+
+def test_israel_wall_clock_set_is_evidence_based():
+    # ynet/ynet_he proven liars 2026-08-19 (gate), walla 2026-08-29 (gate,
+    # 2h08m future). Everything else stays out until the gate says so --
+    # membership here must be evidence, never suspicion.
+    assert dates.ISRAEL_WALL_CLOCK_SOURCE_IDS == frozenset({"ynet", "ynet_he", "walla"})

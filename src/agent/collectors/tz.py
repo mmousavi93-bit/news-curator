@@ -28,10 +28,12 @@ from datetime import date, datetime, timedelta, timezone
 # class of feed lie the collect-test gate exists to surface. Any OTHER
 # source that starts future-dating must fail the gate loudly.
 #
-# walla and maariv are Israeli too but are staged enabled:false and have
-# never been collected, so whether they also lie is UNVERIFIED. Adding them
-# here on suspicion would be guessing; the gate will say so at Phase 8.
-ISRAEL_WALL_CLOCK_SOURCE_IDS = frozenset({"ynet", "ynet_he"})
+# walla added 2026-08-29 on gate EVIDENCE (the rule that governs this set):
+# the first widened collect-test failed with walla 2h08m in the future,
+# the exact ynet signature (Israel wall-clock stamped +00:00, IDT = UTC+3
+# in August). maariv did not fire in that run, so it stays unlisted --
+# suspicion is not evidence; the gate will say so if it lies too.
+ISRAEL_WALL_CLOCK_SOURCE_IDS = frozenset({"ynet", "ynet_he", "walla"})
 
 
 def _last_sunday(year: int, month: int) -> date:
