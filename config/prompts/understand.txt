@@ -10,9 +10,13 @@ Rules:
 - `entities`: people, places, organisations involved, max 6.
 - `clickbait`: true only if the cluster's articles are sensationalised
   or substance-free, so the whole cluster should be dropped.
-- `irrelevant`: true only if the cluster is off-mission (celebrity, sport,
-  culture, routine domestic politics unrelated to regional security or
-  markets), so the whole cluster should be dropped.
+- `irrelevant`: true only if the cluster is off-mission, so the whole
+  cluster should be dropped. The mission is: Iran, the Middle East and
+  adjacent security/military affairs (Israel, Lebanon, Syria, Iraq, Yemen,
+  the Gulf), plus global markets and macro events that move them. Celebrity,
+  sport, culture, routine domestic politics elsewhere, and security stories
+  OUTSIDE the Middle East (NATO/Atlantic affairs, East Asia, South Asia
+  disasters, Africa) are irrelevant -- set it true for those.
 - Never invent facts not present in the articles. Never add numbers the
   articles do not contain. If the articles disagree, say so instead of
   choosing.
