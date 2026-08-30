@@ -330,9 +330,14 @@ llm:
       # 40 clusters. A 429 here is NOT a pacing bug -- do not "fix" the
       # pacer, there is nothing to fix.
     openrouter:
-      # Roster rotates weekly; this free model is a placeholder default.
-      # Owner-editable -- the adapter refuses to run without a model line.
-      model: "meta-llama/llama-3.1-8b-instruct:free"
+      # Free roster rotates weekly; IDs ROT. 2026-08-30: the llama-3.1
+      # series was deprecated on OpenRouter and the old placeholder 404'd on
+      # its first live use. qwen/qwen3.6-plus:free is the current pick
+      # (verified live Aug 2026). If it 404s: try `openrouter/free` (the
+      # self-healing alias) or any model marked FREE at openrouter.ai/models.
+      # 404 = model delisted -> swap the ID here. 402 = balance policy ->
+      # NOT fixable in YAML, tell the owner.
+      model: "qwen/qwen3.6-plus:free"
       rpm: 20
       rpd: 50          # emergency parachute, not a real fallback
       supports_vision: false

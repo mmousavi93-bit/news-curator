@@ -5,6 +5,35 @@ session; this file does not. Nothing here is deleted or condensed — it is the 
 record of what broke, why, and what rule came out of it. Read it when working on the
 phase or subsystem it covers. CLAUDE.md keeps the operational core and points here.
 
+## 2026-08-30 (session 9e) — run 4: threshold validated, OpenRouter went live and 404'd
+
+The 16:35 UTC run (owner's local, post-push) proved three things at once:
+
+1. **The 0.55 threshold works.** 60 items → 26 clusters (2.3 items/cluster, up from
+   1.38) and the cluster cap did NOT fire for the first time on a busy run. The
+   fragmentation lever is real. Side effect, expected: bigger clusters → bigger
+   prompts (some calls now 1.4-1.8K tokens in) → Groq's per-minute wall binds at
+   ~11 calls instead of ~13. Coverage per call is still net positive.
+2. **The session-9 20s timeout fired exactly as designed:** Gemini call #1 hung and
+   died at 20,060ms ("timeout after 20.0s"), then 503'd — the mixed failure mode,
+   both classes handled. Breaker opened after 2.
+3. **OpenRouter went live on its first run — and 404'd.** The owner added the key;
+   the model ID `meta-llama/llama-3.1-8b-instruct:free` was delisted (the entire
+   llama-3.1 series was deprecated on OpenRouter). The 404-not-402 semantics matter:
+   404 = roster rotation, fix the ID; 402 = balance policy, dead under constraint 1.
+   Research agent verified `qwen/qwen3.6-plus:free` as the current free ID
+   (`openrouter/free` is the self-healing alias fallback). Settings + SETUP_ACCOUNTS
+   updated with the 404/402 runbook.
+
+Also fixed: the router's final "stage=X unavailable after N attempt(s)" line now
+logs once per stage per run (was 14 identical lines while both breakers were open —
+the understand-stage collapse from 9d covered the per-cluster line, this one was the
+router's own). Suite 546 → 547. The delivered digest (fuel-tank hit near Oman,
+Mexican MP praise for Iran) is acceptable: the first is exactly the product's job,
+the second is the known weakest class of survivor (fresh, tier-2, uncorroborated
+politics at exactly the min_score floor) — tolerable on a sparse day, worth watching
+in clean-run tuning.
+
 ## 2026-08-30 (session 9d) — first CI run with 9b+9c live: fixes observed, cascade day 3
 
 The 16:04 UTC pipeline run was the first production execution of the session-9b/9c

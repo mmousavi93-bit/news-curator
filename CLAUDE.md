@@ -468,8 +468,8 @@ Real calibration still needs the clean-run CSVs.
       Hand-label the 5 backtest scenario dates, measure Gemini extraction
       precision/recall BEFORE paying any adjudicator; paid cascade stays disabled.
       Markets fetcher needs a free FRED API key (no card) → add to SETUP_ACCOUNTS.md
-      (also unowned: the OpenRouter parachute key -- 50 req/day ≈ 1 run;
-      2026-08-30 showed both primaries can die the same day).
+      (OpenRouter key is OWNED since 2026-08-30 -- first live use 404'd on a
+      delisted model; runbook in the settings.yaml openrouter comment).
 - [ ] **v1.1/v2 deferred, recorded:** (a) evidence-computed lead independence
       (LEAD_HANDLING rev 2) -- its 30-minute near-duplicate window must skip
       date-only items; all-midnight UTC is not simultaneity. (b) Metis stays out

@@ -190,6 +190,20 @@ def test_breaker_skip_logged_once_per_provider_per_run(caplog):
     assert caplog.text.count("circuit breaker open") == 2
 
 
+def test_stage_unavailable_logged_once_per_run(caplog):
+    import logging
+
+    transport = MockHttpTransport(responses=[HttpResponse(500, {})])
+    router = _router(
+        [_gemini(), _groq()], transport, breaker_threshold=2, max_retries=10
+    )
+    with caplog.at_level(logging.INFO, logger="agent.llm.router"):
+        router.complete("first")   # both breakers open; final line logged
+        router.complete("second")  # identical outcome; line suppressed
+    # 2026-08-30: 14 identical "unavailable after 0 attempt(s)" lines.
+    assert caplog.text.count("unavailable after") == 1
+
+
 def test_attempts_bounded_by_max_retries():
     transport = MockHttpTransport(responses=[HttpResponse(500, {})])
     # breaker_threshold high so only max_retries bounds the loop: 3 + 1 = 4

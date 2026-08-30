@@ -45,9 +45,12 @@ Do not add a payment method — free models need zero balance. The key starts wi
 Save as: `OPENROUTER_API_KEY`
 
 The pipeline calls the free model named in `config/settings.yaml` (`providers.openrouter.model`,
-currently `meta-llama/llama-3.1-8b-instruct:free`). OpenRouter's free roster rotates weekly:
-if a run ever logs a model-not-found error from openrouter, open
-**https://openrouter.ai/models?q=free** and put any model marked FREE into that YAML line.
+currently `qwen/qwen3.6-plus:free`). OpenRouter's free roster rotates weekly and IDs rot — the
+original placeholder 404'd on its first live use (2026-08-30). If a run logs a model error
+from openrouter: **404** means the model was delisted — open **https://openrouter.ai/models?q=free**
+and put any model marked FREE into that YAML line (`openrouter/free` is a self-healing alias that
+routes to whatever is free). **402** means OpenRouter's balance policy is blocking zero-balance
+keys — that one is not fixable in config, tell me.
 
 If signup is blocked from your network, use the same access path you used for the Gemini and
 Groq accounts.
