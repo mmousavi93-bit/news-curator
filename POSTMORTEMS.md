@@ -45,6 +45,44 @@ fragmentation directly becomes lost coverage. The threshold tuning session now h
 its evidence. And with 2 cascade days in a row, the OpenRouter parachute key is no
 longer optional bookkeeping — 50 req/day ≈ 1 run of third-rung capacity.
 
+## 2026-08-30 (session 9c) — owner decision: relevance FILTERS, importance SORTS, count dynamic
+
+Owner, on the 15:40 digest: "instead of military first, relevance and impact on
+Iranian people has most priority." First build made relevance a score bonus;
+the owner then refined the design mid-session ("relevance should act as a filter
+and importance should work as sorting... the count of showed news should be
+related to how much at least important items we have") and asked for the
+approach to be VALIDATED by independent agents before code. That loop ran:
+two pro agents labeled all 9 delivered events blind (MUST/SHOULD/DROP + 1-10
+importance + keyword gaps); the orchestrator aggregated. Consensus on 7/9;
+disagreements reconciled: Mecca pact = pass (MUST vs SHOULD — both sides pass),
+Ben Gvir prison = drop (the "self-promotion, no change in the read" argument
+beat "conflict-conduct signal"; the owner's rule is drop when unsure).
+
+Final mechanism (suite 532 → 545, deterministic, zero LLM calls):
+- FILTER: `config/relevance.yaml` tiers (iran_direct 8 / strategic 4 / economy 3)
+  matched over headline+summary+entities; an event below `min_relevance` (3) is
+  `relevance_dropped` — new fate in chosen.csv. Keyword lists carry the
+  evaluators' additions (travel-advisory instrument terms, the regional state
+  ring that E4/E6 ride on) and deliberately exclude blotter magnets (بازداشت،
+  سلاح، بمب، نتانیاهو — they caught only DROPs in the evaluation).
+- SORT: importance restored — category 6/4/3/2/0 + corroboration + tier +
+  recency + size. The old invariant "fresh military rumour survives the
+  threshold" is back at its original arithmetic.
+- COUNT: min_score 8 floor + whatever survives the gate; max_messages 3 → 6 as
+  a safety valve, not the product rule.
+
+Lessons: (1) detection is not relevance — the commentary event E3 mentions Iran
+and matches iran_direct; the understand prompt's commentary rule is the first
+defense, the gate is the second. (2) A keyword tier that elevates instead of
+filtering silently rewards mentions over meaning. (3) compose's shared `_event`
+helper defaulted `entities=("Iran",)` — harmless until entities fed scoring, a
+silent +8 for every test event the moment they did; default is now `("Acme",)`.
+
+Limit stated plainly: keyword tiers approximate "impact on Iranian people"; the
+real impact measure is the v1.5 risk engine. True calibration needs the
+clean-run CSVs (hundreds of events, not nine).
+
 
 ## 2026-08-30 (batch 2) — Persian gate + delivered flag + lead fix, adversarially reviewed
 

@@ -86,6 +86,7 @@ def _fate_for(cluster_key: str, events_by_key: dict, ctx) -> tuple[str, str]:
     for fate_attr, fate in (
         ("lang_dropped", "lang_dropped"),
         ("rank_dropped", "rank_dropped"),
+        ("relevance_dropped", "relevance_dropped"),
         ("repeat_dropped", "repeat_dropped"),
         ("lead_events", "lead_only"),
     ):

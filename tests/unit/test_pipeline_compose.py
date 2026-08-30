@@ -19,9 +19,11 @@ from agent.config import Config, SourceCredibility
 from agent.memory.event_models import Event
 from agent.pipeline.cluster import Cluster
 from agent.pipeline.compose import ComposeStage
+from agent.pipeline.relevance import validate_relevance
 from agent.settings import Settings
 
 _FIXTURE = Path(__file__).parent.parent / "fixtures" / "settings_minimal.yaml"
+_REPO_ROOT = Path(__file__).parent.parent.parent
 NOW = datetime(2026, 8, 20, 12, 0, tzinfo=timezone.utc)
 
 NOTHING_NEW_FA = "چیز تازهای نسبت به اجرای قبلی نیامده."
@@ -43,7 +45,11 @@ class _Log:
 
 def _config() -> Config:
     settings = Settings.from_dict(yaml.safe_load(_FIXTURE.read_text(encoding="utf-8")))
-    return Config(settings=settings, credibility={
+    # The REAL relevance.yaml, like production: the digest-ranker tests must
+    # exercise the shipped keyword tiers, not a test-only copy.
+    relevance = validate_relevance(
+        yaml.safe_load((_REPO_ROOT / "config" / "relevance.yaml").read_text(encoding="utf-8")))
+    return Config(settings=settings, relevance=relevance, credibility={
         "t1": SourceCredibility(tier=1, group="g1"),
         "t2": SourceCredibility(tier=2, group="g2"),
         "t3": SourceCredibility(tier=3, group="g3"),
@@ -83,7 +89,10 @@ def _with_cluster(ctx: _Ctx, event: Event, source_id: str = "t2",
 
 def _event(summary: str, category: str = "military", independent: int = 1,
            claim_status: str = "unconfirmed") -> Event:
-    return Event(event_key="k" * 16, summary=summary, entities=("Iran",),
+    # "Acme" deliberately: entities now feed the relevance scorer
+    # (2026-08-30), and the old default ("Iran") would silently give every
+    # test event the iran_direct +8 bonus.
+    return Event(event_key="k" * 16, summary=summary, entities=("Acme",),
                  category=category, independent_count=independent,
                  claim_status=claim_status, source_count=2,
                  first_seen_at=NOW, last_updated_at=NOW)
@@ -126,7 +135,7 @@ def test_digest_marker_only_when_flagged():
 
 def test_importance_order_military_before_economy():
     ctx = _Ctx(config=_config())
-    economy = _event("خلاصه اقتصادی.", category="economy")
+    economy = _event("خلاصه اقتصادی نفت.", category="economy")
     military = _event("خلاصه نظامی.", category="military")
     ctx.events = [
         _with_cluster(ctx, economy),
@@ -138,7 +147,10 @@ def test_importance_order_military_before_economy():
 
 
 def test_military_rumour_survives_threshold_with_shaye_label():
-    # Military rumour from a tier-3 channel: 5+0+0+3 = 8 >= min_score.
+    # Strategic military rumour from a tier-3 channel: the relevance tier
+    # (نظامی -> strategic 4) leads, so 4+2+0+3 = 9 >= min_score. A military
+    # rumour WITHOUT a strategic keyword now drops -- the owner's 2026-08-30
+    # relevance-first decision demoted category from 6 to 2.
     # Softer-category rumours (politics/security) score below and drop --
     # also asserted below.
     ctx = _Ctx(config=_config())
@@ -169,7 +181,7 @@ def test_date_only_cluster_says_time_not_stated():
 
 def test_llm_headline_is_the_title_summary_is_detail():
     ctx = _Ctx(config=_config())
-    event = _event("جزئیات تکمیلی ماجرا.", category="security")
+    event = _event("جزئیات تکمیلی نظامی ماجرا.", category="security")
     event = Event(event_key="h" * 16, summary=event.summary,
                   headline="تیتر اطلاع‌رسان اصلی", category="security",
                   independent_count=1, source_count=2,
@@ -178,14 +190,14 @@ def test_llm_headline_is_the_title_summary_is_detail():
     ComposeStage(_Log()).run(ctx)
     text = ctx.messages[0]
     assert "تیتر اطلاع‌رسان اصلی" in text  # the LLM headline is the title
-    assert "جزئیات تکمیلی ماجرا" in text   # the summary is the detail
+    assert "جزئیات تکمیلی نظامی ماجرا" in text   # the summary is the detail
 
 
 def test_category_icons_render():
     ctx = _Ctx(config=_config())
     ctx.events = [
         _with_cluster(ctx, _event("خلاصه نظامی.", category="military")),
-        _with_cluster(ctx, _event("خلاصه سیاسی.", category="politics")),
+        _with_cluster(ctx, _event("خلاصه سیاسی جنگ.", category="politics")),
     ]
     ComposeStage(_Log()).run(ctx)
     assert "⚔️" in ctx.messages[0]
@@ -204,10 +216,10 @@ def test_below_threshold_events_never_reach_the_message():
 def test_busy_day_splits_into_multiple_messages_within_char_cap():
     ctx = _Ctx(config=_config())
     for i in range(25):
-        event = _event(f"خبر شماره {i}. " + "جزئیات " * 40, category="security")
+        event = _event(f"خبر شماره {i}. نظامی " + "جزئیات " * 40, category="security")
         ctx.events.append(_with_cluster(ctx, event))
     ComposeStage(_Log()).run(ctx)
-    assert 1 < len(ctx.messages) <= 3  # owner: more than one message allowed
+    assert 1 < len(ctx.messages) <= 6  # max_messages is the safety valve (2026-08-30)
     for text in ctx.messages:
         assert len(text.encode("utf-16-le")) // 2 <= 4096
 
@@ -217,7 +229,7 @@ def test_non_persian_event_dropped_others_kept():
     # back fully Arabic. The gate drops it; the Persian event ships.
     ctx = _Ctx(config=_config())
     persian = _event("خلاصه نظامی.", category="military")
-    arabic = _event("يك خلاصة.", category="military")
+    arabic = _event("يك خلاصة جنگ.", category="military")
     ctx.events = [
         _with_cluster(ctx, persian, source_id="t1"),
         _with_cluster(ctx, arabic, source_id="t2"),
@@ -234,7 +246,7 @@ def test_all_non_persian_events_produce_lang_dropped_one_liner():
     # message says so -- "nothing new" would be a lie about the world.
     from agent.pipeline.labels import labels_for
     ctx = _Ctx(config=_config())
-    arabic = _event("يك خلاصة.", category="military")
+    arabic = _event("يك خلاصة جنگ.", category="military")
     ctx.events = [_with_cluster(ctx, arabic, source_id="t1")]
     ComposeStage(_Log()).run(ctx)
     assert ctx.messages == [labels_for("fa")["lang_dropped"]]

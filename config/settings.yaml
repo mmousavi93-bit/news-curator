@@ -370,9 +370,13 @@ llm:
 # military rumour = 5+0+0+3 = 8 -> kept. politics tier-2 fresh = 3+2+2+3 = 10.
 # ---------------------------------------------------------------------------
 digest_rank:
-  # military: 6 (not 5) -- a fresh military RUMOUR from the owner's own
-  # channels is exactly the early warning this system exists for; 6 keeps
-  # it visible for ~4h of recency decay, then it drops out.
+  # DECISION 2026-08-30 (session 9c): relevance is the FILTER (config/
+  # relevance.yaml min_relevance gate -- an event below it never reaches
+  # the digest), importance is the SORT (this block), and the shown count
+  # is whatever survives both -- max_messages is a safety valve, not the
+  # product rule. Restored: military 6 (not 5) -- a fresh military RUMOUR
+  # from the owner's own channels is exactly the early warning this system
+  # exists for; 6 keeps it visible for ~4h of recency decay, then it drops.
   category_weights: {military: 6, security: 4, politics: 3, economy: 2, other: 0}
   corroboration_weight: 2        # per independent corroborating group
   tier_bonus: {1: 3, 2: 2, 3: 0} # best source tier among cluster members
@@ -380,8 +384,8 @@ digest_rank:
   recency_window_hours: 12
   size_boost_per_member: 0.1
   size_boost_cap: 1.0
-  min_score: 8                   # events below this never reach the message
-  max_messages: 3                # one digest may span up to N messages
+  min_score: 8                   # importance floor: below this, no show
+  max_messages: 6                # safety valve; count is dynamic by design
   repeat_window_hours: 72        # events matching a recent stored event are repeats
 
 delivery:

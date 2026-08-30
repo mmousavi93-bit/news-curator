@@ -139,15 +139,20 @@ def _validate_credibility(raw: dict, errors: list[str]) -> dict[str, SourceCredi
 class Config:
     settings: Settings
     credibility: Mapping[str, SourceCredibility]
+    # Digest-ranking relevance tiers (config/relevance.yaml). None only when
+    # a Config is built directly (tests); load_all always sets it.
+    relevance: object | None = None
 
 
 def load_all(*, base: Path | None = None) -> Config:
-    """Load settings + credibility, validate, freeze, return.
+    """Load settings + credibility + relevance, validate, freeze, return.
 
     Fail-fast: raises ConfigError listing EVERY problem found, not just the
     first. Risk weights and sources are added to this loader in Phases 7/8 --
     they do not exist yet, so they are not loaded here.
     """
+    from agent.pipeline.relevance import validate_relevance
+
     directory = base if base is not None else config_dir()
     errors: list[str] = []
 
@@ -160,6 +165,12 @@ def load_all(*, base: Path | None = None) -> Config:
     credibility_raw: dict | None = None
     try:
         credibility_raw = load_yaml("credibility.yaml", base=directory)
+    except ConfigError as exc:
+        errors.append(str(exc))
+
+    relevance_obj = None
+    try:
+        relevance_obj = validate_relevance(load_yaml("relevance.yaml", base=directory))
     except ConfigError as exc:
         errors.append(str(exc))
 
@@ -178,4 +189,5 @@ def load_all(*, base: Path | None = None) -> Config:
         raise ConfigError("; ".join(errors))
 
     assert settings_obj is not None  # guaranteed: no errors means it loaded and validated
-    return Config(settings=settings_obj, credibility=credibility_obj)
+    return Config(settings=settings_obj, credibility=credibility_obj,
+                  relevance=relevance_obj)
