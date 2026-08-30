@@ -243,6 +243,52 @@ def test_repeat_follow_up_is_dropped(tmp_path):
     assert "a different event entirely" in kept_summaries
 
 
+def test_this_runs_own_rows_are_not_self_repeat_dropped(tmp_path):
+    """Regression 2026-08-30: the production sequence is understand
+    INSERTING this run's events into the events table BEFORE validate
+    reads the repeat window. Unfiltered, the fresh event's own row is
+    among `recent` and self-cosine (1.0) drops it -- every run shipped
+    the nothing-new one-liner. This run's keys must be excluded from the
+    window, while a follow-up matching a PRIOR run's event still drops."""
+    credibility = _cred(t2=SourceCredibility(tier=2, group="g"))
+    conn = memory_db.open_db(tmp_path / "state.db", create_if_absent=True)
+    from agent.memory.event_models import insert_events
+    insert_events(conn, [Event(event_key="o" * 16, summary="old summary",
+                               category="politics", source_count=1,
+                               first_seen_at=NOW, last_updated_at=NOW)])
+    conn.close()
+
+    cluster_fresh = _cluster([_item("t2", "https://x/fresh")])
+    cluster_followup = _cluster([_item("t2", "https://x/followup")])
+    fresh_event = Event(event_key=cluster_fresh.key, summary="fresh summary",
+                        category="politics", source_count=1,
+                        first_seen_at=NOW, last_updated_at=NOW)
+    followup_event = Event(event_key=cluster_followup.key, summary="old summary",
+                           category="politics", source_count=1,
+                           first_seen_at=NOW, last_updated_at=NOW)
+    embedder = _DictEmbedder({
+        "old summary": [1.0, 0.0, 0.0],
+        # Orthogonal to the old row: only the self-match could drop it.
+        "fresh summary": [0.0, 1.0, 0.0],
+    })
+    ctx = _Ctx(
+        clusters=[cluster_fresh, cluster_followup],
+        events=[fresh_event, followup_event],
+    )
+    ctx.db = memory_db.open_db(tmp_path / "state.db", create_if_absent=False)
+    # The understand half of the real sequence: this run's rows exist.
+    insert_events(ctx.db, [fresh_event, followup_event])
+    ctx.embedder = embedder
+    ctx.config = _ctx_config()
+    try:
+        _stage(credibility).run(ctx)
+    finally:
+        ctx.db.close()
+
+    kept_summaries = [e.summary for e in ctx.events]
+    assert kept_summaries == ["fresh summary"]
+
+
 def _ctx_config():
     from agent.config import Config
     from agent.settings import Settings

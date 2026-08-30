@@ -87,13 +87,20 @@ class ValidateStage:
     def _drop_repeats(self, ctx, events: list[Event]) -> list[Event]:
         """Anti-repetition: a follow-up story on an event the owner already
         saw must not appear again. Match each new event's summary against
-        recent stored events' summaries with the LOCAL embedder (zero LLM
+        PREVIOUS runs' stored summaries with the LOCAL embedder (zero LLM
         calls, zero quota); drop matches at/above event_match_threshold.
+        This run's own rows are excluded by event_key: the understand stage
+        inserts them before validate runs, so an unfiltered read would
+        match every event against itself (sim 1.0) and drop everything.
         Skipped when the db or embedder is absent (dry-run / mock)."""
         if getattr(ctx, "db", None) is None or getattr(ctx, "embedder", None) is None:
             return events
         window = ctx.config.settings.digest_rank.repeat_window_hours
-        recent = read_recent_events(ctx.db, hours=window, now=ctx.now)
+        new_keys = {e.event_key for e in events}
+        recent = [
+            e for e in read_recent_events(ctx.db, hours=window, now=ctx.now)
+            if e.event_key not in new_keys
+        ]
         if not recent or not events:
             return events
         threshold = ctx.config.settings.pipeline.event_match_threshold

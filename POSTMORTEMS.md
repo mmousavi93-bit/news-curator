@@ -5,6 +5,45 @@ session; this file does not. Nothing here is deleted or condensed — it is the 
 record of what broke, why, and what rule came out of it. Read it when working on the
 phase or subsystem it covers. CLAUDE.md keeps the operational core and points here.
 
+## 2026-08-30 — every post-rework run shipped "nothing new": validate self-match
+
+Symptom (owner-reported): after the Persian/Jalali output rework, every Telegram message
+was the Farsi `چیز تازهای نسبت به اجرای قبلی نیامده` one-liner — never actual news.
+Mechanically reproduced before fixing (`tools/repro_validate_selfmatch.py`, now
+redundant — the regression test below is the permanent guard).
+
+Root cause: the production stage sequence is understand INSERTING this run's events into
+the events table, THEN validate's anti-repetition (`_drop_repeats`) reading
+`read_recent_events(db, 72h)` from that same table. The fresh events' own rows were in
+the window, so every event cosine-matched ITSELF (1.0 ≥ 0.55) and was dropped as its own
+repeat. Zero events → compose → honest one-liner. Every run, every cluster, silently.
+
+Why the suite stayed green at 488: `test_repeat_follow_up_is_dropped` seeds the DB with
+only a PRIOR run's event — it never simulated the production sequence of
+insert-then-read-within-one-run. The test tested the intent, not the wiring. The trap is
+the familiar one (a green suite that never executed the real sequence) but this time it
+shipped to production and the failure mode was silence, not a crash.
+
+Fix: `_drop_repeats` excludes this run's event keys from the recent window (a set
+subtraction, no schema change). Same-key re-formation within 72h cannot happen in
+production (items are URL/hash-deduped for 7–30 days), so the exclusion costs nothing.
+Regression test added: `test_this_runs_own_rows_are_not_self_repeat_dropped` — runs the
+real insert-then-validate sequence and asserts the fresh event survives while a prior-run
+follow-up still drops. Suite 488 → 489, shim-verified, count predicted before running.
+
+Standing lessons:
+(a) Any stage that READS a table another stage just WROTE in the same run must exclude
+    its own writes, or prove the exclusion is unnecessary. Grep for `read_*` calls in
+    `pipeline/` whenever a stage pair changes order.
+(b) Anti-repetition tests must model the real stage sequence (insert this run's rows
+    first), not just the idealised old-events state.
+(c) Known residual wrinkle, filed in CLAUDE.md Pending: repeat matching compares against
+    ALL recent stored events, including ones the owner never saw (dropped below
+    min_score or as repeats). A never-seen story can block its own follow-ups for up to
+    72h. Clean fix is a `delivered` flag (additive schema, v1.5 candidate). Live-state
+    consequence after this fix ships: events written by the broken runs are in the DB
+    and can suppress matching stories until ~2026-09-02 — self-correcting, accepted.
+
 ## g1 SOLVED 2026-08-19 — date-only RFC-822, plus the Tehran display decision
 
 **PHASE 3 CLOSED. collect-test GREEN 2026-08-19 after this fix.** All six gate conditions

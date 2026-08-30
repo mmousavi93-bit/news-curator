@@ -193,8 +193,9 @@ Prompts live in `config/prompts/*.txt` — edit those, never hardcode prompt tex
   constraint or a free-tier limit, say so with numbers before implementing.
 - **Mock mode is mandatory.** Every external call must be stubbable so tests run offline
   with no keys and no network.
-- **Delegate mechanical work** (bulk file ops, wide greps, repetitive extraction, source-list
-  research) to a Haiku subagent with a scoped brief. Note the routing in one line.
+- **Routing: follow the `claude-agent-routing` skill** (canonical since 2026-08-29).
+  Mechanical work (bulk file ops, wide greps, repetitive extraction, source-list research) →
+  Haiku scout with a scoped brief; note the routing in one line.
 - **Data goes to CSV or files, not into chat.**
 - **Update this file** whenever a fact is verified, an ambiguity resolved, or a phase
   completed. Keep it lean — facts, numbers, blockers, locations. No frameworks, no prose
@@ -328,7 +329,7 @@ Do not re-add that content here — this file loads on every turn.
    rate card, per-run enforcement in `ProviderBudget`); adapter still not implemented,
    per brief.
 
-## Phases 6–10 (2026-08-29) — v1 CODE COMPLETE. Suite 464, 0 failed, shim-verified
+## Phases 6–10 (2026-08-29) — v1 CODE COMPLETE. Suite 489, 0 failed, shim-verified
 
 - Owner's mandate this session: push to done. Built per briefs: Phase 6 Understand
   (suite 415), Phase 7 Actions (429), Phase 8 Widen sources (438), Phase 9 Validate
@@ -362,6 +363,17 @@ Do not re-add that content here — this file loads on every turn.
 
 ## Pending / unresolved
 
+- [ ] **2026-08-30 defect (FIXED, owner to push): validate self-match.** Every run
+      since the Persian rework shipped the nothing-new one-liner: understand writes this
+      run's events to the DB, then validate's anti-repetition read them back as "recent"
+      and every event dropped as its own repeat (self-cosine 1.0). Fixed in
+      `pipeline/validate.py` (this run's event keys excluded from the repeat window) +
+      regression test; suite 489. Forensic: POSTMORTEMS.md top entry.
+- [ ] **Residual wrinkle from that fix (design, not defect):** repeat matching compares
+      against ALL recent stored events, including ones the owner never saw (dropped
+      below min_score or as repeats). A never-seen story can suppress its own follow-ups
+      within the 72h window. Clean fix = `delivered` flag on events (additive schema,
+      v1.5 candidate). Live DB written by the broken runs self-corrects by ~2026-09-02.
 - [ ] **Phase 8: the `date_only` composer consumer.** The understand prompt already
       prints the date + "time not stated" for date-only items (Phase 6); the composer
       must do the same when events render (pending item (a) from before Phase 6).
@@ -370,7 +382,11 @@ Do not re-add that content here — this file loads on every turn.
 - [ ] **Ask DeepSeek whether cached reads count against the 5M free tokens/30d.** The
       cached fresh-token load is ~3.3M/month, so the answer decides whether DeepSeek is a
       **second zero-cost provider** or a $5/mo one. One support ticket. Highest
-      value-per-effort item on this list.
+      value-per-effort item on this list. Checked 2026-08-30: NOT answerable from the
+      agent sandbox — official docs (api-docs.deepseek.com) blocked by the egress
+      allowlist, web search returns content-farm guides only. Two-minute owner check
+      from any browser: `api-docs.deepseek.com/quick_start/pricing` fine print on free
+      credits vs cache hits — or a support ticket. Do not re-search from here.
 
 - [ ] ~~Phase 6 decision: does the `items` table survive?~~ **RESOLVED 2026-08-29:
       `items` survives** as the intra-run raw tier (pruned on `events_days`);
