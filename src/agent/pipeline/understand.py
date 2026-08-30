@@ -28,7 +28,12 @@ _FENCE_RE_OPEN = "```"
 def _extract_json(text: str) -> dict:
     """The model may wrap JSON in markdown fences. Strip them, then parse.
     Raises ValueError on anything unparseable -- the caller skips the
-    cluster, because feeding a half-parse downstream invents content."""
+    cluster, because feeding a half-parse downstream invents content.
+    None arrives when a provider answers 200 with `content: null` (an
+    empty/refusal answer); it is unparseable by definition, never a crash
+    (2026-08-30: exactly this None crashed a whole run mid-pipeline)."""
+    if not isinstance(text, str):
+        raise ValueError("response content is missing (null) -- provider did not answer")
     stripped = text.strip()
     if stripped.startswith(_FENCE_RE_OPEN):
         first_newline = stripped.find("\n")

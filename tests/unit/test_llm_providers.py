@@ -76,6 +76,21 @@ def test_gemini_parse_missing_candidates_raises_schema_error():
         GeminiAdapter("gemini-2.5-flash", "k" * 16).parse({"candidates": []})
 
 
+def test_gemini_parse_null_text_raises_schema_error():
+    # 2026-08-30: content:null crashed a whole run mid-pipeline. The
+    # adapter must convert "the provider said nothing" into a schema
+    # failure (retry -> rotate), never pass None downstream.
+    with pytest.raises(SchemaError):
+        GeminiAdapter("gemini-2.5-flash", "k" * 16).parse(
+            {"candidates": [{"content": {"parts": [{"text": None}]}}]})
+
+
+def test_openai_chat_parse_null_content_raises_schema_error():
+    with pytest.raises(SchemaError):
+        GroqAdapter("llama-3.3-70b-versatile", "k" * 16).parse(
+            {"choices": [{"message": {"content": None}}]})
+
+
 # ---------------------------------------------------------------------------
 # Groq / OpenRouter (shared OpenAI-chat shape)
 # ---------------------------------------------------------------------------

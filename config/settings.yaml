@@ -330,13 +330,12 @@ llm:
       # 40 clusters. A 429 here is NOT a pacing bug -- do not "fix" the
       # pacer, there is nothing to fix.
     openrouter:
-      # Free roster rotates; IDs ROT -- two models 404'd on 2026-08-30 in a
-      # row (llama-3.1 series deprecated, then qwen3.6-plus delisted the same
-      # day). The owner's live FREE-list check settled it: rotation, not the
-      # zero-balance policy. Rule: when this 404s, take the FIRST model
-      # marked FREE at openrouter.ai/models?q=free and put its exact ID
-      # here. 404 = delisted, swap the ID. 402 = balance policy -> NOT
-      # fixable in YAML, tell the owner.
+      # VERDICT 2026-08-30 (run at 18:24 UTC): OpenRouter is DEAD for this
+      # project under the zero-cost constraint. The sequence settled it:
+      # 404 (twice) = delisted models, then 403 on a LIVE-list model =
+      # the balance/key policy. The parachute role moved to the bai gateway
+      # (BAI_API_KEY). Keep this block for the day the policy changes --
+      # 404 = swap the ID, 402/403 = policy, not fixable in YAML.
       # Current pick (2026-08-30): inkling-small. Nemotron-3.5-lightning was
       # DISQUALIFIED by live evidence -- 16.5K output tokens on a ~400-token
       # task, 8-minute calls, both answers useless (the ramble cap in

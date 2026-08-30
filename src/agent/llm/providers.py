@@ -85,6 +85,10 @@ class GeminiAdapter:
             raise SchemaError(
                 "gemini response missing candidates/content/parts/text", provider=self.name
             ) from exc
+        if not isinstance(text, str):
+            # content: null -- the provider answered but said nothing. A
+            # schema failure, never a crash downstream (2026-08-30).
+            raise SchemaError("gemini response content is null", provider=self.name)
         meta = body.get("usageMetadata") or {}
         usage = {
             "in": int(meta.get("promptTokenCount", 0)),
@@ -139,6 +143,11 @@ class _OpenAiChatAdapter:
             raise SchemaError(
                 f"{self.name} response missing choices/message/content", provider=self.name
             ) from exc
+        if not isinstance(text, str):
+            # OpenAI-shape refusals and empty generations arrive as
+            # content: null. Schema failure -> retry -> rotate; never a
+            # crash downstream (2026-08-30: this null crashed the run).
+            raise SchemaError(f"{self.name} response content is null", provider=self.name)
         meta = body.get("usage") or {}
         usage = {
             "in": int(meta.get("prompt_tokens", 0)),

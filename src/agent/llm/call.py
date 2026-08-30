@@ -119,7 +119,13 @@ def attempt(
     # 400/401/403 (and any other non-200 we did not classify above): the
     # request or key is wrong, and it is wrong identically on every
     # provider. Rotating turns one visible fault into three wasted calls
-    # and a misleading log (§3).
+    # and a misleading log (§3) -- so this call's RESULT is fatal and the
+    # loop stops HERE. But the provider itself is dead for this run: the
+    # breaker counts the failure so that after two fatal responses the
+    # provider is skipped instead of re-burned once per cluster
+    # (2026-08-30: a 403-blocked OpenRouter was called 34 times in one
+    # run -- one fatal call per remaining cluster, ~90s of dead air).
+    breaker.failure(name)
     log_call(logger, call_index, stage, provider, prompt_hash,
              f"status_{status}", latency_ms, None)
     logger.error(

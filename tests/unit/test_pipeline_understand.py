@@ -102,6 +102,14 @@ def test_summarises_each_cluster_into_an_event():
     assert event.first_seen_at == T0
 
 
+def test_extract_json_none_raises_value_error_not_attribute_error():
+    # 2026-08-30: a provider returned 200 with content:null -> the parse
+    # passed None through and .strip() crashed the whole run. None must be
+    # an unparseable response (ValueError -> skip cluster), never a crash.
+    with pytest.raises(ValueError):
+        _extract_json(None)  # type: ignore[arg-type]
+
+
 def test_irrelevant_cluster_is_dropped():
     stage, log = _stage()
     ctx = _Ctx(clusters=[_cluster([_item("https://x/1", T0)])],
