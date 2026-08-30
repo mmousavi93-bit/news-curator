@@ -53,8 +53,8 @@ class _StubRouter:
         return self._responses[index]
 
 
-def _ok_json() -> LlmResult:
-    payload = {"headline": "H", "summary": "S.", "entities": ["Iran"],
+def _ok_json(headline: str = "H", summary: str = "S.") -> LlmResult:
+    payload = {"headline": headline, "summary": summary, "entities": ["Iran"],
                "clickbait": False, "irrelevant": False}
     return LlmResult(ok=True, status="ok", text=json.dumps(payload),
                      provider="gemini", model="m", prompt_hash="p" * 16, call_index=1)
@@ -107,7 +107,8 @@ def test_end_to_end_ten_articles_one_event():
         vectors.append(_unit_vec(0.0, 1.0))
 
     log = _Log()
-    ctx = _Ctx(router=_StubRouter([_ok_json(), _ok_json()]))
+    ctx = _Ctx(router=_StubRouter(
+        [_ok_json("H one", "S one."), _ok_json("H two", "S two.")]))
     ctx.items = items
     ctx.embedder = _VecEmbedder(vectors)
     ctx.config = config
@@ -117,6 +118,17 @@ def test_end_to_end_ten_articles_one_event():
     EmbedStage().run(ctx)
     ClusterStage(config, log).run(ctx)
     UnderstandStage(_TEMPLATE, 600, log).run(ctx)
+
+    # The clustering embedder above maps ITEMS; validate's same-run
+    # duplicate pass embeds SUMMARIES. Two distinct summaries must land on
+    # distinct vectors or the new collapse merges them (2026-08-30 e2e fix).
+    class _SummaryVec:
+        def embed(self, texts):
+            return [
+                _unit_vec(1, 0) if t == "S one." else _unit_vec(0, 1) for t in texts
+            ]
+
+    ctx.embedder = _SummaryVec()
     ValidateStage({"src": SourceCredibility(tier=1, group=None)}, log).run(ctx)
     ComposeStage(log).run(ctx)
     DeliverStage({}, log).run(ctx)

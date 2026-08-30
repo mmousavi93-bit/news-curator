@@ -1,0 +1,51 @@
+name: probe-models
+
+# Manual only. Probes every OpenRouter :free model against the REAL
+# understand prompt + a fixed sample set (owner request 2026-08-30: the
+# free roster rotates weekly, and the current pick must be measured, not
+# guessed). Deterministic checks only -- zero LLM-judge (constraint 3).
+#
+# Budget: each dispatch spends ~4 calls per model (28 for the default
+# list) of the OpenRouter free tier's ~50 requests/day -- the pipeline's
+# parachute quota. Do NOT dispatch while Gemini is down for the day.
+#
+# Stdlib only (urllib) -- deliberately no pip install, same contract as
+# check_feeds.py. The key comes from GitHub Secrets; results land in a
+# CSV artifact; nothing is committed.
+
+on:
+  workflow_dispatch:
+    inputs:
+      models:
+        description: "Comma-separated OpenRouter model IDs to probe"
+        required: false
+        default: "minimax/minimax-m3:free,poolside/laguna-s-2.1:free,nvidia/nemotron-3.5-lightning:free,nvidia/nemotron-3-super-120b-a12b:free,inclusionai/ling-3.0-flash-fin:free,thinkingmachines/inkling:free,thinkingmachines/inkling-small:free"
+      tag:
+        description: "Label for this probe run; names the output file"
+        required: true
+        default: "ci"
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Probe every free model from a US runner
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          python tools/probe_free_models.py \
+            --models "${{ inputs.models }}" \
+            --tag "${{ inputs.tag }}"
+
+      - uses: actions/upload-artifact@v5
+        with:
+          name: models-probe-${{ inputs.tag }}
+          path: config/models_probe_${{ inputs.tag }}.csv
+          if-no-files-found: error

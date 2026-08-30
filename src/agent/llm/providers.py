@@ -20,6 +20,7 @@ API_KEY_ENV: dict[str, str] = {
     "groq": "GROQ_API_KEY",
     "openrouter": "OPENROUTER_API_KEY",
     "anthropic": "ANTHROPIC_API_KEY",
+    "bai": "BAI_API_KEY",
 }
 
 # (connect, read) timeout in seconds. Read is generous: a free-tier
@@ -120,6 +121,14 @@ class _OpenAiChatAdapter:
             "model": self.model,
             "messages": [{"role": "user", "content": prompt}],
             "temperature": 0.0,
+            # Hard output cap (2026-08-30 live evidence): without it,
+            # nemotron-3.5-lightning generated ~16.5K tokens on a task that
+            # needs ~400 -- an 8-minute ramble whose continuous bytes kept
+            # the read timeout fed, so it never tripped. The chat adapters'
+            # only consumer today is the understand stage (~400-token strict
+            # JSON); 700 is headroom, and a truncated JSON fails loudly
+            # (schema error -> retry) rather than silently.
+            "max_tokens": 700,
         }
         return self._url, headers, payload
 
@@ -150,4 +159,15 @@ class OpenRouterAdapter(_OpenAiChatAdapter):
     def __init__(self, model: str, api_key: str) -> None:
         super().__init__(
             "openrouter", "https://openrouter.ai/api/v1/chat/completions", model, api_key
+        )
+
+
+class BaiAdapter(_OpenAiChatAdapter):
+    """The owner's reseller gateway (2026-08-30). OpenAI-compatible; the
+    free roster there is a gift, not capacity to depend on -- it sits in
+    the cascade BEHIND groq. Text-only (vision stays on Gemini)."""
+
+    def __init__(self, model: str, api_key: str) -> None:
+        super().__init__(
+            "bai", "https://api.b.ai/v1/chat/completions", model, api_key
         )

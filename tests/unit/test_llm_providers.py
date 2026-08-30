@@ -10,6 +10,7 @@ import pytest
 from agent.llm.errors import SchemaError
 from agent.llm.providers import (
     API_KEY_ENV,
+    BaiAdapter,
     GeminiAdapter,
     GroqAdapter,
     ImageInput,
@@ -86,6 +87,7 @@ def test_gemini_parse_missing_candidates_raises_schema_error():
         (GroqAdapter("llama-3.3-70b-versatile", "k" * 16), "api.groq.com"),
         (OpenRouterAdapter("meta-llama/llama-3.1-8b-instruct:free", "k" * 16),
          "openrouter.ai"),
+        (BaiAdapter("qwen3.8-flash", "k" * 16), "api.b.ai"),
     ],
 )
 def test_openai_chat_request_shape(adapter, host):
@@ -96,6 +98,9 @@ def test_openai_chat_request_shape(adapter, host):
         "model": adapter.model,
         "messages": [{"role": "user", "content": "prompt"}],
         "temperature": 0.0,
+        # 2026-08-30: the ramble cap (nemotron generated ~16.5K tokens on a
+        # ~400-token task and held a call open for 8 minutes).
+        "max_tokens": 700,
     }
 
 
@@ -201,3 +206,4 @@ def test_api_key_env_names():
     assert API_KEY_ENV["gemini"] == "GEMINI_API_KEY"
     assert API_KEY_ENV["groq"] == "GROQ_API_KEY"
     assert API_KEY_ENV["openrouter"] == "OPENROUTER_API_KEY"
+    assert API_KEY_ENV["bai"] == "BAI_API_KEY"
