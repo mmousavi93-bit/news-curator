@@ -142,7 +142,7 @@ def test_military_rumour_survives_threshold_with_shaye_label():
     # Softer-category rumours (politics/security) score below and drop --
     # also asserted below.
     ctx = _Ctx(config=_config())
-    event = _event("خلاصه نظامی تأییدنشده.", category="military",
+    event = _event("خلاصه نظامی تئییدنشده.", category="military",
                    independent=0, claim_status="rumour")
     ctx.events = [_with_cluster(ctx, event, source_id="t3")]
     ComposeStage(_Log()).run(ctx)
@@ -210,3 +210,86 @@ def test_busy_day_splits_into_multiple_messages_within_char_cap():
     assert 1 < len(ctx.messages) <= 3  # owner: more than one message allowed
     for text in ctx.messages:
         assert len(text.encode("utf-16-le")) // 2 <= 4096
+
+
+def test_non_persian_event_dropped_others_kept():
+    # Live-sample regression (2026-08-30): an Arabic-source cluster came
+    # back fully Arabic. The gate drops it; the Persian event ships.
+    ctx = _Ctx(config=_config())
+    persian = _event("خلاصه نظامی.", category="military")
+    arabic = _event("يك خلاصة.", category="military")
+    ctx.events = [
+        _with_cluster(ctx, persian, source_id="t1"),
+        _with_cluster(ctx, arabic, source_id="t2"),
+    ]
+    ComposeStage(_Log()).run(ctx)
+    text = ctx.messages[0]
+    assert "خلاصه نظامی" in text
+    assert "يك" not in text
+    assert ctx.counters["compose_lang_drops"] == 1
+
+
+def test_all_non_persian_events_produce_lang_dropped_one_liner():
+    # Constraint 11: when events existed but none rendered Persian, the
+    # message says so -- "nothing new" would be a lie about the world.
+    from agent.pipeline.labels import labels_for
+    ctx = _Ctx(config=_config())
+    arabic = _event("يك خلاصة.", category="military")
+    ctx.events = [_with_cluster(ctx, arabic, source_id="t1")]
+    ComposeStage(_Log()).run(ctx)
+    assert ctx.messages == [labels_for("fa")["lang_dropped"]]
+    assert ctx.counters["compose_lang_drops"] == 1
+    assert ctx.compose_kept_keys == []
+
+
+def test_kept_events_recorded_for_delivery():
+    # Received-marker keys: compose records kept keys after the rank cut;
+    # the DELIVER stage writes the markers, only after real sends succeed
+    # (review finding 2026-08-30 -- marking here would re-create ghost
+    # suppression on send failure).
+    ctx = _Ctx(config=_config())
+    ctx.events = [_with_cluster(ctx, _event("خلاصه نظامی.", category="military"))]
+    ComposeStage(_Log()).run(ctx)
+    assert ctx.compose_kept_keys == [ctx.events[0].event_key]
+
+
+def test_below_threshold_events_are_never_recorded_for_delivery():
+    # The ghost-suppression fix at the compose boundary: an event the owner
+    # never saw (below min_score) must not block its own follow-ups, so it
+    # must never enter the received-marker keys.
+    ctx = _Ctx(config=_config())
+    event = _event("شایعه سیاسی.", category="politics",
+                   independent=0, claim_status="rumour")
+    ctx.events = [_with_cluster(ctx, event, source_id="t3")]
+    ComposeStage(_Log()).run(ctx)
+    assert ctx.messages == [NOTHING_NEW_FA]  # 3+0+0+3 = 6 < 8
+    assert ctx.compose_kept_keys == []
+
+
+def test_lead_events_never_enter_the_received_marker_keys():
+    # schema.sql note: a corroborated confirmation of a lead must reach the
+    # main feed, so leads are excluded from the received-marker keys.
+    ctx = _Ctx(config=_config())
+    lead = Event(event_key="l" * 16, summary="سرنخ نظامی.",
+                 category="military", source_count=1,
+                 first_seen_at=NOW, last_updated_at=NOW)
+    ctx.lead_events = [lead]
+    ctx.leads_channel_id = "leads"
+    ComposeStage(_Log()).run(ctx)
+    assert getattr(ctx, "lead_message", None) is not None
+    assert ctx.compose_kept_keys == []
+
+
+def test_lead_only_run_delivers_lead_message():
+    # Fix pinned by name (2026-08-30): a lead-only run -- main events empty
+    # because nothing was corroborated -- must still deliver the lead
+    # message; that is exactly the scenario the leads channel exists for.
+    ctx = _Ctx(config=_config())
+    lead = Event(event_key="l" * 16, summary="سرنخ نظامی.",
+                 category="military", source_count=1,
+                 first_seen_at=NOW, last_updated_at=NOW)
+    ctx.lead_events = [lead]
+    ctx.leads_channel_id = "leads"
+    ComposeStage(_Log()).run(ctx)
+    assert ctx.messages == [NOTHING_NEW_FA]  # main feed stays honest
+    assert getattr(ctx, "lead_message", None) is not None

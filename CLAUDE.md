@@ -329,7 +329,7 @@ Do not re-add that content here — this file loads on every turn.
    rate card, per-run enforcement in `ProviderBudget`); adapter still not implemented,
    per brief.
 
-## Phases 6–10 (2026-08-29) — v1 CODE COMPLETE. Suite 489, 0 failed, shim-verified
+## Phases 6–10 (2026-08-29) — v1 CODE COMPLETE. Suite 522, 0 failed, shim-verified
 
 - Owner's mandate this session: push to done. Built per briefs: Phase 6 Understand
   (suite 415), Phase 7 Actions (429), Phase 8 Widen sources (438), Phase 9 Validate
@@ -363,17 +363,28 @@ Do not re-add that content here — this file loads on every turn.
 
 ## Pending / unresolved
 
-- [ ] **2026-08-30 defect (FIXED, owner to push): validate self-match.** Every run
-      since the Persian rework shipped the nothing-new one-liner: understand writes this
-      run's events to the DB, then validate's anti-repetition read them back as "recent"
-      and every event dropped as its own repeat (self-cosine 1.0). Fixed in
-      `pipeline/validate.py` (this run's event keys excluded from the repeat window) +
-      regression test; suite 489. Forensic: POSTMORTEMS.md top entry.
-- [ ] **Residual wrinkle from that fix (design, not defect):** repeat matching compares
-      against ALL recent stored events, including ones the owner never saw (dropped
-      below min_score or as repeats). A never-seen story can suppress its own follow-ups
-      within the 72h window. Clean fix = `delivered` flag on events (additive schema,
-      v1.5 candidate). Live DB written by the broken runs self-corrects by ~2026-09-02.
+- [ ] **NEXT SESSION — owner workflow: push → verify → download CSVs → analysis.**
+      Everything below is BUILT and tested (suite 522); the only open item is the
+      owner's commit/push and the first real logs. Sequence: (1) commit+push all
+      uncommitted changes (batch 2: Persian gate / delivered flag / lead fix /
+      prompt hardening, PLUS observability CSVs). Verify content, not HEAD:
+      `git show origin/main:src/agent/report_csv.py | findstr write_run_reports`
+      must print. (2) CI on the push must be green at 522. (3) First cron run:
+      Actions → latest `pipeline` run → Artifacts → `run-reports` (4 CSVs per run:
+      read / chosen / summaries / run). (4) Owner downloads the CSVs and posts them
+      here. (5) Analysis session: input qualification = read.csv (items per source,
+      date_only share, languages); output qualification = chosen.csv (fate
+      distribution -- sent vs each drop reason) + summaries.csv (lang-gate hits,
+      category mix, score spread). Then tune `digest_rank.min_score`, category
+      weights, cluster threshold, source pruning -- all owner-editable YAML, no code.
+- [ ] **2026-08-30 batch (owner to push): Persian gate + delivered flag + lead fix
+      + observability CSVs.** Suite 522, adversarially reviewed (fresh-context Pro
+      agent, ACCEPT WITH FIXES, all fixes applied). Closed here: the validate
+      self-match defect (pushed `4be352f`) and its residual wrinkle (delivered table,
+      SCHEMA_VERSION 3). Forensic + review findings: POSTMORTEMS.md top entry. Known
+      accepted edges: first run after deploy may re-surface a near-duplicate (no
+      markers for the last 72h -- self-correcting); format_split truncation
+      over-marks lowest-priority items for <=72h.
 - [ ] **Phase 8: the `date_only` composer consumer.** The understand prompt already
       prints the date + "time not stated" for date-only items (Phase 6); the composer
       must do the same when events render (pending item (a) from before Phase 6).
@@ -425,11 +436,12 @@ Do not re-add that content here — this file loads on every turn.
       real blockers like the robots.txt one, which was on no list anywhere.
 - [ ] **Owner decision — the `group: null` contradiction** (session-5 facts, last bullet).
       Inert today, live the moment any owner-channel goes tier 2. Three options on record.
-- [ ] **Tools line-cap decision now covers THREE files.** `tools/check_feeds.py` (217),
-      `tools/dump_body.py` (213) and `tools/pytest_shim.py` (465, added 2026-08-29).
-      Overage in the first two is comment/docstring, not logic; the shim is a single-job
-      test runner. Owner to decide: trim, split (`tools/_fetch.py`, shim core/fixtures
-      split), or grant the dev-tool exception explicitly.
+- [ ] **Line-cap decision now covers SIX files.** `tools/check_feeds.py` (217),
+      `tools/dump_body.py` (213), `tools/pytest_shim.py` (465, added 2026-08-29),
+      `memory/schema.sql` (226, comment-only overage, pre-existing), plus test files
+      `test_pipeline_compose.py` (308) and `test_pipeline_validate.py` (378) -- tests
+      grew past the cap naturally with coverage. Owner to decide: trim, split, or
+      grant the explicit exception per category (dev tools / schema comments / tests).
 - [ ] ~~**Phase 3 collector — `DATE_RE` does not match Ynet's date format.**~~ Both `ynet` and
       `ynet_he` return 30 items with an empty `newest`, so neither can be staleness-checked.
       Related and already known: the `t.me/s/` preview has no `pubDate` at all — post times

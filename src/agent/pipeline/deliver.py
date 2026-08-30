@@ -16,6 +16,7 @@ from typing import Mapping
 
 from agent.delivery.credentials import TelegramConfigError
 from agent.delivery.telegram import TelegramClient
+from agent.memory.event_models import mark_delivered
 
 
 class DeliverStage:
@@ -38,8 +39,10 @@ class DeliverStage:
         client = self._client()
         if client is None:
             return
+        results = []
         for text in messages:
-            self._send(ctx, client, text, is_lead=False)
+            results.append(self._send(ctx, client, text, is_lead=False))
+        self._mark_if_all_real(ctx, results)
 
         lead_text = getattr(ctx, "lead_message", None)
         if lead_text:
@@ -50,6 +53,21 @@ class DeliverStage:
                     "deliver: lead events stored but not sent (no leads channel configured)"
                 )
 
+    def _mark_if_all_real(self, ctx, results) -> None:
+        """Write the received-markers (compose's kept keys) only when every
+        main-feed send REALLY succeeded. Marking before send -- or on a
+        mocked send -- would re-create the ghost suppression the delivered
+        table exists to kill: send failure is non-fatal by contract, and
+        the owner never saw these events."""
+        if not results:
+            return
+        if any(getattr(r, "mocked", False) or not getattr(r, "ok", False)
+               for r in results):
+            return
+        keys = getattr(ctx, "compose_kept_keys", None)
+        if keys and getattr(ctx, "db", None) is not None:
+            mark_delivered(ctx.db, keys, ctx.now)
+
     def _client(self):
         try:
             return TelegramClient.from_env(self._env)
@@ -57,7 +75,7 @@ class DeliverStage:
             self._logger.error("deliver: %s", exc)
             return None
 
-    def _send(self, ctx, client, text: str, *, is_lead: bool) -> None:
+    def _send(self, ctx, client, text: str, *, is_lead: bool):
         result = client.send(text)
         if result.ok:
             ctx.counters["deliver"] += 1
@@ -73,3 +91,4 @@ class DeliverStage:
                 "deliver: send failed (status=%s, description=%s)",
                 result.status_code, result.description,
             )
+        return result

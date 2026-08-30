@@ -84,44 +84,54 @@ class ValidateStage:
         # pipeline/cluster.py) -- cosine is the dot product.
         return sum(x * y for x, y in zip(a, b))
 
-    def _drop_repeats(self, ctx, events: list[Event]) -> list[Event]:
+    def _drop_repeats(
+        self, ctx, events: list[Event]
+    ) -> tuple[list[Event], list[Event]]:
         """Anti-repetition: a follow-up story on an event the owner already
-        saw must not appear again. Match each new event's summary against
-        PREVIOUS runs' stored summaries with the LOCAL embedder (zero LLM
-        calls, zero quota); drop matches at/above event_match_threshold.
-        This run's own rows are excluded by event_key: the understand stage
-        inserts them before validate runs, so an unfiltered read would
-        match every event against itself (sim 1.0) and drop everything.
+        RECEIVED must not appear again (owner decision 2026-08-30 -- a
+        story he never saw, dropped below min_score, as a repeat, or by
+        the Persian output gate, must not suppress its own follow-ups).
+        Match each new event's summary against PREVIOUS runs' DELIVERED
+        summaries with the LOCAL embedder (zero LLM calls, zero quota);
+        drop matches at/above event_match_threshold. This run's own rows
+        are excluded by event_key: the understand stage inserts them
+        before validate runs, so an unfiltered read would match every
+        event against itself (sim 1.0) and drop everything.
         Skipped when the db or embedder is absent (dry-run / mock)."""
         if getattr(ctx, "db", None) is None or getattr(ctx, "embedder", None) is None:
-            return events
+            return events, []
         window = ctx.config.settings.digest_rank.repeat_window_hours
         new_keys = {e.event_key for e in events}
         recent = [
-            e for e in read_recent_events(ctx.db, hours=window, now=ctx.now)
+            e for e in read_recent_events(
+                ctx.db, hours=window, now=ctx.now, delivered_only=True
+            )
             if e.event_key not in new_keys
         ]
         if not recent or not events:
-            return events
+            return events, []
         threshold = ctx.config.settings.pipeline.event_match_threshold
         new_vectors = ctx.embedder.embed([e.summary for e in events])
         old_vectors = ctx.embedder.embed([e.summary for e in recent])
         kept: list[Event] = []
+        dropped: list[Event] = []
         for event, vector in zip(events, new_vectors):
             best = max((self._cosine(vector, old) for old in old_vectors), default=0.0)
             if best >= threshold:
                 self._logger.info(
                     "validate: %s dropped as a repeat (sim %.2f)", event.event_key[:8], best
                 )
+                dropped.append(event)
                 continue
             kept.append(event)
-        return kept
+        return kept, dropped
 
     def run(self, ctx) -> None:
         clusters = list(getattr(ctx, "clusters", None) or [])
         events = list(getattr(ctx, "events", None) or [])
         by_key = {c.key: c for c in clusters}
-        events = self._drop_repeats(ctx, events)
+        events, repeat_dropped = self._drop_repeats(ctx, events)
+        ctx.repeat_dropped = repeat_dropped
 
         kept: list[Event] = []
         lead_events: list[Event] = []

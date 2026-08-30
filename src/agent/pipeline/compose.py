@@ -18,6 +18,7 @@ from agent.collectors.tz import to_tehran
 from agent.delivery.formatter import format_split
 from agent.delivery.message import Item, Message
 from agent.pipeline.labels import category_icon, category_name, labels_for
+from agent.pipeline.langgate import split_persian
 from agent.pipeline.rank import rank_events
 from agent.util.jalali import format_jalali
 
@@ -60,20 +61,43 @@ class ComposeStage:
         labels = labels_for(settings.delivery.output_language)
         events = list(getattr(ctx, "events", None) or [])
         clusters = {c.key: c for c in getattr(ctx, "clusters", None) or []}
+        ctx.compose_kept_keys = []
+        # Built FIRST: a lead-only run (main events empty -- nothing
+        # corroborated) must still deliver leads, which is exactly the
+        # scenario the leads channel exists for (fix 2026-08-30).
+        self._build_lead_message(ctx, settings)
+
+        lang_dropped: list = []
+        if events:
+            events, lang_dropped = split_persian(events)
+            if lang_dropped:
+                ctx.counters["compose_lang_drops"] = len(lang_dropped)
+                self._logger.warning(
+                    "compose: %d event(s) dropped -- output not Persian: %s",
+                    len(lang_dropped),
+                    ", ".join(e.event_key[:8] for e in lang_dropped),
+                )
+        ctx.lang_dropped = lang_dropped
 
         if not events:
-            text = (
-                labels["ai_unavailable"] if getattr(ctx, "llm_failed", False)
-                else labels["nothing_new"]
-            )
+            if lang_dropped:
+                # Events existed but none rendered Persian: say so, never
+                # "nothing new" -- that would be a lie about the world
+                # (constraint 11).
+                text = labels["lang_dropped"]
+            elif getattr(ctx, "llm_failed", False):
+                text = labels["ai_unavailable"]
+            else:
+                text = labels["nothing_new"]
             ctx.messages = [text]
             ctx.counters["compose"] = 0
             self._logger.info("compose: no events -- honest one-liner")
             return
 
-        kept, _dropped = rank_events(
+        kept, dropped = rank_events(
             events, clusters, ctx.config.credibility, settings, ctx.now, self._logger
         )
+        ctx.rank_dropped = dropped
 
         if not kept:
             # Everything fell below the importance threshold: the honest
@@ -126,22 +150,49 @@ class ComposeStage:
             message, max_units=max_units, max_messages=settings.digest_rank.max_messages
         )
         ctx.counters["compose"] = len(kept)
+        # Received-marker keys for the anti-repetition window, recorded
+        # after the rank cut (below-threshold events were never seen and
+        # must not suppress their own follow-ups). The deliver stage writes
+        # the markers itself, only after real sends succeeded -- marking
+        # here would re-create the ghost suppression on send failure
+        # (review finding 2026-08-30). Known edge: on the busiest days
+        # format_split may truncate the lowest-priority items -- those are
+        # then over-marked for at most the 72h repeat window. Accepted
+        # (rare, low-priority, self-correcting).
+        ctx.compose_kept_keys = [e.event_key for e in kept]
         self._logger.info(
             "compose: %d event(s) -> %d message(s)", len(kept), len(ctx.messages)
         )
 
+    def _build_lead_message(self, ctx, settings) -> None:
+        """Leads channel message. Lead events are gated by the Persian
+        output gate like main events, but are NEVER marked delivered:
+        their corroborated confirmation must reach the main feed
+        (schema.sql note)."""
+        labels = labels_for(settings.delivery.output_language)
         lead_events = list(getattr(ctx, "lead_events", None) or [])
-        if lead_events and getattr(ctx, "leads_channel_id", None):
-            lead_items = []
-            for index, event in enumerate(lead_events):
-                lead_items.append(Item(
-                    headline=f"📡 {labels['lead_prefix']} · {_headline(event.summary)}",
-                    priority=index,
-                    detail=event.summary,
-                ))
-            lead_message = Message(
-                header=labels["lead_header"], items=tuple(lead_items), footer=None
-            )
-            ctx.lead_message = format_split(
-                lead_message, max_units=max_units, max_messages=1
-            )[0]
+        if lead_events:
+            lead_events, lead_lang_dropped = split_persian(lead_events)
+            if lead_lang_dropped:
+                self._logger.warning(
+                    "compose: %d lead event(s) dropped -- output not Persian: %s",
+                    len(lead_lang_dropped),
+                    ", ".join(e.event_key[:8] for e in lead_lang_dropped),
+                )
+        if not (lead_events and getattr(ctx, "leads_channel_id", None)):
+            return
+        lead_items = []
+        for index, event in enumerate(lead_events):
+            lead_items.append(Item(
+                headline=f"📡 {labels['lead_prefix']} · {_headline(event.summary)}",
+                priority=index,
+                detail=event.summary,
+            ))
+        lead_message = Message(
+            header=labels["lead_header"], items=tuple(lead_items), footer=None
+        )
+        ctx.lead_message = format_split(
+            lead_message,
+            max_units=settings.delivery.telegram_max_chars,
+            max_messages=1,
+        )[0]

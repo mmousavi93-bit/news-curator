@@ -210,3 +210,17 @@ CREATE TABLE IF NOT EXISTS lead_outcomes (
     observed_at    TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_lead_outcomes_event ON lead_outcomes (event_key);
+
+-- ---------------------------------------------------------------------------
+-- Phase 10 (additive, SCHEMA_VERSION 3): events the owner actually RECEIVED.
+-- validate's anti-repetition matches only against delivered events (owner
+-- decision 2026-08-30: a story he never saw -- dropped below min_score, as a
+-- repeat, or by the Persian output gate -- must not suppress its own
+-- follow-ups). Written by compose after the message budget is decided;
+-- pruned by retention on events_days. Lead events are deliberately NOT
+-- marked: their corroborated confirmation must reach the main feed.
+CREATE TABLE IF NOT EXISTS delivered (
+    event_key    TEXT PRIMARY KEY,
+    delivered_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_delivered_at ON delivered (delivered_at);

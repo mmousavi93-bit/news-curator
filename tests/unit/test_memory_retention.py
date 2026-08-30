@@ -39,6 +39,7 @@ _INSERTS = {
              " VALUES ('s', ?, 't', 'b', 'en', 'h', ?)",
     "events": "INSERT INTO events (event_key, summary, first_seen_at, last_updated_at)"
               " VALUES (?, 's', '2026-01-01T00:00:00+00:00', ?)",
+    "delivered": "INSERT INTO delivered (event_key, delivered_at) VALUES (?, ?)",
     "signal_events": "INSERT INTO signal_events (signal_id, observed_at) VALUES (?, ?)",
     "speaker_statements": "INSERT INTO speaker_statements (speaker, source_id, said_at,"
                           " text_hash) VALUES (?, 's', ?, 'h')",
@@ -71,6 +72,7 @@ def count(connection, table: str) -> int:
         ("seen_urls", 7),
         ("items", 30),
         ("events", 30),
+        ("delivered", 30),
         ("signal_events", 180),
         ("speaker_statements", 45),
         ("risk_history", 365),

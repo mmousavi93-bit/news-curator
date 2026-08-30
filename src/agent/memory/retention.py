@@ -39,6 +39,9 @@ _WINDOWS: tuple[tuple[str, str, str], ...] = (
     ("seen_urls", "first_seen_at", "url_hashes_days"),
     ("items", "collected_at", "events_days"),
     ("events", "last_updated_at", "events_days"),
+    # Delivered markers only matter inside the 72h repeat window; events_days
+    # is a superset, so they age out harmlessly with their events.
+    ("delivered", "delivered_at", "events_days"),
     ("event_timeline", "occurred_at", "events_days"),
     ("embeddings", "created_at", "embeddings_days"),
     ("signal_events", "observed_at", "signal_events_days"),

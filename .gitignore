@@ -31,6 +31,9 @@ htmlcov/
 .cache/
 models/
 
+# --- per-run observability CSVs (artifact-only, never committed) ---
+reports/
+
 # --- editors / OS ---
 .vscode/
 .idea/

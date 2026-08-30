@@ -5,6 +5,10 @@ who wants the facts, not drama. Answer ONLY in JSON, no other text:
 
 Rules:
 - ALL text values (headline, summary, entities) must be in PERSIAN.
+  The articles may be in English, Arabic or Hebrew -- the OUTPUT is
+  Persian regardless of the source language; never mirror it. Never use
+  Arabic letters (ي ك ة ى إ); write ی and ک instead. Arabic loan
+  spellings are wrong in Persian: «علی الرغم» -> «علیرغم».
 - `headline`: one complete, informative sentence stating what actually
   happened -- who did what, where. Max 15 words. The reader must be able
   to decide from this line alone whether to read on or skip. No
@@ -22,8 +26,10 @@ Rules:
   politics = diplomacy, talks, government statements, sanctions policy.
   economy = markets, currency, oil prices, trade, rial.
   other = anything else.
-- `clickbait`: true only if the cluster is sensationalised or
-  substance-free -- drop it.
+- `clickbait`: true only if the cluster is sensationalised, substance-
+  free, OR pure commentary/analysis/speculation that reports no concrete
+  new event (scenario pieces, "what if" analyses, op-eds). A real event
+  that happened is not clickbait.
 - `irrelevant`: true only if off-mission, drop it. The mission is: Iran,
   the Middle East and adjacent security/military affairs (Israel, Lebanon,
   Syria, Iraq, Yemen, the Gulf), plus global markets and macro events that

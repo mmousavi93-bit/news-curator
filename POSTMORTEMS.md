@@ -5,6 +5,58 @@ session; this file does not. Nothing here is deleted or condensed — it is the 
 record of what broke, why, and what rule came out of it. Read it when working on the
 phase or subsystem it covers. CLAUDE.md keeps the operational core and points here.
 
+## 2026-08-30 (batch 2) — Persian gate + delivered flag + lead fix, adversarially reviewed
+
+Built from the owner's live-sample review (first real digest after the self-match fix):
+3 items, one fully Arabic (LLM mirrored the Arabic source), one scenario-analysis piece
+(commentary, not an event), one clean. Owner approved three improvements plus a deep
+scan. Suite 489 -> 516, shim-verified, count predicted before each run.
+
+What shipped:
+1. `pipeline/langgate.py` (NEW): deterministic Persian output gate, zero LLM calls.
+   Arabic-only codepoints ة ى ي ك إ (NOT أ -- see review) and the Hebrew block drop an
+   event from the MESSAGE only; events stay stored. New honest one-liner
+   `lang_dropped` when all events drop; counter `compose_lang_drops` for log visibility.
+2. `delivered` table (SCHEMA_VERSION 3, additive CREATE-IF-NOT-EXISTS, live DB gains it
+   on first open): the anti-repetition window now matches events the owner actually
+   RECEIVED. Never-seen events (below min_score, repeats, gate-dropped) no longer
+   suppress their own follow-ups -- the residual wrinkle from the self-match fix is
+   CLOSED, and the ~2 days of ghost events in the live DB stop blocking immediately.
+   Markers are written by DELIVER only after real sends succeed; leads never marked.
+3. `understand.txt`: output-language rule hardened (never mirror the source, banned
+   letters, «علی الرغم» -> «علیرغم» example) and clickbait extended to drop pure
+   commentary/analysis/scenario speculation.
+4. Found while building: a lead-only run never built the lead message (compose's early
+   return skipped it) -- leads are now built FIRST, pinned by name in a test.
+
+Adversarial review (fresh-context Pro agent, read-only): ACCEPT WITH FIXES. The catches,
+all fixed before shipping:
+- **أ U+0623 was wrongly a marker.** Persian productively uses it (تأیید، تأثیر،
+  مأموریت). Dropping events on it would have silently lost exactly the stories the
+  digest exists for. Removed from the gate and the prompt; pinned by test.
+- **One-script-per-key upgrade stamped v1 DBs to 3 without creating `delivered`**, and
+  the lied-about meta row blocked every retry. Now: stepwise loop applies every script;
+  version > SCHEMA_VERSION halts (that halt was briefly broken by the first rewrite --
+  the suite caught it; the guard is back and tested).
+- **Mark-before-send would re-create ghost suppression on send failure** (send failure
+  is non-fatal by contract). Markers moved to the deliver stage: all-real-sends-ok only.
+  Bonus: dry-run and the no-credentials mock path never mark, so local `--db` runs stay
+  clean.
+
+Accepted edges, documented in CLAUDE.md Pending: first run after deploy has no markers
+for the last 72h (one near-duplicate may re-surface, self-correcting by run 2);
+format_split truncation over-marks the lowest-priority items for <=72h.
+
+Standing lessons:
+(a) The fresh-context reviewer caught a factual claim of mine (أ is Arabic-only) that I
+    had asserted from pattern-matching instead of checking. Orthography claims need a
+    native-speaker check, not a codepoint-table glance.
+(b) A schema-version loop needs TWO halts: unknown-future (version > current) AND
+    missing-step (no script for a step). Writing the first while forgetting the second
+    is what the suite is for -- the unknown-version test caught it within one run.
+(c) "Mark what was received" means mark AFTER the send, not after the compose -- the
+    same defect as the original ghost-suppression, one stage later.
+
 ## 2026-08-30 — every post-rework run shipped "nothing new": validate self-match
 
 Symptom (owner-reported): after the Persian/Jalali output rework, every Telegram message

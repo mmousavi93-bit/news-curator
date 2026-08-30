@@ -75,8 +75,9 @@ class UnderstandStage:
     def run(self, ctx) -> None:
         clusters = list(getattr(ctx, "clusters", None) or [])
         events: list[Event] = []
+        cluster_fates: list[tuple[str, str]] = []
         saw_success = False
-        for cluster in clusters:
+        for index, cluster in enumerate(clusters):
             result = ctx.router.complete(
                 render_prompt(self._template, cluster, self._body_chars),
                 stage="understand",
@@ -91,10 +92,14 @@ class UnderstandStage:
                         "remaining clusters skipped, run continues degraded",
                         len(events),
                     )
+                    cluster_fates.extend(
+                        (c.key, "cap_refused") for c in clusters[index:]
+                    )
                     break
                 self._logger.error(
                     "understand: cluster %s skipped (status=%s)", cluster.key, result.status
                 )
+                cluster_fates.append((cluster.key, result.status))
                 continue
             saw_success = True  # the AI answered; parse quality is separate
 
@@ -104,6 +109,7 @@ class UnderstandStage:
                 self._logger.error(
                     "understand: cluster %s response unparseable -- skipped", cluster.key
                 )
+                cluster_fates.append((cluster.key, "unparseable"))
                 continue
 
             if parsed.get("clickbait") or parsed.get("irrelevant"):
@@ -113,11 +119,15 @@ class UnderstandStage:
                     cluster.key, bool(parsed.get("clickbait")),
                     bool(parsed.get("irrelevant")),
                 )
+                cluster_fates.append(
+                    (cluster.key, "clickbait" if parsed.get("clickbait") else "irrelevant")
+                )
                 continue
 
             events.append(self._build_event(cluster, parsed, ctx.now))
 
         ctx.events = events
+        ctx.cluster_fates = cluster_fates
         # Honesty flag for the composer: clusters existed but NO LLM call
         # succeeded. "Nothing new" would be a lie about the world -- the
         # truth is "the AI was unavailable" (ARCHITECTURE.md §8).

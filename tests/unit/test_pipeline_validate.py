@@ -206,10 +206,13 @@ def test_repeat_follow_up_is_dropped(tmp_path):
     kept. Local embedder, zero LLM calls."""
     credibility = _cred(t2=SourceCredibility(tier=2, group="g"))
     conn = memory_db.open_db(tmp_path / "state.db", create_if_absent=True)
-    from agent.memory.event_models import insert_events
+    from agent.memory.event_models import insert_events, mark_delivered
     insert_events(conn, [Event(event_key="o" * 16, summary="old summary",
                                category="politics", source_count=1,
                                first_seen_at=NOW, last_updated_at=NOW)])
+    # The repeat window matches DELIVERED events only (owner decision
+    # 2026-08-30) -- this prior event was received.
+    mark_delivered(conn, ["o" * 16], NOW)
     conn.close()
 
     cluster_same = _cluster([_item("t2", "https://x/followup")])
@@ -252,10 +255,12 @@ def test_this_runs_own_rows_are_not_self_repeat_dropped(tmp_path):
     window, while a follow-up matching a PRIOR run's event still drops."""
     credibility = _cred(t2=SourceCredibility(tier=2, group="g"))
     conn = memory_db.open_db(tmp_path / "state.db", create_if_absent=True)
-    from agent.memory.event_models import insert_events
+    from agent.memory.event_models import insert_events, mark_delivered
     insert_events(conn, [Event(event_key="o" * 16, summary="old summary",
                                category="politics", source_count=1,
                                first_seen_at=NOW, last_updated_at=NOW)])
+    # The prior event was RECEIVED, so it belongs in the repeat window.
+    mark_delivered(conn, ["o" * 16], NOW)
     conn.close()
 
     cluster_fresh = _cluster([_item("t2", "https://x/fresh")])
@@ -339,3 +344,35 @@ def test_stage_persists_validation_and_lead_outcomes(tmp_path):
     assert events[0].claim_status == "likely"
     assert events[0].independent_count == 2
     assert outcomes == [("lead", cluster.key, "confirmed")]
+
+
+def test_stored_but_never_delivered_event_does_not_block(tmp_path):
+    """Owner decision 2026-08-30: an event the owner never RECEIVED (below
+    min_score, dropped as a repeat, or by the Persian gate) must not
+    suppress its own follow-up. The 72h window matches DELIVERED events
+    only -- the same summary, stored but never sent, blocks nothing."""
+    credibility = _cred(t2=SourceCredibility(tier=2, group="g"))
+    conn = memory_db.open_db(tmp_path / "state.db", create_if_absent=True)
+    from agent.memory.event_models import insert_events
+    insert_events(conn, [Event(event_key="o" * 16, summary="old summary",
+                               category="politics", source_count=1,
+                               first_seen_at=NOW, last_updated_at=NOW)])
+    conn.close()  # NOT marked delivered: the owner never saw it
+
+    cluster = _cluster([_item("t2", "https://x/followup")])
+    embedder = _DictEmbedder({"old summary": [1.0, 0.0, 0.0]})
+    ctx = _Ctx(
+        clusters=[cluster],
+        events=[Event(event_key=cluster.key, summary="old summary",
+                      category="politics", source_count=1,
+                      first_seen_at=NOW, last_updated_at=NOW)],
+    )
+    ctx.db = memory_db.open_db(tmp_path / "state.db", create_if_absent=False)
+    ctx.embedder = embedder
+    ctx.config = _ctx_config()
+    try:
+        _stage(credibility).run(ctx)
+    finally:
+        ctx.db.close()
+
+    assert [e.summary for e in ctx.events] == ["old summary"]

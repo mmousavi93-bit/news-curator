@@ -139,14 +139,37 @@ def read_events(
 
 
 def read_recent_events(
-    conn: sqlite3.Connection, *, hours: int, now: datetime
+    conn: sqlite3.Connection, *, hours: int, now: datetime,
+    delivered_only: bool = False,
 ) -> list[Event]:
     """Events whose last_updated_at falls within `hours` of the injected
     `now` (the clock-read rule: callers pass ctx.now, nothing here reads
     the wall clock). Used by the validate stage's anti-repetition
-    matching."""
+    matching, which passes `delivered_only=True`: only events the owner
+    actually RECEIVED may suppress follow-ups (owner decision 2026-08-30
+    -- a story he never saw must not block its own future reporting)."""
     from datetime import timedelta
 
     cutoff = (now - timedelta(hours=hours)).isoformat()
-    sql = _SELECT_SQL + " WHERE last_updated_at >= ? ORDER BY last_updated_at DESC"
+    where = "last_updated_at >= ?"
+    if delivered_only:
+        where += " AND event_key IN (SELECT event_key FROM delivered)"
+    sql = _SELECT_SQL + f" WHERE {where} ORDER BY last_updated_at DESC"
     return [row_to_event(r) for r in conn.execute(sql, (cutoff,)).fetchall()]
+
+
+def mark_delivered(
+    conn: sqlite3.Connection, event_keys: Iterable[str], now: datetime
+) -> int:
+    """Record that these events reached the owner's message (compose calls
+    this AFTER the rank cut, so below-threshold events are never marked).
+    INSERT OR IGNORE: marking twice is a no-op. Lead events are never
+    marked -- a corroborated confirmation must reach the main feed."""
+    rows = [(key, to_utc_iso(now)) for key in event_keys]
+    if not rows:
+        return 0
+    cursor = conn.executemany(
+        "INSERT OR IGNORE INTO delivered (event_key, delivered_at) VALUES (?, ?)",
+        rows,
+    )
+    return int(cursor.rowcount)

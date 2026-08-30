@@ -42,6 +42,10 @@ LABELS: Mapping[str, Mapping[str, str]] = {
         "header": "مرور اخبار",
         "digest_marker": "مرور روزانه",
         "tehran": "تهران",
+        "lang_dropped": (
+            "در این اجرا خبر جمع شد اما به فارسی آماده نشد؛ "
+            "خبرها ذخیره شدند و در اجراهای بعدی پوشش داده می‌شوند."
+        ),
         "nothing_new": "چیز تازهای نسبت به اجرای قبلی نیامده.",
         "ai_unavailable": (
             "هوش مصنوعی در این اجرا در دسترس نبود؛ خبرها جمعآوری و "
@@ -61,6 +65,10 @@ LABELS: Mapping[str, Mapping[str, str]] = {
         "ai_unavailable": (
             "AI unavailable this run -- items were collected and stored, "
             "but nothing could be summarised."
+        ),
+        "lang_dropped": (
+            "Events were collected this run but could not be rendered in "
+            "Persian; they are stored and will be covered by later runs."
         ),
         "time_not_stated": "time not stated",
         "date_unknown": "date unknown",

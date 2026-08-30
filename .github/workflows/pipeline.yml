@@ -96,6 +96,7 @@ jobs:
       - name: Run pipeline
         env:
           NEWS_CURATOR_DIGEST: ${{ github.event.schedule == '30 3 * * *' }}
+          NEWS_CURATOR_REPORT_DIR: reports
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -121,6 +122,18 @@ jobs:
           path: state.db.age
           retention-days: 90
           if-no-files-found: error
+
+      # Observability CSVs (owner request 2026-08-30): read / chosen /
+      # summaries / run per execution -- the input and output qualification
+      # the owner downloads for digest tuning. Same ordering rule as the
+      # state backup: upload BEFORE the branch dance deletes untracked files.
+      - name: Upload run reports (read / chosen / summaries / run CSVs)
+        uses: actions/upload-artifact@v4
+        with:
+          name: run-reports
+          path: reports/*.csv
+          retention-days: 90
+          if-no-files-found: ignore
 
       # One revision ever: orphan branch, force-pushed (CLAUDE.md owner
       # decision). A failed push logs but does not fail the job -- the next

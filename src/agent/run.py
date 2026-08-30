@@ -43,14 +43,26 @@ class RunContext:
     db: object | None = None                        # sqlite3 conn
     daily_digest: bool = False                      # 07:00 canonical run
     leads_channel_id: str | None = None             # optional lead channel
+    report_dir: Path | None = None                  # CSV observability output
 
 
 def run_pipeline(ctx: RunContext, stages: Sequence[Stage], logger: logging.Logger) -> None:
-    """Execute `stages` in order against `ctx`, then emit one summary line.
-    Pure given its inputs -- no clock reads, no global state -- so tests can
-    call it twice with the same `ctx.now` and expect identical output."""
+    """Execute `stages` in order against `ctx`, then write the observability
+    CSVs and emit one summary line. Pure given its inputs -- no clock reads,
+    no global state -- so tests can call it twice with the same `ctx.now`
+    and expect identical output."""
     for stage in stages:
         stage.run(ctx)
+
+    if ctx.report_dir is not None:
+        try:
+            from agent.report_csv import write_run_reports
+            written = write_run_reports(ctx, ctx.report_dir)
+            logger.info(
+                "reports: wrote %s", ", ".join(p.name for p in written)
+            )
+        except Exception as exc:  # noqa: BLE001 -- reporting never breaks a run
+            logger.error("reports: writing failed: %s", exc)
 
     logger.info(
         "run summary: items=%d clusters=%d messages=%d",
@@ -187,6 +199,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         router=router, embedder=embedder, db=db_conn,
         daily_digest=os.environ.get("NEWS_CURATOR_DIGEST") == "true",
         leads_channel_id=os.environ.get("TELEGRAM_LEADS_CHANNEL_ID") or None,
+        # CSV observability output (owner download from the Actions
+        # artifacts). Set in the workflow; absent in tests -> no writes.
+        report_dir=Path(os.environ["NEWS_CURATOR_REPORT_DIR"]) if "NEWS_CURATOR_REPORT_DIR" in os.environ else None,
     )
     try:
         run_pipeline(ctx, stages, logger)
