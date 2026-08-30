@@ -24,6 +24,30 @@ from agent.pipeline.cluster import Cluster
 
 _FENCE_RE_OPEN = "```"
 
+# Output-contract bounds (the prompt asks for a 15-word headline and 1-2
+# sentence summary). Enforced HERE because gateways can ignore max_tokens:
+# 2026-08-30, bai returned 6,587 and 2,626 output tokens on a ~400-token
+# task and the JSON parsed anyway -- a rambling summary the digest must
+# never render. Deterministic, zero LLM calls. Shared with
+# tools/probe_free_models.py so the probe measures the same contract.
+HEADLINE_WORD_BOUNDS = (2, 25)
+SUMMARY_WORD_BOUNDS = (2, 60)
+
+
+def within_bounds(payload: dict) -> tuple[bool, str]:
+    """(ok, reason) -- the digest's output contract on one parsed response."""
+    headline = payload.get("headline") or ""
+    summary = payload.get("summary") or ""
+    if not isinstance(headline, str) or not isinstance(summary, str):
+        return False, "headline/summary not strings"
+    headline_words = len(headline.split())
+    if not (HEADLINE_WORD_BOUNDS[0] <= headline_words <= HEADLINE_WORD_BOUNDS[1]):
+        return False, f"headline {headline_words} words (bounds {HEADLINE_WORD_BOUNDS})"
+    summary_words = len(summary.split())
+    if not (SUMMARY_WORD_BOUNDS[0] <= summary_words <= SUMMARY_WORD_BOUNDS[1]):
+        return False, f"summary {summary_words} words (bounds {SUMMARY_WORD_BOUNDS})"
+    return True, ""
+
 
 def _extract_json(text: str) -> dict:
     """The model may wrap JSON in markdown fences. Strip them, then parse.
@@ -121,6 +145,18 @@ class UnderstandStage:
                     "understand: cluster %s response unparseable -- skipped", cluster.key
                 )
                 cluster_fates.append((cluster.key, "unparseable"))
+                continue
+
+            ok_bounds, bounds_reason = within_bounds(parsed)
+            if not ok_bounds:
+                # A parseable JSON that violates the output contract -- the
+                # ramble class (2026-08-30: bai's 6.5K-token summary). The
+                # event never renders; the cluster is skipped, not crashed.
+                self._logger.error(
+                    "understand: cluster %s out of contract -- skipped (%s)",
+                    cluster.key, bounds_reason,
+                )
+                cluster_fates.append((cluster.key, "oversized"))
                 continue
 
             if parsed.get("clickbait") or parsed.get("irrelevant"):

@@ -58,7 +58,9 @@ def _ok(text: str) -> LlmResult:
 
 
 def _json_result(**overrides) -> LlmResult:
-    payload = {"headline": "Headline", "summary": "Summary text.",
+    # The default payload must satisfy the output contract (2026-08-30
+    # bounds check): headline 2-25 words, summary 2-60.
+    payload = {"headline": "Headline here", "summary": "Summary text.",
                "entities": ["Iran"], "clickbait": False, "irrelevant": False}
     payload.update(overrides)
     return _ok(json.dumps(payload))
@@ -100,6 +102,29 @@ def test_summarises_each_cluster_into_an_event():
     assert event.entities == ("Iran",)
     assert event.source_count == 3
     assert event.first_seen_at == T0
+
+
+def test_oversized_summary_cluster_is_skipped_with_fate():
+    # 2026-08-30: bai returned a 6.5K-token summary that parsed as valid
+    # JSON. Parseable is not enough -- the output contract bounds must hold
+    # or the ramble reaches the digest.
+    stage, log = _stage()
+    ramble = _json_result(summary="بله. " * 200)  # 200 words
+    ctx = _Ctx(clusters=[_cluster([_item("https://x/r", T0)])],
+               router=_StubRouter([ramble]))
+    stage.run(ctx)
+    assert ctx.events == []
+    assert any("out of contract" in m for m in log.messages)
+    assert ctx.cluster_fates == [(ctx.clusters[0].key, "oversized")]
+
+
+def test_within_bounds_contract():
+    from agent.pipeline.understand import within_bounds
+    ok, _ = within_bounds({"headline": "حمله به یک کشتی", "summary": "جزئیات حادثه."})
+    assert ok is True
+    ok2, reason = within_bounds({"headline": "یک کلمه", "summary": "خلاصه " * 80})
+    assert ok2 is False
+    assert "summary" in reason
 
 
 def test_extract_json_none_raises_value_error_not_attribute_error():

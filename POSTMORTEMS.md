@@ -5,6 +5,23 @@ session; this file does not. Nothing here is deleted or condensed — it is the 
 record of what broke, why, and what rule came out of it. Read it when working on the
 phase or subsystem it covers. CLAUDE.md keeps the operational core and points here.
 
+## 2026-08-30 (session 9l) — bai goes live; the output contract moves into the pipeline
+
+First run with BAI_API_KEY present: the full chain worked -- gemini died (429+503),
+groq carried 13 clusters, bai caught the two 429-rotations, digest shipped. The
+cascade design is now complete with a real third rung.
+
+Bai's first live answers exposed the last quality gap: 6,587 and 2,626 output
+tokens on a ~400-token task (58s and 26s calls) -- the GATEWAY ignores the
+max_tokens we send, so the cap must be enforced on the parsed result, not at the
+API boundary. FIX: `within_bounds` in pipeline/understand.py -- headline 2-25
+words, summary 2-60 -- checked after parse; violations skip the cluster with a
+new `oversized` fate. tools/probe_free_models.py now measures the SAME contract
+(imports within_bounds) so the probe and the pipeline cannot diverge. Suite 562
+-> 564. Test fallout worth recording: six understand tests failed because their
+canned default headline ("Headline", one word) violated the new contract --
+the fixtures were the offenders, not the code.
+
 ## 2026-08-30 (sessions 9j+9k) — null-content crash, state loss on crash, OpenRouter 403 verdict
 
 1. **A whole run crashed on `'NoneType'.strip()`.** A provider returned 200 with
