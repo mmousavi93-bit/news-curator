@@ -5,6 +5,47 @@ session; this file does not. Nothing here is deleted or condensed — it is the 
 record of what broke, why, and what rule came out of it. Read it when working on the
 phase or subsystem it covers. CLAUDE.md keeps the operational core and points here.
 
+## 2026-08-30 (session 9b) — owner's local run reviewed end-to-end; 4 fixes shipped
+
+Owner ran `python -m agent.run --db state.db` manually (13:26 Tehran) and pasted log +
+rendered digest + the 4 observability CSVs. Second cascade of the day: Gemini 503 from
+call #1, breaker open after 2 failures (shipped threshold 2, working as designed);
+Groq carried exactly 13 calls then 429x2 — the ~13-call ceiling confirmed a second
+time, independent of the morning run. 27 of 40 clusters skipped `unavailable`. Note:
+today's Gemini failures are fast 503s, not hangs — the session-9 20s read timeout
+would not have helped today; it only shortens the dead-primary path for hangs.
+
+Four real defects found in the CSVs + digest, all fixed, suite 528 -> 532 (predicted
+532 before running):
+
+1. **9-day-old item delivered as news (Lebanon advisory, Aug 21 -> Aug 30).** Root
+   cause: `seen_urls` hashes prune at `url_hashes_days=7`, but the State Dept feed
+   lists advisories for weeks — so every date-only item loops back into the digest
+   every ~7 days forever. Fix: collect drops date-only items older than
+   `date_only_max_age_hours` (72h, owner-editable) BEFORE dedup — a date-only item
+   that old is by construction a re-surface, never news. Handles naive datetimes
+   without crashing. Settings schema + fixture + 2 tests.
+2. **summaries.csv `rank` column meant nothing.** The writer numbered events in
+   creation order while the digest delivers score-desc — in this run rank 0 was NOT
+   the first message item. Fix: shared `event_order_key` in rank.py, writer sorts
+   with it; rank 0 now IS the reader's first line. +1 test.
+3. **Two relevance misses in one digest** (Groq/qwen was the only understand model
+   all day): a police-blotter crime story and a "leaders face domestic political
+   wars" commentary piece. The prompt already said commentary should drop — the
+   model ignored it. Prompt hardened (understand.txt, contract unchanged): no-new-
+   event clusters are `irrelevant` explicitly; routine crime is `irrelevant` unless
+   terror/organised-violence/weapons; "when unsure between keeping and dropping,
+   drop — a digest earns trust by omission."
+4. **54 identical "skipping (circuit breaker open)" log lines** — one per cluster
+   per provider. Router now logs the skip once per provider per run. +1 test.
+
+Standing observations, no code: the 0.62 clustering threshold fragmented 67 items
+into 51 clusters (1.31 items/cluster; 11 dropped by the cap) — on a cascade day that
+fragmentation directly becomes lost coverage. The threshold tuning session now has
+its evidence. And with 2 cascade days in a row, the OpenRouter parachute key is no
+longer optional bookkeeping — 50 req/day ≈ 1 run of third-rung capacity.
+
+
 ## 2026-08-30 (batch 2) — Persian gate + delivered flag + lead fix, adversarially reviewed
 
 Built from the owner's live-sample review (first real digest after the self-match fix):

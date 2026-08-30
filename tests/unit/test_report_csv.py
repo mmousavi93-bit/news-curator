@@ -132,6 +132,31 @@ def test_summaries_csv_contains_only_sent_events(tmp_path):
     assert float(rows[0]["score"]) >= 8
 
 
+def test_summaries_csv_rank_follows_digest_score_order(tmp_path):
+    # rank 0 must be the digest's first item (highest score), not the first
+    # event created -- the two disagree in any run whose events are created
+    # out of score order (the 2026-08-30 run: rank column meant nothing).
+    ctx = _Ctx(tmp_path)
+    first = _cluster("hi", "t1", "https://x/hi")   # tier 1 military -> top
+    second = _cluster("lo", "t3", "https://x/lo")  # tier 3 other -> below
+    ctx.clusters = [first, second] + ctx.clusters
+    ctx.events = [
+        Event(event_key=second.key, headline="پایین", summary="متن پایین.",
+              category="other", claim_status="unconfirmed",
+              independent_count=1, source_count=1,
+              first_seen_at=NOW, last_updated_at=NOW),
+        Event(event_key=first.key, headline="بالا", summary="متن بالا.",
+              category="military", claim_status="unconfirmed",
+              independent_count=1, source_count=1,
+              first_seen_at=NOW, last_updated_at=NOW),
+    ]
+    ctx.compose_kept_keys = [first.key, second.key]
+    written = {p.name.split("_")[0]: p for p in write_run_reports(ctx, tmp_path)}
+    rows = _rows(written["summaries"])
+    assert [r["event_key"] for r in rows] == [first.key, second.key]
+    assert [r["rank"] for r in rows] == ["0", "1"]
+
+
 def test_run_csv_records_counters_and_digest_flag(tmp_path):
     ctx = _Ctx(tmp_path)
     written = {p.name.split("_")[0]: p for p in write_run_reports(ctx, tmp_path)}

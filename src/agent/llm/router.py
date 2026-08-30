@@ -65,6 +65,9 @@ class Router:
         self._max_retries = max_retries
         self._base_delay = base_delay_seconds
         self._call_index = 0
+        # Breaker-skip lines are logged once per provider per RUN, not once
+        # per cluster (2026-08-30: 54 identical lines in one run's log).
+        self._skip_logged: set[str] = set()
         rpm_map = rpm_by_provider or {}
         limits = provider_limits or {}
         timeout_map = timeout_by_provider or {}
@@ -135,15 +138,14 @@ class Router:
         prompt_hash = hashlib.sha256(prompt.encode("utf-8")).hexdigest()[:16]
         queue: deque[Provider] = deque(candidates)
         attempts = 0
-        skipped: set[str] = set()
 
         while queue and attempts < self._max_retries + 1:
             provider = queue.popleft()
             name = provider.name
 
             if self._breaker.is_open(name):
-                if name not in skipped:
-                    skipped.add(name)
+                if name not in self._skip_logged:
+                    self._skip_logged.add(name)
                     self._logger.error("llm: skipping %s (circuit breaker open)", name)
                 continue
             if provider.spend is not None and not provider.spend.acquire():

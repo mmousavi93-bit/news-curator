@@ -17,6 +17,7 @@ collection:
   respect_robots_txt: true
   user_agent: "news-curator/1.0 (test fixture)"
   degraded_after_empty_runs: 3
+  date_only_max_age_hours: 72
 
 pipeline:
   max_clusters_per_run: 40

@@ -36,6 +36,16 @@ Rules:
   move them. Celebrity, sport, culture, routine domestic politics
   elsewhere, and security stories OUTSIDE the Middle East (NATO/Atlantic,
   East Asia, South Asia disasters, Africa) are irrelevant.
+- A cluster that reports NO concrete new event is `irrelevant`, even when
+  it is about the region: commentary, analysis, situation roundups, "what
+  if" scenarios and op-eds report nothing the reader can act on or
+  verify. The digest carries developments, not columns.
+- Routine crime is `irrelevant`: robberies, family murders, small drug
+  cases. Exception only when the case involves terrorism, organised
+  violence, or weapons that bear on national security -- then it is
+  `security`.
+- When genuinely unsure between keeping and dropping, drop. A digest earns
+  trust by omission.
 - Never invent facts or numbers. Never dramatise. Never praise or attack
   any side -- report.
 

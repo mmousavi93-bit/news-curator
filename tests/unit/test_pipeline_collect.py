@@ -5,7 +5,7 @@ store logic is the real code)."""
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
@@ -53,6 +53,12 @@ def _report(items) -> registry.CollectReport:
     result = SourceResult(source_id="src", raw_entries=len(items),
                           parsed=len(items), kept=len(items), items=items)
     return registry.CollectReport(NOW, {"src": result}, len(items), 1, 1)
+
+
+def _item_at(url: str, published_at, date_only: bool = False) -> Item:
+    return Item(source_id="src", url=url, title=f"t {url}", body=f"b {url}",
+                published_at=published_at, lang="en", raw_hash=url[-16:],
+                date_only=date_only)
 
 
 @dataclass
@@ -134,3 +140,42 @@ def test_collect_without_db_in_real_run_raises():
                          collect_fn=lambda s, st, now: _report([]))
     with pytest.raises(ValueError, match="no database"):
         stage.run(_Ctx(db=None))
+
+
+def test_collect_drops_stale_date_only_items(tmp_path):
+    # 2026-08-30 defect: a 9-day-old date-only advisory re-surfaced as new
+    # because the URL hash pruned at 7 days while the feed still listed it.
+    conn = memory_db.open_db(tmp_path / "state.db", create_if_absent=True)
+    stale = _item_at("https://x/stale", NOW - timedelta(days=9), date_only=True)
+    fresh = _item_at("https://x/fresh", NOW - timedelta(hours=10), date_only=True)
+    old_full = _item_at("https://x/oldfull", NOW - timedelta(days=9))  # has a clock time
+    log = _Log()
+    ctx = _Ctx(db=conn)
+    stage = CollectStage([], _settings(mock_mode=False), log,
+                         collect_fn=lambda s, st, now: _report([stale, fresh, old_full]))
+    try:
+        stage.run(ctx)
+    finally:
+        conn.close()
+    assert ctx.counters["collect"] == 2  # stale dropped, the others stored
+    assert {i.url for i in ctx.items} == {"https://x/fresh", "https://x/oldfull"}
+    assert any("stale date-only" in m for m in log.messages)
+
+
+def test_collect_stale_drop_handles_naive_datetime(tmp_path):
+    # A collector emitting naive datetimes must not crash the run; the
+    # contract is UTC, so the item is treated as UTC and dropped as stale.
+    conn = memory_db.open_db(tmp_path / "state.db", create_if_absent=True)
+    naive = _item_at(
+        "https://x/naive",
+        NOW.replace(tzinfo=None) - timedelta(days=9),
+        date_only=True,
+    )
+    ctx = _Ctx(db=conn)
+    stage = CollectStage([], _settings(mock_mode=False), _Log(),
+                         collect_fn=lambda s, st, now: _report([naive]))
+    try:
+        stage.run(ctx)
+    finally:
+        conn.close()
+    assert ctx.counters["collect"] == 0

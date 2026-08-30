@@ -95,6 +95,14 @@ collection:
   # degraded and reported in the daily digest. It is not silently dropped.
   degraded_after_empty_runs: 3
 
+  # DECISION 2026-08-30 (run review, POSTMORTEMS.md): a date-only item older
+  # than this is dropped at collect. Evidence: the Lebanon advisory (Aug 21)
+  # re-surfaced as "new" on Aug 30 because seen_urls hashes are pruned at
+  # url_hashes_days=7 while the State Dept feed lists advisories for weeks --
+  # every such item loops back into the digest every ~7 days forever. A
+  # date-only item this old is by construction a re-surface, never news.
+  date_only_max_age_hours: 72
+
 # ---------------------------------------------------------------------------
 # PIPELINE BUDGETS
 # ---------------------------------------------------------------------------

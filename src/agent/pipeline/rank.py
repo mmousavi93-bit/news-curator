@@ -73,6 +73,27 @@ def score_event(
     return round(score, 3)
 
 
+def event_order_key(
+    event: Event,
+    clusters_by_key: Mapping[str, Cluster],
+    credibility: Mapping[str, object],
+    settings: Settings,
+    now: datetime,
+) -> tuple:
+    """The digest sort key: score desc, then recency desc, then key. Shared
+    by rank_events and the summaries.csv writer, so `rank` in the CSV is the
+    position the reader actually sees in the message -- before the split
+    (2026-08-30), the CSV numbered events in creation order and the column
+    meant nothing against the delivered digest."""
+    cluster = clusters_by_key.get(event.event_key)
+    stamp = latest_stamp(cluster) if cluster else None
+    return (
+        -score_event(event, cluster, credibility, settings, now),
+        -(stamp.timestamp() if stamp else 0.0),
+        event.event_key,
+    )
+
+
 def rank_events(
     events: Sequence[Event],
     clusters_by_key: Mapping[str, Cluster],
@@ -84,18 +105,9 @@ def rank_events(
     """Sorts events by score desc (recency, then key, as tie-breaks) and
     splits at min_score. Returns (kept, dropped). Dropped events never
     reach the message -- logged once with their scores."""
-    def _recency(event: Event) -> float:
-        cluster = clusters_by_key.get(event.event_key)
-        stamp = latest_stamp(cluster) if cluster else None
-        return stamp.timestamp() if stamp else 0.0
-
     scored = sorted(
         events,
-        key=lambda e: (
-            -score_event(e, clusters_by_key.get(e.event_key), credibility, settings, now),
-            -_recency(e),
-            e.event_key,
-        ),
+        key=lambda e: event_order_key(e, clusters_by_key, credibility, settings, now),
     )
     kept = [e for e in scored if score_event(
         e, clusters_by_key.get(e.event_key), credibility, settings, now

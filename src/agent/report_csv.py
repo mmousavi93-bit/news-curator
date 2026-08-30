@@ -22,7 +22,7 @@ import csv
 from pathlib import Path
 from typing import Iterable
 
-from agent.pipeline.rank import score_event
+from agent.pipeline.rank import event_order_key, score_event
 
 _BODY_CAP = 400
 _TIMESTAMP_FMT = "%Y%m%dT%H%M%SZ"
@@ -125,18 +125,19 @@ def _write_chosen(ctx, path: Path) -> Path:
 
 def _write_summaries(ctx, path: Path) -> Path:
     clusters_by_key = {c.key: c for c in getattr(ctx, "clusters", None) or []}
-    events = list(getattr(ctx, "events", None) or [])
     sent_keys = set(getattr(ctx, "compose_kept_keys", None) or [])
     credibility = ctx.config.credibility
+    events = [e for e in (getattr(ctx, "events", None) or []) if e.event_key in sent_keys]
+    # Same order the reader sees: the digest's sort key, so rank 0 is the
+    # first item of the message, not the first event created.
+    events.sort(key=lambda e: event_order_key(
+        e, clusters_by_key, credibility, ctx.config.settings, ctx.now))
     with path.open("w", encoding="utf-8-sig", newline="") as fh:
         writer = csv.writer(fh)
         writer.writerow(["rank", "event_key", "score", "category", "claim_status",
                          "independent_count", "best_tier", "n_members", "sources",
                          "latest_utc", "headline", "summary"])
-        rank = 0
-        for event in events:
-            if event.event_key not in sent_keys:
-                continue
+        for rank, event in enumerate(events):
             cluster = clusters_by_key.get(event.event_key)
             writer.writerow([
                 rank, event.event_key,
@@ -149,7 +150,6 @@ def _write_summaries(ctx, path: Path) -> Path:
                 _when_utc(cluster) if cluster else "",
                 event.headline, event.summary,
             ])
-            rank += 1
     return path
 
 

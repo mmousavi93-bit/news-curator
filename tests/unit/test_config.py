@@ -72,7 +72,8 @@ bogus_top_level_key: true
 schedule: { timezone: "Asia/Tehran", pipeline_cron: "x", digest_cron: "x",
             canonical_daily_run: "07:00", lookback_hours: 6 }
 collection: { max_items_per_source: 1, concurrency: 1, per_source_timeout_seconds: 1,
-              respect_robots_txt: true, user_agent: "x", degraded_after_empty_runs: 1 }
+              respect_robots_txt: true, user_agent: "x", degraded_after_empty_runs: 1,
+              date_only_max_age_hours: 72 }
 pipeline: { max_clusters_per_run: 1, max_vision_calls_per_run: 1,
             cluster_similarity_threshold: 0.1, event_match_threshold: 0.1,
             vision_min_image_bytes: 1 }

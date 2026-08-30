@@ -11,6 +11,7 @@ are offline by definition. Per-source failures are recorded by registry
 from __future__ import annotations
 
 import logging
+from datetime import timedelta, timezone
 from typing import Callable
 
 from agent.collectors import registry
@@ -53,6 +54,33 @@ class CollectStage:
             )
         report = self._collect_fn(self._sources, self._settings, ctx.now)
         items = [item for res in report.results.values() for item in res.items]
+        # Staleness drop (2026-08-30 defect, POSTMORTEMS.md): a date-only item
+        # older than the hash-retention window is by construction a re-surface
+        # -- seen_urls prunes at url_hashes_days and the feed still lists the
+        # item, so it would loop back into the digest every ~7 days forever.
+        # A date-only item this old can never be new: drop before dedup so it
+        # costs nothing (no hash row, no item row, no cluster, no LLM call).
+        cutoff = ctx.now - timedelta(
+            hours=self._settings.collection.date_only_max_age_hours)
+        kept_items: list = []
+        stale = 0
+        for item in items:
+            if item.date_only and item.published_at is not None:
+                published = item.published_at
+                if published.tzinfo is None:
+                    # The collector contract is UTC; a naive datetime is a
+                    # collector bug, not a reason to crash the run.
+                    published = published.replace(tzinfo=timezone.utc)
+                if published < cutoff:
+                    stale += 1
+                    continue
+            kept_items.append(item)
+        if stale:
+            self._logger.info(
+                "collect: dropped %d stale date-only item(s) older than %dh",
+                stale, self._settings.collection.date_only_max_age_hours,
+            )
+        items = kept_items
         stored = dedup.store_new(ctx.db, items, ctx.now)
         pruned = retention.prune(ctx.db, self._settings.retention, ctx.now)
         ctx.items = list(stored.new)
