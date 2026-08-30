@@ -5,6 +5,37 @@ session; this file does not. Nothing here is deleted or condensed — it is the 
 record of what broke, why, and what rule came out of it. Read it when working on the
 phase or subsystem it covers. CLAUDE.md keeps the operational core and points here.
 
+## 2026-08-30 (sessions 9j+9k) — null-content crash, state loss on crash, OpenRouter 403 verdict
+
+1. **A whole run crashed on `'NoneType'.strip()`.** A provider returned 200 with
+   `content: null` (an empty/refusal answer); the adapter passed None through and
+   understand's _extract_json called .strip() on it. FIX at both boundaries: the
+   adapters raise SchemaError on null content (retry -> rotate, the normal
+   "provider did not answer" path), and _extract_json raises ValueError on
+   non-string input (skip the cluster). Suite 558 -> 561. This was the owner's
+   "handle not answering" requirement, arrived at by crash instead of design.
+2. **A crashed run lost its state.** The workflow's encrypt/backup/push steps
+   only ran after a successful pipeline step, so a crash discarded everything
+   collect had persisted. FIX: those steps now run `if: always()` with
+   self-guards (no state.db -> skip). Decrypt-halt semantics unchanged -- it is
+   still fatal at its own step. Also added the missing BAI_API_KEY env pass.
+3. **OpenRouter verdict: DEAD under zero cost.** Run 8's log: 403 on
+   inkling-small (a live-list model). The full sequence -- 404, 404, 403 -- is
+   now diagnostic: 404 = delisted model, 402/403 = the balance/key policy. The
+   parachute role moves to the bai gateway. Settings comment carries the
+   verdict; the block stays for the day the policy changes.
+4. **Fatal responses now open the breaker.** The 403 run burned 34 identical
+   fatal calls (one per remaining cluster, ~90s of dead air): the fatal path
+   deliberately does not rotate, but it never marked the provider, so every
+   cluster re-burned it. FIX: fatal responses count toward the breaker; after
+   two, the provider is skipped for the run. The fatal RESULT still surfaces
+   for the first calls (the diagnosis stays visible). Suite 561 -> 562.
+5. Fragmentation persists at 0.55 (90 items -> 57 clusters, 17 dropped by cap):
+   the threshold lever is exhausted; the analysis session's re-clustering with
+   the DB is the real fix. And the run again proves the architecture: with
+   Gemini down, Groq walled, bai keyless and OpenRouter 403-blocked, the digest
+   still shipped (4 events, 940 chars).
+
 ## 2026-08-30 (session 9i) — run-6 evidence: ramble cap, same-run dups, model probe, bai gateway
 
 Run 6 (17:26 UTC) was the richest evidence day yet: the parachute fired for real and

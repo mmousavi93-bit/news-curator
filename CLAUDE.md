@@ -416,6 +416,19 @@ Real calibration still needs the clean-run CSVs.
    `qwen3.8-flash` (swap list in the settings comment). Free only; gpt-5.2
    stays out until constraint-15 caps. Env var `BAI_API_KEY`. Suite 547 → 558.
 
+## Sessions 9j+9k (2026-08-30) — null-content crash, state persistence, OpenRouter verdict
+
+1. **content:null crash fixed at both boundaries** — adapters raise SchemaError
+   on null content; _extract_json raises ValueError on non-str. "Provider did
+   not answer" is now retry → rotate, never a crash.
+2. **Crashed runs persist state** — pipeline.yml encrypt/backup/push steps run
+   `if: always()` with self-guards; BAI_API_KEY added to the run env.
+3. **OpenRouter is DEAD under zero cost** — 404/404/403 sequence settled it
+   (403 on a live-list model = balance policy). Parachute role is now bai's;
+   the settings comment carries the runbook (404 = swap ID, 402/403 = policy).
+4. **Fatal responses open the breaker** — the 403 run burned 34 identical
+   fatal calls; after two, the provider is skipped for the run. Suite 562.
+
 ## Phases 6–10 (2026-08-29) — v1 CODE COMPLETE. Suite 522, 0 failed, shim-verified
 
 - Owner's mandate this session: push to done. Built per briefs: Phase 6 Understand

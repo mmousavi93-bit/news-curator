@@ -175,6 +175,21 @@ def test_circuit_breaker_opens_and_skips_for_rest_of_run(caplog):
     assert "circuit breaker open" in caplog.text
 
 
+def test_fatal_responses_open_the_breaker_and_stop_reburning():
+    # 2026-08-30: a 403-blocked OpenRouter was called once per remaining
+    # cluster (34 identical fatal calls). The fatal RESULT still stops the
+    # loop per call; the breaker must stop the PROVIDER after two.
+    transport = MockHttpTransport(responses=[HttpResponse(403, {})])
+    router = _router([_gemini()], transport, breaker_threshold=2, max_retries=10)
+    first = router.complete("a")
+    second = router.complete("b")
+    third = router.complete("c")
+    assert first.status == FATAL  # the first call surfaces the diagnosis
+    assert second.status == FATAL  # breaker opens on this one
+    assert third.status == UNAVAILABLE  # skipped, not re-burned
+    assert len(transport.calls) == 2
+
+
 def test_breaker_skip_logged_once_per_provider_per_run(caplog):
     import logging
 

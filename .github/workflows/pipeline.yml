@@ -102,26 +102,38 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          BAI_API_KEY: ${{ secrets.BAI_API_KEY }}
         run: python -m agent.run --db state.db
 
       # A failed encrypt fails the job: losing state is the worst outcome.
       # The recipient is a PUBLIC key; safe in argv.
+      # `if: always()` + self-guard: a crashed PIPELINE (2026-08-30:
+      # content-null AttributeError) must still persist what it collected --
+      # hashes written by collect are valid state even when understand dies.
+      # When DECRYPT halted, state.db does not exist and the guard skips.
       - name: Encrypt state
+        if: always()
         env:
           AGE_PUBLIC_KEY: ${{ secrets.AGE_PUBLIC_KEY }}
-        run: age -r "$AGE_PUBLIC_KEY" -o state.db.age.new state.db && mv state.db.age.new state.db.age
+        run: |
+          if [ ! -f state.db ]; then
+            echo "no state.db -- skipping encrypt (decrypt halts or no collect ran)"
+            exit 0
+          fi
+          age -r "$AGE_PUBLIC_KEY" -o state.db.age.new state.db && mv state.db.age.new state.db.age
 
       # 90-day backup, independent of the git history. Runs BEFORE the
       # state-branch push on purpose: the push's branch dance (`git
       # checkout`) deletes files tracked in the orphan branch but not in
       # main -- first run evidence: state.db.age was gone by upload time.
       - name: Backup state artifact
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: state-db
           path: state.db.age
           retention-days: 90
-          if-no-files-found: error
+          if-no-files-found: ignore
 
       # Observability CSVs (owner request 2026-08-30): read / chosen /
       # summaries / run per execution -- the input and output qualification
@@ -140,7 +152,12 @@ jobs:
       # run re-pushes; nothing is lost. `git add -f`: *.age is gitignored
       # for main, and that ignore would silently swallow the add here.
       - name: Push state branch
+        if: always()
         run: |
+          if [ ! -f state.db.age ]; then
+            echo "no state.db.age -- nothing to push (decrypt halts or no state)"
+            exit 0
+          fi
           # The runner has no git identity; the commit below fails without
           # one (exit 128, "empty ident name" -- first run evidence
           # 2026-08-29). Runner-local config, never committed.
