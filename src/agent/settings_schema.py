@@ -30,6 +30,7 @@ class CollectionSettings:
     respect_robots_txt: bool
     user_agent: str
     degraded_after_empty_runs: int
+    date_only_max_age_hours: int
 
 
 @dataclass(frozen=True, slots=True)
@@ -148,7 +149,8 @@ SECTIONS: tuple[tuple[str, type, tuple[str, ...]], ...] = (
      ("timezone", "pipeline_cron", "digest_cron", "canonical_daily_run", "lookback_hours")),
     ("collection", CollectionSettings,
      ("max_items_per_source", "concurrency", "per_source_timeout_seconds",
-      "respect_robots_txt", "user_agent", "degraded_after_empty_runs")),
+      "respect_robots_txt", "user_agent", "degraded_after_empty_runs",
+      "date_only_max_age_hours")),
     ("pipeline", PipelineSettings,
      ("max_clusters_per_run", "max_vision_calls_per_run", "cluster_similarity_threshold",
       "event_match_threshold", "vision_min_image_bytes", "embed_model",

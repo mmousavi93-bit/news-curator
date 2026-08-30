@@ -175,6 +175,21 @@ def test_circuit_breaker_opens_and_skips_for_rest_of_run(caplog):
     assert "circuit breaker open" in caplog.text
 
 
+def test_breaker_skip_logged_once_per_provider_per_run(caplog):
+    import logging
+
+    transport = MockHttpTransport(responses=[HttpResponse(500, {})])
+    router = _router(
+        [_gemini(), _groq()], transport, breaker_threshold=2, max_retries=10
+    )
+    with caplog.at_level(logging.INFO, logger="agent.llm.router"):
+        router.complete("first")   # both breakers open here
+        router.complete("second")  # both skipped again -- silently this time
+    # One line per provider for the whole run, not one line per cluster
+    # (2026-08-30: 27 clusters produced 54 identical lines).
+    assert caplog.text.count("circuit breaker open") == 2
+
+
 def test_attempts_bounded_by_max_retries():
     transport = MockHttpTransport(responses=[HttpResponse(500, {})])
     # breaker_threshold high so only max_retries bounds the loop: 3 + 1 = 4

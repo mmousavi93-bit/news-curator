@@ -361,6 +361,23 @@ Closes the two open decisions from the first automated run's provider cascade. F
    V4-Pro costs ~3x and fixes none of these. Revisit only via the v1.5
    accuracy-gate pilot in cascade position, if Gemini flakiness recurs.
 
+## Session 9b (2026-08-30) — owner's local run reviewed; 4 fixes shipped, suite 528 → 532
+
+Owner mandate: "review all, think deeply on quality and optimization and iterate."
+The run was the day's SECOND provider cascade (Gemini fast-503s; Groq again hit
+the ~13-call ceiling at exactly 13 — the accepted floor re-confirmed). Forensic:
+POSTMORTEMS.md top entry. Fixes:
+1. **`date_only_max_age_hours: 72`** (collection block) — collect drops date-only
+   items older than this BEFORE dedup. The 9-day-old Lebanon advisory defect:
+   `url_hashes_days=7` is shorter than the State Dept listing horizon, so items
+   looped back into the digest every ~7 days forever.
+2. **summaries.csv `rank` = delivered digest position** (shared `event_order_key`
+   in `pipeline/rank.py`) — it was creation order, meaningless against the message.
+3. **understand.txt hardened** (contract unchanged): no-new-event clusters →
+   `irrelevant`; routine crime → `irrelevant` unless terror/organised violence/
+   weapons; when unsure between keeping and dropping, drop.
+4. **Router breaker-skip logged once per provider per run** (was 54 lines/run).
+
 ## Phases 6–10 (2026-08-29) — v1 CODE COMPLETE. Suite 522, 0 failed, shim-verified
 
 - Owner's mandate this session: push to done. Built per briefs: Phase 6 Understand
@@ -396,15 +413,17 @@ Closes the two open decisions from the first automated run's provider cascade. F
 ## Pending / unresolved
 
 - [ ] **NEXT SESSION — owner workflow: push → verify → analysis.** The session-9
-      timeout batch (suite 528) is the one unpushed batch: `git show
-      origin/main:src/agent/llm/call.py | findstr provider.timeout` must print;
-      CI must be green at 528 (batch 2 already verified live 2026-08-30). Then
-      the analysis session, on a CLEAN run only (the first run's CSVs are
-      polluted by the provider cascade): owner downloads run-reports (read /
-      chosen / summaries / run), posts them; tune `digest_rank.min_score`,
-      category weights, `cluster_similarity_threshold` (still placeholder 0.62),
-      source pruning -- all owner-editable YAML. Gates in progress: 3-run gate,
-      1-week gate, 60-day cron reset (RUNBOOK.md §6–8).
+      + 9b batches (suite 532) are the unpushed work: `git show
+      origin/main:src/agent/llm/call.py | findstr provider.timeout` and
+      `git show origin/main:src/agent/pipeline/collect.py | findstr date_only_max_age_hours`
+      must both print; CI must be green at 532. Then the analysis session, on a
+      CLEAN run only (the first two runs' CSVs are polluted by provider
+      cascades): owner downloads run-reports (read / chosen / summaries / run),
+      posts them; tune `digest_rank.min_score`, category weights,
+      `cluster_similarity_threshold` (0.62 is now proven too strict: 67 items →
+      51 clusters, 11 dropped by cap), source pruning -- all owner-editable YAML.
+      Gates in progress: 3-run gate, 1-week gate, 60-day cron reset (RUNBOOK.md
+      §6–8).
 - [ ] **Batch-2 accepted edges, self-correcting ≤2026-09-02.** First run after
       deploy had no delivered markers for the last 72h (one near-duplicate may
       re-surface); format_split truncation over-marks lowest-priority items
