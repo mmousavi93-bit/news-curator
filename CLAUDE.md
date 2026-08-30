@@ -329,6 +329,38 @@ Do not re-add that content here — this file loads on every turn.
    rate card, per-run enforcement in `ProviderBudget`); adapter still not implemented,
    per brief.
 
+## Session 9 decisions (2026-08-30) — owner-confirmed ("finalize decisions based on understanding")
+
+Closes the two open decisions from the first automated run's provider cascade. Forensic: POSTMORTEMS.md top entry.
+
+1. **Per-call read timeout 60s → 20s for the primary** — `read_timeout_seconds: 20`
+   on the `providers.gemini` block in settings.yaml. Connect stays 10s everywhere;
+   Groq/OpenRouter keep DEFAULT_TIMEOUT (10, 60). Reason: a dead Gemini cost ~8 min
+   of an ~8-min run before the breaker opened (4 attempts × 2 failures × 60s); at
+   20s that path is ~160s and a merely-slow Gemini still survives. Plumbing:
+   `ProviderSettings.read_timeout_seconds` (int, strict-validated) → wiring
+   `timeout_map` → Router `timeout_by_provider` → `Provider.timeout` →
+   transport.post. MockHttpTransport now records the timeout so tests assert the
+   real value handed to requests. Suite 522 → **528** (3 validation + 3 flow tests,
+   `tests/unit/test_llm_timeout.py`).
+2. **Groq's free-tier ~13-call ceiling ACCEPTED as the degradation floor**, not a
+   bug to fix — 30 RPM pacing was correct; the free tier's token-per-minute wall is
+   the limit. On Gemini-outage days each run covers its priority-ordered top
+   ~14/40 clusters. Documented next to groq's rpm/rpd in settings.yaml ("a 429
+   here is NOT a pacing bug") and in POSTMORTEMS.md. OpenRouter stays a parachute
+   (50 req/day ≈ 1 run), not capacity. **Adding a third provider is a v1.5
+   decision taken with failure-rate data, not a knee-jerk patch after one bad
+   day.**
+3. **Provider-addition question (DeepSeek V4-Flash / V4-Pro) researched
+   2026-08-30 and REJECTED for now.** Full dossier: `analysis/deepseek_v4_eval.md`.
+   One-liner: the 5M-free-token question is MOOT (wholesale fresh load ~7.4M
+   tokens/mo > 5M in every branch — the repo's 3.3M counted input only); quality
+   research found family-level disqualifiers for this pipeline's extraction task
+   (topic-selective censorship on war/geopolitics = silent intelligence failure,
+   documented JSON-discipline defects, Chinese-first behavior on Persian).
+   V4-Pro costs ~3x and fixes none of these. Revisit only via the v1.5
+   accuracy-gate pilot in cascade position, if Gemini flakiness recurs.
+
 ## Phases 6–10 (2026-08-29) — v1 CODE COMPLETE. Suite 522, 0 failed, shim-verified
 
 - Owner's mandate this session: push to done. Built per briefs: Phase 6 Understand
@@ -363,150 +395,47 @@ Do not re-add that content here — this file loads on every turn.
 
 ## Pending / unresolved
 
-- [ ] **NEXT SESSION — owner workflow: push → verify → download CSVs → analysis.**
-      Everything below is BUILT and tested (suite 522); the only open item is the
-      owner's commit/push and the first real logs. Sequence: (1) commit+push all
-      uncommitted changes (batch 2: Persian gate / delivered flag / lead fix /
-      prompt hardening, PLUS observability CSVs). Verify content, not HEAD:
-      `git show origin/main:src/agent/report_csv.py | findstr write_run_reports`
-      must print. (2) CI on the push must be green at 522. (3) First cron run:
-      Actions → latest `pipeline` run → Artifacts → `run-reports` (4 CSVs per run:
-      read / chosen / summaries / run). (4) Owner downloads the CSVs and posts them
-      here. (5) Analysis session: input qualification = read.csv (items per source,
-      date_only share, languages); output qualification = chosen.csv (fate
-      distribution -- sent vs each drop reason) + summaries.csv (lang-gate hits,
-      category mix, score spread). Then tune `digest_rank.min_score`, category
-      weights, cluster threshold, source pruning -- all owner-editable YAML, no code.
-- [ ] **2026-08-30 batch (owner to push): Persian gate + delivered flag + lead fix
-      + observability CSVs.** Suite 522, adversarially reviewed (fresh-context Pro
-      agent, ACCEPT WITH FIXES, all fixes applied). Closed here: the validate
-      self-match defect (pushed `4be352f`) and its residual wrinkle (delivered table,
-      SCHEMA_VERSION 3). Forensic + review findings: POSTMORTEMS.md top entry. Known
-      accepted edges: first run after deploy may re-surface a near-duplicate (no
-      markers for the last 72h -- self-correcting); format_split truncation
-      over-marks lowest-priority items for <=72h.
-- [ ] **Phase 8: the `date_only` composer consumer.** The understand prompt already
-      prints the date + "time not stated" for date-only items (Phase 6); the composer
-      must do the same when events render (pending item (a) from before Phase 6).
-      Midnight UTC renders as **03:30 Tehran** — printing it invents a publication
-      moment (constraints 10 and 11).
-- [ ] **Ask DeepSeek whether cached reads count against the 5M free tokens/30d.** The
-      cached fresh-token load is ~3.3M/month, so the answer decides whether DeepSeek is a
-      **second zero-cost provider** or a $5/mo one. One support ticket. Highest
-      value-per-effort item on this list. Checked 2026-08-30: NOT answerable from the
-      agent sandbox — official docs (api-docs.deepseek.com) blocked by the egress
-      allowlist, web search returns content-farm guides only. Two-minute owner check
-      from any browser: `api-docs.deepseek.com/quick_start/pricing` fine print on free
-      credits vs cache hits — or a support ticket. Do not re-search from here.
-
-- [ ] ~~Phase 6 decision: does the `items` table survive?~~ **RESOLVED 2026-08-29:
-      `items` survives** as the intra-run raw tier (pruned on `events_days`);
-      `events` is the post-understand store written by Phase 6's understand stage
-      (`memory/event_models.py`). No second raw tier. (Moved to POSTMORTEMS.)
-- [ ] Owner to approve `ARCHITECTURE.md`.
-- [ ] **Answer whether `t.me/robots.txt` disallows `/s/`.** Round 1 checked `telegram.org`
-      by mistake — robots.txt is per-host and the collector fetches `t.me`. Fixed in
-      `dump-body.yml`; the fetch rides along with the next CI dispatch. Tried from the
-      agent sandbox 2026-08-29: blocked by the sandbox egress allowlist (only
-      api.metisai.ir), so the answer still must come from a GitHub runner. Kept out of
-      the pipeline deliberately — a robots fetch failing on that host would take out 23
-      of 51 sources. If it *is* disallowed, that is a real input to whether `t.me/s/`
-      scraping stays the Telegram path, and constraint 6 leaves no alternative, so the
-      answer would be a scope question, not a code change.
-- [ ] **Verify the hardened gate with a fresh `workflow_dispatch`, never "Re-run jobs".**
-      The every-source null-`published_at` assertion and the >14-day staleness assertion
-      are in `collect-test.yml` (added 2026-08-19, CLAUDE.md pending item was stale); the
-      `all_timestamps_identical` date-only false-positive was fixed 2026-08-29
-      (`date_only_count` + real-timestamps-only in `report.py`). Expect the dispatch to
-      FAIL on `state_dept_travel` (g1) and `tg_ukmto_mirror` (g2) on first run — that
-      failure is the acceptance test for the assertions themselves.
-- [ ] **Phase 9: the 30-minute near-duplicate window must skip date-only items.**
-      LEAD_HANDLING.md's lead collapse uses a 30-min window; all-midnight UTC is not
-      simultaneity, so the window must not treat same-day date-only items as
-      simultaneous. `Item.date_only` round-trips through memory (Phase 4) and is
-      respected by the understand prompt (Phase 6) — the lead collapse is the last
-      consumer.
-- [ ] ~~Staleness-audit the other Telegram sources~~ DONE BY CONSTRUCTION 2026-08-29:
-      the collect-test gate now asserts the >14-day staleness rule over ALL 51 sources
-      on every dispatch -- the gate IS the audit. Per-source health counters
-      (`memory/source_health.py`, written by the collect stage every run) make
-      dormancy visible in logs between dispatches.
-- [ ] **Re-scope or close "owner to approve ARCHITECTURE.md".** Open since session 1 while
-      three phases were built against it. Stale bookkeeping at the top of the list masks
-      real blockers like the robots.txt one, which was on no list anywhere.
-- [ ] **Owner decision — the `group: null` contradiction** (session-5 facts, last bullet).
-      Inert today, live the moment any owner-channel goes tier 2. Three options on record.
-- [ ] **Line-cap decision now covers SIX files.** `tools/check_feeds.py` (217),
-      `tools/dump_body.py` (213), `tools/pytest_shim.py` (465, added 2026-08-29),
-      `memory/schema.sql` (226, comment-only overage, pre-existing), plus test files
-      `test_pipeline_compose.py` (308) and `test_pipeline_validate.py` (378) -- tests
-      grew past the cap naturally with coverage. Owner to decide: trim, split, or
-      grant the explicit exception per category (dev tools / schema comments / tests).
-- [ ] ~~**Phase 3 collector — `DATE_RE` does not match Ynet's date format.**~~ Both `ynet` and
-      `ynet_he` return 30 items with an empty `newest`, so neither can be staleness-checked.
-      Related and already known: the `t.me/s/` preview has no `pubDate` at all — post times
-      live in a `<time datetime=...>` attribute, and the 30-minute near-duplicate window in
-      `LEAD_HANDLING.md` depends on parsing it.
-      Deferred, not blocking: the 7 CUT_BOT_BLOCKED tier-1 mechanical feeds (ISW, UKMTO ×2,
-      CENTCOM alt, Times of Israel, Trading Economics) are reachable only via the Google
-      News `site:` proxy already used for Reuters/AP — same `USE_CAVEAT`, decide at Phase 6.
-      The 3 NEEDS_BODY_DUMP rows (radio_farda, rferl_iran, safeairspace) need a probe flag
-      that saves raw bytes; one round, worth it only for safeairspace.
-- [ ] **Two dev tools now exceed the ~200-line cap in constraint 12: `tools/check_feeds.py`
-      at 217 and `tools/dump_body.py` at 213.** One owner decision covers both. Overage in
-      each is comment, not logic, and neither is pipeline code. Overage
-      is comment, and it is a dev tool not pipeline code. Owner to decide: trim comments,
-      split the fetch layer into `tools/_fetch.py`, or grant an explicit exception.
-- [ ] Owner to create accounts per `SETUP_ACCOUNTS.md` and supply secrets.
-- [ ] Owner to create the bot via @BotFather, create a private channel, add the bot as
-      admin, and put `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHANNEL_ID` in GitHub Secrets.
-      Never in chat, never in a commit — public repo.
-- [ ] **Metis (api.metisai.ir) — owner pays in rial and it may expose API keys.** This
-      partially defuses the payment blocker below, but it is NOT wired in and should not be
-      without an explicit owner decision. Open question is jurisdictional, not technical:
-      the prompt stream is a continuous record of an Iran-resident systematically monitoring
-      Iranian military/regime topics. Content is public news; the *query pattern* is not.
-      Gemini puts that outside Iranian jurisdiction, Metis puts it inside. Assumption on
-      record: **Metis stays out of v1**, chain remains Gemini → Groq → degrade. Revisit at
-      Phase 5 only if Gemini is revoked. Constraint 15 (hard spend cap, per-run call
-      counter) applies before any metered provider goes live unattended.
-- [ ] Owner to paste his own Telegram channel handles (esp. the untrusted `lead` ones)
-      and prune `config/sources_candidates.csv` → then it becomes `sources.yaml`.
-- [ ] ~~sources.yaml signals_covered~~ DONE 2026-08-29 (Phase 8): all 51 entries carry
-      `signals_covered`; the startup coverage check (`agent/coverage.py`) runs in
-      build_stages against `risk_weights.yaml` (generated from the backtest's canonical
-      values) -- 0 gaps on the real config; warns by default, can fail the build.
-- [ ] ~~Credibility tiers and risk weight matrix as YAML~~ DONE 2026-08-29:
-      `config/risk_weights.yaml` = 36-signal catalog copied from
-      `analysis/backtest_weights.py` (machine-verified at generation). [BACKTESTED]
-      values -- changing one invalidates the only validation the scoring has.
-- [ ] **Re-filed to v1.5 (Phase 11): the extraction accuracy gate.** Hand-label the 5
-      backtest scenario dates, measure Gemini extraction precision/recall BEFORE paying
-      any adjudicator. Not buildable in v1: the extraction prompt and scorer do not
-      exist (session-3 scope cut). The paid-adjudicator cascade stays disabled.
-      Draft catalog/weights/tiers in `analysis/ESCALATION_SCORING.md` §2 and §5. Backtest
-      automated 2026-08-01 (`analysis/backtest_weights.py`): 5/5 targets pass with tier
-      multipliers 1.0/0.8/0.5 and the posture-persistence rule (stateful signals decay from
-      state end, not first report — without it Feb 21 2026 scores 40 vs target 55–70).
-      Both rules now in ESCALATION_SCORING.md §2–3. Scenario signal sets in the backtest are
-      reconstructions from WAR_SIGNALS_PAPER.md, not exhaustive — refine in Phase 8 if needed.
-      Stateful decay counts from state END date (Feb 21 state score: 63.9).
-- [ ] Clustering similarity threshold needs empirical tuning on real data → Phase 6.
-      Placeholder 0.62 in settings.yaml is a guess, not a measurement.
-- [ ] **BLOCKER — payment and geo access not yet confirmed.** Owner is in Iran
-      (Asia/Tehran). Every paid provider (Anthropic, DeepSeek, Moonshot) requires an
-      international card or Chinese payment rails, and several US providers geo-block
-      Iranian signups outright. Pipeline *execution* is safe — API calls originate from
-      GitHub's US runners, not the owner's IP — but ACCOUNT CREATION and PAYMENT happen
-      from Iran. Confirm the owner can actually sign up and pay before any paid provider
-      enters the design. This also applies to Gemini/Groq free tiers at signup time.
-      Resolve before Phase 5, not at Phase 9.
-- [ ] **Phase 7 gate — measure Gemini extraction accuracy before paying anyone.**
-      Hand-label signal sets for the 5 backtest scenario dates (they are already
-      specified in `backtest_weights.py`), run Gemini extraction against the same
-      source text, compute per-signal precision/recall. Only if F1 is poor does a paid
-      adjudicator get switched on. Cascade is wired but disabled in settings.yaml.
-- [ ] FRED free API key needed for the daily market series → add to SETUP_ACCOUNTS.md.
-- [ ] `sources.yaml` not written. Must carry `signals_covered` per entry → Phase 2.
-- [ ] X/Twitter: no legal free path as of 2026-08. Deferred to v2. Collector interface must
-      accommodate it without changes elsewhere.
+- [ ] **NEXT SESSION — owner workflow: push → verify → analysis.** The session-9
+      timeout batch (suite 528) is the one unpushed batch: `git show
+      origin/main:src/agent/llm/call.py | findstr provider.timeout` must print;
+      CI must be green at 528 (batch 2 already verified live 2026-08-30). Then
+      the analysis session, on a CLEAN run only (the first run's CSVs are
+      polluted by the provider cascade): owner downloads run-reports (read /
+      chosen / summaries / run), posts them; tune `digest_rank.min_score`,
+      category weights, `cluster_similarity_threshold` (still placeholder 0.62),
+      source pruning -- all owner-editable YAML. Gates in progress: 3-run gate,
+      1-week gate, 60-day cron reset (RUNBOOK.md §6–8).
+- [ ] **Batch-2 accepted edges, self-correcting ≤2026-09-02.** First run after
+      deploy had no delivered markers for the last 72h (one near-duplicate may
+      re-surface); format_split truncation over-marks lowest-priority items
+      ≤72h. POSTMORTEMS 2026-08-30 (batch 2) references this line as the
+      documentation. Delete this item once past 2026-09-02.
+- [ ] **Owner decision — the `group: null` contradiction is now executed code.**
+      `pipeline/validate.py` resolves null → own-id (fully independent) per the
+      documented fallback, and 17 owner channels still carry `group: null` in
+      `credibility.yaml`. Harmless while all stay tier 3/lead; a tier-2 promotion
+      of any one opens the fabricated-signal path. Options on record
+      (session-5 facts): leave, shared `unlisted_tg` group, or loader defaults.
+- [ ] **Owner decision — approve `ARCHITECTURE.md`, or close the question.**
+      Open since session 1; all ten phases were built and shipped against it.
+      Either way this line dies. (Merges the two duplicate approval items.)
+- [ ] **Owner decision — line cap on six files.** `tools/check_feeds.py` (217),
+      `tools/dump_body.py` (213), `tools/pytest_shim.py` (465),
+      `memory/schema.sql` (226, comment-only), `tests/unit/test_pipeline_compose.py`
+      (295), `tests/unit/test_pipeline_validate.py` (378). Overage is comments and
+      test growth, no logic split needed. Decide: trim, split, or grant explicit
+      exceptions per category (dev tools / schema comments / tests).
+- [ ] **v1.5 (Phase 11) scope — risk engine, accuracy gate, markets fetcher.**
+      Hand-label the 5 backtest scenario dates, measure Gemini extraction
+      precision/recall BEFORE paying any adjudicator; paid cascade stays disabled.
+      Markets fetcher needs a free FRED API key (no card) → add to SETUP_ACCOUNTS.md
+      (also unowned: the OpenRouter parachute key -- 50 req/day ≈ 1 run;
+      2026-08-30 showed both primaries can die the same day).
+- [ ] **v1.1/v2 deferred, recorded:** (a) evidence-computed lead independence
+      (LEAD_HANDLING rev 2) -- its 30-minute near-duplicate window must skip
+      date-only items; all-midnight UTC is not simultaneity. (b) Metis stays out
+      -- revisit only under the third-provider decision if Gemini is revoked.
+      (c) X/Twitter: no legal free path -- deferred to v2; the collector interface
+      accommodates it. (d) Maritime coverage is ZERO (UKMTO mirror disabled
+      2026-08-19, all 4 MARAD paths blocked) -- only a Google News `site:` proxy
+      or owner-supplied mirror could close it.

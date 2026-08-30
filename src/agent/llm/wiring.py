@@ -16,6 +16,7 @@ from typing import Callable, Mapping, Sequence
 from agent.llm.limits import ProviderBudget
 from agent.llm.providers import (
     API_KEY_ENV,
+    DEFAULT_TIMEOUT,
     GeminiAdapter,
     GroqAdapter,
     OpenRouterAdapter,
@@ -96,8 +97,13 @@ def build_router(
     adapters = build_adapters(settings.order, settings.providers, env, logger)
     limits: dict[str, ProviderBudget] = {}
     rpm_map: dict[str, int | None] = {}
+    timeout_map: dict[str, tuple[float, float]] = {}
     for name, cfg in settings.providers.items():
         rpm_map[name] = cfg.rpm
+        if cfg.read_timeout_seconds is not None:
+            # Connect timeout is shared; only the read leg is overridable
+            # (2026-08-30 decision: primary reads time out at 20s).
+            timeout_map[name] = (DEFAULT_TIMEOUT[0], float(cfg.read_timeout_seconds))
         if cfg.max_calls_per_run is not None or cfg.max_spend_usd_per_month is not None:
             limits[name] = ProviderBudget(
                 name=name,
@@ -117,6 +123,7 @@ def build_router(
         breaker_threshold=settings.backoff.circuit_breaker_failures,
         provider_limits=limits,
         rpm_by_provider=rpm_map,
+        timeout_by_provider=timeout_map,
         clock=clock,
         sleep=sleep,
         logger=logger,

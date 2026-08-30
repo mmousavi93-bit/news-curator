@@ -30,7 +30,7 @@ from agent.llm.breaker import CircuitBreaker, backoff_delay
 from agent.llm.call import _OK, _SAME, Provider, attempt
 from agent.llm.errors import FATAL, REFUSED_CAP, UNAVAILABLE, LlmResult
 from agent.llm.limits import CallBudget, ProviderBudget, RpmPacer
-from agent.llm.providers import ImageInput, ProviderAdapter
+from agent.llm.providers import DEFAULT_TIMEOUT, ImageInput, ProviderAdapter
 from agent.llm.transport import HttpTransport, RequestsHttpTransport
 from agent.util.logging import get_logger
 
@@ -50,6 +50,7 @@ class Router:
         breaker_threshold: int = 5,
         provider_limits: Mapping[str, ProviderBudget] | None = None,
         rpm_by_provider: Mapping[str, int | None] | None = None,
+        timeout_by_provider: Mapping[str, tuple[float, float]] | None = None,
         clock: Callable[[], float] = _time.monotonic,
         sleep: Callable[[float], None] = _time.sleep,
         logger: logging.Logger | None = None,
@@ -66,8 +67,12 @@ class Router:
         self._call_index = 0
         rpm_map = rpm_by_provider or {}
         limits = provider_limits or {}
+        timeout_map = timeout_by_provider or {}
         self._providers = [
-            Provider(p.name, p, rpm_map.get(p.name), limits.get(p.name)) for p in providers
+            Provider(
+                p.name, p, rpm_map.get(p.name), limits.get(p.name),
+                timeout=timeout_map.get(p.name, DEFAULT_TIMEOUT),
+            ) for p in providers
         ]
 
     # -- budget helpers (pipeline: priority-ordered spending) --------------

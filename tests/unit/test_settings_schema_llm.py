@@ -186,3 +186,25 @@ def test_settings_llm_block_is_immutable():
     settings = Settings.from_dict(_raw())
     with pytest.raises(FrozenInstanceError):
         settings.llm.max_calls_per_run = 1  # type: ignore[misc]
+
+
+def test_read_timeout_seconds_accepted_and_defaults_to_none():
+    raw = _raw()
+    raw["llm"]["providers"]["gemini"]["read_timeout_seconds"] = 20
+    settings = Settings.from_dict(raw)
+    assert settings.llm.providers["gemini"].read_timeout_seconds == 20
+    assert settings.llm.providers["groq"].read_timeout_seconds is None
+
+
+def test_read_timeout_seconds_string_rejected():
+    _expect_error(
+        lambda r: r["llm"]["providers"]["gemini"].__setitem__("read_timeout_seconds", "20"),
+        r"providers\.gemini\.read_timeout_seconds: expected int, got str",
+    )
+
+
+def test_read_timeout_seconds_negative_rejected():
+    _expect_error(
+        lambda r: r["llm"]["providers"]["gemini"].__setitem__("read_timeout_seconds", -1),
+        r"providers\.gemini\.read_timeout_seconds: must not be negative",
+    )

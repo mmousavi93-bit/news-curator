@@ -106,7 +106,12 @@ class MockHttpTransport:
         payload: Mapping[str, object],
         timeout: tuple[float, float],
     ) -> HttpResponse:
-        self.calls.append({"url": url, "headers": dict(headers), "payload": dict(payload)})
+        self.calls.append({
+            "url": url,
+            "headers": dict(headers),
+            "payload": dict(payload),
+            "timeout": timeout,
+        })
         if not self.responses:
             return HttpResponse(status_code=200, body={})
         index = min(len(self.calls) - 1, len(self.responses) - 1)

@@ -33,6 +33,7 @@ class ProviderSettings:
     model: str | None = None
     rpm: int | None = None
     rpd: int | None = None
+    read_timeout_seconds: int | None = None
     supports_vision: bool = False
     enabled: bool | None = None
     prompt_cache: bool | None = None
@@ -54,6 +55,7 @@ _PROVIDER_FIELDS: dict[str, type] = {
     "model": str,
     "rpm": int,
     "rpd": int,
+    "read_timeout_seconds": int,
     "supports_vision": bool,
     "enabled": bool,
     "prompt_cache": bool,

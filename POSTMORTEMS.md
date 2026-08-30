@@ -57,6 +57,69 @@ Standing lessons:
 (c) "Mark what was received" means mark AFTER the send, not after the compose -- the
     same defect as the original ghost-suppression, one stage later.
 
+## 2026-08-30 — first automated run: provider cascade, degradation held, CSVs live
+
+Owner pasted the first post-push cron log (12:21 Tehran). Three verifications at once:
+the self-match fix held (9 events → real 2,351-char message), the Persian gate caught
+its first live drop (`a5220106`), and all 4 observability CSVs were written and
+uploaded. The new code executing in production IS the content check for the push.
+
+The incident: Gemini failed call #1 with a 60s timeout, got a 503 on #3, and the
+breaker opened after 2 consecutive failures (shipped setting) -- Gemini skipped for
+the run. Groq (qwen/qwen3.8-27b) carried calls #2 and #4-#14, then 429'd twice and
+its breaker opened too. Both providers dead → 26 of 40 clusters skipped
+`status=unavailable`. 10 events from 40 clusters, one message sent.
+
+Load-bearing finding: **Groq free ≈ 13 calls/run before 429.** The pacer ran at
+Groq's 30 RPM (2s gaps, visible in log timestamps), so this was not a pacing bug --
+it is the free tier's token-per-minute limit (~10K tokens in ~30s). Consequence: on a
+Gemini-outage day every run degrades to ~1/3 cluster capacity, permanently, on free
+tiers. OpenRouter free (50/day) was already rejected as a third provider.
+
+Decisions finalized 2026-08-30 (owner's instruction: "finalize decisions based on
+understanding"). Suite 522 → 528, shim-verified.
+
+1. **Primary read timeout 60s → 20s, implemented as config.** The 60s default cost a
+   dead Gemini 60s per attempt; with max_retries=3 and the shipped breaker threshold
+   of 2, the failover path could burn ~8 min of an ~8-min run before Groq got the
+   wheel (the 13-min figure above assumed the old 5-failure breaker). At 20s the same
+   path is ~160s, and a merely-slow Gemini still survives. Mechanics: new
+   `read_timeout_seconds` key on any `providers:` entry (int, negative/str/bool
+   rejected); `providers.py` keeps DEFAULT_TIMEOUT (10, 60) as the fallback default;
+   wiring maps overrides to `timeout_by_provider`; the timeout now rides on
+   `Provider.timeout` and MockHttpTransport records it, so the tests assert the REAL
+   value handed to requests. Tests: 3 validation in test_settings_schema_llm.py +
+   3 flow tests in new `tests/unit/test_llm_timeout.py` (settings → wiring → router →
+   call → transport). Connect timeout stays 10s everywhere.
+2. **Groq's ~13-call free ceiling ACCEPTED as the degradation floor.** Not a pacing
+   bug -- 30 RPM pacing was correct; it is the free tier's token-per-minute wall. On a
+   Gemini-outage day each run covers its priority-ordered top ~14 of 40 clusters, and
+   because cluster.py ranks by tier → recency → size, the stories that survive are
+   the right ones. Documented next to groq's rpm/rpd in settings.yaml ("a 429 here is
+   NOT a pacing bug"). OpenRouter stays a last-rung parachute (50 req/day ≈ 1 run)
+   and is not counted as capacity. Adding a real third provider is a v1.5 decision
+   taken with failure-rate data, not a knee-jerk patch after one bad day.
+
+Tuning note: that run's CSVs are polluted for analysis (26 unavailable clusters) --
+the analysis session uses a clean run only.
+
+Provider-addition question (DeepSeek V4-Flash / V4-Pro), researched 2026-08-30 with
+parallel research agents. Full dossier: `analysis/deepseek_v4_eval.md`. Verdict:
+REJECTED for now, on three independent findings.
+(1) Cost: DeepSeek repriced 2026-08-17 to peak/off-peak (peak = 2x; the repo's
+Aug-1 rate card is superseded). V4-Flash wholesale ~$4.4/mo, V4-Pro ~$13/mo;
+cascade position (3rd rung, after Groq's 13 free calls) ~$0.09/outage-day for
+Flash, and that usage fits under the 5M-free-token allotment -- so cost is not the
+blocker. (2) Quality: family-level disqualifiers for THIS task -- topic-selective
+censorship on war/geopolitics (a softened military development is a silent
+intelligence failure, constraint 10), documented JSON-discipline defects (this
+pipeline has zero retry budget), Chinese-first behavior on Persian prompts, RTL
+issues. V4-Pro buys ~1 AA index point of hard reasoning and fixes none of these.
+(3) The free-5M question is MOOT: wholesale fresh load is ~7.4M tokens/mo (3.45M
+input + 3.9M output) > 5M in every branch -- the repo's 3.3M claim counted input
+only. Revisit only via the v1.5 accuracy-gate pilot in cascade position, if
+Gemini flakiness recurs across the next week of clean runs.
+
 ## 2026-08-30 — every post-rework run shipped "nothing new": validate self-match
 
 Symptom (owner-reported): after the Persian/Jalali output rework, every Telegram message
@@ -1253,6 +1316,7 @@ reading and did not.** Prose with numbers in it needs the same mechanical check 
       permanently (fork network retains the blob); rotate, never delete the line.
       Residual risk is termination, not throttling: AI Studio is not offered in Iran, so the
       account may be revoked without warning. Fallback chain is the mitigation.
-      STILL OPEN: Groq key not obtained (second-tier fallback, 30 RPM / 14,400 RPD, no
-      card). Get it on the same access path while that path works. OpenRouter and FRED
-      also unowned. Paid providers remain unconfirmed and unneeded.
+      Groq key obtained and proven live 2026-08-30 (carried calls #2 and #4-#14 in the
+      first automated run's cascade; free-tier ceiling ~13 calls/run -- see the
+      2026-08-30 cascade entry). OpenRouter and FRED still unowned. Paid providers
+      remain unconfirmed and unneeded.

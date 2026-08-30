@@ -294,6 +294,13 @@ llm:
       rpm: 10
       rpd: 1500
       supports_vision: true
+      # DECISION 2026-08-30 (first automated run, POSTMORTEMS.md): read
+      # timeout 20s, not the 60s default. Evidence: Gemini hung until the
+      # 60s read timeout, and at 4 attempts x 2 failing calls that is ~8
+      # minutes of an ~8-min run burned before the breaker opens. 20s keeps
+      # a merely-slow Gemini alive and fails a dead one over in seconds.
+      # Connect timeout stays 10s everywhere.
+      read_timeout_seconds: 20
     groq:
       # 2026-08-29, run-log evidence: llama-3.3-70b-versatile is gone from
       # Groq's roster (404). qwen3.8-27b from the live list (probe step).
@@ -301,6 +308,12 @@ llm:
       rpm: 30
       rpd: 14400
       supports_vision: false
+      # 2026-08-30 cascade evidence: Groq free-tier TPM caps capacity at
+      # ~13-14 calls per run regardless of correct 30-RPM pacing (429s at
+      # call ~14). ACCEPTED (owner decision, POSTMORTEMS.md): on
+      # Gemini-outage days each run covers its priority-ordered top ~14 of
+      # 40 clusters. A 429 here is NOT a pacing bug -- do not "fix" the
+      # pacer, there is nothing to fix.
     openrouter:
       # Roster rotates weekly; this free model is a placeholder default.
       # Owner-editable -- the adapter refuses to run without a model line.

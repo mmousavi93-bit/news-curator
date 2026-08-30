@@ -29,12 +29,16 @@ _OK, _ROTATE, _SAME, _FATAL = "ok", "rotate", "same", "fatal"
 @dataclass
 class Provider:
     """One provider as the router's loop sees it: adapter + per-run state.
-    `spend` is None for free providers (no guard rails configured)."""
+    `spend` is None for free providers (no guard rails configured).
+    `timeout` is the (connect, read) pair used for this provider's HTTP
+    calls -- per-provider override from settings, DEFAULT_TIMEOUT otherwise
+    (2026-08-30 decision: the primary runs a tighter read timeout)."""
 
     name: str
     adapter: ProviderAdapter
     rpm: int | None
     spend: ProviderBudget | None = None
+    timeout: tuple[float, float] = DEFAULT_TIMEOUT
     schema_retried: bool = False
 
 
@@ -70,7 +74,7 @@ def attempt(
 
     start = clock()
     try:
-        response = transport.post(url, headers, payload, DEFAULT_TIMEOUT)
+        response = transport.post(url, headers, payload, provider.timeout)
     except (HttpTimeout, HttpError) as exc:
         breaker.failure(name)
         latency_ms = int((clock() - start) * 1000)
