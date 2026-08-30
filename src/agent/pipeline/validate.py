@@ -126,12 +126,54 @@ class ValidateStage:
             kept.append(event)
         return kept, dropped
 
+    def _drop_same_run_dups(
+        self, ctx, events: list[Event]
+    ) -> tuple[list[Event], list[Event]]:
+        """Two events from the SAME run telling the same story must not both
+        reach the digest (2026-08-30: the same Hormuz tanker incident was
+        delivered twice -- _drop_repeats only compares against PREVIOUS runs'
+        delivered summaries). Pairwise cosine over the LLM-written Persian
+        summaries, which are more normalised than raw items; the larger
+        cluster survives, ties keep the first. Zero LLM calls."""
+        if getattr(ctx, "embedder", None) is None or len(events) < 2:
+            return events, []
+        threshold = ctx.config.settings.pipeline.event_match_threshold
+        vectors = ctx.embedder.embed([e.summary for e in events])
+        clusters_by_key = {c.key: c for c in getattr(ctx, "clusters", None) or []}
+
+        def _size(key: str) -> int:
+            cluster = clusters_by_key.get(key)
+            return len(cluster.members) if cluster is not None else 0
+
+        dropped_keys: set[str] = set()
+        for i, event in enumerate(events):
+            if event.event_key in dropped_keys:
+                continue
+            for j in range(i + 1, len(events)):
+                other = events[j]
+                if other.event_key in dropped_keys:
+                    continue
+                similarity = self._cosine(vectors[i], vectors[j])
+                if similarity < threshold:
+                    continue
+                loser = event if _size(event.event_key) < _size(other.event_key) else other
+                dropped_keys.add(loser.event_key)
+                self._logger.info(
+                    "validate: %s dropped as same-run duplicate of a larger "
+                    "cluster (sim %.2f)", loser.event_key[:8], similarity,
+                )
+        return (
+            [e for e in events if e.event_key not in dropped_keys],
+            [e for e in events if e.event_key in dropped_keys],
+        )
+
     def run(self, ctx) -> None:
         clusters = list(getattr(ctx, "clusters", None) or [])
         events = list(getattr(ctx, "events", None) or [])
         by_key = {c.key: c for c in clusters}
         events, repeat_dropped = self._drop_repeats(ctx, events)
-        ctx.repeat_dropped = repeat_dropped
+        events, same_run_dropped = self._drop_same_run_dups(ctx, events)
+        ctx.repeat_dropped = repeat_dropped + same_run_dropped
 
         kept: list[Event] = []
         lead_events: list[Event] = []

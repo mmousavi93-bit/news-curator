@@ -282,7 +282,7 @@ llm:
   # Enforcement is real, not advisory: llm/router.py refuses call N+1
   # before a request is built (CLAUDE.md constraint #2).
   max_calls_per_run: 51
-  order: ["gemini", "groq", "openrouter"]
+  order: ["gemini", "groq", "bai", "openrouter"]
 
   stages:
     vision:    { provider: "gemini" }
@@ -337,9 +337,30 @@ llm:
       # marked FREE at openrouter.ai/models?q=free and put its exact ID
       # here. 404 = delisted, swap the ID. 402 = balance policy -> NOT
       # fixable in YAML, tell the owner.
-      model: "nvidia/nemotron-3.5-lightning:free"
+      # Current pick (2026-08-30): inkling-small. Nemotron-3.5-lightning was
+      # DISQUALIFIED by live evidence -- 16.5K output tokens on a ~400-token
+      # task, 8-minute calls, both answers useless (the ramble cap in
+      # llm/providers.py now prevents the 8-minute class regardless of model).
+      # tools/probe_free_models.py (workflow: probe-models) measures the
+      # whole roster; the next swap should follow its CSV, not a guess.
+      model: "thinkingmachines/inkling-small:free"
       rpm: 20
       rpd: 50          # emergency parachute, not a real fallback
+      supports_vision: false
+    bai:
+      # The owner's reseller gateway (docs.b.ai, 2026-08-30). All listed
+      # models are FREE ("a gift, but do not depend on it" -- owner), so it
+      # sits BEHIND groq and AHEAD of the 50-req/day openrouter parachute.
+      # Model pick = orchestrator's priority for this task (Persian output,
+      # strict JSON): qwen3.8-flash first (Qwen's multilingual lineage),
+      # then glm-5.3-flash, mimo-v2.5, hy3, deepseek-v4-flash last (family
+      # flags on record -- analysis/deepseek_v4_eval.md). gpt-5.2 is PAID on
+      # this gateway and stays unused: enabling it requires constraint-15
+      # spend caps wired first (input/output_usd_per_mtok + max_spend).
+      # Rate limits unknown (reseller) -- conservative until measured.
+      model: "qwen3.8-flash"
+      rpm: 20
+      rpd: 1000
       supports_vision: false
     anthropic:
       enabled: false

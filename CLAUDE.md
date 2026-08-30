@@ -398,6 +398,24 @@ Detection is not relevance: a commentary piece mentioning Iran still matches
 `iran_direct` — the understand prompt's commentary rule is the first defense.
 Real calibration still needs the clean-run CSVs.
 
+## Session 9i (2026-08-30) — run-6 evidence: ramble cap, same-run dups, model probe, bai gateway
+
+1. **`max_tokens: 700` on the chat adapters** — nemotron-3.5-lightning generated
+   ~16.5K tokens on a ~400-token task (8-minute calls; continuous bytes kept the
+   read timeout fed). Truncated JSON fails loudly instead. OpenRouter model
+   swapped to inkling-small:free (nemotron disqualified).
+2. **Same-run duplicate collapse in validate** — the same Hormuz tanker incident
+   was delivered twice in one digest: new events were never compared against
+   each other, only against previous runs. Pairwise cosine over summaries; the
+   larger cluster survives.
+3. **`tools/probe_free_models.py` + `probe-models.yml`** — measures every
+   OpenRouter :free model against the real understand prompt, deterministic
+   checks only. Manual dispatch; ~28 calls = the parachute quota — never run on
+   a Gemini-down day. Joins the tools line-cap owner decision (237 lines).
+4. **bai gateway wired** — cascade gemini → groq → bai → openrouter; model
+   `qwen3.8-flash` (swap list in the settings comment). Free only; gpt-5.2
+   stays out until constraint-15 caps. Env var `BAI_API_KEY`. Suite 547 → 558.
+
 ## Phases 6–10 (2026-08-29) — v1 CODE COMPLETE. Suite 522, 0 failed, shim-verified
 
 - Owner's mandate this session: push to done. Built per briefs: Phase 6 Understand

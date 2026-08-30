@@ -17,6 +17,7 @@ from agent.llm.limits import ProviderBudget
 from agent.llm.providers import (
     API_KEY_ENV,
     DEFAULT_TIMEOUT,
+    BaiAdapter,
     GeminiAdapter,
     GroqAdapter,
     OpenRouterAdapter,
@@ -31,6 +32,7 @@ from agent.util.logging import get_logger
 _ADAPTERS: dict[str, type] = {
     "gemini": GeminiAdapter,
     "groq": GroqAdapter,
+    "bai": BaiAdapter,
     "openrouter": OpenRouterAdapter,
     # "anthropic": deliberately not implemented in Phase 5 (brief "Out of
     # scope"); the budget guardrails for it ARE built and tested.

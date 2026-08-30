@@ -55,6 +55,18 @@ keys — that one is not fixable in config, tell me.
 If signup is blocked from your network, use the same access path you used for the Gemini and
 Groq accounts.
 
+## 3b. b.ai reseller gateway — the third rung (5 min)
+
+Your own gateway (docs.b.ai). All listed models are free; the pipeline treats them as a
+gift, not capacity to depend on (your words). Create the API key on the b.ai console.
+
+Save as: `BAI_API_KEY`
+
+The model line lives in `config/settings.yaml` (`providers.bai.model`, currently
+`qwen3.8-flash`); the comment next to it lists the swap order (glm-5.3-flash, mimo-v2.5,
+hy3, deepseek-v4-flash). gpt-5.2 is paid on this gateway and stays unused until spend caps
+are wired — do not enable it without telling me.
+
 ## 4. Telegram bot (5 min)
 
 Open Telegram and search for **@BotFather** — the one with the blue verified check.

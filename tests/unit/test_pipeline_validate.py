@@ -246,6 +246,72 @@ def test_repeat_follow_up_is_dropped(tmp_path):
     assert "a different event entirely" in kept_summaries
 
 
+def test_same_run_duplicate_pair_collapses_to_larger_cluster(tmp_path):
+    # 2026-08-30: the same Hormuz tanker incident was delivered twice in one
+    # digest -- _drop_repeats only compares against PREVIOUS runs, so two new
+    # events telling the same story never met each other. The same-run pass
+    # collapses the pair; the larger cluster survives.
+    credibility = _cred(t2=SourceCredibility(tier=2, group="g"))
+    conn = memory_db.open_db(tmp_path / "state.db", create_if_absent=True)
+    big = _cluster([_item("t2", "https://x/a1"), _item("t2", "https://x/a2")])
+    small = _cluster([_item("t2", "https://x/b1")])
+    embedder = _DictEmbedder({
+        "tanker hit in hormuz": [1.0, 0.0, 0.0],
+        "same tanker hit again": [1.0, 0.0, 0.0],   # identical story
+    })
+    ctx = _Ctx(
+        clusters=[big, small],
+        events=[
+            Event(event_key=big.key, summary="tanker hit in hormuz",
+                  category="military", source_count=2,
+                  first_seen_at=NOW, last_updated_at=NOW),
+            Event(event_key=small.key, summary="same tanker hit again",
+                  category="military", source_count=1,
+                  first_seen_at=NOW, last_updated_at=NOW),
+        ],
+    )
+    ctx.db = conn
+    ctx.embedder = embedder
+    ctx.config = _ctx_config()
+    try:
+        _stage(credibility).run(ctx)
+    finally:
+        conn.close()
+    assert [e.summary for e in ctx.events] == ["tanker hit in hormuz"]
+    assert [e.event_key for e in ctx.repeat_dropped] == [small.key]
+
+
+def test_same_run_distinct_events_both_survive(tmp_path):
+    credibility = _cred(t2=SourceCredibility(tier=2, group="g"))
+    conn = memory_db.open_db(tmp_path / "state.db", create_if_absent=True)
+    first = _cluster([_item("t2", "https://x/c1")])
+    second = _cluster([_item("t2", "https://x/c2")])
+    embedder = _DictEmbedder({
+        "one story": [1.0, 0.0, 0.0],
+        "another story": [0.0, 1.0, 0.0],
+    })
+    ctx = _Ctx(
+        clusters=[first, second],
+        events=[
+            Event(event_key=first.key, summary="one story",
+                  category="military", source_count=1,
+                  first_seen_at=NOW, last_updated_at=NOW),
+            Event(event_key=second.key, summary="another story",
+                  category="politics", source_count=1,
+                  first_seen_at=NOW, last_updated_at=NOW),
+        ],
+    )
+    ctx.db = conn
+    ctx.embedder = embedder
+    ctx.config = _ctx_config()
+    try:
+        _stage(credibility).run(ctx)
+    finally:
+        conn.close()
+    assert len(ctx.events) == 2
+    assert ctx.repeat_dropped == []
+
+
 def test_this_runs_own_rows_are_not_self_repeat_dropped(tmp_path):
     """Regression 2026-08-30: the production sequence is understand
     INSERTING this run's events into the events table BEFORE validate

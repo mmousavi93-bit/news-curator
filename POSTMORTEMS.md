@@ -5,6 +5,49 @@ session; this file does not. Nothing here is deleted or condensed — it is the 
 record of what broke, why, and what rule came out of it. Read it when working on the
 phase or subsystem it covers. CLAUDE.md keeps the operational core and points here.
 
+## 2026-08-30 (session 9i) — run-6 evidence: ramble cap, same-run dups, model probe, bai gateway
+
+Run 6 (17:26 UTC) was the richest evidence day yet: the parachute fired for real and
+was measured doing it.
+
+1. **Nemotron-3.5-lightning DISQUALIFIED by its own first live calls**: 16,494 and
+   10,873 output tokens on a ~400-token task, 8-minute and 7-minute calls, both
+   answers useless (clusters dropped as irrelevant). The mechanism: the chat
+   adapter sent no max_tokens, and a rambling model's continuous bytes keep the
+   read timeout fed -- a call that "succeeds" after 8 minutes. FIX: `max_tokens:
+   700` on the chat adapters (the understand output is ~400; a truncated JSON
+   fails loudly via schema-retry). OpenRouter model swapped to
+   `thinkingmachines/inkling-small:free` (research fit-4; US vendor).
+2. **Same-run duplicate delivered**: the Hormuz tanker incident appeared TWICE in
+   one digest. Root cause: validate's anti-repetition compares new events against
+   PREVIOUS runs only -- two new events telling the same story never met. FIX:
+   `_drop_same_run_dups` -- pairwise cosine over the LLM-written summaries
+   (more normalised than raw items), the larger cluster survives. Suite gained
+   two tests; the e2e stub needed distinct summary vectors (its canned payloads
+   were identical, which the new pass correctly collapsed).
+3. **tools/probe_free_models.py + probe-models.yml** (owner request): measures
+   every :free model against the REAL understand prompt with deterministic
+   checks only (HTTP, strict JSON, fields, Persian codepoints, category enum,
+   refusal markers, expected-category red-team). Stdlib/urllib, key from
+   secrets, CSV artifact, nothing committed. ~28 calls/dispatch = the parachute
+   quota -- never dispatch on a Gemini-down day. 237 lines: joins the tools
+   line-cap owner decision.
+4. **bai gateway wired** (owner's reseller, OpenAI-compatible): BaiAdapter +
+   cascade order gemini → groq → bai → openrouter; model `qwen3.8-flash`
+   (swap list in the settings comment: glm-5.3-flash, mimo-v2.5, hy3,
+   deepseek-v4-flash). Free models only -- gpt-5.2 is paid and stays unused
+   until constraint-15 spend caps are wired. Env var BAI_API_KEY.
+5. **Self-inflicted settings edit caught by the repo's own guard**: an edit
+   inserted the bai block between openrouter's model line and its
+   rpm/rpd/supports_vision lines, producing a duplicate `rpm` key. Plain YAML
+   loads that silently (last-write-wins); the repo's _DuplicateKeyCheckingLoader
+   raised it at load time and six tests went red until fixed. The guard earned
+   its keep exactly as designed.
+
+Suite 547 → 558. Run 6's digest also showed the keyword-fix trade-off cost (the
+Sydney-protest item re-entered via the new israel keyword -- borderline, watch in
+clean-run tuning) and the relevance gate dropping 2/13.
+
 ## 2026-08-30 (session 9g) — run-4 gate forensics: one over-cut, root cause a merge error
 
 The owner's run-4 CSVs let the gate's decisions be judged against actual text for
