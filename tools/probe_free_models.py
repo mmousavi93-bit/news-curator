@@ -38,7 +38,7 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(_REPO_ROOT / "src"))
 
 from agent.pipeline.langgate import is_persian_output  # noqa: E402
-from agent.pipeline.understand import _extract_json  # noqa: E402
+from agent.pipeline.understand import _extract_json, within_bounds  # noqa: E402
 
 _CATEGORIES = frozenset({"military", "security", "politics", "economy", "other"})
 _REQUIRED_FIELDS = ("headline", "summary", "category")
@@ -86,10 +86,6 @@ DEFAULT_MODELS = (
 )
 
 
-def _count_words(text: str) -> int:
-    return len(text.split())
-
-
 def check_response(payload: dict, expected_category: str) -> tuple[bool, str]:
     """Deterministic quality verdict for one parsed response. Returns
     (ok, reason). Pure -- the unit tests exercise this directly."""
@@ -107,10 +103,9 @@ def check_response(payload: dict, expected_category: str) -> tuple[bool, str]:
         return False, f"bad category {category!r}"
     if not is_persian_output(headline + "\n" + summary):
         return False, "non-Persian output"
-    if not (2 <= _count_words(headline) <= 25):
-        return False, f"headline word count {_count_words(headline)}"
-    if not (2 <= _count_words(summary) <= 60):
-        return False, f"summary word count {_count_words(summary)}"
+    ok_bounds, bounds_reason = within_bounds(payload)
+    if not ok_bounds:
+        return False, bounds_reason
     text = (headline + " " + summary).casefold()
     for marker in _REFUSAL_MARKERS:
         if marker in text:

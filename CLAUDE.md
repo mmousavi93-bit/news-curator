@@ -429,6 +429,15 @@ Real calibration still needs the clean-run CSVs.
 4. **Fatal responses open the breaker** — the 403 run burned 34 identical
    fatal calls; after two, the provider is skipped for the run. Suite 562.
 
+## Session 9l (2026-08-30) — bai live; output contract enforced in the pipeline
+
+First run with BAI_API_KEY: full chain worked (gemini down, groq 13 clusters,
+bai caught the 429-rotations, digest shipped). Bai's live answers rambled
+(6,587 / 2,626 tokens on a ~400-token task) -- the gateway ignores max_tokens,
+so `within_bounds` (headline 2-25 / summary 2-60 words) now runs after parse;
+violations skip the cluster with an `oversized` fate. The probe measures the
+same contract. Suite 562 → 564.
+
 ## Phases 6–10 (2026-08-29) — v1 CODE COMPLETE. Suite 522, 0 failed, shim-verified
 
 - Owner's mandate this session: push to done. Built per briefs: Phase 6 Understand
