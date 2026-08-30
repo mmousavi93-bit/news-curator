@@ -330,14 +330,14 @@ llm:
       # 40 clusters. A 429 here is NOT a pacing bug -- do not "fix" the
       # pacer, there is nothing to fix.
     openrouter:
-      # Free roster rotates weekly; IDs ROT. 2026-08-30: the llama-3.1
-      # series was deprecated on OpenRouter and the old placeholder 404'd on
-      # its first live use. qwen/qwen3.6-plus:free is the current pick
-      # (verified live Aug 2026). If it 404s: try `openrouter/free` (the
-      # self-healing alias) or any model marked FREE at openrouter.ai/models.
-      # 404 = model delisted -> swap the ID here. 402 = balance policy ->
-      # NOT fixable in YAML, tell the owner.
-      model: "qwen/qwen3.6-plus:free"
+      # Free roster rotates; IDs ROT -- two models 404'd on 2026-08-30 in a
+      # row (llama-3.1 series deprecated, then qwen3.6-plus delisted the same
+      # day). The owner's live FREE-list check settled it: rotation, not the
+      # zero-balance policy. Rule: when this 404s, take the FIRST model
+      # marked FREE at openrouter.ai/models?q=free and put its exact ID
+      # here. 404 = delisted, swap the ID. 402 = balance policy -> NOT
+      # fixable in YAML, tell the owner.
+      model: "nvidia/nemotron-3.5-lightning:free"
       rpm: 20
       rpd: 50          # emergency parachute, not a real fallback
       supports_vision: false
