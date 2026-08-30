@@ -68,6 +68,9 @@ class Router:
         # Breaker-skip lines are logged once per provider per RUN, not once
         # per cluster (2026-08-30: 54 identical lines in one run's log).
         self._skip_logged: set[str] = set()
+        # The final "stage unavailable" line likewise: once per stage per run
+        # (2026-08-30: 14 identical lines while both breakers were open).
+        self._unavailable_logged: set[str] = set()
         rpm_map = rpm_by_provider or {}
         limits = provider_limits or {}
         timeout_map = timeout_by_provider or {}
@@ -188,7 +191,9 @@ class Router:
             queue.append(provider)  # rotate: this provider goes to the back
             self._sleep(backoff_delay(attempts, self._base_delay))
 
-        self._logger.error(
-            "llm: stage=%s unavailable after %d attempt(s)", stage, attempts
-        )
+        if stage not in self._unavailable_logged:
+            self._unavailable_logged.add(stage)
+            self._logger.error(
+                "llm: stage=%s unavailable after %d attempt(s)", stage, attempts
+            )
         return LlmResult(ok=False, status=UNAVAILABLE)
