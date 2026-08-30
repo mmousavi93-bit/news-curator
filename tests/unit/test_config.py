@@ -109,6 +109,18 @@ sources:
 """,
         encoding="utf-8",
     )
+    # Valid on purpose: the test exists to prove the THREE problems above
+    # are all reported, not to add a fourth.
+    (tmp_path / "relevance.yaml").write_text(
+        """
+weights: {iran_direct: 8, strategic: 4, economy: 3}
+keywords:
+  iran_direct: ["ایران"]
+  strategic: ["جنگ"]
+  economy: ["نفت"]
+""",
+        encoding="utf-8",
+    )
 
     with pytest.raises(ConfigError) as exc_info:
         load_all(base=tmp_path)

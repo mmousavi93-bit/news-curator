@@ -56,8 +56,8 @@ def _item(source_id: str, hours_ago: float = 1.0) -> Item:
 
 
 def _event(key: str, category: str, independent: int = 1,
-           claim_status: str = "unconfirmed") -> Event:
-    return Event(event_key=key, summary=f"s {key}", category=category,
+           claim_status: str = "unconfirmed", summary: str | None = None) -> Event:
+    return Event(event_key=key, summary=summary or f"s {key}", category=category,
                  independent_count=independent, claim_status=claim_status,
                  source_count=1, first_seen_at=NOW, last_updated_at=NOW)
 
@@ -80,6 +80,57 @@ def test_military_outranks_politics_at_equal_corroboration():
     s_m = score_event(military, cluster_m, credibility, settings, NOW)
     s_p = score_event(politics, cluster_p, credibility, settings, NOW)
     assert s_m > s_p
+
+
+def _relevance_cfg() -> object:
+    from agent.pipeline.relevance import validate_relevance
+
+    return validate_relevance({
+        "weights": {"iran_direct": 8, "strategic": 4, "economy": 3},
+        "min_relevance": 3,
+        "keywords": {
+            "iran_direct": ["ایران"],
+            "strategic": ["جنگ"],
+            "economy": ["نفت"],
+        },
+    })
+
+
+def test_relevance_gate_filters_before_importance_sort():
+    # Owner decision 2026-08-30 (v2): relevance is a FILTER. A corroborated
+    # tier-1 military event with no relevance match is dropped by the gate
+    # even though its importance score (6+4+3+3 = 16) clears min_score.
+    settings = _settings()
+    log = _Log()
+    noise = _event("n" * 16, "military", independent=2)
+    kept, dropped_score, gated = rank_events(
+        [noise],
+        {"n" * 16: _cluster("", [_item("t1"), _item("t2")])},
+        CRED, settings, NOW, log, _relevance_cfg(),
+    )
+    assert kept == []
+    assert dropped_score == []
+    assert [e.event_key for e in gated] == ["n" * 16]
+    assert any("relevance gate" in m for m in log.messages)
+
+
+def test_gated_in_events_sort_by_importance_not_relevance_tier():
+    # An iran_direct economy item (relevance 8) must NOT outrank a strategic
+    # military item (relevance 4): within the gate, IMPORTANCE sorts --
+    # military 6+2+2+3 = 13 beats economy 2+2+2+3 = 9.
+    settings = _settings()
+    log = _Log()
+    iran_econ = _event("a" * 16, "economy", summary="قیمت نفت در ایران بالا رفت")
+    strat_mil = _event("b" * 16, "military", summary="جنگ در منطقه آغاز شد")
+    kept, _, _ = rank_events(
+        [iran_econ, strat_mil],
+        {
+            "a" * 16: _cluster("", [_item("t2")]),
+            "b" * 16: _cluster("", [_item("t2")]),
+        },
+        CRED, settings, NOW, log, _relevance_cfg(),
+    )
+    assert [e.event_key for e in kept] == ["b" * 16, "a" * 16]
 
 
 def test_strong_corroboration_can_beat_weak_category():
@@ -118,13 +169,14 @@ def test_min_score_splits_kept_from_dropped():
     log = _Log()
     military = _event("m" * 16, "military", independent=1)   # 5+2+2+3 = 12
     other = _event("o" * 16, "other", independent=1)         # 0+2+2+3 = 7
-    kept, dropped = rank_events(
+    kept, dropped, gated = rank_events(
         [other, military],
         {"m" * 16: _cluster("", [_item("t2")]), "o" * 16: _cluster("", [_item("t2")])},
         CRED, settings, NOW, log,
     )
     assert [e.event_key for e in kept] == ["m" * 16]
     assert [e.event_key for e in dropped] == ["o" * 16]
+    assert gated == []  # no relevance config: gate is open
     assert any("below min_score" in m for m in log.messages)
 
 

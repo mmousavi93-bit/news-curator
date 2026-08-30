@@ -157,6 +157,7 @@ Prompts live in `config/prompts/*.txt` — edit those, never hardcode prompt tex
 | `config/risk_weights.yaml` | Signal → indicator weight matrix. Drives risk scoring. |
 | `config/prompts/` | All prompt text, editable without touching code. **Created 2026-08-29 (Phase 6):** `understand.txt` (cluster summarisation, JSON contract), `vision.txt` (inert until collectors extract images). |
 | `config/topics.yaml` | **Created 2026-08-29 (Phase 6):** per-language keyword lists gating the six `topic_gate: true` sources. Owner-editable; `pipeline/filter.py` validates shape. |
+| `config/relevance.yaml` | **Created 2026-08-30 (session 9c):** Iran-relevance keyword tiers for digest ranking — `iran_direct` 8 / `strategic` 4 / `economy` 3, highest match wins. Owner-editable; `pipeline/relevance.py` validates shape and scores. |
 | `config/risk_weights.yaml` | **Created 2026-08-29 (Phase 8):** 36-signal catalog + [BACKTESTED] weights + stateful list + markets-fetcher exemptions, copied from `analysis/backtest_weights.py`. Consumed by the Phase 11 scorer and the startup coverage check. |
 | `docs/` + `RUNBOOK.md` | **Phase 10:** OPERATIONS.md, ADDING_SOURCES.md, TROUBLESHOOTING.md; RUNBOOK.md is the go-live sequence (commit → secrets → state bootstrap → send-test → collect-test-expects-failure → pipeline → 3-run gate → 1-week gate). |
 | `config/settings.yaml` | Drafted 2026-08-01. Values marked `[BACKTESTED]` must not be changed without re-running `analysis/backtest_weights.py`. |
@@ -378,6 +379,25 @@ POSTMORTEMS.md top entry. Fixes:
    weapons; when unsure between keeping and dropping, drop.
 4. **Router breaker-skip logged once per provider per run** (was 54 lines/run).
 
+## Session 9c (2026-08-30) — owner decision: relevance FILTERS, importance SORTS, count is dynamic
+
+Validated by two independent pro-agent evaluations of the 9 delivered events
+(labels aggregated by the orchestrator; disagreements reconciled: Mecca pact =
+pass, Ben Gvir prison = drop). Design: an event whose highest relevance tier
+(`config/relevance.yaml`: `iran_direct` 8 / `strategic` 4 / `economy` 3) is
+below `min_relevance` (3) never reaches the digest — `pipeline/relevance.py`
+matches deterministically (zero LLM calls) over headline+summary+entities. The
+keyword lists carry the evaluators' calibrations (travel-advisory instrument
+terms, the regional state ring) and deliberately exclude blotter magnets
+(بازداشت، سلاح، بمب، نتانیاهو — they caught only noise in the evaluation).
+Within the gate, importance (restored category 6/4/3/2/0 + corroboration +
+tier + recency) sorts; `min_score` 8 is the importance floor; the shown count
+is whatever survives both — `max_messages` 3 → 6 as a safety valve only.
+`chosen.csv` gains the `relevance_dropped` fate. Suite 532 → **545**.
+Detection is not relevance: a commentary piece mentioning Iran still matches
+`iran_direct` — the understand prompt's commentary rule is the first defense.
+Real calibration still needs the clean-run CSVs.
+
 ## Phases 6–10 (2026-08-29) — v1 CODE COMPLETE. Suite 522, 0 failed, shim-verified
 
 - Owner's mandate this session: push to done. Built per briefs: Phase 6 Understand
@@ -413,17 +433,17 @@ POSTMORTEMS.md top entry. Fixes:
 ## Pending / unresolved
 
 - [ ] **NEXT SESSION — owner workflow: push → verify → analysis.** The session-9
-      + 9b batches (suite 532) are the unpushed work: `git show
+      + 9b + 9c batches (suite 542) are the unpushed work: `git show
       origin/main:src/agent/llm/call.py | findstr provider.timeout` and
       `git show origin/main:src/agent/pipeline/collect.py | findstr date_only_max_age_hours`
-      must both print; CI must be green at 532. Then the analysis session, on a
+      must both print; CI must be green at 542. Then the analysis session, on a
       CLEAN run only (the first two runs' CSVs are polluted by provider
       cascades): owner downloads run-reports (read / chosen / summaries / run),
-      posts them; tune `digest_rank.min_score`, category weights,
-      `cluster_similarity_threshold` (0.62 is now proven too strict: 67 items →
-      51 clusters, 11 dropped by cap), source pruning -- all owner-editable YAML.
-      Gates in progress: 3-run gate, 1-week gate, 60-day cron reset (RUNBOOK.md
-      §6–8).
+      posts them; tune `digest_rank.min_score`, `config/relevance.yaml` keyword
+      tiers, `cluster_similarity_threshold` (0.62 is now proven too strict: 67
+      items → 51 clusters, 11 dropped by cap), source pruning -- all
+      owner-editable YAML. Gates in progress: 3-run gate, 1-week gate, 60-day
+      cron reset (RUNBOOK.md §6–8).
 - [ ] **Batch-2 accepted edges, self-correcting ≤2026-09-02.** First run after
       deploy had no delivered markers for the last 72h (one near-duplicate may
       re-surface); format_split truncation over-marks lowest-priority items

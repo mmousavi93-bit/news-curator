@@ -1,0 +1,143 @@
+# Digest-ranking relevance tiers (owner-editable).
+#
+# Owner decision 2026-08-30: digest order is relevance-to-Iran first,
+# category second. This file is a DETERMINISTIC, zero-LLM approximation of
+# "does this matter for Iranian people": the scorer matches these keywords
+# against the event's headline + summary + entities (already produced by
+# the understand stage) and adds the highest matching tier's weight to the
+# digest score. No new LLM calls. Identical input -> identical order.
+#
+# Three tiers, highest match wins (not additive):
+#   iran_direct  - the event names Iran or Iranian institutions directly.
+#   strategic    - regional war/military/diplomatic developments that shape
+#                  Iran's security environment even when Iran is not named
+#                  (the Mecca Defense Pact case: no "Iran" in the text, but
+#                  a Turkish-Saudi-Pakistani defense alignment is exactly
+#                  what an Iranian reader needs at the top).
+#   economy      - global markets/sanctions/oil moves that hit Iranian
+#                  wallets.
+# Anything matching no tier gets no bonus -- category and recency decide.
+#
+# Keywords are Persian AND English (entities can arrive in either; the
+# output contract says Persian, the fallback model does not always obey).
+# Matching is case-insensitive substring. Persian spelling follows the
+# output contract (ی/ک, never ي/ك). Add variants here -- no code change.
+weights:
+  iran_direct: 8
+  strategic: 4
+  economy: 3
+
+# FILTER threshold (owner decision 2026-08-30, session 9c-v2): an event whose
+# highest matched tier is BELOW this never reaches the digest -- relevance is a
+# gate, importance is the sort. Default 3 = economy tier passes (macro moves
+# matter). Set 4 for strategic-only, 8 for Iran-direct-only.
+min_relevance: 3
+
+keywords:
+  iran_direct:
+    - "ایران"
+    - "ایرانی"
+    - "تهران"
+    - "سپاه"
+    - "پاسدار"
+    - "خامنه"
+    - "رهبری"
+    - "جمهوری اسلامی"
+    - "خلیج فارس"
+    - "تنگه هرمز"
+    - "iran"
+    - "iranian"
+    - "tehran"
+    - "irgc"
+    - "khamenei"
+    - "persian gulf"
+    - "strait of hormuz"
+  strategic:
+    # Calibrated 2026-08-30 by two independent pro-agent evaluations of the 9
+    # delivered events (labels aggregated by the orchestrator). The regional
+    # "ring" states ride here deliberately: E4/E6 (the MUST-class events)
+    # carry them. DELIBERATELY ABSENT -- blotter magnets that caught only
+    # DROPs in the evaluation: بازداشت (arrest), سلاح/اسلحه (weapon), بمب
+    # (bomb), نتانیاهو (a person is not a signal), نشست/وزیران (routine
+    # diplomacy floods). The evaluation also left زندانی/اسیر out: the Ben
+    # Gvir prison item split the evaluators, and the owner's rule is drop
+    # when unsure.
+    - "جنگ"
+    - "حمله"
+    - "موشک"
+    - "پهپاد"
+    - "هسته‌ای"
+    - "اتمی"
+    - "پیمان"
+    - "دفاع"
+    - "نظامی"
+    - "ارتش"
+    - "آتش‌بس"
+    - "جنگنده"
+    - "نفتکش"
+    - "محاصره"
+    - "بمباران"
+    - "تسلیحات"
+    - "پدافند"
+    - "هشدار سفر"
+    - "ممنوعیت سفر"
+    - "وزارت خارجه"
+    - "ائتلاف"
+    - "حزب‌الله"
+    - "لبنان"
+    - "بحرین"
+    - "اردن"
+    - "عربستان"
+    - "سوریه"
+    - "عراق"
+    - "یمن"
+    - "پاکستان"
+    - "ترکیه"
+    - "قطر"
+    - "امارات"
+    - "کویت"
+    - "war"
+    - "strike"
+    - "missile"
+    - "drone"
+    - "nuclear"
+    - "military"
+    - "defense"
+    - "navy"
+    - "blockade"
+    - "bombing"
+    - "arms deal"
+    - "air defense"
+    - "travel advisory"
+    - "travel warning"
+    - "state department"
+    - "coalition"
+    - "hezbollah"
+    - "lebanon"
+    - "bahrain"
+    - "jordan"
+    - "saudi"
+    - "syria"
+    - "iraq"
+    - "yemen"
+    - "pakistan"
+    - "turkey"
+    - "qatar"
+    - "uae"
+    - "kuwait"
+  economy:
+    - "نفت"
+    - "اوپک"
+    - "ریال"
+    - "ارز"
+    - "دلار"
+    - "طلا"
+    - "بورس"
+    - "تورم"
+    - "تحریم"
+    - "oil"
+    - "opec"
+    - "rial"
+    - "gold"
+    - "inflation"
+    - "sanctions"

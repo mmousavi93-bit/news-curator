@@ -94,10 +94,12 @@ class ComposeStage:
             self._logger.info("compose: no events -- honest one-liner")
             return
 
-        kept, dropped = rank_events(
-            events, clusters, ctx.config.credibility, settings, ctx.now, self._logger
+        kept, dropped, gated = rank_events(
+            events, clusters, ctx.config.credibility, settings, ctx.now,
+            self._logger, ctx.config.relevance,
         )
         ctx.rank_dropped = dropped
+        ctx.relevance_dropped = gated
 
         if not kept:
             # Everything fell below the importance threshold: the honest

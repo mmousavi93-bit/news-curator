@@ -106,7 +106,7 @@ digest_rank:
   size_boost_per_member: 0.1
   size_boost_cap: 1.0
   min_score: 8
-  max_messages: 3
+  max_messages: 6
   repeat_window_hours: 72
 
 delivery:

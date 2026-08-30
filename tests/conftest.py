@@ -52,7 +52,8 @@ def tmp_config_dir(tmp_path: Path) -> Path:
     dest.mkdir()
     shutil.copy(fixtures_dir / "settings_minimal.yaml", dest / "settings.yaml")
     repo_root = Path(__file__).parent.parent
-    for name in ("credibility.yaml", "sources.yaml", "topics.yaml", "risk_weights.yaml"):
+    for name in ("credibility.yaml", "sources.yaml", "topics.yaml", "risk_weights.yaml",
+                 "relevance.yaml"):
         shutil.copy(repo_root / "config" / name, dest / name)
     prompts_dir = dest / "prompts"
     prompts_dir.mkdir()
