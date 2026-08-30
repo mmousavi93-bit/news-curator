@@ -117,7 +117,14 @@ pipeline:
 
   # Cosine similarity for agglomerative clustering. UNTUNED — placeholder until
   # Phase 10 measures it on real multilingual data. Expect to change.
-  cluster_similarity_threshold: 0.62
+  # PROVISIONAL 2026-08-30 (run-review iteration 2): 0.62 measured too
+  # strict -- 67→51 and 83→60 clusters (1.3-1.4 items/cluster), the 40-cap
+  # dropping 11-20 stories per run BEFORE the LLM stage, and on cascade days
+  # (3 of 3 runs today) every fragment wastes a Groq call (~13/run ceiling).
+  # Lower = more merging = fewer clusters = more coverage per LLM call; too
+  # low = distinct stories merged into one summary. 0.55 is a first step,
+  # owner-editable -- nudge again after the clean-run CSVs arrive.
+  cluster_similarity_threshold: 0.55
 
   # Matching a new cluster to an already-open event in memory.
   event_match_threshold: 0.55

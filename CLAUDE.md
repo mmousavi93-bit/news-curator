@@ -440,10 +440,10 @@ Real calibration still needs the clean-run CSVs.
       CLEAN run only (the first two runs' CSVs are polluted by provider
       cascades): owner downloads run-reports (read / chosen / summaries / run),
       posts them; tune `digest_rank.min_score`, `config/relevance.yaml` keyword
-      tiers, `cluster_similarity_threshold` (0.62 is now proven too strict: 67
-      items → 51 clusters, 11 dropped by cap), source pruning -- all
-      owner-editable YAML. Gates in progress: 3-run gate, 1-week gate, 60-day
-      cron reset (RUNBOOK.md §6–8).
+      tiers, `cluster_similarity_threshold` (0.62 proven too strict — 67→51 and
+      83→60 clusters; set 0.55 PROVISIONAL 2026-08-30, re-tune on clean CSVs),
+      source pruning -- all owner-editable YAML. Gates in progress: 3-run gate,
+      1-week gate, 60-day cron reset (RUNBOOK.md §6–8).
 - [ ] **Batch-2 accepted edges, self-correcting ≤2026-09-02.** First run after
       deploy had no delivered markers for the last 72h (one near-duplicate may
       re-surface); format_split truncation over-marks lowest-priority items

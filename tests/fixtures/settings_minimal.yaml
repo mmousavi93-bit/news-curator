@@ -22,7 +22,7 @@ collection:
 pipeline:
   max_clusters_per_run: 40
   max_vision_calls_per_run: 10
-  cluster_similarity_threshold: 0.62
+  cluster_similarity_threshold: 0.55
   event_match_threshold: 0.55
   vision_min_image_bytes: 20000
   embed_model: "paraphrase-multilingual-MiniLM-L12-v2"

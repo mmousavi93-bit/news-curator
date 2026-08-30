@@ -111,6 +111,23 @@ def test_irrelevant_cluster_is_dropped():
     assert any("content filter" in m for m in log.messages)
 
 
+def test_unavailable_skip_lines_collapse_after_first():
+    # 2026-08-30: 27 identical "skipped (status=unavailable)" lines in one
+    # run. The first names the evidence; the rest collapse into one count.
+    from agent.llm.errors import UNAVAILABLE
+
+    stage, log = _stage()
+    failing = LlmResult(ok=False, status=UNAVAILABLE, provider="gemini")
+    clusters = [_cluster([_item(f"https://x/u/{i}", T0)]) for i in range(3)]
+    ctx = _Ctx(clusters=clusters, router=_StubRouter([failing]))
+    stage.run(ctx)
+    assert ctx.events == []
+    per_cluster = [m for m in log.messages
+                   if m.startswith("understand: cluster") and "skipped" in m]
+    assert len(per_cluster) == 1  # only the first names a cluster key
+    assert any("2 more cluster(s) skipped" in m for m in log.messages)
+
+
 def test_clickbait_cluster_is_dropped():
     stage, _ = _stage()
     ctx = _Ctx(clusters=[_cluster([_item("https://x/1", T0)])],

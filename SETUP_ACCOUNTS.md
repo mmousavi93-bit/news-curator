@@ -32,17 +32,25 @@ Go to **https://console.groq.com**, sign up with Google or GitHub, open **API Ke
 
 Save as: `GROQ_API_KEY`
 
-## 3. OpenRouter — the emergency parachute (3 min, optional)
+## 3. OpenRouter — the emergency parachute (3 min, recommended)
 
 Only fires if both Gemini and Groq are down at once. Its free tier allows just 50 requests a
-day, so it cannot carry the system — it exists to prevent total silence.
+day, so it cannot carry the system — it exists to prevent total silence. Recommended since
+2026-08-30: both primaries died the same day, three runs in a row (Gemini 503s, Groq's
+free-tier ceiling).
 
-Go to **https://openrouter.ai**, sign up, **Keys** → **Create Key**. Do not add a payment
-method. Starts with `sk-or-`.
+Go to **https://openrouter.ai**, sign up (email or Google), **Keys** → **Create Key**.
+Do not add a payment method — free models need zero balance. The key starts with `sk-or-`.
 
 Save as: `OPENROUTER_API_KEY`
 
-Skip this if you want. The system works with the first two.
+The pipeline calls the free model named in `config/settings.yaml` (`providers.openrouter.model`,
+currently `meta-llama/llama-3.1-8b-instruct:free`). OpenRouter's free roster rotates weekly:
+if a run ever logs a model-not-found error from openrouter, open
+**https://openrouter.ai/models?q=free** and put any model marked FREE into that YAML line.
+
+If signup is blocked from your network, use the same access path you used for the Gemini and
+Groq accounts.
 
 ## 4. Telegram bot (5 min)
 
@@ -109,7 +117,7 @@ matter.
 |---|---|
 | `GEMINI_API_KEY` | 1 |
 | `GROQ_API_KEY` | 2 |
-| `OPENROUTER_API_KEY` | 3, optional |
+| `OPENROUTER_API_KEY` | 3, recommended |
 | `TELEGRAM_BOT_TOKEN` | 4 |
 | `TELEGRAM_CHAT_ID` | 4 |
 | `AGE_PRIVATE_KEY` | 6, later |
