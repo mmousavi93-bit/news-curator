@@ -77,6 +77,7 @@ class UnderstandStage:
         events: list[Event] = []
         cluster_fates: list[tuple[str, str]] = []
         saw_success = False
+        unavailable_total = 0
         for index, cluster in enumerate(clusters):
             result = ctx.router.complete(
                 render_prompt(self._template, cluster, self._body_chars),
@@ -96,9 +97,14 @@ class UnderstandStage:
                         (c.key, "cap_refused") for c in clusters[index:]
                     )
                     break
-                self._logger.error(
-                    "understand: cluster %s skipped (status=%s)", cluster.key, result.status
-                )
+                unavailable_total += 1
+                if unavailable_total == 1:
+                    # One per-cluster line names the evidence; the rest are
+                    # the same sentence with a different hash (2026-08-30:
+                    # 27 identical lines in one run's log).
+                    self._logger.error(
+                        "understand: cluster %s skipped (status=%s)", cluster.key, result.status
+                    )
                 cluster_fates.append((cluster.key, result.status))
                 continue
             saw_success = True  # the AI answered; parse quality is separate
@@ -126,6 +132,11 @@ class UnderstandStage:
 
             events.append(self._build_event(cluster, parsed, ctx.now))
 
+        if unavailable_total > 1:
+            self._logger.error(
+                "understand: %d more cluster(s) skipped (status=unavailable)",
+                unavailable_total - 1,
+            )
         ctx.events = events
         ctx.cluster_fates = cluster_fates
         # Honesty flag for the composer: clusters existed but NO LLM call

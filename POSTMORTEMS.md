@@ -5,6 +5,33 @@ session; this file does not. Nothing here is deleted or condensed — it is the 
 record of what broke, why, and what rule came out of it. Read it when working on the
 phase or subsystem it covers. CLAUDE.md keeps the operational core and points here.
 
+## 2026-08-30 (session 9d) — first CI run with 9b+9c live: fixes observed, cascade day 3
+
+The 16:04 UTC pipeline run was the first production execution of the session-9b/9c
+batch. Every new mechanism fired and is visible in the log: 22 stale date-only items
+dropped at collect (the Lebanon-loop fix), 1 event gated by `min_relevance` (the new
+`relevance_dropped` fate in chosen.csv), breaker-skip lines collapsed. Suite 545 → 546.
+
+Two standing findings, one acted on:
+
+1. **Fragmentation worsened: 83 items → 60 clusters (1.38/cluster), 20 dropped by
+   the 40-cap** — before the LLM stage even started. On a cascade day this is
+   compounding: capacity (Groq ~13 calls) is spent on fragments while real stories
+   die at the cap. ACTED: `cluster_similarity_threshold` 0.62 → **0.55,
+   PROVISIONAL**, owner-editable, with the trade-off written into the settings.yaml
+   comment. Real tuning still owes the clean-run CSVs.
+2. **Groq pacing is mathematically incapable of fixing the ceiling.** 12 calls in
+   ~25s ≈ 12K tokens/min against a per-minute wall; pacing at any RPM below the
+   wall changes burstiness, never the 60s token budget. The ceiling stands as the
+   accepted degradation floor (session 9). The real mitigations are fewer clusters
+   (item 1), the OpenRouter parachute key (owner signup — three cascade days in a
+   row make it urgent), and the third-provider decision with failure-rate data.
+
+Also: understand-stage "unavailable" lines collapsed (first names the cluster, rest
+counted) — the last of the per-cluster log spam. The delivered digest (1 event:
+Turkey's PKK casualty-list publication) is a defensible SHOULD via the regional
+ring — no keyword change without more evidence.
+
 ## 2026-08-30 (session 9b) — owner's local run reviewed end-to-end; 4 fixes shipped
 
 Owner ran `python -m agent.run --db state.db` manually (13:26 Tehran) and pasted log +
