@@ -5,6 +5,57 @@ session; this file does not. Nothing here is deleted or condensed — it is the 
 record of what broke, why, and what rule came out of it. Read it when working on the
 phase or subsystem it covers. CLAUDE.md keeps the operational core and points here.
 
+## 2026-08-30 (session 9g) — run-4 gate forensics: one over-cut, root cause a merge error
+
+The owner's run-4 CSVs let the gate's decisions be judged against actual text for
+the first time. Verdict: 3 of 4 cuts correct (Sydney Marathon protest = off-mission;
+haaretz 6.9 would have dropped on importance anyway; walla politics = domestic).
+The fourth was a REAL over-cut: the mee security singleton (importance 10.99) was
+the British-activist abduction by armed Israeli settlers in Masafer Yatta — genuine
+regional security news, gated because «اسرائیل» was MISSING from the relevance
+keyword tiers. Root cause: the evaluators' keyword notes assumed اسرائیل existed
+("Israel-actor coverage should ride on اسرائیل + instrument tokens"); I dropped it
+when merging the lists into relevance.yaml. Fixed: اسرائیل/israel added to the
+strategic ring, with the trade-off stated in the file — it gates in ALL Israel
+items (including street crime), and the crime-blotter defense is the understand
+prompt's routine-crime rule; the digest prefers a rare leaked blotter item over
+permanent blindness to West-Bank/settler violence. Suite 547 unchanged.
+
+Also settled: the «رور اخبار» header in the owner's paste is a copy-paste artifact —
+labels.py carries the correct «مرور اخبار». The sent item (Iran's ambassador
+delivering Araghchi's letter to Iraq's FM) is exactly the product's job.
+
+Lesson for the analysis session: gate forensics need TEXT, not scores — chosen.csv
+has no headline/summary, so over-cut detection required matching read.csv rows by
+source. Consider adding headline/summary to chosen.csv in the tuning round.
+
+## 2026-08-30 (session 9f) — run 5: 9e verified in CI; OpenRouter 404'd a SECOND time
+
+The 16:56 CI run verified every session-9e fix in production: the stage-unavailable
+line logged once, the understand collapse (1 + "N more"), breaker skips once per
+provider, threshold 0.55 (31 items → 21 clusters, no cap drop), relevance gate live
+(4 of 5 events gated). Gemini remains degraded (a 503 that took 18s to arrive, then a
+20s hang — both classes in one run, day 4). Groq walked its per-minute wall visibly:
+successes interleaved with 429s (14 successes / 4 429s) — the ceiling is a 60-second
+token budget, not a call count, and the interleaving is the wall recovering.
+
+**OpenRouter 404'd a SECOND time — on the replacement ID.** `qwen/qwen3.6-plus:free`
+returned 404 on its first live use, exactly like the delisted llama-3.1. Two IDs in a
+row raises the alternative hypothesis: OpenRouter may return 404 (not 402) for
+zero-balance keys on free models, or the free roster genuinely turns over this fast —
+agent-searched mirrors are no longer reliable evidence either way. The empirical test
+is the owner's browser: open openrouter.ai/models?q=free, take the FIRST model marked
+FREE, put it in settings.yaml. A live-list model that still 404s = balance policy on
+zero-balance keys = the parachute is dead under constraint 1, and the third-provider
+question reopens on the DeepSeek free-allotment cascade path (with failure-rate data).
+
+Gate evidence, both directions: run 3's gated pair scored 10.9 and 10.9 on importance
+(mee and al_jazeera security singles — no keyword match) — the bluntness of keyword
+gates on real regional security stories is now measurable, and run 4 gated 4 of 5
+events. Calibration on the clean-run CSVs is what decides whether the gate over-cuts;
+until then it is working as designed, and the digest's promise is omission, not
+coverage.
+
 ## 2026-08-30 (session 9e) — run 4: threshold validated, OpenRouter went live and 404'd
 
 The 16:35 UTC run (owner's local, post-push) proved three things at once:
