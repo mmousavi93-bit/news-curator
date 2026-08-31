@@ -37,8 +37,8 @@ from pathlib import Path
 _REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(_REPO_ROOT / "src"))
 
+from agent.pipeline.contract import extract_json, within_bounds  # noqa: E402
 from agent.pipeline.langgate import is_persian_output  # noqa: E402
-from agent.pipeline.understand import _extract_json, within_bounds  # noqa: E402
 
 _CATEGORIES = frozenset({"military", "security", "politics", "economy", "other"})
 _REQUIRED_FIELDS = ("headline", "summary", "category")
@@ -86,7 +86,7 @@ DEFAULT_MODELS = (
 )
 
 
-def check_response(payload: dict, expected_category: str) -> tuple[bool, str]:
+def check_response(payload: dict, expected_category: str, raw_len: int = 0) -> tuple[bool, str]:
     """Deterministic quality verdict for one parsed response. Returns
     (ok, reason). Pure -- the unit tests exercise this directly."""
     for field in _REQUIRED_FIELDS:
@@ -103,7 +103,7 @@ def check_response(payload: dict, expected_category: str) -> tuple[bool, str]:
         return False, f"bad category {category!r}"
     if not is_persian_output(headline + "\n" + summary):
         return False, "non-Persian output"
-    ok_bounds, bounds_reason = within_bounds(payload)
+    ok_bounds, bounds_reason = within_bounds(payload, raw_len=raw_len)
     if not ok_bounds:
         return False, bounds_reason
     text = (headline + " " + summary).casefold()
@@ -179,13 +179,14 @@ def probe_model(model: str, api_key: str, template: str) -> list[dict]:
             row["check_reason"] = f"http {row['http']} {row['error']}"
         else:
             try:
-                payload = _extract_json(result.get("text", ""))
+                payload = extract_json(result.get("text", ""))
             except ValueError as exc:
                 payload = None
                 row["check"] = "FAIL"
                 row["check_reason"] = f"unparseable JSON: {exc}"
             if payload is not None:
-                ok, reason = check_response(payload, expected_category)
+                ok, reason = check_response(
+                    payload, expected_category, raw_len=len(result.get("text", "")))
                 row["check"] = "PASS" if ok else "FAIL"
                 row["check_reason"] = reason
         rows.append(row)

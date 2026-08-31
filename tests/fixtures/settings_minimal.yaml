@@ -5,10 +5,10 @@ version: 1
 
 schedule:
   timezone: "Asia/Tehran"
-  pipeline_cron: "0 */3 * * *"
-  digest_cron: "0 7 * * *"
-  canonical_daily_run: "07:00"
-  lookback_hours: 6
+  pipeline_cron: "30 8,11,14,17,20 * * *"
+  digest_cron: "30 5 * * *"
+  canonical_daily_run: "09:00"
+  lookback_hours: 12
 
 collection:
   max_items_per_source: 20

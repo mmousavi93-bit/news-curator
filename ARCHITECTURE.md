@@ -3,7 +3,7 @@
 Status: **awaiting approval**. No implementation code until this is signed off.
 
 Owner constraints locked: public GitHub repo, encrypted state, 8 pipeline runs/day plus a
-07:00 Asia/Tehran daily digest, zero paid services, zero credit cards, owner's PC always off.
+09:00 Asia/Tehran daily digest, zero paid services, zero credit cards, owner's PC always off.
 
 ---
 
@@ -47,7 +47,7 @@ failure mode. SQLite holds the records, NumPy does the maths.
 ## 1. System diagram
 
 ```
-                        GitHub Actions cron  (*/3 hours, plus 07:00 digest job)
+                        GitHub Actions cron  (09:00 Tehran digest + every 3h through 00:00 Tehran)
                                       |
                                       v
         +---------------------------------------------------------------+
@@ -198,7 +198,7 @@ degrades the run to "collect and store only, deliver nothing" rather than crashi
 news-curator/
 ├── .github/workflows/
 │   ├── pipeline.yml            # every 3 hours
-│   ├── digest.yml              # 07:00 Asia/Tehran
+│   ├── digest.yml              # 09:00 Asia/Tehran
 │   └── tests.yml               # on push / PR
 ├── config/
 │   ├── sources.yaml            # THE file the owner edits to add feeds

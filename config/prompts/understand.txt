@@ -44,6 +44,11 @@ Rules:
   cases. Exception only when the case involves terrorism, organised
   violence, or weapons that bear on national security -- then it is
   `security`.
+- Commemorative or ceremonial announcements report no operational fact:
+  national-day celebrations, memorials, anniversaries, award ceremonies,
+  public-relations events. Mark them `irrelevant` UNLESS the item unveils
+  new weapons or equipment or reports concrete military action during
+  the event.
 - When genuinely unsure between keeping and dropping, drop. A digest earns
   trust by omission.
 - Never invent facts or numbers. Never dramatise. Never praise or attack

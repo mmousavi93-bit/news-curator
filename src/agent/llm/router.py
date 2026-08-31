@@ -31,6 +31,7 @@ from agent.llm.call import _OK, _SAME, Provider, attempt
 from agent.llm.errors import FATAL, REFUSED_CAP, UNAVAILABLE, LlmResult
 from agent.llm.limits import CallBudget, ProviderBudget, RpmPacer
 from agent.llm.providers import DEFAULT_TIMEOUT, ImageInput, ProviderAdapter
+from agent.llm.stats import ProviderStats
 from agent.llm.transport import HttpTransport, RequestsHttpTransport
 from agent.util.logging import get_logger
 
@@ -80,6 +81,8 @@ class Router:
                 timeout=timeout_map.get(p.name, DEFAULT_TIMEOUT),
             ) for p in providers
         ]
+        # Per-provider attempt counters, rendered into run.csv (report_csv).
+        self.stats = ProviderStats(p.name for p in self._providers)
 
     # -- budget helpers (pipeline: priority-ordered spending) --------------
 
@@ -172,6 +175,7 @@ class Router:
                 logger=self._logger,
             )
             attempts += 1
+            self.stats.record(name, outcome == _OK)
 
             if outcome == _OK:
                 self._breaker.success(name)

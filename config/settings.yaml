@@ -15,26 +15,31 @@ version: 1
 schedule:
   timezone: "Asia/Tehran"
 
-  # Pipeline runs every 3 hours (8/day). Owner chose per-run delivery over
-  # threshold-only. Runs with no score change send a short honest one-liner.
-  pipeline_cron: "0 */3 * * *"
+  # OWNER SCHEDULE 2026-08-30 (all times Iran time; crons below are UTC --
+  # Tehran is UTC+3:30 fixed, no DST): daily digest at 09:00 Tehran, then
+  # every 3 hours (12:00/15:00/18:00/21:00/00:00), silent midnight-09:00.
+  # 6 runs/day. The digest run is the 09:00 one.
+  pipeline_cron: "30 8,11,14,17,20 * * *"
 
   # DECISION 1 — the canonical daily evaluation.
   #
   # The scoring rulebook is day-granular: AGE is in whole days, half-lives are in
   # days, and Step 12 counts "7 consecutive DAILY evaluations". Running 8x/day
-  # made that ambiguous (7 days or 56 runs?). Resolved: the 07:00 digest run is
-  # THE daily evaluation. Regime counters, the trailing 7-day mean, and novelty
-  # cycles advance only there.
+  # made that ambiguous (7 days or 56 runs?). Resolved: the 09:00 Tehran digest
+  # run is THE daily evaluation. Regime counters, the trailing 7-day mean, and
+  # novelty cycles advance only there.
   #
   # Intra-day runs still compute and report scores — a new signal dated today
   # gets AGE 0 and registers within 3 hours — but they never advance regime state.
   # This keeps WARTIME entry/exit deterministic.
-  digest_cron: "0 7 * * *"
-  canonical_daily_run: "07:00"
+  digest_cron: "30 5 * * *"   # 09:00 Asia/Tehran
+  canonical_daily_run: "09:00"
 
-  # A skipped or delayed GitHub cron must not lose data.
-  lookback_hours: 6
+  # Declared but NOT consumed by code (2026-08-30): collect has no
+  # publish-age filter for timestamped items -- dedup against url_hashes
+  # handles late/silent-window items. If an age filter is ever added, keep
+  # this >= 9 (the silent-window gap).
+  lookback_hours: 12
 
 # ---------------------------------------------------------------------------
 # COLLECTION
@@ -277,7 +282,7 @@ markets:
 llm:
   # OWNER DECISION 2026-08-29 (session 8): ceiling = 51 -- the worst case
   # (40 clusters + 10 vision + 1 compose). The owner's rule: keep the
-  # project free, use the free tools' caps. 9 runs/day x 51 = 459 calls vs
+  # project free, use the free tools' caps. 6 runs/day x 51 = 306 calls vs
   # Gemini's 1,500 RPD; RPM 10 is paced proactively (llm/limits.py).
   # Enforcement is real, not advisory: llm/router.py refuses call N+1
   # before a request is built (CLAUDE.md constraint #2).

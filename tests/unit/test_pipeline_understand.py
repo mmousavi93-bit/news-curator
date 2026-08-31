@@ -127,6 +127,18 @@ def test_within_bounds_contract():
     assert "summary" in reason
 
 
+def test_within_bounds_catches_ramble_hiding_in_other_fields():
+    # 2026-08-30: a 3,114-token answer passed the field bounds because the
+    # essay was NOT in headline/summary. The raw-length cap catches it.
+    from agent.pipeline.understand import MAX_RESPONSE_CHARS, within_bounds
+    compliant_fields = {"headline": "حمله به یک کشتی", "summary": "جزئیات حادثه."}
+    ok, reason = within_bounds(compliant_fields, raw_len=MAX_RESPONSE_CHARS + 1)
+    assert ok is False
+    assert "too long" in reason
+    ok2, _ = within_bounds(compliant_fields, raw_len=500)
+    assert ok2 is True
+
+
 def test_extract_json_none_raises_value_error_not_attribute_error():
     # 2026-08-30: a provider returned 200 with content:null -> the parse
     # passed None through and .strip() crashed the whole run. None must be

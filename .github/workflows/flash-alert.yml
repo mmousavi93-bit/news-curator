@@ -1,0 +1,153 @@
+name: flash-alert
+
+# Tehran explosion + escalation flash monitor (owner 2026-08-30): ~15-min
+# scans, 24/7 by owner decision (the digest's midnight-09:00 silent window
+# does NOT apply to emergency alerts), ZERO LLM calls, fully deterministic.
+#
+# State = its OWN encrypted DB on its OWN `flash-state` orphan branch —
+# NEVER the pipeline's state branch: two workflows force-pushing one
+# branch race on lost updates, and the pipeline's push dance (git rm -rf)
+# deletes everything on its branch except its own one file (solver
+# analysis 2026-08-30).
+#
+# Constraint 14, scoped deviation (owner-approved design): FIRST boot may
+# create a fresh DB — safe because the 120-min freshness gate means empty
+# memory cannot fire old items. A decrypt FAILURE on an existing file
+# halts AND sends the system-down notice; it never boots empty over a
+# file it could not read.
+#
+# Cron is UTC; Tehran = UTC+3:30 fixed, no DST. 96 runs/day, free on a
+# public repo. The 60-day inactivity auto-disable applies here too — the
+# owner's repo-touch habit (RUNBOOK) keeps it alive.
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: flash-alert
+  cancel-in-progress: true  # a slow run must never starve the next tick
+
+permissions:
+  contents: write           # needed for the flash-state force-push
+
+jobs:
+  flash:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      # NO [embeddings] extra on purpose: this path has no models, no
+      # MiniLM download — pure latency would break the 15-min envelope.
+      - name: Install package (no embeddings)
+        run: pip install -e .
+
+      - name: Install age
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq age
+
+      - name: Fetch flash-state branch
+        run: |
+          git fetch origin flash-state --quiet || echo "no flash-state branch (first boot)"
+          # The redirect must NOT leave an empty file behind: an empty
+          # flash.db.age would pass the decrypt step's existence guard,
+          # fail age -d, and send the system-down alarm every 15 minutes
+          # forever (reviewer finding 2026-08-31).
+          if git show origin/flash-state:flash.db.age > flash.db.age 2>/dev/null; then
+            echo "flash.db.age fetched"
+          else
+            rm -f flash.db.age
+            echo "no flash.db.age (first boot)"
+          fi
+
+      # Constraint 14: a file that will not decrypt HALTS — and here it
+      # also ALERTS, because a silently dead emergency monitor is worse
+      # than no monitor (solver mode 6). The identity file is 0600 and
+      # removed immediately, same discipline as pipeline.yml.
+      - name: Decrypt flash state (halt + alert on failure)
+        env:
+          AGE_SECRET_KEY: ${{ secrets.AGE_SECRET_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
+          FLASH_CHANNEL_ID: ${{ secrets.FLASH_CHANNEL_ID }}
+        run: |
+          if [ ! -f flash.db.age ]; then
+            echo "first boot: no flash.db.age -- fresh DB is safe (freshness gate)"
+            exit 0
+          fi
+          umask 077
+          printf '%s\n' "$AGE_SECRET_KEY" > /tmp/age-key.txt
+          if ! age -d -i /tmp/age-key.txt -o flash.db flash.db.age; then
+            rm -f /tmp/age-key.txt
+            echo "FLASH DECRYPT FAILED -- sending system-down notice and halting"
+            python -m agent.flash.run_flash --system-down
+            exit 1
+          fi
+          rm -f /tmp/age-key.txt
+
+      - name: Run flash monitor
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
+          # Optional: owner moves alerts to their own channel by adding
+          # this ONE secret; unset -> digest channel (fallback in code).
+          FLASH_CHANNEL_ID: ${{ secrets.FLASH_CHANNEL_ID }}
+          NEWS_CURATOR_REPORT_DIR: flash-reports
+        # flash.ok gates the encrypt/push steps: a crashed or corrupt run
+        # must NOT re-encrypt over the branch's last good state.
+        run: python -m agent.flash.run_flash --db flash.db && touch flash.ok
+
+      - name: Encrypt flash state
+        if: always()
+        env:
+          AGE_PUBLIC_KEY: ${{ secrets.AGE_PUBLIC_KEY }}
+        run: |
+          if [ ! -f flash.ok ]; then
+            echo "run did not complete -- preserving last good state, skipping encrypt"
+            exit 0
+          fi
+          if [ ! -f flash.db ]; then
+            echo "no flash.db -- skipping encrypt"
+            exit 0
+          fi
+          age -r "$AGE_PUBLIC_KEY" -o flash.db.age.new flash.db && mv flash.db.age.new flash.db.age
+
+      # The tuning loop: matches/kills CSV per run, downloaded from the
+      # artifact — owner-visible evidence for YAML tuning.
+      - name: Upload flash tuning CSV
+        uses: actions/upload-artifact@v4
+        with:
+          name: flash-reports
+          path: flash-reports/*.csv
+          retention-days: 30
+          if-no-files-found: ignore
+
+      - name: Push flash-state branch
+        if: always()
+        run: |
+          if [ ! -f flash.ok ]; then
+            echo "run did not complete -- preserving last good state, skipping push"
+            exit 0
+          fi
+          if [ ! -f flash.db.age ]; then
+            echo "no flash.db.age -- nothing to push"
+            exit 0
+          fi
+          git config user.name "news-curator-bot"
+          git config user.email "news-curator-bot@users.noreply.github.com"
+          git fetch origin flash-state --quiet || true
+          git branch -D flash-state-upload 2>/dev/null || true
+          git checkout --orphan flash-state-upload --quiet
+          git rm -rf . --quiet || true
+          cp flash.db.age flash-state.db.age
+          mv flash-state.db.age flash.db.age
+          git add -f flash.db.age
+          git commit -m "flash state $(date -u +%Y-%m-%dT%H:%M:%SZ)" --quiet
+          git push -f origin flash-state-upload:flash-state --quiet
+          git checkout -f main --quiet
+          git branch -D flash-state-upload --quiet
