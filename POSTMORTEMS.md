@@ -5,6 +5,79 @@ session; this file does not. Nothing here is deleted or condensed — it is the 
 record of what broke, why, and what rule came out of it. Read it when working on the
 phase or subsystem it covers. CLAUDE.md keeps the operational core and points here.
 
+## 2026-08-31 (session 9o) — the supply batch: cooldown, cap 70, labeled Chinese rung
+
+Owner decision ("go 1 & 2" + "chinese ones to get at least sthh, but label them"):
+1. **429 cooldown.** A per-minute token wall is a waiting room, not sickness.
+   `CooldownRegister` (breaker.py): a 429'd provider rests 30s; others serve;
+   if ALL remaining providers are cooling, the loop proceeds anyway (a run
+   with only groq alive must not give up on one 429). `LlmResult.http_status`
+   now carries the transport status; the 9n dedicated-429 branch sets it
+   (first attempt set it only in the 404/500 branch -- the tests caught it).
+   16 wasted calls/run was the measured cost of retrying into the wall.
+2. **`max_calls_per_run` 51 -> 70.** Evidence: the 13:03 run exhausted 51
+   calls having processed 21 of 40 clusters while groq was still answering.
+   70 x 6 runs = 420/day vs Gemini's 1,500 RPD. Session-8 owner number
+   superseded with new evidence, same arithmetic discipline.
+3. **DeepSeek as the LABELED last rung -- via the bai gateway.** The owner
+   added deepseek to his bai services, so the direct-signup path is MOOT
+   (no DEEPSEEK_API_KEY, no signup gate). Shipped instead: a SECOND provider
+   entry on the same gateway -- `bai_deepseek` -- its own adapter name (so
+   the CSVs read `provider=bai_deepseek`, traceable apart from the qwen
+   rung), its own breaker and pacing, sharing BAI_API_KEY. Order: gemini,
+   groq, bai, bai_deepseek, openrouter (openrouter absolute last -- dead
+   policy must not tax the budget first). Quality flags on record
+   (analysis/deepseek_v4_eval.md): its events are SOMETHING, not trust; the
+   model id (`deepseek-v4-flash`) is the gateway's listing and the owner
+   verifies it against the b.ai console. The direct DeepSeekAdapter stays
+   registered (tested, zero cost) for the day the gateway path dies.
+4. Split shipped with it: router.py crossed the 200-line cap (stats, health,
+   cooldown -- 224) -> `failover.py` owns the loop (127), router owns the
+   machine (125). Suite 669 -> **674**, shim-green.
+5. **The probe now measures the GATEWAY, not OpenRouter.** Owner: "we have
+   all models in bai" -- the whole free roster is served there with no
+   quota, no balance policy, no rotation. tools/probe_free_models.py gained
+   a --gateway flag (openrouter | bai) with the b.ai roster as default
+   (BAI_MODELS, gpt-5.2 absent -- paid); probe-models.yml takes a gateway
+   input. The cascade stays at 5 rungs by design: a 12-deep cascade is
+   budget-toxic and dilutes provenance -- the gateway gets MEASURED, the
+   winner gets WIRED. Wrong model ids self-diagnose: the probe's http
+   column shows exactly which ids the console spells differently.
+   Suite 674 -> 676.
+
+## 2026-08-31 (run 13:03 UTC) — first capacity-bound day; every 9n feature verified live
+
+War-volume day: 175 new items -> 69 clusters -> cap kept 40 -> budget processed 21.
+Both binding constraints fired in one run for the first time. The honest number:
+48 of 69 clusters never reached an LLM (29 dropped by the cluster cap, 19 skipped
+when the 51-call budget exhausted). The digest still shipped 10 events + 5 raw-title
+fallbacks (2,984 chars) -- the product survives its worst load, thinner than the day
+deserved.
+
+Every session-9n feature is visible working in this run: health-aware cascade (groq
+opened the run -- gemini demoted from yesterday), langretry ("retried -- Persian
+recovered"), raw-title fallback (the ⚠️ footer with honest labels), same-run dup
+collapse (11 repeats), 403-breaker (openrouter skipped after two), budget refusal
+(clean degradation at cap), stale date-only drop (28).
+
+Budget churn measured: 51 calls for 21 clusters = 2.4 calls/cluster (healthy: ~1.1).
+The tax: 16 groq 429s (wall thrash -- rotating to dead gemini/bai and back) and
+3 bai timeouts at exactly 45s (~135s + 3 clusters). bai's recovered value is anyway
+low -- its one success was a 2,847-token ramble. No code change: the pacer, breaker
+and budget behaved as designed; the ceiling is the free-tier supply, and the answer
+to that is the labeled pilot, not another knob.
+
+Digest quality: strong. UAE drone shootdown with the unconfirmed US-drone claim
+properly attributed, Trump's 52k-vs-100k contradiction caught in the summary, Mecca
+pact's first meeting delivered, Pezeshkian's SCO meetings (the keyword fix working),
+Iraq disarmament timeline. Two leak-class items to calibrate in the analysis
+session: the Israeli military-pharmacists arrest (qwen ignored the routine-crime
+rule -- second instance of the class) and the East Jerusalem schools item
+(marginal relevance via the Israel ring keyword). The fallback footer treating the
+BREAKING ballistic-missile Telegram title as raw-and-unlabeled is correct behaviour.
+
+This run's CSVs are cascade/cap-polluted again -- the clean-run wait continues.
+
 ## 2026-08-30 (session 9l) — bai goes live; the output contract moves into the pipeline
 
 First run with BAI_API_KEY present: the full chain worked -- gemini died (429+503),

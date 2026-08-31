@@ -82,7 +82,7 @@ markets:
     gold_daily_move_pct: 3.0
 
 llm:
-  max_calls_per_run: 51
+  max_calls_per_run: 70
   order: ["gemini", "groq", "openrouter"]
   stages:
     vision: { provider: "gemini" }

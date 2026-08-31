@@ -85,6 +85,26 @@ DEFAULT_MODELS = (
     "thinkingmachines/inkling-small:free",
 )
 
+# The owner's b.ai gateway roster (2026-08-31): every model the pipeline
+# cares about is served there -- no quota, no rotation, no balance policy.
+# IDs are best-effort from the console listing; the workflow's models
+# input is the owner-editable correction if the console spells any
+# differently. gpt-5.2 deliberately ABSENT (paid; constraint 1).
+BAI_MODELS = (
+    "qwen3.8-flash",
+    "glm-5.3-flash",
+    "mimo-v2.5",
+    "hy3",
+    "deepseek-v4-flash",
+    "minimax-m3",
+    "laguna-s-2.1",
+    "nemotron-3.5-lightning",
+    "nemotron-3-super-120b-a12b",
+    "ling-3.0-flash-fin",
+    "inkling",
+    "inkling-small",
+)
+
 
 def check_response(payload: dict, expected_category: str, raw_len: int = 0) -> tuple[bool, str]:
     """Deterministic quality verdict for one parsed response. Returns
@@ -115,9 +135,23 @@ def check_response(payload: dict, expected_category: str, raw_len: int = 0) -> t
     return True, ""
 
 
-def call_model(model: str, prompt: str, api_key: str) -> dict:
-    """One OpenRouter chat-completions call. Returns a result dict; never
-    raises (network failures are results, not crashes)."""
+# OpenAI-compatible gateways the probe can measure against. Both speak
+# the same chat-completions shape; the key env differs per gateway.
+GATEWAYS = {
+    "openrouter": {
+        "endpoint": "https://openrouter.ai/api/v1/chat/completions",
+        "key_env": "OPENROUTER_API_KEY",
+    },
+    "bai": {
+        "endpoint": "https://api.b.ai/v1/chat/completions",
+        "key_env": "BAI_API_KEY",
+    },
+}
+
+
+def call_model(model: str, prompt: str, api_key: str, endpoint: str) -> dict:
+    """One chat-completions call against `endpoint`. Returns a result dict;
+    never raises (network failures are results, not crashes)."""
     started = time.monotonic()
     payload = json.dumps({
         "model": model,
@@ -126,7 +160,7 @@ def call_model(model: str, prompt: str, api_key: str) -> dict:
         "max_tokens": _MAX_TOKENS,
     }).encode("utf-8")
     request = urllib.request.Request(
-        "https://openrouter.ai/api/v1/chat/completions",
+        endpoint,
         data=payload,
         headers={
             "Authorization": f"Bearer {api_key}",
@@ -163,11 +197,11 @@ def call_model(model: str, prompt: str, api_key: str) -> dict:
     }
 
 
-def probe_model(model: str, api_key: str, template: str) -> list[dict]:
+def probe_model(model: str, api_key: str, template: str, endpoint: str) -> list[dict]:
     rows = []
     for name, expected_category, items_text in SAMPLES:
         prompt = template.replace("{items}", items_text)
-        result = call_model(model, prompt, api_key)
+        result = call_model(model, prompt, api_key, endpoint)
         row = {
             "model": model, "sample": name, "expected_category": expected_category,
             "http": result.get("http"), "latency_ms": result.get("latency_ms"),
@@ -196,25 +230,29 @@ def probe_model(model: str, api_key: str, template: str) -> list[dict]:
 
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--models", default=",".join(DEFAULT_MODELS),
-                        help="comma-separated model IDs (default: the owner's free list)")
-    parser.add_argument("--key-env", default="OPENROUTER_API_KEY")
+    parser.add_argument("--gateway", choices=sorted(GATEWAYS), default="openrouter",
+                        help="which OpenAI-compatible gateway to probe")
+    parser.add_argument("--models", default="",
+                        help="comma-separated model IDs (default: the gateway's roster)")
     parser.add_argument("--tag", default="ci")
     parser.add_argument("--out", default="")
     args = parser.parse_args(argv)
 
-    api_key = os.environ.get(args.key_env) or ""
+    gateway = GATEWAYS[args.gateway]
+    api_key = os.environ.get(gateway["key_env"]) or ""
     if not api_key:
-        print(f"error: {args.key_env} is not set", file=sys.stderr)
+        print(f"error: {gateway['key_env']} is not set", file=sys.stderr)
         return 1
+    default_models = BAI_MODELS if args.gateway == "bai" else DEFAULT_MODELS
     template_path = _REPO_ROOT / "config" / "prompts" / "understand.txt"
     template = template_path.read_text(encoding="utf-8")
-    models = [m.strip() for m in args.models.split(",") if m.strip()]
+    models = [m.strip() for m in (args.models or ",".join(default_models)).split(",")
+              if m.strip()]
 
     rows: list[dict] = []
     for index, model in enumerate(models, 1):
         print(f"[{index}/{len(models)}] {model}", flush=True)
-        model_rows = probe_model(model, api_key, template)
+        model_rows = probe_model(model, api_key, template, gateway["endpoint"])
         passes = sum(1 for r in model_rows if r["check"] == "PASS")
         print(f"  -> {passes}/{len(model_rows)} samples passed", flush=True)
         rows.extend(model_rows)

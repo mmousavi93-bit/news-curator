@@ -71,9 +71,14 @@ class UnderstandStage:
         cluster_fates: list[tuple[str, str]] = []
         saw_success = False
         unavailable_total = 0
+        # Provider provenance per cluster/event (owner 2026-08-31: the
+        # labeled-last-rung debugging trail -- which model answered what).
+        ctx.cluster_provider = {}
+        ctx.event_provider = {}
         for index, cluster in enumerate(clusters):
             prompt = render_prompt(self._template, cluster, self._body_chars)
             result = ctx.router.complete(prompt, stage="understand")
+            ctx.cluster_provider[cluster.key] = result.provider or ""
             if not result.ok:
                 if result.status == REFUSED_CAP:
                     # The budget is exhausted: every further call would be
@@ -153,6 +158,7 @@ class UnderstandStage:
                         "(%s); original kept, compose gate drops if needed",
                         cluster.key, retry_status,
                     )
+            ctx.event_provider[cluster.key] = result.provider or ""
             events.append(event)
 
         if unavailable_total > 1:

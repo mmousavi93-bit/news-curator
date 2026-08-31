@@ -26,14 +26,19 @@ import time as _time
 from collections import deque
 from typing import Callable, Mapping, Sequence
 
-from agent.llm.breaker import CircuitBreaker, backoff_delay
+from agent.llm.breaker import CircuitBreaker, CooldownRegister, backoff_delay
 from agent.llm.call import _OK, _SAME, Provider, attempt
 from agent.llm.errors import FATAL, REFUSED_CAP, UNAVAILABLE, LlmResult
+from agent.llm.failover import failover
 from agent.llm.limits import CallBudget, ProviderBudget, RpmPacer
 from agent.llm.providers import DEFAULT_TIMEOUT, ImageInput, ProviderAdapter
 from agent.llm.stats import ProviderStats
 from agent.llm.transport import HttpTransport, RequestsHttpTransport
 from agent.util.logging import get_logger
+
+# 429 cooldown seconds (2026-08-31): Groq's free wall is a ~60s token
+# budget; 30s of rest lets it refill while other providers serve.
+_COOLDOWN_SECONDS = 30.0
 
 
 class Router:
@@ -72,6 +77,10 @@ class Router:
         # The final "stage unavailable" line likewise: once per stage per run
         # (2026-08-30: 14 identical lines while both breakers were open).
         self._unavailable_logged: set[str] = set()
+        # 429 cooldown: a token wall is a waiting room, not sickness
+        # (16 wasted calls in one run) -- state lives in breaker.py.
+        self._cooldowns = CooldownRegister(_COOLDOWN_SECONDS)
+        self._cooldown_seconds = _COOLDOWN_SECONDS
         rpm_map = rpm_by_provider or {}
         limits = provider_limits or {}
         timeout_map = timeout_by_provider or {}
@@ -99,8 +108,9 @@ class Router:
         use_reservation: str | None = None,
     ) -> LlmResult:
         """Text completion. `use_reservation` names a prior reserve() label
-        whose slot this call consumes (compose) instead of spending fresh."""
-        return self._run(prompt, [], stage=stage, use_reservation=use_reservation)
+        whose slot this call consumes (compose) instead of spending fresh.
+        The loop lives in failover.py (split out 2026-08-31, constraint 12)."""
+        return failover(self, prompt, [], stage=stage, use_reservation=use_reservation)
 
     def see(
         self, prompt: str, images: Sequence[ImageInput], *, stage: str = "vision",
@@ -112,92 +122,4 @@ class Router:
         inventing a caption violates constraints #10 and #11 at the source."""
         if not images:
             return LlmResult(ok=False, status=UNAVAILABLE)
-        return self._run(prompt, images, stage=stage, use_reservation=use_reservation)
-
-    # -- internals ----------------------------------------------------------
-
-    def _acquire_slot(self, stage: str, use_reservation: str | None) -> bool:
-        if use_reservation is not None:
-            if self._budget.consume_reserved(use_reservation):
-                return True
-            self._logger.error(
-                "llm budget: reservation %s exhausted -- call refused", use_reservation
-            )
-            return False
-        return self._budget.acquire(stage)
-
-    def _run(
-        self,
-        prompt: str,
-        images: Sequence[ImageInput],
-        *,
-        stage: str,
-        use_reservation: str | None,
-    ) -> LlmResult:
-        candidates = [
-            p for p in self._providers if not images or p.adapter.supports_vision
-        ]
-        if not candidates:
-            self._logger.error("llm: no provider available for stage=%s", stage)
-            return LlmResult(ok=False, status=UNAVAILABLE)
-
-        prompt_hash = hashlib.sha256(prompt.encode("utf-8")).hexdigest()[:16]
-        queue: deque[Provider] = deque(candidates)
-        attempts = 0
-
-        while queue and attempts < self._max_retries + 1:
-            provider = queue.popleft()
-            name = provider.name
-
-            if self._breaker.is_open(name):
-                if name not in self._skip_logged:
-                    self._skip_logged.add(name)
-                    self._logger.error("llm: skipping %s (circuit breaker open)", name)
-                continue
-            if provider.spend is not None and not provider.spend.acquire():
-                continue  # the guard logged it
-
-            if not self._acquire_slot(stage, use_reservation):
-                return LlmResult(ok=False, status=REFUSED_CAP)
-
-            self._pacer.wait(name, provider.rpm)
-            self._call_index += 1
-            outcome, result = attempt(
-                provider=provider,
-                prompt=prompt,
-                images=images,
-                prompt_hash=prompt_hash,
-                stage=stage,
-                transport=self._transport,
-                breaker=self._breaker,
-                clock=self._clock,
-                call_index=self._call_index,
-                logger=self._logger,
-            )
-            attempts += 1
-            self.stats.record(name, outcome == _OK)
-
-            if outcome == _OK:
-                self._breaker.success(name)
-                if provider.spend is not None:
-                    provider.spend.record_usage(
-                        result.usage.get("in", 0), result.usage.get("out", 0)
-                    )
-                return result
-            if outcome == FATAL:
-                return result
-
-            if outcome == _SAME and not provider.schema_retried:
-                provider.schema_retried = True
-                queue.appendleft(provider)  # retry once on the same provider
-                continue
-            provider.schema_retried = False
-            queue.append(provider)  # rotate: this provider goes to the back
-            self._sleep(backoff_delay(attempts, self._base_delay))
-
-        if stage not in self._unavailable_logged:
-            self._unavailable_logged.add(stage)
-            self._logger.error(
-                "llm: stage=%s unavailable after %d attempt(s)", stage, attempts
-            )
-        return LlmResult(ok=False, status=UNAVAILABLE)
+        return failover(self, prompt, images, stage=stage, use_reservation=use_reservation)

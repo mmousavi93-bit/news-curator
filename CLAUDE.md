@@ -440,6 +440,20 @@ Real calibration still needs the clean-run CSVs.
 4. **Fatal responses open the breaker** — the 403 run burned 34 identical
    fatal calls; after two, the provider is skipped for the run. Suite 562.
 
+## Session 9o (2026-08-31) — supply batch: 429 cooldown, cap 70, labeled DeepSeek rung
+
+Owner: "go 1 & 2" + Chinese models as a labeled last resort. Shipped:
+(1) `CooldownRegister` (breaker.py) — a 429'd provider rests 30s; the loop
+proceeds anyway if all are cooling. (2) `max_calls_per_run` 51 → 70 (evidence:
+the 13:03 run exhausted 51 calls at 21/40 clusters while groq still answered;
+70×6=420/day vs 1,500 RPD). (3) DeepSeek rides the bai gateway as its own
+labeled rung — `bai_deepseek` (own adapter name for provenance, shares
+BAI_API_KEY; order gemini, groq, bai, bai_deepseek, openrouter); `provider`
+provenance columns in chosen.csv/summaries.csv; quality flags on record;
+direct signup MOOT (owner added deepseek to his bai services).
+(4) Split: router.py (224, over cap) → `failover.py` owns the loop, router
+owns the machine. Suite 669 → 674.
+
 ## Session 9l (2026-08-30) — bai live; output contract enforced in the pipeline
 
 First run with BAI_API_KEY: full chain worked (gemini down, groq 13 clusters,
@@ -621,7 +635,7 @@ cleaning + momentum semantics; independent adversarial review before push.
       the unpushed work: `git add -A && git commit && git push`, then
       `git show origin/main:src/agent/flash/momentum.py | findstr DE-ESCALATION`
       and `git show origin/main:.github/workflows/flash-alert.yml | findstr flash.ok`
-      must both print; CI must be green at 669. Flash go-live: NO new
+      must both print; CI must be green at 674. Flash go-live: NO new
       secrets needed (FLASH_CHANNEL_ID optional); first boot is
       self-bootstrapping; then dispatch `flash-alert` manually once and
       confirm a clean run + flash-reports artifact. Tuning loop: download

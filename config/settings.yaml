@@ -280,14 +280,24 @@ markets:
 # text. Do not "upgrade" to a later Haiku without recomputing the table above;
 # headline rate can be unchanged while real cost rises a third.
 llm:
-  # OWNER DECISION 2026-08-29 (session 8): ceiling = 51 -- the worst case
-  # (40 clusters + 10 vision + 1 compose). The owner's rule: keep the
-  # project free, use the free tools' caps. 6 runs/day x 51 = 306 calls vs
-  # Gemini's 1,500 RPD; RPM 10 is paced proactively (llm/limits.py).
-  # Enforcement is real, not advisory: llm/router.py refuses call N+1
-  # before a request is built (CLAUDE.md constraint #2).
-  max_calls_per_run: 51
-  order: ["gemini", "groq", "bai", "openrouter"]
+  # OWNER DECISION 2026-08-31 (session 9o): ceiling 51 -> 70. Evidence: the
+  # 13:03 run exhausted 51 calls having processed only 21 of 40 clusters
+  # (2.4 calls/cluster -- 429 thrash + slow bai), while groq was still
+  # answering. 6 runs/day x 70 = 420 calls vs Gemini's 1,500 RPD; groq's
+  # 14,400 RPD has 34x headroom. The binding limits on gemini-dead days are
+  # groq's per-minute wall and wall-clock, not this cap. Enforcement is
+  # real, not advisory: llm/router.py refuses call N+1 before a request is
+  # built (CLAUDE.md constraint #2).
+  max_calls_per_run: 70
+  # deepseek rides the bai gateway as its OWN rung (bai_deepseek, owner
+  # 2026-08-31: "get at least something", labeled): it fires only when
+  # everything else fails, its answers carry provider provenance in the
+  # CSVs for debugging, and its quality flags are on record
+  # (analysis/deepseek_v4_eval.md). Same gateway, separate breaker/pacing
+  # -- a dead gateway costs a few extra calls, bounded by the cap.
+  # openrouter sits absolute-last: its zero-balance policy is dead,
+  # recheck monthly, and it must not tax the budget before deepseek does.
+  order: ["gemini", "groq", "bai", "bai_deepseek", "openrouter"]
 
   stages:
     vision:    { provider: "gemini" }
@@ -368,6 +378,19 @@ llm:
       # outlier stays acceptable against that. 45s: slow answers survive,
       # only truly hung ones rotate.
       model: "qwen3.8-flash"
+      rpm: 20
+      rpd: 1000
+      read_timeout_seconds: 45
+      supports_vision: false
+    bai_deepseek:
+      # OWNER 2026-08-31: deepseek is available THROUGH the bai gateway --
+      # no direct signup, no second key (shares BAI_API_KEY). Family flags
+      # on record (topic-selective censorship on war/geopolitics,
+      # Chinese-first Persian, JSON discipline -- analysis/deepseek_v4_eval.md):
+      # its events are NOT trusted, they are SOMETHING, and every one
+      # carries provider=bai_deepseek in the CSVs for debugging. The model
+      # id is the gateway's listing -- verify it matches the b.ai console.
+      model: "deepseek-v4-flash"
       rpm: 20
       rpd: 1000
       read_timeout_seconds: 45

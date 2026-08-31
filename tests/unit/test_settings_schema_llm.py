@@ -31,15 +31,16 @@ def _expect_error(mutate, match):
 def test_real_settings_yaml_has_owner_decided_ceiling():
     raw = yaml.safe_load((_REPO_ROOT / "config" / "settings.yaml").read_text(encoding="utf-8"))
     settings = Settings.from_dict(raw)
-    # Owner decision 2026-08-29: 51 = worst case (40 clusters + 10 vision +
-    # 1 compose), free-tier caps bind. Do not change this number without
-    # re-checking the arithmetic in the settings.yaml comment.
-    assert settings.llm.max_calls_per_run == 51
+    # Owner decision 2026-08-31 (session 9o): 51 -> 70. Evidence: the 13:03
+    # run exhausted 51 calls having processed 21 of 40 clusters while groq
+    # was still answering. 70 x 6 runs = 420/day vs Gemini's 1,500 RPD.
+    # Do not change without re-checking the arithmetic in the comment.
+    assert settings.llm.max_calls_per_run == 70
 
 
 def test_fixture_loads_under_new_validation():
     settings = Settings.from_dict(_raw())
-    assert settings.llm.max_calls_per_run == 51
+    assert settings.llm.max_calls_per_run == 70
     assert set(settings.llm.providers) == {"gemini", "groq", "openrouter"}
 
 

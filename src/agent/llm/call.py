@@ -116,7 +116,10 @@ def attempt(
         # attempt (run.csv) -- the breaker just does not judge on it.
         log_call(logger, call_index, stage, provider, prompt_hash,
                  f"status_{status}", latency_ms, None)
-        return _ROTATE, LlmResult(ok=False, status=UNAVAILABLE, provider=name)
+        # http_status feeds the router's 429 COOLDOWN (2026-08-31): a wall
+        # must cool the provider, not the budget.
+        return _ROTATE, LlmResult(
+            ok=False, status=UNAVAILABLE, provider=name, http_status=status)
 
     if status == 404 or status >= 500:
         # 404 rotates too: "this provider does not have this model" is
@@ -127,7 +130,8 @@ def attempt(
         breaker.failure(name)
         log_call(logger, call_index, stage, provider, prompt_hash,
                  f"status_{status}", latency_ms, None)
-        return _ROTATE, LlmResult(ok=False, status=UNAVAILABLE, provider=name)
+        return _ROTATE, LlmResult(
+            ok=False, status=UNAVAILABLE, provider=name, http_status=status)
 
     # 400/401/403 (and any other non-200 we did not classify above): the
     # request or key is wrong, and it is wrong identically on every
@@ -145,7 +149,8 @@ def attempt(
         "llm: fatal response status=%s from provider=%s -- not rotating", status, name
     )
     return _FATAL, LlmResult(
-        ok=False, status=FATAL, provider=name, model=provider.adapter.model
+        ok=False, status=FATAL, provider=name, model=provider.adapter.model,
+        http_status=status,
     )
 
 
