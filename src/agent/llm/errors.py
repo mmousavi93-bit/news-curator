@@ -76,3 +76,7 @@ class LlmResult:
     prompt_hash: str = ""
     call_index: int = 0
     usage: Mapping[str, int] = field(default_factory=dict)
+    # The HTTP status behind a failed attempt, when the transport answered
+    # one (429/5xx/4xx). The router uses it for the 429 cooldown -- a wall
+    # must cool the provider, not the budget.
+    http_status: int | None = None

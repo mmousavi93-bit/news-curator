@@ -21,6 +21,8 @@ API_KEY_ENV: dict[str, str] = {
     "openrouter": "OPENROUTER_API_KEY",
     "anthropic": "ANTHROPIC_API_KEY",
     "bai": "BAI_API_KEY",
+    "bai_deepseek": "BAI_API_KEY",
+    "deepseek": "DEEPSEEK_API_KEY",
 }
 
 # (connect, read) timeout in seconds. Read is generous: a free-tier
@@ -171,6 +173,19 @@ class OpenRouterAdapter(_OpenAiChatAdapter):
         )
 
 
+class DeepSeekAdapter(_OpenAiChatAdapter):
+    """Owner decision 2026-08-31: the labeled last rung. DeepSeek's V4
+    family carries documented quality flags (censorship on war/geopolitics,
+    Chinese-first Persian) -- it fires ONLY when nothing else answers, and
+    every event it produces carries its provider name in the observability
+    CSVs so the debugging trail exists. OpenAI-compatible API."""
+
+    def __init__(self, model: str, api_key: str) -> None:
+        super().__init__(
+            "deepseek", "https://api.deepseek.com/chat/completions", model, api_key
+        )
+
+
 class BaiAdapter(_OpenAiChatAdapter):
     """The owner's reseller gateway (2026-08-30). OpenAI-compatible; the
     free roster there is a gift, not capacity to depend on -- it sits in
@@ -180,3 +195,15 @@ class BaiAdapter(_OpenAiChatAdapter):
         super().__init__(
             "bai", "https://api.b.ai/v1/chat/completions", model, api_key
         )
+
+
+class BaiDeepSeekAdapter(BaiAdapter):
+    """DeepSeek served through the same bai gateway (owner 2026-08-31 --
+    no direct signup needed). Same endpoint and key, different model, and
+    a distinct NAME so the provider provenance columns separate the
+    labeled last resort from the qwen rung. Family flags on record:
+    analysis/deepseek_v4_eval.md -- its events are SOMETHING, not trust."""
+
+    def __init__(self, model: str, api_key: str) -> None:
+        super().__init__(model, api_key)
+        self.name = "bai_deepseek"

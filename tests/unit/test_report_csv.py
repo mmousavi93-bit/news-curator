@@ -195,6 +195,20 @@ def test_summaries_csv_rank_follows_digest_score_order(tmp_path):
     assert [r["rank"] for r in rows] == ["0", "1"]
 
 
+def test_provider_provenance_columns_record_who_answered(tmp_path):
+    # Owner 2026-08-31: the labeled last rung -- every event carries the
+    # provider that produced it, so a deepseek answer is traceable.
+    ctx = _Ctx(tmp_path)
+    sent_key = ctx.clusters[0].key
+    ctx.cluster_provider = {sent_key: "deepseek"}
+    ctx.event_provider = {sent_key: "deepseek"}
+    written = {p.name.split("_")[0]: p for p in write_run_reports(ctx, tmp_path)}
+    chosen = {r["cluster_key"]: r for r in _rows(written["chosen"])}
+    assert chosen[sent_key]["provider"] == "deepseek"
+    summaries = _rows(written["summaries"])
+    assert summaries[0]["provider"] == "deepseek"
+
+
 def test_run_csv_records_counters_and_digest_flag(tmp_path):
     ctx = _Ctx(tmp_path)
     written = {p.name.split("_")[0]: p for p in write_run_reports(ctx, tmp_path)}

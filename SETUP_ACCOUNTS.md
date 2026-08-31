@@ -67,6 +67,17 @@ The model line lives in `config/settings.yaml` (`providers.bai.model`, currently
 hy3, deepseek-v4-flash). gpt-5.2 is paid on this gateway and stays unused until spend caps
 are wired — do not enable it without telling me.
 
+## 3b. DeepSeek via the bai gateway — the labeled last rung (0 min, already done)
+
+Owner decision 2026-08-31: deepseek fires only when gemini, groq AND the qwen
+bai rung are all failing -- "get at least something", and every event it produces
+carries `provider=bai_deepseek` in the CSVs so its output is traceable. It rides
+the SAME bai key (BAI_API_KEY) -- no signup, no payment, nothing to do here.
+One check when convenient: open your b.ai console's model list and confirm the
+model id is `deepseek-v4-flash` as written in `config/settings.yaml`
+(`providers.bai_deepseek.model`). If the console lists it differently, edit that
+one line.
+
 ## 4. Telegram bot (5 min)
 
 Open Telegram and search for **@BotFather** — the one with the blue verified check.

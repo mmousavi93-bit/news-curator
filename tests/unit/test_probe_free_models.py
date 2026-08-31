@@ -82,3 +82,13 @@ def test_check_response_empty_headline_fails():
 def test_default_models_list_has_no_duplicates():
     assert len(pfm.DEFAULT_MODELS) == len(set(pfm.DEFAULT_MODELS))
     assert "thinkingmachines/inkling-small:free" in pfm.DEFAULT_MODELS
+
+
+def test_bai_gateway_roster_and_config():
+    # The b.ai roster (owner 2026-08-31): no paid models, no duplicates,
+    # and the gateway config points at b.ai with BAI_API_KEY.
+    assert len(pfm.BAI_MODELS) == len(set(pfm.BAI_MODELS))
+    assert "deepseek-v4-flash" in pfm.BAI_MODELS
+    assert "gpt-5.2" not in pfm.BAI_MODELS  # paid; constraint 1
+    assert pfm.GATEWAYS["bai"]["key_env"] == "BAI_API_KEY"
+    assert "api.b.ai" in pfm.GATEWAYS["bai"]["endpoint"]

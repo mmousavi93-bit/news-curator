@@ -19,6 +19,8 @@ from agent.llm.providers import (
     API_KEY_ENV,
     DEFAULT_TIMEOUT,
     BaiAdapter,
+    BaiDeepSeekAdapter,
+    DeepSeekAdapter,
     GeminiAdapter,
     GroqAdapter,
     OpenRouterAdapter,
@@ -34,7 +36,9 @@ _ADAPTERS: dict[str, type] = {
     "gemini": GeminiAdapter,
     "groq": GroqAdapter,
     "bai": BaiAdapter,
+    "bai_deepseek": BaiDeepSeekAdapter,
     "openrouter": OpenRouterAdapter,
+    "deepseek": DeepSeekAdapter,
     # "anthropic": deliberately not implemented in Phase 5 (brief "Out of
     # scope"); the budget guardrails for it ARE built and tested.
 }

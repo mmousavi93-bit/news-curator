@@ -16,10 +16,14 @@ name: probe-models
 on:
   workflow_dispatch:
     inputs:
+      gateway:
+        description: "Which gateway to probe (openrouter | bai)"
+        required: true
+        default: "bai"
       models:
-        description: "Comma-separated OpenRouter model IDs to probe"
+        description: "Comma-separated model IDs (empty = the gateway's default roster)"
         required: false
-        default: "minimax/minimax-m3:free,poolside/laguna-s-2.1:free,nvidia/nemotron-3.5-lightning:free,nvidia/nemotron-3-super-120b-a12b:free,inclusionai/ling-3.0-flash-fin:free,thinkingmachines/inkling:free,thinkingmachines/inkling-small:free"
+        default: ""
       tag:
         description: "Label for this probe run; names the output file"
         required: true
@@ -39,8 +43,10 @@ jobs:
       - name: Probe every free model from a US runner
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          BAI_API_KEY: ${{ secrets.BAI_API_KEY }}
         run: |
           python tools/probe_free_models.py \
+            --gateway "${{ inputs.gateway }}" \
             --models "${{ inputs.models }}" \
             --tag "${{ inputs.tag }}"
 

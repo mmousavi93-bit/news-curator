@@ -105,8 +105,9 @@ def _write_chosen(ctx, path: Path) -> Path:
     with path.open("w", encoding="utf-8-sig", newline="") as fh:
         writer = csv.writer(fh)
         writer.writerow(["cluster_key", "fate", "reason", "n_members", "sources",
-                         "best_tier", "category", "claim_status",
+                         "provider", "best_tier", "category", "claim_status",
                          "independent_count", "score", "headline", "summary"])
+        providers = getattr(ctx, "cluster_provider", None) or {}
         for cluster in clusters:
             event = events_by_key.get(cluster.key)
             fate, reason = _fate_for(cluster.key, events_by_key, ctx)
@@ -115,7 +116,8 @@ def _write_chosen(ctx, path: Path) -> Path:
                 score = f"{score_event(event, cluster, credibility, ctx.config.settings, ctx.now):.3f}"
             writer.writerow([
                 cluster.key, fate, reason, len(cluster.members),
-                _sources(cluster), _best_tier(cluster, credibility),
+                _sources(cluster), providers.get(cluster.key, ""),
+                _best_tier(cluster, credibility),
                 getattr(event, "category", "") if event else "",
                 getattr(event, "claim_status", "") if event else "",
                 getattr(event, "independent_count", "") if event else "",
@@ -142,7 +144,8 @@ def _write_summaries(ctx, path: Path) -> Path:
         writer = csv.writer(fh)
         writer.writerow(["rank", "event_key", "score", "category", "claim_status",
                          "independent_count", "best_tier", "n_members", "sources",
-                         "latest_utc", "headline", "summary"])
+                         "provider", "latest_utc", "headline", "summary"])
+        providers = getattr(ctx, "event_provider", None) or {}
         for rank, event in enumerate(events):
             cluster = clusters_by_key.get(event.event_key)
             writer.writerow([
@@ -153,6 +156,7 @@ def _write_summaries(ctx, path: Path) -> Path:
                 _best_tier(cluster, credibility) if cluster else "",
                 len(cluster.members) if cluster else "",
                 _sources(cluster) if cluster else "",
+                providers.get(event.event_key, ""),
                 _when_utc(cluster) if cluster else "",
                 event.headline, event.summary,
             ])

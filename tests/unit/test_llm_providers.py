@@ -11,6 +11,8 @@ from agent.llm.errors import SchemaError
 from agent.llm.providers import (
     API_KEY_ENV,
     BaiAdapter,
+    BaiDeepSeekAdapter,
+    DeepSeekAdapter,
     GeminiAdapter,
     GroqAdapter,
     ImageInput,
@@ -103,6 +105,8 @@ def test_openai_chat_parse_null_content_raises_schema_error():
         (OpenRouterAdapter("meta-llama/llama-3.1-8b-instruct:free", "k" * 16),
          "openrouter.ai"),
         (BaiAdapter("qwen3.8-flash", "k" * 16), "api.b.ai"),
+        (BaiDeepSeekAdapter("deepseek-v4-flash", "k" * 16), "api.b.ai"),
+        (DeepSeekAdapter("deepseek-v4-flash", "k" * 16), "api.deepseek.com"),
     ],
 )
 def test_openai_chat_request_shape(adapter, host):

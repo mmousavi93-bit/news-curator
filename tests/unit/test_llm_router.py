@@ -218,6 +218,42 @@ def test_breaker_skip_logged_once_per_provider_per_run(caplog):
     assert caplog.text.count("circuit breaker open") == 2
 
 
+def test_429_cools_provider_and_rotates_to_ready_one():
+    # 2026-08-31: retrying into a per-minute token wall burned 16 calls in
+    # one run. A 429'd provider rests; others serve meanwhile.
+    transport = MockHttpTransport(responses=[HttpResponse(429, {}), _GROQ_OK, _GROQ_OK])
+    clock = {"t": 0.0}
+    router = _router([_gemini(), _groq()], transport, clock=lambda: clock["t"])
+    assert router.complete("a").provider == "groq"  # gemini 429 -> cooled
+    assert router.complete("b").provider == "groq"  # gemini still cooling
+    gemini_calls = [c for c in transport.calls if GEMINI_URL_PREFIX in c["url"]]
+    assert len(gemini_calls) == 1  # not re-burned while cooling
+
+
+def test_all_providers_cooling_proceeds_anyway():
+    # Spinning forever is worse than hitting the wall once: when the ONLY
+    # provider is cooling, the loop retries it anyway after backoff -- a
+    # run with just groq alive must not give up on one 429.
+    transport = MockHttpTransport(responses=[HttpResponse(429, {}), _GEMINI_OK])
+    clock = {"t": 0.0}
+    router = _router([_gemini()], transport, clock=lambda: clock["t"])
+    result = router.complete("a")
+    assert result.ok is True
+    assert result.provider == "gemini"
+    assert len(transport.calls) == 2  # 429, then the retry
+
+
+def test_cooldown_expires_with_clock():
+    transport = MockHttpTransport(responses=[HttpResponse(429, {}), _GROQ_OK, _GEMINI_OK])
+    clock = {"t": 0.0}
+    router = _router([_gemini(), _groq()], transport, clock=lambda: clock["t"])
+    assert router.complete("a").provider == "groq"   # gemini 429 -> cooled
+    clock["t"] = 31.0
+    assert router.complete("b").provider == "gemini"  # cooled off -> serves
+    gemini_calls = [c for c in transport.calls if GEMINI_URL_PREFIX in c["url"]]
+    assert len(gemini_calls) == 2  # once at t=0, once after expiry
+
+
 def test_stage_unavailable_logged_once_per_run(caplog):
     import logging
 

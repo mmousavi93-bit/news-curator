@@ -59,3 +59,24 @@ class CircuitBreaker:
 
     def success(self, name: str) -> None:
         self._failures[name] = 0
+
+
+class CooldownRegister:
+    """Transient 429 state (2026-08-31): a per-minute token wall is a
+    waiting room, not sickness -- 16 budget calls were burned retrying
+    into it in one run. A 429'd provider rests for `seconds`; others
+    serve meanwhile. When EVERY remaining provider is cooling, the
+    router proceeds anyway (spinning forever is worse than the wall)."""
+
+    def __init__(self, seconds: float) -> None:
+        self._seconds = seconds
+        self._until: dict[str, float] = {}
+
+    def cool(self, name: str, now: float) -> None:
+        self._until[name] = now + self._seconds
+
+    def is_cooling(self, name: str, now: float) -> bool:
+        return now < self._until.get(name, 0.0)
+
+    def any_ready(self, names, now: float) -> bool:
+        return any(now >= self._until.get(n, 0.0) for n in names)
