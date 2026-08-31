@@ -548,7 +548,16 @@ cleaning + momentum semantics; independent adversarial review before push.
    interleaved); bai functional but 10-36s latency and up to 3.7K
    output tokens — a ramble answer flipping `clickbait=True` is the
    hypothesis; chosen.csv forensic queued.
-6. **Flash live-feedback fixes (owner's first live run 2026-08-31,
+6. **CSV forensic (owner's 08:48 run, 2026-08-31):** bai's 46.5s /
+   3,989-token answer was spent on meme posts (tg_fighter_radar) and the
+   clickbait verdict was CORRECT — bai's token count is gateway-inflated,
+   not a bounds hole; `bai.read_timeout_seconds: 20` added anyway (the
+   46s call was a third of the run). Real over-cut found: the Pezeshkian
+   SCO-trip item relevance-gated because neither «ایران» nor his name
+   was in the keywords (Masafer Yatta disease) — پزشکیان/بزشکیان added
+   to `relevance.yaml` iran_direct, pinned by a regression test.
+   Suite 667.
+7. **Flash live-feedback fixes (owner's first live run 2026-08-31,
    suite 666):** the escalation class fired 6 first-alerts in ~2h for
    one wave. Fixes: escalation burst is CLASS-LEVEL (one open state,
    180-min collapse; novelty re-alert only after `novelty_min_gap_minutes`
@@ -601,7 +610,7 @@ cleaning + momentum semantics; independent adversarial review before push.
       the unpushed work: `git add -A && git commit && git push`, then
       `git show origin/main:src/agent/flash/momentum.py | findstr DE-ESCALATION`
       and `git show origin/main:.github/workflows/flash-alert.yml | findstr flash.ok`
-      must both print; CI must be green at 666. Flash go-live: NO new
+      must both print; CI must be green at 667. Flash go-live: NO new
       secrets needed (FLASH_CHANNEL_ID optional); first boot is
       self-bootstrapping; then dispatch `flash-alert` manually once and
       confirm a clean run + flash-reports artifact. Tuning loop: download
