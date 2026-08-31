@@ -105,7 +105,20 @@ def attempt(
             usage=usage,
         )
 
-    if status == 429 or status == 404 or status >= 500:
+    if status == 429:
+        # 429 rotates WITHOUT counting toward the breaker: rate-limit
+        # pacing means "slow down", not "this provider is broken". The
+        # 2026-08-31 09:36 run lost Groq -- its only healthy provider --
+        # to the breaker over TWO pacing 429s, and the whole cascade
+        # collapsed into 24 skipped clusters. Groq carried 23 calls the
+        # same morning with six scattered 429s: the signal is transient,
+        # never sickness. The stats counter still records the failed
+        # attempt (run.csv) -- the breaker just does not judge on it.
+        log_call(logger, call_index, stage, provider, prompt_hash,
+                 f"status_{status}", latency_ms, None)
+        return _ROTATE, LlmResult(ok=False, status=UNAVAILABLE, provider=name)
+
+    if status == 404 or status >= 500:
         # 404 rotates too: "this provider does not have this model" is
         # provider-SPECIFIC -- each provider has its own model id, so the
         # next one may well succeed. Learned 2026-08-29: gemini-2.5-flash

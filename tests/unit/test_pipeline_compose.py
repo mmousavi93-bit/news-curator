@@ -206,6 +206,23 @@ def test_pezeshkian_sco_trip_passes_relevance_gate():
     assert event.event_key not in {e.event_key for e in ctx.relevance_dropped}
 
 
+def test_fallback_uses_body_lead_when_title_empty():
+    # Owner 2026-08-31: the raw-title section shipped an EMPTY bullet
+    # for an untitled Telegram post. Body lead stands in; no empty lines.
+    ctx = _Ctx(config=_config())
+    ctx.llm_failed = True
+    ctx.cluster_fates = []
+    cluster = Cluster(key="")
+    cluster.add(Item(source_id="tg_x", url="https://x/raw/0", title="",
+                     body="پست تلگرامی بدون عنوان درباره انفجار تهران",
+                     published_at=NOW, lang="fa", raw_hash="h" * 8), [1.0])
+    ctx.clusters.append(cluster)
+    ctx.cluster_fates.append((cluster.key, "unavailable"))
+    ComposeStage(_Log()).run(ctx)
+    assert "پست تلگرامی بدون عنوان" in ctx.messages[0]
+    assert "•\n" not in ctx.messages[0]
+
+
 def test_fallback_respects_max_items():
     ctx = _Ctx(config=_config())
     ctx.llm_failed = True

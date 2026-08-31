@@ -362,13 +362,15 @@ llm:
       # this gateway and stays unused: enabling it requires constraint-15
       # spend caps wired first (input/output_usd_per_mtok + max_spend).
       # Rate limits unknown (reseller) -- conservative until measured.
-      # 2026-08-31: a 46.5s / 3,989-token answer on a meme cluster cost a
-      # third of the run -- cap the read leg like the primary (a merely
-      # slow bai still survives; a hung one rotates).
+      # 2026-08-31 (corrected same day): bai's MEDIAN answer is ~19-20s
+      # and 4 of 6 measured calls were >=19s -- a 20s cap timed out both
+      # calls of the 09:36 run and killed the fallback. The 46.5s meme
+      # outlier stays acceptable against that. 45s: slow answers survive,
+      # only truly hung ones rotate.
       model: "qwen3.8-flash"
       rpm: 20
       rpd: 1000
-      read_timeout_seconds: 20
+      read_timeout_seconds: 45
       supports_vision: false
     anthropic:
       enabled: false

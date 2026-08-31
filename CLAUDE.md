@@ -557,6 +557,17 @@ cleaning + momentum semantics; independent adversarial review before push.
    was in the keywords (Masafer Yatta disease) — پزشکیان/بزشکیان added
    to `relevance.yaml` iran_direct, pinned by a regression test.
    Suite 667.
+8. **Cascade-death fixes (owner's 09:36 run, 2026-08-31, suite 669):**
+   (a) **429s no longer count toward the circuit breaker** — rate-limit
+   pacing is transient, not sickness; the run lost Groq (its only
+   healthy provider) to the breaker over TWO pacing 429s and collapsed
+   into 24 skipped clusters. Pinned by a test. (b) bai
+   `read_timeout_seconds` 20 → 45 — the 20s cap was MY own-goal: bai's
+   median answer is ~19-20s and both 09:36 calls timed out exactly at
+   20s. (c) raw fallback uses the body lead for untitled TG posts (no
+   more empty bullets). (d) flash first-template rumour line shortened
+   to «شایعه — تأیید نشده» per owner. The health-aware cascade was
+   VALIDATED live in the same run: gemini demoted → groq started.
 7. **Flash live-feedback fixes (owner's first live run 2026-08-31,
    suite 666):** the escalation class fired 6 first-alerts in ~2h for
    one wave. Fixes: escalation burst is CLASS-LEVEL (one open state,
@@ -610,7 +621,7 @@ cleaning + momentum semantics; independent adversarial review before push.
       the unpushed work: `git add -A && git commit && git push`, then
       `git show origin/main:src/agent/flash/momentum.py | findstr DE-ESCALATION`
       and `git show origin/main:.github/workflows/flash-alert.yml | findstr flash.ok`
-      must both print; CI must be green at 667. Flash go-live: NO new
+      must both print; CI must be green at 669. Flash go-live: NO new
       secrets needed (FLASH_CHANNEL_ID optional); first boot is
       self-bootstrapping; then dispatch `flash-alert` manually once and
       confirm a clean run + flash-reports artifact. Tuning loop: download

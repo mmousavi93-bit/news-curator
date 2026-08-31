@@ -55,6 +55,12 @@ def _raw_fallback(clusters: list, event_keys: set, fates: dict, labels: dict,
         if fate not in _UNCOVERED_FATES and fate is not None:
             continue  # judged (clickbait/irrelevant) or another stage's drop
         title = cluster.members[0].title.strip()
+        if not title:
+            # Telegram posts carry no title: the body lead stands in —
+            # an empty bullet is worse than nothing (owner 2026-08-31).
+            title = (cluster.members[0].body or "").strip()[:_RAW_TITLE_CAP]
+        if not title:
+            continue
         if len(title) > _RAW_TITLE_CAP:
             title = title[:_RAW_TITLE_CAP] + "…"
         lines.append(f"• {title}")
