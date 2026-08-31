@@ -61,6 +61,10 @@ silently work around them.
   Emergency parachute only, not a real fallback.
 - GitHub Actions: unlimited minutes on **public** repos; 2,000/mo private. Cache 10 GB.
   Cron auto-disables after 60 days of repo inactivity.
+  Overusage check 2026-08-31: 102 workflow runs/day (~2.5 runner-h/day),
+  ~21 API calls/h vs the 1,000/h limit, 15-min cron vs the 5-min minimum —
+  no published GitHub limit within 20x of this usage. The real exposures
+  are third-party source bans and the 60-day cron auto-disable.
 - Telegram Bot API: 1 msg/sec per chat, 4,096 char max.
 - Paid-provider rate card, verified 2026-08-01, costed against THIS pipeline
   (~35 extraction calls/run at ~3,050 in / 400 out, 9 runs/day, vision stays on Gemini):
@@ -528,6 +532,35 @@ cleaning + momentum semantics; independent adversarial review before push.
 4. Latency honesty: GitHub cron ≈ 10-20 min median, not real-time; a bot
    button is impossible without a hosted server. Owner accepted the
    monitor as the mechanism.
+5. **LLM robustness moves 1+2 (owner-approved 2026-08-31, suite 659):**
+   (a) raw-title fallback digest — clusters the LLM could not cover
+   (`unavailable`/`refused_cap`/`unparseable`/`oversized`) render as
+   escaped raw source titles in a compose footer / on the one-liner;
+   `digest_rank.fallback_max_items` (5) caps them; the product survives
+   total LLM loss by construction. (b) health-aware cascade —
+   `llm/health.py` persists per-provider calls/failed in the state DB
+   meta table (7-day window; ≥4 samples and ≥50% failure → demoted to
+   cascade end); run.py now opens the DB BEFORE the router.
+   (c) Owner's 05:10 UTC run log (2026-08-31) read: **Groq carried 23
+   calls on qwen/qwen3.8-27b — the old ~13-call ceiling is
+   MODEL-DEPENDENT, not a Groq-wide floor** (supersedes part of the
+   session-9 accepted conclusion); gemini soft-throttled (3 ok / 3×429,
+   interleaved); bai functional but 10-36s latency and up to 3.7K
+   output tokens — a ramble answer flipping `clickbait=True` is the
+   hypothesis; chosen.csv forensic queued.
+6. **Flash live-feedback fixes (owner's first live run 2026-08-31,
+   suite 666):** the escalation class fired 6 first-alerts in ~2h for
+   one wave. Fixes: escalation burst is CLASS-LEVEL (one open state,
+   180-min collapse; novelty re-alert only after `novelty_min_gap_minutes`
+   120 of quiet — "once per momentum change is enough"); per-bucket
+   `ring_requirements` (strike/maritime/posture must hit iran_geo —
+   Gaza-front coverage no longer fires; statement buckets may match
+   actors); headline = title or body-lead (TG posts have no title);
+   «(عربی)»/«(انگلیسی)» prefix on non-Persian headlines; token-END
+   location matching (Arabic definite article: «الإيراني»); "us"
+   removed from actors (pronoun false positive); convergence counts
+   ALERTED buckets only, reading the wave's full bucket list (new
+   `buckets` column, additive ALTER on existing flash DBs).
 
 ## Phases 6–10 (2026-08-29) — v1 CODE COMPLETE. Suite 522, 0 failed, shim-verified
 
@@ -564,11 +597,11 @@ cleaning + momentum semantics; independent adversarial review before push.
 ## Pending / unresolved
 
 - [ ] **NEXT SESSION — owner workflow: push → verify → flash go-live →
-      analysis.** The 9l.2 + 9m + 9n batches (suite 646, shim-green) are
+      analysis.** The 9l.2 + 9m + 9n batches (suite 659, shim-green) are
       the unpushed work: `git add -A && git commit && git push`, then
       `git show origin/main:src/agent/flash/momentum.py | findstr DE-ESCALATION`
       and `git show origin/main:.github/workflows/flash-alert.yml | findstr flash.ok`
-      must both print; CI must be green at 646. Flash go-live: NO new
+      must both print; CI must be green at 666. Flash go-live: NO new
       secrets needed (FLASH_CHANNEL_ID optional); first boot is
       self-bootstrapping; then dispatch `flash-alert` manually once and
       confirm a clean run + flash-reports artifact. Tuning loop: download

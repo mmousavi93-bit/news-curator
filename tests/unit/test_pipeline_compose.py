@@ -133,6 +133,76 @@ def test_digest_marker_only_when_flagged():
     assert "مرور روزانه" not in ctx2.messages[0]
 
 
+# -- raw fallback (move 1, 2026-08-31): the product survives LLM loss --
+
+
+def _raw_cluster(ctx: _Ctx, title: str) -> str:
+    cluster = Cluster(key="")
+    cluster.add(Item(source_id="t3", url=f"https://x/raw/{len(ctx.clusters)}",
+                     title=title, body="b", published_at=NOW, lang="en",
+                     raw_hash="h" * 8), [1.0])
+    ctx.clusters.append(cluster)
+    return cluster.key
+
+
+def test_llm_failed_run_includes_escaped_raw_fallback_titles():
+    ctx = _Ctx(config=_config())
+    ctx.llm_failed = True
+    key1 = _raw_cluster(ctx, "انفجار در تهران & کرج گزارش شد")
+    key2 = _raw_cluster(ctx, "Iranian vessels repositioned near Hormuz")
+    ctx.cluster_fates = [(key1, "unavailable"), (key2, "unavailable")]
+    ComposeStage(_Log()).run(ctx)
+    message = ctx.messages[0]
+    assert "هوش مصنوعی" in message
+    assert "عناوین خام" in message
+    assert "انفجار در تهران &amp; کرج" in message  # HTML-escaped
+    assert "Hormuz" in message
+
+
+def test_fallback_excludes_judged_clusters():
+    ctx = _Ctx(config=_config())
+    ctx.llm_failed = True
+    key_clickbait = _raw_cluster(ctx, "کلیک‌بیت خالص")
+    key_irrelevant = _raw_cluster(ctx, "فستیوال مو قرمز هلند")
+    key_uncovered = _raw_cluster(ctx, "حمله آمریکا به لارک")
+    ctx.cluster_fates = [(key_clickbait, "clickbait"),
+                         (key_irrelevant, "irrelevant"),
+                         (key_uncovered, "unavailable")]
+    ComposeStage(_Log()).run(ctx)
+    message = ctx.messages[0]
+    assert "حمله آمریکا به لارک" in message
+    assert "کلیک" not in message
+    assert "مو قرمز" not in message
+
+
+def test_fallback_absent_when_everything_covered():
+    ctx = _Ctx(config=_config())
+    ctx.events = [_with_cluster(ctx, _event("خلاصه نظامی."))]
+    ComposeStage(_Log()).run(ctx)
+    assert "عناوین خام" not in ctx.messages[0]
+
+
+def test_kept_path_appends_fallback_as_footer():
+    ctx = _Ctx(config=_config())
+    ctx.events = [_with_cluster(ctx, _event("خلاصه نظامی."))]
+    key = _raw_cluster(ctx, "پدافند در تنگه هرمز فعال شد")
+    ctx.cluster_fates = [(key, "unavailable")]
+    ComposeStage(_Log()).run(ctx)
+    assert "عناوین خام" in ctx.messages[0]
+    assert "پدافند در تنگه هرمز فعال شد" in ctx.messages[0]
+
+
+def test_fallback_respects_max_items():
+    ctx = _Ctx(config=_config())
+    ctx.llm_failed = True
+    ctx.cluster_fates = []
+    for i in range(6):
+        key = _raw_cluster(ctx, f"خبر پوشش‌داده‌نشده شماره {i}")
+        ctx.cluster_fates.append((key, "unavailable"))
+    ComposeStage(_Log()).run(ctx)
+    assert ctx.messages[0].count("•") == 5
+
+
 def test_importance_order_military_before_economy():
     ctx = _Ctx(config=_config())
     economy = _event("خلاصه اقتصادی نفت.", category="economy")

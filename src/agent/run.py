@@ -22,6 +22,7 @@ from agent.delivery.credentials import TelegramConfigError
 from agent.delivery.formatter import format_single
 from agent.delivery.message import Item, Message
 from agent.delivery.telegram import SendResult, TelegramClient
+from agent.llm import health as llm_health
 from agent.pipeline import Stage, build_stages
 from agent.util.logging import PROCESS_FILTER, get_logger, register_env_secrets
 
@@ -183,10 +184,12 @@ def main(argv: Sequence[str] | None = None) -> int:
             args.config_dir, args.db, args.init_db,
         )
 
-    stages, router, embedder = build_stages(
-        config, os.environ, base=args.config_dir, force_mock=args.dry_run
-    )
+    # DB FIRST, then the router (move 2, 2026-08-31): the health-aware
+    # cascade reads the last 7 days of provider outcomes so a measurably
+    # sick provider starts last — the 05:10 UTC run's pattern (Gemini 50%
+    # throttled, every cluster burned a doomed Gemini attempt first).
     db_conn = None
+    provider_health = {}
     if args.db is not None:
         try:
             memory_db.assert_halt_flags(config.settings.ops)
@@ -194,6 +197,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         except memory_db.StateError as exc:
             logger.error("run: %s", exc)
             return 1
+        provider_health = llm_health.load_health(db_conn)
+    stages, router, embedder = build_stages(
+        config, os.environ, base=args.config_dir,
+        force_mock=args.dry_run, provider_health=provider_health,
+    )
     ctx = RunContext(
         config=config, dry_run=args.dry_run, now=datetime.now(timezone.utc),
         router=router, embedder=embedder, db=db_conn,
@@ -207,6 +215,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         run_pipeline(ctx, stages, logger)
     finally:
         if db_conn is not None:
+            try:
+                llm_health.save_health(db_conn, router.stats.as_dict(), ctx.now)
+            except Exception as exc:  # noqa: BLE001 -- health never breaks a run
+                logger.error("health: saving failed: %s", exc)
             db_conn.close()
     return 0
 

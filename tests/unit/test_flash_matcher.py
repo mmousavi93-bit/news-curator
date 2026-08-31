@@ -91,7 +91,7 @@ def test_larak_fa_strike_fires_escalation():
         "منابع خبری از حمله نظامی آمریکا به مواضع ایران در تنگه هرمز خبر می‌دهند.",
     )])
     assert len(matches) == 1
-    assert matches[0].signature == "escalation|strike|iran_geo"
+    assert matches[0].signature == "escalation"  # class-level burst
 
 
 def test_larak_ar_strike_fires_escalation():
@@ -194,7 +194,7 @@ def test_maritime_vessel_attack_fires_escalation():
         "منابع از حمله دریایی به یک شناور تجاری در نزدیکی تنگه هرمز خبر می‌دهند.",
     )])
     assert len(matches) == 1
-    assert matches[0].signature == "escalation|maritime|iran_geo"
+    assert matches[0].signature == "escalation"
     assert matches[0].location_token == "تنگه هرمز"
 
 
@@ -217,7 +217,7 @@ def test_apparatus_evacuation_fires_escalation():
         "تخلیه سفارت آمریکا در تهران آغاز شد",
     )])
     assert len(matches) == 1
-    assert matches[0].signature == "escalation|apparatus|iran_geo"
+    assert matches[0].signature == "escalation"
 
 
 def test_ultimatum_fires_escalation():
@@ -247,6 +247,44 @@ def test_exclusion_kills_anniversary_item():
         "مراسم سالگرد انفجار در تهران برگزار شد",
     )])
     assert matches == []
+
+
+def test_gaza_front_artillery_does_not_fire_escalation():
+    # Owner live feedback 2026-08-31: routine Gaza/Lebanon front coverage
+    # is not escalation. strike terms + actors ring only = killed by the
+    # iran_geo ring requirement.
+    matches, kills = match_items([_item(
+        "https://x/16",
+        "الاحتلال يواصل تجريف المنصوري بالتزامن مع القصف المدفعي",
+        source_id="al_manar", lang="ar",
+    )], _CONFIG, NOW)
+    assert matches == []
+    assert any(k == ("al_manar", "escalation:no_location") for k in kills)
+
+
+def test_pronoun_us_never_matches_actors():
+    # "us" was removed from the actors ring: normalization lowercases
+    # text, so the English pronoun would match forever.
+    matches, kills = match_items([_item(
+        "https://x/17",
+        "They will respond and let us know",
+        source_id="tg_src", lang="en",
+    )], _CONFIG, NOW)
+    assert matches == []
+    assert any(k == ("tg_src", "escalation:no_location") for k in kills)
+
+
+def test_irgc_navy_statement_fires_via_iranian_adjective():
+    # The live 10:02 item 2026-08-31: its only Iran-marker is the
+    # article-attached adjective «الإيراني» — token-END matching must see
+    # it so the maritime bucket clears its iran_geo requirement.
+    matches = _matches([_item(
+        "https://x/18",
+        "بحرية الحرس الثوري الإيراني: على شركات الشحن البحري ألا تنخدع بتحريض الجيش الأمريكي",
+        source_id="al_manar", lang="ar",
+    )])
+    assert len(matches) == 1
+    assert matches[0].term_bucket == "maritime"
 
 
 def test_space_variant_fireworks_exclusion_kills():

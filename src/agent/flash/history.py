@@ -5,6 +5,7 @@ lines did two jobs — DDL/CRUD and history reads; constraint 12)."""
 from __future__ import annotations
 
 import hashlib
+import json
 import sqlite3
 from datetime import datetime
 
@@ -68,16 +69,30 @@ def location_tokens_since(conn: sqlite3.Connection, class_name: str,
 
 
 def recent_distinct_buckets(conn: sqlite3.Connection, class_name: str,
-                            since: str, exclude_bucket: str) -> set[str]:
+                            since: str, exclude_bucket: str,
+                            sent_only: bool = False) -> set[str]:
     """Distinct term buckets of a class with bursts first seen since
     `since`, excluding one bucket. Powers the convergence note
-    (WAR_SIGNALS_PAPER: three categories moving within 72h is a war)."""
+    (WAR_SIGNALS_PAPER: three categories moving within 72h is a war).
+    Reads the burst's FULL bucket list (class-level bursts merge a whole
+    wave — the opener's bucket column alone would hide every secondary
+    category). `sent_only` restricts to ALERTED buckets — a category the
+    owner never saw must not inflate the count (owner feedback
+    2026-08-31)."""
+    sent_clause = " AND alert_sent = 1" if sent_only else ""
     rows = conn.execute(
-        "SELECT DISTINCT term_bucket FROM bursts WHERE class_name = ? AND "
-        "term_bucket != ? AND first_seen_at >= ?",
-        (class_name, exclude_bucket, since),
+        f"SELECT buckets FROM bursts WHERE class_name = ? AND "
+        f"first_seen_at >= ?{sent_clause}",
+        (class_name, since),
     ).fetchall()
-    return {r["term_bucket"] for r in rows}
+    buckets: set[str] = set()
+    for row in rows:
+        try:
+            buckets |= set(json.loads(row["buckets"] or "[]"))
+        except (ValueError, TypeError):
+            continue
+    buckets.discard(exclude_bucket)
+    return buckets
 
 
 def get_meta(conn: sqlite3.Connection, key: str) -> str | None:

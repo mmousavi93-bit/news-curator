@@ -35,15 +35,21 @@ def _term_bucket(text: str, alert_class: AlertClass) -> str | None:
     return None
 
 
-def _location(text: str, alert_class: AlertClass) -> tuple[str, str] | None:
+def _location(text: str, alert_class: AlertClass,
+              allowed_rings: tuple[str, ...]) -> tuple[str, str] | None:
     """(ring, token) or None. Single-word terms are whole-token matches;
     multi-word phrases are substring matches. RING PRECEDENCE FIRST: the
     rings are ordered by importance in the config (iran_geo before
     actors), so «حمله آمریکا به لارک» displays لارک (the target), never
     آمریکا (the attacker). WITHIN a ring the most specific token wins:
-    longest, ties broken by earliest occurrence."""
+    longest, ties broken by earliest occurrence. `allowed_rings` is the
+    bucket's ring_requirements — action buckets must hit Iran territory,
+    statement buckets may match actors (owner live feedback 2026-08-31:
+    routine Gaza-front coverage is not escalation)."""
     tokens = _tokens(text)
     for ring, locations in alert_class.locations.items():
+        if ring not in allowed_rings:
+            continue
         best: tuple[int, int, str] | None = None  # (len, -index, loc)
         for loc in locations:
             if " " in loc:
@@ -51,7 +57,13 @@ def _location(text: str, alert_class: AlertClass) -> tuple[str, str] | None:
                 if index < 0:
                     continue
                 candidate_len = len(loc)
-            elif loc in tokens:
+            elif loc in tokens or (
+                # Arabic attaches the definite article: «الإيراني» is the
+                # only Iran-marker in the live IRGC-navy item, and whole-
+                # token matching cannot see it. Token-END matching covers
+                # it; the >=4-char floor keeps «ری» from matching «خبری».
+                len(loc) >= 4 and any(t.endswith(loc) for t in tokens)
+            ):
                 index = text.find(loc)
                 candidate_len = len(loc)
             else:
@@ -71,10 +83,7 @@ class Match:
     location_ring: str
     location_token: str
     item: object
-
-    @property
-    def signature(self) -> str:
-        return f"{self.class_name}|{self.term_bucket}|{self.location_ring}"
+    signature: str  # class-level for burst_scope: class, else class|bucket|ring
 
 
 def _fresh(item, freshness_minutes: int, now: datetime) -> bool:
@@ -106,18 +115,27 @@ def match_items(items, config: FlashConfig, now: datetime):
             bucket = _term_bucket(text, alert_class)
             if bucket is None:
                 continue
-            location = _location(text, alert_class)
+            allowed = alert_class.ring_requirements.get(bucket) or tuple(
+                alert_class.locations)
+            location = _location(text, alert_class, allowed)
             if location is None:
-                # A term hit without a location in THIS class must not
-                # block later classes: «حمله موشکی» in a non-Tehran item
-                # is a tehran no_location but may be a live escalation
-                # (the Larak FA item carries موشک).
+                # A term hit without an allowed location must not block
+                # later classes: «حمله موشکی» in a non-Tehran item is a
+                # tehran no_location but may be a live escalation
+                # (the Larak FA item carries موشک). A Gaza artillery
+                # story is a strike whose ring requirement (iran_geo)
+                # is unmet — killed here, exactly as designed.
                 kills.append((item.source_id, f"{class_name}:no_location"))
                 continue
             ring, token = location
+            signature = (
+                class_name if alert_class.burst_scope == "class"
+                else f"{class_name}|{bucket}|{ring}"
+            )
             matches.append(Match(
                 class_name=class_name, term_bucket=bucket,
                 location_ring=ring, location_token=token, item=item,
+                signature=signature,
             ))
             break  # class precedence: first matching class wins
     return matches, kills

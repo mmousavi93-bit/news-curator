@@ -122,6 +122,7 @@ class DigestRankSettings:
     min_score: float
     max_messages: int
     repeat_window_hours: int
+    fallback_max_items: int
 
 
 @dataclass(frozen=True, slots=True)
@@ -176,7 +177,8 @@ SECTIONS: tuple[tuple[str, type, tuple[str, ...]], ...] = (
     ("digest_rank", DigestRankSettings,
      ("category_weights", "corroboration_weight", "tier_bonus",
       "recency_max_bonus", "recency_window_hours", "size_boost_per_member",
-      "size_boost_cap", "min_score", "max_messages", "repeat_window_hours")),
+      "size_boost_cap", "min_score", "max_messages", "repeat_window_hours",
+      "fallback_max_items")),
     ("delivery", DeliverySettings,
      ("telegram_max_chars", "char_budget", "truncate_priority", "output_language",
       "source_languages")),

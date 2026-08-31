@@ -14,6 +14,7 @@ import time as _time
 from typing import Callable, Mapping, Sequence
 
 from agent.llm.limits import ProviderBudget
+from agent.llm.health import cascade_order
 from agent.llm.providers import (
     API_KEY_ENV,
     DEFAULT_TIMEOUT,
@@ -88,15 +89,21 @@ def build_router(
     clock: Callable[[], float] = _time.monotonic,
     sleep: Callable[[float], None] = _time.sleep,
     logger: logging.Logger | None = None,
+    health: Mapping[str, Mapping] | None = None,
 ) -> Router:
     """Build a production router from the validated `llm:` settings block.
 
     Provider-level budget guards come from the same block, for ANY provider
     carrying them (PHASE_5_BRIEF §10) -- enabling a metered provider later
     is a config edit, not a new code path written under pressure.
+
+    `health` (llm/health.py, owner-approved move 2, 2026-08-31) reorders
+    the cascade: providers measurably sick in the last 7 days start last,
+    so priority clusters hit the provider that actually worked yesterday.
     """
     logger = logger or get_logger("agent.llm.router")
-    adapters = build_adapters(settings.order, settings.providers, env, logger)
+    order = cascade_order(settings.order, health or {})
+    adapters = build_adapters(order, settings.providers, env, logger)
     limits: dict[str, ProviderBudget] = {}
     rpm_map: dict[str, int | None] = {}
     timeout_map: dict[str, tuple[float, float]] = {}
