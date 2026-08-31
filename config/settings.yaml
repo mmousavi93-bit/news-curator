@@ -423,6 +423,7 @@ digest_rank:
   size_boost_cap: 1.0
   min_score: 8                   # importance floor: below this, no show
   max_messages: 6                # safety valve; count is dynamic by design
+  fallback_max_items: 5          # LLM-outage raw-title section (move 1)
   repeat_window_hours: 72        # events matching a recent stored event are repeats
 
 delivery:

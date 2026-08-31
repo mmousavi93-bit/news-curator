@@ -42,9 +42,13 @@ matching:
   window_chars: 300           # buckets must appear in title + first 300 chars
 
 burst:
-  collapse_window_minutes: 30 # event key = class|term_bucket|location_ring
+  collapse_window_minutes: 30 # tehran default; escalation overrides per-class
   followup_window_minutes: 90 # after first sighting, alerts stop; digest owns it
   followups: [3, 8]           # at most 2 per event; count = distinct source ids
+  # Escalation re-alert guard (owner 2026-08-31, live-feedback): a novel
+  # bucket/ring only re-alerts after this much quiet on the open burst —
+  # "once per momentum change is enough", not once per micro-post.
+  novelty_min_gap_minutes: 120
 
 caps:
   max_alerts_per_hour: 3      # NEW-event first alerts, ALL classes; FUs exempt
@@ -108,11 +112,28 @@ classes:
 
   escalation:
     label: "افزایش تنش"
+    # ONE open escalation state, not one burst per story (owner live
+    # feedback 2026-08-31: the same IRGC-navy story fired twice because
+    # two sources matched different location tokens). All matches of a
+    # wave merge; a novel bucket/ring re-alerts only past the novelty gap.
+    burst_scope: class
+    collapse_window_minutes: 180
     # Escalation rhetoric (IRGC response threats) is a constant background
     # hum — a SHORTER quiet window than tehran, not a longer one, because a
     # genuine response follows fast and must not be suppressed.
     quiet_hours: 12
     quiet_requires_sources: 3
+    # ACTION buckets must hit IRAN TERRITORY: routine Gaza/Lebanon front
+    # coverage («الاحتلال يجرف المنصوري بالقصف المدفعي») is not escalation.
+    # Statement buckets may match the actors ring (IRGC threats, Trump
+    # ultimatums).
+    ring_requirements:
+      strike: [iran_geo]
+      maritime: [iran_geo]
+      posture: [iran_geo]
+      response_threat: [iran_geo, actors]
+      ultimatum: [iran_geo, actors]
+      apparatus: [iran_geo, actors]
     # Bucket order = evidential value (WAR_SIGNALS_PAPER.md taxonomy,
     # 2025-26 Iran wars): E kinetic (maritime first — a vessel attack
     # preceded EVERY US strike wave by 24-72h in July 2026) → A posture
@@ -153,17 +174,20 @@ classes:
         ar: [رد, انتقام, سيرد, سنرد, توعد]
     locations:
       iran_geo:  # Iran territory incl. strategic islands/sites (Larak-class)
-        fa: [ایران, تهران, لارک, تنگه هرمز, خلیج فارس, هرمز, بوشهر, بندرعباس,
-             بندر لنگه, خارک, اصفهان, نطنز, فوردو, کیش, قشم, ابوموسی,
-             تنب بزرگ, تنب کوچک, میناب]
-        en: [iran, tehran, larak, strait of hormuz, persian gulf, hormuz,
-             bushehr, bandar abbas, isfahan, natanz, fordo, kish, qeshm,
-             abu musa, kharg]
-        ar: [إيران, لارك, مضيق هرمز, الخليج, هرمز, بوشهر, بندر عباس, نطنز, جزيرة]
+        fa: [ایران, ایرانی, تهران, لارک, تنگه هرمز, خلیج فارس, هرمز, بوشهر,
+             بندرعباس, بندر لنگه, خارک, اصفهان, نطنز, فوردو, کیش, قشم,
+             ابوموسی, تنب بزرگ, تنب کوچک, میناب]
+        en: [iran, iranian, tehran, larak, strait of hormuz, persian gulf,
+             hormuz, bushehr, bandar abbas, isfahan, natanz, fordo, kish,
+             qeshm, abu musa, kharg]
+        ar: [إيران, إيراني, لارك, مضيق هرمز, الخليج, هرمز, بوشهر, بندر عباس,
+             نطنز, جزيرة]
       actors:  # whose actions/statements make it escalation-relevant
         fa: [آمریکا, آمریکایی, ترامپ, اسرائیل, اسرائیلی, پنتاگون, سپاه,
              پاسداران, خامنه‌ای, خامنه ای, عراقچی, فرمانده کل]
-        en: [us, usa, united states, american, trump, pentagon, israel,
+        # "us" is ABSENT on purpose: normalization lowercases text, so
+        # the English pronoun "us" would match and re-alert forever.
+        en: [usa, united states, american, trump, pentagon, israel,
              israeli, irgc, khamenei, araqchi]
         ar: [أمريكا, امريكا, ترامب, إسرائيل, البنتاغون, الحرس الثوري, خامنئي, عراقجي]
 

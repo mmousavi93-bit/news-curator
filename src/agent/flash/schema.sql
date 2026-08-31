@@ -21,6 +21,8 @@ CREATE TABLE IF NOT EXISTS bursts (
     first_seen_at  TEXT NOT NULL,
     last_seen_at   TEXT NOT NULL,
     source_ids     TEXT NOT NULL,     -- JSON list, distinct
+    buckets        TEXT NOT NULL DEFAULT '[]',  -- JSON list: every term bucket
+                                     -- seen in the wave (convergence counter)
     requires_sources INTEGER NOT NULL DEFAULT 0,  -- quiet/momentum-held
     alert_sent     INTEGER NOT NULL DEFAULT 0,
     alert_sent_at  TEXT,

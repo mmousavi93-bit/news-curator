@@ -29,6 +29,9 @@ class AlertClass:
     locations: Mapping[str, tuple[str, ...]]
     quiet_hours: int
     quiet_requires_sources: int
+    burst_scope: str                 # "signature" | "class"
+    collapse_window_minutes: int | None  # None = global burst default
+    ring_requirements: Mapping[str, tuple[str, ...]]  # bucket -> allowed rings
 
 
 @dataclass(frozen=True, slots=True)
@@ -42,6 +45,7 @@ class FlashConfig:
     followup_window_minutes: int
     followups: tuple[int, ...]
     max_alerts_per_hour: int
+    novelty_min_gap_minutes: int
     momentum_streak_window_days: int
     momentum_streak_repeat_threshold_days: int
     momentum_repeat_requires_sources: int
@@ -133,6 +137,46 @@ def check_class(raw: object, name: str, errors: list[str]) -> AlertClass | None:
     quiet_requires = check_int(raw.get("quiet_requires_sources"),
                                f"classes.{name}.quiet_requires_sources", 1, errors)
 
+    burst_scope = raw.get("burst_scope", "signature")
+    if burst_scope not in ("signature", "class"):
+        errors.append(
+            f"flash_alert.yaml: classes.{name}.burst_scope must be "
+            f"'signature' or 'class', got {burst_scope!r}"
+        )
+        burst_scope = "signature"
+
+    collapse = raw.get("collapse_window_minutes")
+    if collapse is not None:
+        collapse = check_int(collapse, f"classes.{name}.collapse_window_minutes",
+                             1, errors)
+
+    ring_reqs_raw = raw.get("ring_requirements")
+    ring_requirements: dict[str, tuple[str, ...]] = {}
+    if ring_reqs_raw is not None:
+        if not isinstance(ring_reqs_raw, dict):
+            errors.append(f"flash_alert.yaml: classes.{name}.ring_requirements "
+                          "must be a mapping")
+        else:
+            for bucket, rings in ring_reqs_raw.items():
+                if bucket not in terms:
+                    errors.append(
+                        f"flash_alert.yaml: classes.{name}.ring_requirements."
+                        f"{bucket}: unknown term bucket"
+                    )
+                    continue
+                ring_list = check_str_list(rings,
+                                           f"classes.{name}.ring_requirements.{bucket}",
+                                           errors)
+                bad = [r for r in ring_list
+                       if r not in _RINGS and r not in locations]
+                for r in bad:
+                    errors.append(
+                        f"flash_alert.yaml: classes.{name}.ring_requirements."
+                        f"{bucket}: unknown ring {r!r}"
+                    )
+                if ring_list:
+                    ring_requirements[bucket] = ring_list
+
     if not terms:
         errors.append(f"flash_alert.yaml: classes.{name} has no term buckets")
     if not locations:
@@ -141,4 +185,6 @@ def check_class(raw: object, name: str, errors: list[str]) -> AlertClass | None:
     return AlertClass(
         name=name, label=label, terms=terms, locations=locations,
         quiet_hours=quiet_hours, quiet_requires_sources=quiet_requires,
+        burst_scope=burst_scope, collapse_window_minutes=collapse,
+        ring_requirements=ring_requirements,
     )

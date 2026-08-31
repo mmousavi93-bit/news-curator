@@ -44,6 +44,7 @@ class BurstRow:
     first_seen_at: str
     last_seen_at: str
     source_ids: tuple[str, ...]
+    buckets: tuple[str, ...]
     requires_sources: int
     alert_sent: bool
     followups_sent: int
@@ -69,6 +70,14 @@ def open_flash_db(path: Path, *, create_if_absent: bool = False) -> sqlite3.Conn
     conn = sqlite3.connect(str(path))
     conn.row_factory = sqlite3.Row
     conn.executescript(_SCHEMA_PATH.read_text(encoding="utf-8"))
+    # Additive upgrade for DBs created before the buckets column
+    # (2026-08-31, class-level escalation bursts): CREATE TABLE IF NOT
+    # EXISTS never touches an existing table, so a column added later
+    # must be ALTERed in — additive-only, never a rewrite.
+    cols = {r["name"] for r in conn.execute("PRAGMA table_info(bursts)")}
+    if "buckets" not in cols:
+        conn.execute("ALTER TABLE bursts ADD COLUMN buckets TEXT NOT NULL DEFAULT '[]'")
+        conn.commit()
     row = conn.execute("SELECT value FROM meta WHERE key = ?",
                        (_VERSION_KEY,)).fetchone()
     if row is None:
@@ -104,6 +113,8 @@ def _burst(row: sqlite3.Row) -> BurstRow:
         headline=row["headline"], first_source=row["first_source"],
         first_seen_at=row["first_seen_at"], last_seen_at=row["last_seen_at"],
         source_ids=tuple(json.loads(row["source_ids"])),
+        buckets=tuple(json.loads(
+            row["buckets"] if "buckets" in row.keys() else "[]")),
         requires_sources=row["requires_sources"],
         alert_sent=bool(row["alert_sent"]),
         followups_sent=row["followups_sent"],
@@ -113,32 +124,50 @@ def _burst(row: sqlite3.Row) -> BurstRow:
 
 def insert_burst(conn: sqlite3.Connection, match, now: datetime,
                  requires_sources: int) -> int:
+    # Headline = title, or the body's lead when the title is empty —
+    # Telegram posts carry their content in the body and nothing in the
+    # title, which shipped blank headlines in the first live run
+    # (owner feedback 2026-08-31).
+    headline = (match.item.title or "").strip() or (match.item.body or "").strip()[:120]
     cursor = conn.execute(
         """INSERT INTO bursts (class_name, signature, term_bucket, location_ring,
            location_token, headline, first_source, first_seen_at, last_seen_at,
-           source_ids, requires_sources)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+           source_ids, buckets, requires_sources)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
         (
             match.class_name, match.signature, match.term_bucket,
             match.location_ring, match.location_token,
-            match.item.title, match.item.source_id,
+            headline, match.item.source_id,
             _iso(now), _iso(now), json.dumps([match.item.source_id]),
-            requires_sources,
+            json.dumps([match.term_bucket]), requires_sources,
         ),
     )
     conn.commit()
     return int(cursor.lastrowid)
 
 
-def add_sources(conn: sqlite3.Connection, burst_id: int,
-                source_ids: set[str], now: datetime) -> None:
-    row = conn.execute("SELECT source_ids FROM bursts WHERE id = ?",
+def add_source(conn: sqlite3.Connection, burst_id: int, source_id: str,
+               term_bucket: str, now: datetime) -> None:
+    """Merge one match into the wave: distinct sources accumulate, and
+    the bucket list records every category the wave touched — the
+    convergence counter reads the wave's FULL bucket variety, not just
+    the opener's (a class-level burst would otherwise make secondary
+    buckets invisible)."""
+    row = conn.execute("SELECT source_ids, buckets FROM bursts WHERE id = ?",
                        (burst_id,)).fetchone()
-    merged = sorted(set(json.loads(row["source_ids"])) | source_ids)
+    sources = sorted(set(json.loads(row["source_ids"])) | {source_id})
+    buckets = sorted(set(json.loads(
+        row["buckets"] if "buckets" in row.keys() else "[]")) | {term_bucket})
     conn.execute(
-        "UPDATE bursts SET source_ids = ?, last_seen_at = ? WHERE id = ?",
-        (json.dumps(merged), _iso(now), burst_id),
+        "UPDATE bursts SET source_ids = ?, buckets = ?, last_seen_at = ? WHERE id = ?",
+        (json.dumps(sources), json.dumps(buckets), _iso(now), burst_id),
     )
+    conn.commit()
+
+
+def set_requires(conn: sqlite3.Connection, burst_id: int, value: int) -> None:
+    conn.execute("UPDATE bursts SET requires_sources = ? WHERE id = ?",
+                 (value, burst_id))
     conn.commit()
 
 

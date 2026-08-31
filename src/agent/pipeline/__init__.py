@@ -50,6 +50,7 @@ def build_stages(
     *,
     base: Path | None = None,
     force_mock: bool = False,
+    provider_health: Mapping[str, Mapping] | None = None,
 ) -> tuple[tuple[Stage, ...], object, object]:
     """Wire the real Phase 6 stages. `base` overrides the config dir (tests).
     Returns (stages, router, embedder) -- the caller attaches the last two
@@ -102,7 +103,8 @@ def build_stages(
                         clock=lambda: 0.0, sleep=lambda s: None, logger=logger)
         embedder = FakeEmbedder()
     else:
-        router = build_router(config.settings.llm, environment, logger=logger)
+        router = build_router(config.settings.llm, environment, logger=logger,
+                              health=provider_health)
         embedder = MiniLmEmbedder(config.settings.pipeline.embed_model)
 
     understand_prompt = _load_prompt("understand.txt", base)

@@ -63,6 +63,8 @@ def validate_flash(raw: object) -> FlashConfig:
                          "burst.collapse_window_minutes", 1, errors)
     followup_window = check_int(burst_raw.get("followup_window_minutes"),
                                 "burst.followup_window_minutes", 1, errors)
+    novelty_gap = check_int(burst_raw.get("novelty_min_gap_minutes"),
+                            "burst.novelty_min_gap_minutes", 1, errors)
     followups_raw = burst_raw.get("followups")
     followups: tuple[int, ...] = ()
     if (isinstance(followups_raw, list)
@@ -144,6 +146,7 @@ def validate_flash(raw: object) -> FlashConfig:
         followup_window_minutes=followup_window,
         followups=followups,
         max_alerts_per_hour=max_alerts,
+        novelty_min_gap_minutes=novelty_gap,
         momentum_streak_window_days=streak_window,
         momentum_streak_repeat_threshold_days=repeat_threshold,
         momentum_repeat_requires_sources=repeat_requires,

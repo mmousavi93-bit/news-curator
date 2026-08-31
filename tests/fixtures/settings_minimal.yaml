@@ -108,6 +108,7 @@ digest_rank:
   min_score: 8
   max_messages: 6
   repeat_window_hours: 72
+  fallback_max_items: 5
 
 delivery:
   telegram_max_chars: 4096

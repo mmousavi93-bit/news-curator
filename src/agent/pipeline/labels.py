@@ -47,6 +47,7 @@ LABELS: Mapping[str, Mapping[str, str]] = {
             "خبرها ذخیره شدند و در اجراهای بعدی پوشش داده می‌شوند."
         ),
         "nothing_new": "چیز تازهای نسبت به اجرای قبلی نیامده.",
+        "raw_fallback": "⚠️ خلاصه خودکار در دسترس نیست — عناوین خام منابع:",
         "ai_unavailable": (
             "هوش مصنوعی در این اجرا در دسترس نبود؛ خبرها جمعآوری و "
             "ذخیره شدند اما خلاصهای ساخته نشد."
@@ -62,6 +63,7 @@ LABELS: Mapping[str, Mapping[str, str]] = {
         "digest_marker": "daily digest",
         "tehran": "Tehran",
         "nothing_new": "Nothing new since the last run.",
+        "raw_fallback": "⚠️ Automated summaries unavailable — raw source titles:",
         "ai_unavailable": (
             "AI unavailable this run -- items were collected and stored, "
             "but nothing could be summarised."

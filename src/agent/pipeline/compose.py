@@ -15,7 +15,7 @@ from __future__ import annotations
 import logging
 
 from agent.collectors.tz import to_tehran
-from agent.delivery.formatter import format_split
+from agent.delivery.formatter import escape_html, format_split
 from agent.delivery.message import Item, Message
 from agent.pipeline.labels import category_icon, category_name, labels_for
 from agent.pipeline.langgate import split_persian
@@ -31,6 +31,38 @@ def _headline(summary: str) -> str:
         return first
     cut = first[:137].rsplit(" ", 1)[0]
     return cut + "…"
+
+
+_RAW_TITLE_CAP = 110
+# Understand-stage PROVIDER failures only — an inclusion list on purpose:
+# validate judgments (lang/rank/repeat drops) have events and their own
+# fates; a repeat-drop is not a provider failure.
+_UNCOVERED_FATES = {"unavailable", "refused_cap", "unparseable", "oversized"}
+
+
+def _raw_fallback(clusters: list, event_keys: set, fates: dict, labels: dict,
+                  max_items: int) -> str:
+    """Raw-title section for clusters the LLM could not cover (move 1,
+    2026-08-31: the product survives total LLM loss). Content-filtered
+    clusters (clickbait/irrelevant) are judgments, not failures — they
+    stay out. Source titles are quoted text, displayed as-is; the
+    formatter (or the plain-text path) escapes them."""
+    lines: list[str] = []
+    for cluster in clusters:
+        fate = fates.get(cluster.key)
+        if cluster.key in event_keys:
+            continue
+        if fate not in _UNCOVERED_FATES and fate is not None:
+            continue  # judged (clickbait/irrelevant) or another stage's drop
+        title = cluster.members[0].title.strip()
+        if len(title) > _RAW_TITLE_CAP:
+            title = title[:_RAW_TITLE_CAP] + "…"
+        lines.append(f"• {title}")
+        if len(lines) >= max_items:
+            break
+    if not lines:
+        return ""
+    return labels["raw_fallback"] + "\n" + "\n".join(lines)
 
 
 def _when_text(cluster, labels) -> str:
@@ -79,6 +111,16 @@ class ComposeStage:
                 )
         ctx.lang_dropped = lang_dropped
 
+        # Raw fallback section (move 1, 2026-08-31): clusters the LLM
+        # could not cover, as escaped raw source titles. lang-dropped
+        # events were judged -- their keys stay out of the fallback.
+        fates = dict(getattr(ctx, "cluster_fates", None) or [])
+        raw_fallback = _raw_fallback(
+            list(getattr(ctx, "clusters", None) or []),
+            {e.event_key for e in events} | {e.event_key for e in lang_dropped},
+            fates, labels, settings.digest_rank.fallback_max_items,
+        )
+
         if not events:
             if lang_dropped:
                 # Events existed but none rendered Persian: say so, never
@@ -89,6 +131,8 @@ class ComposeStage:
                 text = labels["ai_unavailable"]
             else:
                 text = labels["nothing_new"]
+            if raw_fallback:
+                text += "\n\n" + escape_html(raw_fallback)
             ctx.messages = [text]
             ctx.counters["compose"] = 0
             self._logger.info("compose: no events -- honest one-liner")
@@ -108,6 +152,8 @@ class ComposeStage:
                 labels["ai_unavailable"] if getattr(ctx, "llm_failed", False)
                 else labels["nothing_new"]
             )
+            if raw_fallback:
+                text += "\n\n" + escape_html(raw_fallback)
             ctx.messages = [text]
             ctx.counters["compose"] = 0
             self._logger.info(
@@ -144,7 +190,8 @@ class ComposeStage:
                 detail=" · ".join(detail_bits),
             ))
 
-        message = Message(header=header, items=tuple(items), footer=None)
+        message = Message(header=header, items=tuple(items),
+                          footer=raw_fallback or None)
         max_units = settings.delivery.telegram_max_chars
         # format_split budgets and splits by priority; the digest may span
         # up to digest_rank.max_messages messages (owner decision).

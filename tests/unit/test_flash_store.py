@@ -52,9 +52,12 @@ def test_burst_lifecycle_and_alert_count_window(tmp_path):
 
         match = Match(class_name="tehran", term_bucket="explosion",
                       location_ring="city", location_token="تهران",
-                      item=type("I", (), {"title": "انفجار", "source_id": "tg_a"})())
+                      item=type("I", (), {"title": "انفجار", "body": "",
+                                          "source_id": "tg_a"})(),
+                      signature="tehran|explosion|city")
         burst_id = store.insert_burst(conn, match, NOW, requires_sources=0)
-        store.add_sources(conn, burst_id, {"tg_b"}, NOW + timedelta(minutes=5))
+        store.add_source(conn, burst_id, "tg_b", "explosion",
+                         NOW + timedelta(minutes=5))
         store.mark_alert_sent(conn, burst_id, NOW)
         old = NOW - timedelta(hours=2)
         assert store.alerts_sent_since(conn, store._iso(old)) == 1
@@ -72,7 +75,9 @@ def test_prune_removes_old_closed_bursts_and_urls(tmp_path):
 
         match = Match(class_name="tehran", term_bucket="explosion",
                       location_ring="city", location_token="تهران",
-                      item=type("I", (), {"title": "انفجار", "source_id": "tg_a"})())
+                      item=type("I", (), {"title": "انفجار", "body": "",
+                                          "source_id": "tg_a"})(),
+                      signature="tehran|explosion|city")
         burst_id = store.insert_burst(conn, match, NOW, requires_sources=0)
         store.close_burst(conn, burst_id, NOW)
         # Bursts keep 30 days (the momentum lookback horizon); urls 7.
@@ -91,6 +96,27 @@ def test_prune_removes_old_closed_bursts_and_urls(tmp_path):
                      (store._iso(NOW - timedelta(days=8)), burst_id2))
         conn.commit()
         assert store.prune(conn, NOW)[0] == 0
+    finally:
+        conn.close()
+
+
+def test_insert_burst_uses_body_when_title_empty(tmp_path):
+    # Owner live feedback 2026-08-31: Telegram posts carry their content
+    # in the body and nothing in the title — the first live run shipped
+    # blank headlines.
+    conn = store.open_flash_db(tmp_path / "flash.db", create_if_absent=True)
+    try:
+        from agent.flash.matcher import Match
+
+        match = Match(class_name="tehran", term_bucket="explosion",
+                      location_ring="city", location_token="تهران",
+                      item=type("I", (), {
+                          "title": "",
+                          "body": "صدای انفجار در تهران شنیده شد — جزئیات بعدا",
+                          "source_id": "tg_a"})(),
+                      signature="tehran|explosion|city")
+        store.insert_burst(conn, match, NOW, requires_sources=0)
+        assert store.open_bursts(conn)[0].headline.startswith("صدای انفجار")
     finally:
         conn.close()
 
