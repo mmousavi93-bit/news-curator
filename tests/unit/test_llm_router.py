@@ -255,5 +255,19 @@ def test_backoff_sleep_between_retryable_failures():
     assert sleeps == [2.0, 4.0]
 
 
+def test_consecutive_429s_do_not_open_the_breaker():
+    # 2026-08-31 09:36 run: Groq's breaker opened over TWO pacing 429s
+    # and the cascade collapsed into 24 skipped clusters. A 429 means
+    # "slow down", not "broken" -- the breaker must not judge on it.
+    # With one provider: two 429s in a row would open a breaker that
+    # counts them, and the third attempt would return UNAVAILABLE.
+    transport = MockHttpTransport(
+        responses=[HttpResponse(429, {}), HttpResponse(429, {}), _GEMINI_OK]
+    )
+    result = _router([_gemini()], transport, breaker_threshold=2).complete("hello")
+    assert result.ok is True
+    assert result.provider == "gemini"
+
+
 # The call-cap, vision-gating, reservation and provider-spend tests live in
 # test_llm_router_budget.py (split for the ~200-line convention).

@@ -69,7 +69,7 @@ def test_end_to_end_alert_sent_once_then_deduped(tmp_path, monkeypatch):
     assert run_flash._run(_args(db=db)) == 0
     assert len(client.sent) == 1
     assert "افزایش تنش" in client.sent[0]
-    assert "شایعه" in client.sent[0]
+    assert "تأیید نشده" in client.sent[0]
     # Second run: same URL already seen -> no duplicate alert.
     client2 = _FakeClient()
     _patch(monkeypatch, [_larak_item()], client2)

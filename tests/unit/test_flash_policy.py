@@ -72,7 +72,7 @@ def test_first_alert_fires_at_one_source(tmp_path):
     stats = evaluate([match], conn, _CONFIG, NOW, sender, _Log())
     assert stats["sent"] == 1
     assert len(sender.sent) == 1
-    assert "🚨" in sender.sent[0] and "شایعه" in sender.sent[0]
+    assert "🚨" in sender.sent[0] and "تأیید نشده" in sender.sent[0]
     assert store.open_bursts(conn)[0].alert_sent is True
 
 

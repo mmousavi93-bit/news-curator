@@ -13,7 +13,7 @@
 # Burst signature = class|term_bucket|location_ring — one first alert plus
 # at most 2 source-count follow-ups per burst. Repetition over sources is
 # AMPLIFICATION, never corroboration — every message carries the
-# «شایعه — تأیید نشده» label (standing rumour policy).
+# «تأیید نشده» label (standing rumour policy).
 #
 # CLASS PRECEDENCE: classes are checked in file order; the first matching
 # class wins (a Tehran explosion alerts as tehran, not escalation).
@@ -198,12 +198,12 @@ templates:
     📍 {location_token}
     📡 منابع: {first_source}{more_sources}
     {convergence}⏱ {jalali} — {tehran_time}
-    «شایعه — تأیید نشده؛ تکرار خبر توسط منابع متعدد به‌معنای تأیید نیست.»
+    «تأیید نشده»
   followup: |
     🚨 به‌روزرسانی — {n} منبع گزارش می‌دهند
     {label}
     {headline}
-    «شایعه — تأیید نشده»
+    «تأیید نشده»
   system_down: |
     ⚠️ سیستم هشدار از کار افتاده است (رمزگشایی state ناموفق یا خطای بحرانی).
     تا رفع مشکل، به مرور اخبار عادی تکیه کنید.
