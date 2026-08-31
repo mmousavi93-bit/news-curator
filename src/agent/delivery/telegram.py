@@ -100,7 +100,13 @@ class TelegramClient:
         self._rate_limiter = _RateLimiter(MIN_SEND_INTERVAL_SECONDS, sleep, now)
 
     @classmethod
-    def from_env(cls, env: Mapping[str, str], transport: Transport | None = None) -> "TelegramClient":
+    def from_env(
+        cls,
+        env: Mapping[str, str],
+        transport: Transport | None = None,
+        *,
+        channel_env_var: str = "TELEGRAM_CHANNEL_ID",
+    ) -> "TelegramClient":
         """Read both credentials from `env`, register them with the
         redaction filter before doing anything else with them, validate the
         channel id's shape if present, and build a client. Absent env vars
@@ -108,9 +114,15 @@ class TelegramClient:
         the real (`requests`-backed) transport when both credentials are
         actually present -- constructing it unconditionally would make
         mock mode, --send-test, and the test suite require `requests` to be
-        installed even though mock mode never sends a byte over the network."""
+        installed even though mock mode never sends a byte over the network.
+
+        `channel_env_var` names an optional OVERRIDE that falls back to
+        TELEGRAM_CHANNEL_ID (flash monitor: FLASH_CHANNEL_ID -> owner moves
+        the alert channel by adding one secret, 2026-08-30)."""
         token = env.get("TELEGRAM_BOT_TOKEN") or None
-        channel_id = env.get("TELEGRAM_CHANNEL_ID") or None
+        channel_id = (
+            env.get(channel_env_var) or env.get("TELEGRAM_CHANNEL_ID") or None
+        )
         register_credentials(token, channel_id)
         if channel_id:
             validate_channel_id(channel_id)

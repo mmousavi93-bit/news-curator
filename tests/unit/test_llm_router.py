@@ -88,6 +88,19 @@ def test_429_rotates_to_next_provider():
     assert GROQ_URL_PREFIX in transport.calls[1]["url"]
 
 
+def test_stats_count_attempts_per_provider():
+    # 2026-08-30: run.csv gains calls_<provider>/fails_<provider> so the
+    # owner watches bai's ceiling and Gemini's degradation from artifacts.
+    transport = MockHttpTransport(responses=[HttpResponse(429, {}), _GROQ_OK])
+    router = _router([_gemini(), _groq()], transport)
+    result = router.complete("hello")
+    assert result.ok is True
+    assert router.stats.as_dict() == {
+        "gemini": {"calls": 1, "failed": 1},   # the 429 attempt
+        "groq": {"calls": 1, "failed": 0},     # the carrying attempt
+    }
+
+
 def test_500_rotates_to_next_provider():
     transport = MockHttpTransport(responses=[HttpResponse(500, {}), _GROQ_OK])
     result = _router([_gemini(), _groq()], transport).complete("hello")

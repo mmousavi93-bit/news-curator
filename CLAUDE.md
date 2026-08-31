@@ -86,9 +86,12 @@ silently work around them.
 ## Owner's chosen configuration
 
 - Public repo, state encrypted with `age`, force-pushed to an orphan `state` branch.
-- Pipeline every 3 hours (8/day) **plus** a daily digest at 07:00 Asia/Tehran.
-  Owner explicitly chose per-run messages over threshold-only delivery. Honour it, but keep
-  no-change runs to a short honest one-liner.
+- Pipeline: daily digest at 09:00 Asia/Tehran, then every 3 hours
+  (12/15/18/21/00:00 Tehran), silent 00:00–09:00 — 6 runs/day. Owner changed
+  this 2026-08-30 from 8/day + 07:00 digest. All schedule times the owner
+  states are IRAN time; crons in the workflow are UTC (Tehran = UTC+3:30,
+  no DST). Owner explicitly chose per-run messages over threshold-only
+  delivery. Honour it, but keep no-change runs to a short honest one-liner.
 - Output language: English. Sources in en / fa / ar / he.
 - LLM order: Gemini → Groq → OpenRouter → degrade gracefully.
 
@@ -97,10 +100,11 @@ silently work around them.
 Six gaps found when the scoring analysis was reconciled against the pipeline design.
 All six are now written into `config/settings.yaml` and `config/credibility.yaml`.
 
-1. **Canonical daily evaluation = the 07:00 digest run.** The rulebook is day-granular
+1. **Canonical daily evaluation = the 09:00 digest run** (was 07:00; owner moved it
+   2026-08-30). The rulebook is day-granular
    and Step 12 counts "7 consecutive *daily* evaluations", but the pipeline runs 8x/day —
    7 days or 56 runs was undefined, making WARTIME entry nondeterministic. Regime
-   counters, trailing 7-day means and novelty cycles advance only at 07:00. Intra-day
+   counters, trailing 7-day means and novelty cycles advance only at 09:00. Intra-day
    runs score normally (a signal dated today gets AGE 0 and registers within 3h) but
    never advance regime state.
 2. **Retention split, no longer a flat 30 days.** H1's 30-day half-life means a state
@@ -174,16 +178,19 @@ Prompts live in `config/prompts/*.txt` — edit those, never hardcode prompt tex
 | `agents/briefs/` | One Architect brief per phase. `PHASE_1_BRIEF.md`, `PHASE_2_BRIEF.md`, `PHASE_3_BRIEF.md`, `PHASE_4_BRIEF.md` (Storage), **`PHASE_5_BRIEF.md` (LLM router, 2026-08-21, 199 lines)**. An Implementer runs only from a brief. |
 | `tools/` | Dev utilities, stdlib-only, never imported by the pipeline. `check_feeds.py` probes every URL in `sources_candidates.csv`. **`dump_body.py`** answers *why* a live feed's data is shaped wrong: counts `DATE_RE` hits inside vs outside `<item>` slices and inventories item tag names, so cause (a) channel-level-date-only is distinguished from cause (b) collector-regex-miss mechanically. Its `ENTRY_RE`/`DATE_RE` are copied verbatim from `rss.py` and CAN drift — it prints both patterns every run so a diff is one glance. **`pytest_shim.py`** (465 lines, added 2026-08-29): stdlib pytest-substitute because the sandbox has no PyPI — runs the literal suite, reproduced the 361 total exactly. |
 | `.github/workflows/probe-feeds.yml` | Manual `workflow_dispatch` run of `check_feeds.py --tag ci` from a US runner. Authoritative feed-liveness verdict. Uploads artifact, commits nothing. Already takes `candidates` + `tag` inputs, so a new probe round needs **zero code**. |
-| `.github/workflows/pipeline.yml` | **Phase 7, written 2026-08-29.** THE unattended run: cron `0 */3 * * *` + `30 3 * * *` (07:00 Tehran digest, canonical), decrypt (halt on failure) → run → encrypt → force-push orphan `state` branch (`git add -f` — *.age is gitignored) → 90-day artifact backup. Digest cron sets `NEWS_CURATOR_DIGEST`. `permissions: contents: write`. |
+| `.github/workflows/pipeline.yml` | **Phase 7, written 2026-08-29; schedule changed 2026-08-30.** THE unattended run: cron `30 5 * * *` (09:00 Tehran digest, canonical) + `30 8,11,14,17,20 * * *` (12/15/18/21/00:00 Tehran; silent 00:00–09:00, 6 runs/day), decrypt (halt on failure) → run → encrypt → force-push orphan `state` branch (`git add -f` — *.age is gitignored) → 90-day artifact backup. Digest cron sets `NEWS_CURATOR_DIGEST` via the schedule-string comparison. `permissions: contents: write`. |
 | `.github/workflows/ci.yml` | Tests on push/PR. `test` job deliberately installs NO [embeddings] extra (offline guard stays meaningful); `embeddings` job installs it, caches ~/.cache/huggingface, smokes real MiniLM to 384 dims. |
 | `.github/workflows/dump-body.yml` | Manual `workflow_dispatch` run of `dump_body.py`. Diagnostic, asserts nothing, always exits 0. Also fetches `telegram.org/robots.txt` and greps it for `/s/`. Body returns as an artifact; `config/_body_dump.bin` is gitignored and must never be committed. |
 | `config/sources_probe_<tag>.csv` | Probe output, one file per environment (`local` = owner's PC in Iran, `ci` = GitHub US runner). |
 | `src/agent/collectors/` | One file per source type, all implement `base.py`. |
-| `src/agent/pipeline/` | **Phases 6–7 built 2026-08-29:** `filter.py` (topic gate), `embed.py` (Embedder protocol + MiniLM + FakeEmbedder), `cluster.py` (greedy cosine + priority rank + enforced cap), `understand.py` (one router call per cluster + clickbait/irrelevance filter + events write), `collect.py` (fetch → dedup → store → ctx.items), `compose.py` (events → one budgeted message; date_only respected), `deliver.py` (Telegram or mock), `build_stages()` in `__init__.py` wires them; vision/validate/score stay no-ops until their phases. Full pipe: `python -m agent.run --db state.db`. |
+| `src/agent/pipeline/` | **Phases 6–7 built 2026-08-29:** `filter.py` (topic gate), `embed.py` (Embedder protocol + MiniLM + FakeEmbedder), `cluster.py` (greedy cosine + priority rank + enforced cap), `understand.py` (one router call per cluster + clickbait/irrelevance filter + events write), `langretry.py` (retry-once forced-Persian, 9m), `collect.py` (fetch → dedup → store → ctx.items), `compose.py` (events → one budgeted message; date_only respected), `deliver.py` (Telegram or mock), `build_stages()` in `__init__.py` wires them; vision/validate/score stay no-ops until their phases. Full pipe: `python -m agent.run --db state.db`. |
 | `src/agent/memory/` | **Phase 4 closed 2026-08-21; extended Phases 6–10.** `schema.sql` (13 tables, `SCHEMA_VERSION = 2` — lead_outcomes added additively), `db.py` (additive-only upgrades), `models.py`, `event_models.py` (Phase 6), `lead_models.py` + `source_health.py` (Phase 9/10), `dedup.py` (layers 1–3), `retention.py`, `crypto.py`. Journal mode DELETE not WAL, on purpose. `open_db` refuses to create by default — constraint 14. |
 | `src/agent/risk/` | Deterministic scoring. No LLM calls permitted in this package. |
-| `src/agent/llm/` | **Phase 5, built + gate-green 2026-08-29.** `errors.py` (typed outcomes, LlmResult), `transport.py` (lazy requests + recording mock), `limits.py` (CallBudget, ProviderBudget, RpmPacer), `breaker.py` (backoff + circuit breaker), `call.py` (one attempt + structured logging), `providers.py` (Gemini/Groq/OpenRouter adapters), `router.py` (failover loop), `wiring.py` (build_router + build_adapters). Clock/sleep injected everywhere. |
+| `src/agent/llm/` | **Phase 5, built + gate-green 2026-08-29.** `errors.py` (typed outcomes, LlmResult), `transport.py` (lazy requests + recording mock), `limits.py` (CallBudget, ProviderBudget, RpmPacer), `breaker.py` (backoff + circuit breaker), `call.py` (one attempt + structured logging), `providers.py` (Gemini/Groq/OpenRouter/Bai adapters), `router.py` (failover loop), `stats.py` (per-provider attempt counters → run.csv, 9m), `wiring.py` (build_router + build_adapters). Clock/sleep injected everywhere. |
 | `src/agent/delivery/` | Telegram client and message formatter. |
+| `src/agent/flash/` | **Session 9n:** `textnorm.py` (shared normalization), `config.py` + `loader.py` (strict validation, keywords normalized at load), `matcher.py`, `store.py` + `schema.sql` + `history.py` (own flash.db on the `flash-state` branch), `policy.py`, `momentum.py`, `run_flash.py`. Entry: `python -m agent.flash.run_flash --db flash.db`; `--dry-run` writes the tuning CSV, sends nothing. |
+| `.github/workflows/flash-alert.yml` | **Session 9n:** cron `*/15 * * * *` (24/7 by owner decision), decrypt halts + sends system-down, `flash.ok` gates encrypt/push so a crashed run never overwrites last good state, own orphan `flash-state` branch. |
+| `config/flash_alert.yaml` | **Session 9n:** classes, terms, locations, exclusions, momentum, deescalation, templates — owner-editable, strictly validated. |
 
 ## Working agreement for agents on this project
 
@@ -438,6 +445,90 @@ so `within_bounds` (headline 2-25 / summary 2-60 words) now runs after parse;
 violations skip the cluster with an `oversized` fate. The probe measures the
 same contract. Suite 562 → 564.
 
+## Session 9m (2026-08-30) — batch-2 built, suite 590 (owner to push): lang retry, ceremony rule, chosen text, provider counters
+
+Owner phase refocus: "empower llm call and api usage — ensure the service
+is not corrupted by api limits or changes." Findings + build:
+
+1. **`pipeline/langretry.py` — retry-once forced-Persian.** The 18:54 clean
+   run (cascade-free, the tuning dataset) lost its best tier-2 item (AJ
+   Arabic: Sudan/Kordofan displacement, score 9.14) to `lang_dropped` --
+   the provider answered in Arabic despite the prompt. Now: non-Persian
+   headline/summary triggers ONE extra router call with a forced-Persian
+   line; on any failure the original event survives (compose's gate still
+   drops it from the message). Cost ~1 call/drift, inside budget.
+2. **Ceremonial rule in `understand.txt`**: commemorations/ceremonies →
+   `irrelevant` unless equipment unveiling or concrete military action
+   (kills the air-defense-day PR-item class).
+3. **`chosen.csv` gains headline/summary** for event-bearing fates — the
+   Masafer Yatta lesson (gate forensics need text).
+4. **`outputs/` gitignored** — run CSVs are artifact-only; `git rm -r
+   --cached outputs/` on the owner's next commit.
+5. **`llm/stats.py` → run.csv `calls_<p>`/`fails_<p>` columns.** Passive
+   per-provider attempt counters: bai's ceiling measured like Groq's ~13
+   was, Gemini degradation trended, OpenRouter resurrection detected --
+   from artifacts, not logs.
+6. **Provider research on record** (owner asked why gemini/openrouter
+   failed; bai limits): Gemini's day-long 429/503 = free-tier throttling
+   (Google changed Gemini access/limits in 2026 -- support page +
+   tier-downgrade forum threads); OpenRouter verdict stands (404 = roster
+   rot, 403 on live-list model = zero-balance policy — dead under
+   constraint 1); bai limits UNKNOWN and unreadable (reseller, docs
+   egress-blocked) → measured via (5), never guessed.
+7. **Rumour policy answered, no change**: tier-3 never corroborates
+   (validate.py, rulebook Step 1). OSINT repetition = amplification, not
+   evidence; the delivery mechanism for "explosion near islands" is the
+   existing شایعه label within 3h. No multi-channel-OSINT tier.
+8. **Tuning findings from the 18:54 clean run**: cluster threshold 0.55
+   KEEP (1.77 items/cluster; Bennett-series fragmentation died downstream
+   anyway); min_score 8 no change (small n); delivered set was 100%
+   tier-3 rumour BECAUSE the one tier-2 item died at the lang gate —
+   fix (1) changes that composition. Full forensic: POSTMORTEMS.md.
+
+Remaining this phase: labeled pilot (needs 2–3 more clean-run CSVs),
+then cascade-order decision on evidence.
+
+## Session 9n (2026-08-30/31) — Iran-time schedule + flash monitor, suite 646 (owner to push)
+
+Owner directives: all stated times are IRAN time (Tehran = UTC+3:30 fixed,
+no DST); digest 09:00 Tehran + 3-hourly through 00:00, silent overnight
+(6 runs/day, LLM budget 306/day); near-instant unverified Tehran-explosion
+AND escalation alerts (Larak attack live 2026-08-30: US struck Iranian
+launchers on Larak Island, AP-confirmed), 15-min scans, 24/7, burst
+cleaning + momentum semantics; independent adversarial review before push.
+
+1. **Schedule**: pipeline.yml crons `30 5 * * *` (09:00 Tehran digest,
+   canonical) + `30 8,11,14,17,20 * * *`; digest detection via the
+   schedule-string comparison; lookback_hours 12 (declared, still
+   unconsumed by code).
+2. **`src/agent/flash/`** — zero-LLM deterministic monitor. matcher
+   (classes × term-bucket × location-ring; ring precedence then
+   longest-token; normalization applied to BOTH text and keywords;
+   120-min freshness gate); policy (burst collapse 30min, follow-ups at
+   3/8 sources, cap 3/h with defer-never-drop ENFORCED, per-class quiet
+   windows, ack-gating); momentum (day-3 background rule for repeated
+   buckets, novel-target restore, slow de-escalation certified only
+   after ≥3 quiet alerted-days, convergence notes — WAR_SIGNALS_PAPER
+   applied); store+schema.sql+history (own flash.db on its own
+   `flash-state` branch — NEVER the pipeline's state branch, two
+   force-pushers would race); run_flash (--dry-run tuning CSV, no sends;
+   --system-down). Config: `config/flash_alert.yaml`, owner-editable,
+   strictly validated. Channel: FLASH_CHANNEL_ID secret overrides,
+   TELEGRAM_CHANNEL_ID is the fallback (owner moves alerts by adding ONE
+   secret). Escalation buckets mined from WAR_SIGNALS_PAPER: maritime
+   (24-72h resumption law), strike, posture, apparatus (0-3d lead),
+   ultimatum, response_threat.
+3. **Independent adversarial review** (fresh context, owner mandate):
+   REJECT with 4 blocking findings — first-boot empty-file false-alarm
+   loop, cap-deferral silently dropping events, HTML parse-mode without
+   escaping, two line-cap violations — + 6 should-fix. ALL fixed, each
+   pinned by a new test. Standing lesson: never register a short string
+   with the redaction filter (a 1-char token redacts every occurrence
+   of that char in every later log record).
+4. Latency honesty: GitHub cron ≈ 10-20 min median, not real-time; a bot
+   button is impossible without a hosted server. Owner accepted the
+   monitor as the mechanism.
+
 ## Phases 6–10 (2026-08-29) — v1 CODE COMPLETE. Suite 522, 0 failed, shim-verified
 
 - Owner's mandate this session: push to done. Built per briefs: Phase 6 Understand
@@ -472,18 +563,28 @@ same contract. Suite 562 → 564.
 
 ## Pending / unresolved
 
-- [ ] **NEXT SESSION — owner workflow: push → verify → analysis.** The session-9
-      + 9b + 9c batches (suite 542) are the unpushed work: `git show
-      origin/main:src/agent/llm/call.py | findstr provider.timeout` and
-      `git show origin/main:src/agent/pipeline/collect.py | findstr date_only_max_age_hours`
-      must both print; CI must be green at 542. Then the analysis session, on a
-      CLEAN run only (the first two runs' CSVs are polluted by provider
-      cascades): owner downloads run-reports (read / chosen / summaries / run),
-      posts them; tune `digest_rank.min_score`, `config/relevance.yaml` keyword
-      tiers, `cluster_similarity_threshold` (0.62 proven too strict — 67→51 and
-      83→60 clusters; set 0.55 PROVISIONAL 2026-08-30, re-tune on clean CSVs),
-      source pruning -- all owner-editable YAML. Gates in progress: 3-run gate,
+- [ ] **NEXT SESSION — owner workflow: push → verify → flash go-live →
+      analysis.** The 9l.2 + 9m + 9n batches (suite 646, shim-green) are
+      the unpushed work: `git add -A && git commit && git push`, then
+      `git show origin/main:src/agent/flash/momentum.py | findstr DE-ESCALATION`
+      and `git show origin/main:.github/workflows/flash-alert.yml | findstr flash.ok`
+      must both print; CI must be green at 646. Flash go-live: NO new
+      secrets needed (FLASH_CHANNEL_ID optional); first boot is
+      self-bootstrapping; then dispatch `flash-alert` manually once and
+      confirm a clean run + flash-reports artifact. Tuning loop: download
+      flash-reports CSVs for 2-3 days, tune `config/flash_alert.yaml`
+      with me (the dry-run dispatch exists for keyword testing). Then the
+      digest analysis session needs 2-3 MORE clean-run CSVs (no
+      `status=unavailable`): the 18:54 clean run is already analysed
+      (session 9m §8); tune `digest_rank.min_score`, `config/relevance.yaml`
+      tiers, `cluster_similarity_threshold` (0.55 KEEP for now), source
+      pruning -- all owner-editable YAML. Gates in progress: 3-run gate,
       1-week gate, 60-day cron reset (RUNBOOK.md §6–8).
+- [ ] **Flash watchdog DEFERRED (session 9n).** No in-band signal when
+      the monitor dies (60-day cron auto-disable, config `enabled: false`,
+      broken edit). Interim: if no flash-reports artifact for >24h the
+      monitor is dead — check Actions. Proper fix later: a one-liner in
+      the 09:00 digest reporting the flash-state branch's last-commit age.
 - [ ] **Batch-2 accepted edges, self-correcting ≤2026-09-02.** First run after
       deploy had no delivered markers for the last 72h (one near-duplicate may
       re-surface); format_split truncation over-marks lowest-priority items

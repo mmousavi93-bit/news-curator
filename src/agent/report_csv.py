@@ -106,7 +106,7 @@ def _write_chosen(ctx, path: Path) -> Path:
         writer = csv.writer(fh)
         writer.writerow(["cluster_key", "fate", "reason", "n_members", "sources",
                          "best_tier", "category", "claim_status",
-                         "independent_count", "score"])
+                         "independent_count", "score", "headline", "summary"])
         for cluster in clusters:
             event = events_by_key.get(cluster.key)
             fate, reason = _fate_for(cluster.key, events_by_key, ctx)
@@ -120,6 +120,11 @@ def _write_chosen(ctx, path: Path) -> Path:
                 getattr(event, "claim_status", "") if event else "",
                 getattr(event, "independent_count", "") if event else "",
                 score,
+                # Gate forensics need the text (the Masafer Yatta lesson:
+                # a drop is unjudgeable without the words the gate saw).
+                # Empty for fates recorded before an event existed.
+                getattr(event, "headline", "") if event else "",
+                getattr(event, "summary", "") if event else "",
             ])
     return path
 
@@ -156,12 +161,23 @@ def _write_summaries(ctx, path: Path) -> Path:
 
 def _write_run(ctx, path: Path) -> Path:
     counters = getattr(ctx, "counters", None) or {}
+    # Per-provider attempt counters (llm/stats.py, owner request
+    # 2026-08-30): who carried the run and who failed it, read from the
+    # artifact instead of the log. Absent when ctx has no router.
+    router = getattr(ctx, "router", None)
+    stats = getattr(router, "stats", None)
+    stat_cols: list[tuple[str, str]] = []
+    if stats is not None:
+        for name, entry in sorted(stats.as_dict().items()):
+            stat_cols.append((f"calls_{name}", str(entry["calls"])))
+            stat_cols.append((f"fails_{name}", str(entry["failed"])))
     with path.open("w", encoding="utf-8-sig", newline="") as fh:
         writer = csv.writer(fh)
         writer.writerow(["run_at_utc", "daily_digest", "items", "clusters",
                          "events", "sent", "lang_drops", "rank_dropped",
                          "repeat_dropped", "lead_events", "llm_failed",
-                         "messages", "deliver"])
+                         "messages", "deliver",
+                         *[h for h, _ in stat_cols]])
         writer.writerow([
             ctx.now.isoformat(),
             int(bool(getattr(ctx, "daily_digest", False))),
@@ -176,5 +192,6 @@ def _write_run(ctx, path: Path) -> Path:
             int(bool(getattr(ctx, "llm_failed", False))),
             len(getattr(ctx, "messages", None) or []),
             counters.get("deliver", 0),
+            *[v for _, v in stat_cols],
         ])
     return path

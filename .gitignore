@@ -33,6 +33,7 @@ models/
 
 # --- per-run observability CSVs (artifact-only, never committed) ---
 reports/
+outputs/
 
 # --- editors / OS ---
 .vscode/

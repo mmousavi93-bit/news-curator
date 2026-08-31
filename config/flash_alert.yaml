@@ -1,0 +1,188 @@
+# flash_alert.yaml — Tehran explosion + escalation flash monitor.
+# Deterministic, ZERO LLM calls, owner-editable (2026-08-30, owner-approved
+# design: 15-min scans, 24/7, unverified-OK alerts with burst cleaning).
+#
+# Loader (agent/flash/config.py) validates shape strictly: a typo fails the
+# run loudly, never silently widens or narrows the alert.
+#
+# SEMANTICS: an alert fires when one of a CLASS's term buckets AND one of
+# its location rings both match an item published in the last
+# `freshness_minutes`. Term = substring; single-word location = whole-token
+# (so «ری» never matches «خبری»); multi-word locations match as phrases.
+# Global exclusions kill any fire (substring, full text).
+# Burst signature = class|term_bucket|location_ring — one first alert plus
+# at most 2 source-count follow-ups per burst. Repetition over sources is
+# AMPLIFICATION, never corroboration — every message carries the
+# «شایعه — تأیید نشده» label (standing rumour policy).
+#
+# CLASS PRECEDENCE: classes are checked in file order; the first matching
+# class wins (a Tehran explosion alerts as tehran, not escalation).
+
+version: 2
+
+enabled: true
+
+# FAST SUBSET (owner decision 2026-08-30): the burst signal lives in
+# Telegram first. The full sweep stays the 3-hourly pipeline's job — a
+# 16x request-rate hike (96 vs 6 fetches/day per source) on every feed
+# risks 403/429 source cuts (unfixable).
+flash_source_ids:
+  - tg_wfwitness
+  - tg_tabzlive
+  - tg_tweet_mardomi
+  - tg_iranian_militarism
+  - tg_geopolitics_prime
+  - tg_geopwatch
+  - osint613_a
+  - al_manar
+  - sky_news_arabia
+
+matching:
+  freshness_minutes: 120      # only items published in the last 2h can fire
+  window_chars: 300           # buckets must appear in title + first 300 chars
+
+burst:
+  collapse_window_minutes: 30 # event key = class|term_bucket|location_ring
+  followup_window_minutes: 90 # after first sighting, alerts stop; digest owns it
+  followups: [3, 8]           # at most 2 per event; count = distinct source ids
+
+caps:
+  max_alerts_per_hour: 3      # NEW-event first alerts, ALL classes; FUs exempt
+  # Cap hit -> defer, never drop: the burst stays open, the next scan
+  # re-evaluates. Window expiry -> items flow to the 3-hourly digest.
+
+# MOMENTUM (owner 2026-08-31): the same attack-and-response pattern is
+# escalation on day 1-2 and background noise by day 3 at the same
+# intensity. A NEW target domain (novel location token) or a NEW bucket
+# restores full escalation. Escalation guesses FAST; de-escalation is
+# certified SLOWLY (asymmetric by design).
+momentum:
+  streak_window_days: 7
+  streak_repeat_threshold_days: 3   # 3rd distinct day of the same bucket = background
+  repeat_requires_sources: 3        # background buckets need 3 sources to re-alert
+
+deescalation:
+  quiet_days: 3                     # sustained quiet before the 📉 notice
+  cooldown_days: 7                  # one notice per week at most
+
+exclusions:
+  # substring over FULL title+body; ANY hit kills the fire. «شایعه» is
+  # deliberately NOT here: a hedged early post is the best alert there is.
+  # Space variants sit BESIDE the ZWNJ forms: normalization strips ZWNJ
+  # but never collapses spaces, so «آتش بازی» would evade «آتش‌بازی»
+  # (reviewer finding 2026-08-31).
+  fa: [سالگرد, یادبود, قدیمی, آرشیو, دیروز, دیشب, شب گذشته, فیلم, سینما, تئاتر,
+       سریال, آتش‌بازی, آتش بازی, تکذیب, کذب, بی‌اساس, بی اساس, نقشه, بازداشت,
+       دستگیری, خنثی, کشف شد, تحلیل, یادداشت, سرمقاله]
+  en: [anniversary, memorial, archive, yesterday, last night, film, movie,
+       theater, fireworks, denied, denial, no evidence, unsubstantiated,
+       plot, planned, arrested, defused, discovered, cyber, hack, analysis, op-ed]
+  ar: [فيلم, سينما, مسلسل, ذكرى, أرشيف]
+
+classes:
+  tehran:
+    label: "هشدار انفجار"
+    quiet_hours: 24             # closed burst: same signature re-fires only at
+    quiet_requires_sources: 3   # >=3 sources (FP-repeat + re-surface defense)
+    terms:
+      explosion:
+        fa: [انفجار, صدای انفجار, بمب, مهیب, ترکش]
+        en: [explosion, blast, bomb]
+        ar: [انفجار, صوت انفجار, قنبلة]
+      attack_air:
+        fa: [موشک, موشک‌باران, حمله هوایی, حمله موشکی, پهپاد, پدافند, دفاع هوایی, رهگیری]
+        en: [missile, drone, airstrike, air raid, air strike, rocket, interception, air defense, air defence]
+        ar: [صواريخ, غارة, مسيرة, قصف, دفاع جوي]
+      # ABSENT BY DESIGN (digest's job): تیراندازی/shooting, آتش‌سوزی/fire, cyber.
+      # ACCEPTED: گاز/gas blasts fire via «انفجار» — a building blast in
+      # Tehran is emergency information regardless of cause.
+    locations:
+      city:  # تهران + districts + landmarks; the template names the matched token
+        fa: [تهران, تهرانپارس, تجریش, ونک, پاسداران, شمیران, سعادت‌آباد, سعادت آباد,
+             نارمک, ازگل, میدان آزادی, میدان ولیعصر, فرودگاه مهرآباد, بازار تهران]
+        en: [tehran, tehranpars, tajrish, shemiran, mehrabad]
+      region:  # استان تهران + metro ring
+        fa: [کرج, پردیس, قرچک, شهریار, ری, ورامین, پاکدشت, لواسان, ملارد, اسلامشهر,
+             بهارستان, رباط‌کریم, رباط کریم, دماوند, فیروزکوه, پیشوا, قدس, گلستان]
+        en: [karaj, pardis, varamin, pakdasht, rey, lavasan]
+
+  escalation:
+    label: "افزایش تنش"
+    # Escalation rhetoric (IRGC response threats) is a constant background
+    # hum — a SHORTER quiet window than tehran, not a longer one, because a
+    # genuine response follows fast and must not be suppressed.
+    quiet_hours: 12
+    quiet_requires_sources: 3
+    # Bucket order = evidential value (WAR_SIGNALS_PAPER.md taxonomy,
+    # 2025-26 Iran wars): E kinetic (maritime first — a vessel attack
+    # preceded EVERY US strike wave by 24-72h in July 2026) → A posture
+    # (expensive, hard to fake) → B apparatus protection (0-3d lead, the
+    # shortest) → C/D calendar+rhetoric → D rhetoric (cheapest, decays).
+    terms:
+      maritime:
+        fa: [حمله به کشتی, حمله دریایی, کشتی تجاری, نفتکش, مین‌گذاری,
+             مین گذاری, تلغیم]
+        en: [vessel attack, tanker, ship attacked, ship attack, maritime incident,
+             mining, naval attack, blockade]
+        ar: [ناقلة, سفينة, تلغيم, بحرية]
+      strike:
+        fa: [حمله, حمله نظامی, حمله هوایی, موشک‌باران, هدف قرار گرفت, بمباران,
+             تهاجم, ضربه, غاره, انهدام]
+        en: [strike, attack, hit, targeted, bombed, raid, destroyed]
+        ar: [هاجم, قصف, ضربة, استهدف, غارة, دمر]
+      posture:
+        fa: [ناوهواپیمابر, ناو هواپیمابر, بمب‌افکن, بمب افکن, تاد, پاتریوت,
+             استقرار نظامی, انتقال مهمات, ناو جنگی, جنگنده]
+        en: [carrier, aircraft carrier, bomber, b-52, b-2, thaad, patriot,
+             deployment, repositioning, munitions, fighter jets]
+        ar: [حاملة طائرات, قاذفة, صواريخ دفاعية]
+      apparatus:
+        fa: [تخلیه سفارت, تخلیه شهروندان, تخلیه پرسنل, هشدار سفر, بستن سفارت,
+             تعطیلی سفارت, تعطیل شدن سفارت]
+        en: [evacuation, evacuate, travel advisory, embassy closure,
+             closing embassy, embassy closed, personnel depart]
+        ar: [إجلاء, إغلاق السفارة, تخلي]
+      ultimatum:
+        fa: [اولتیماتوم, ضرب‌الاجل, مهلت داد, هشدار نهایی, مهلت پایان]
+        en: [ultimatum, deadline, final warning]
+        ar: [مهلة, إنذار نهائي]
+      response_threat:
+        fa: [پاسخ, تلافی, انتقام, پاسخ قاطع, پاسخ خواهیم داد, واکنش سخت,
+             پاسخی کوبنده, پاسخ سهمگین, تهدید کرد]
+        en: [retaliate, retaliation, revenge, will respond, response, threatens, vowed]
+        ar: [رد, انتقام, سيرد, سنرد, توعد]
+    locations:
+      iran_geo:  # Iran territory incl. strategic islands/sites (Larak-class)
+        fa: [ایران, تهران, لارک, تنگه هرمز, خلیج فارس, هرمز, بوشهر, بندرعباس,
+             بندر لنگه, خارک, اصفهان, نطنز, فوردو, کیش, قشم, ابوموسی,
+             تنب بزرگ, تنب کوچک, میناب]
+        en: [iran, tehran, larak, strait of hormuz, persian gulf, hormuz,
+             bushehr, bandar abbas, isfahan, natanz, fordo, kish, qeshm,
+             abu musa, kharg]
+        ar: [إيران, لارك, مضيق هرمز, الخليج, هرمز, بوشهر, بندر عباس, نطنز, جزيرة]
+      actors:  # whose actions/statements make it escalation-relevant
+        fa: [آمریکا, آمریکایی, ترامپ, اسرائیل, اسرائیلی, پنتاگون, سپاه,
+             پاسداران, خامنه‌ای, خامنه ای, عراقچی, فرمانده کل]
+        en: [us, usa, united states, american, trump, pentagon, israel,
+             israeli, irgc, khamenei, araqchi]
+        ar: [أمريكا, امريكا, ترامب, إسرائيل, البنتاغون, الحرس الثوري, خامنئي, عراقجي]
+
+templates:
+  first: |
+    🚨 {label}
+    {headline}
+    📍 {location_token}
+    📡 منابع: {first_source}{more_sources}
+    {convergence}⏱ {jalali} — {tehran_time}
+    «شایعه — تأیید نشده؛ تکرار خبر توسط منابع متعدد به‌معنای تأیید نیست.»
+  followup: |
+    🚨 به‌روزرسانی — {n} منبع گزارش می‌دهند
+    {label}
+    {headline}
+    «شایعه — تأیید نشده»
+  system_down: |
+    ⚠️ سیستم هشدار از کار افتاده است (رمزگشایی state ناموفق یا خطای بحرانی).
+    تا رفع مشکل، به مرور اخبار عادی تکیه کنید.
+  deescalation: |
+    📉 کاهش تنش — {n} روز بدون سیگنال تشدید
+    الگوی درگیری‌ها در حال فروکش است. این ارزیابی محتاطانه است و تنها پس از چند روز آرامش پایدار صادر می‌شود.

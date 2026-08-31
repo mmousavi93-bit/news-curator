@@ -1,16 +1,20 @@
 name: pipeline
 
 # THE unattended run. Public repo -> unlimited minutes. Both schedules are
-# stated in UTC; Tehran is UTC+3:30 fixed (no DST). The 07:00 Tehran digest
-# is the canonical daily run (CLAUDE.md session-2 decision 1).
+# stated in UTC; Tehran is UTC+3:30 fixed (no DST). The 09:00 Tehran digest
+# is the canonical daily run (CLAUDE.md session-2 decision 1; owner moved
+# it from 07:00 on 2026-08-30).
+#
+# Owner schedule 2026-08-30: digest at 09:00 Tehran, then every 3 hours
+# (12/15/18/21/00:00 Tehran), silent midnight-09:00. 6 runs/day.
 #
 # Cron auto-disables after 60 days of repo inactivity: the owner must touch
 # the repo (any commit, or re-enable the workflow in the UI) to keep it
 # alive -- this is in the runbook, not fixable from here.
 on:
   schedule:
-    - cron: "0 */3 * * *"   # every 3 hours, 8 runs/day
-    - cron: "30 3 * * *"    # 07:00 Asia/Tehran daily digest
+    - cron: "30 5 * * *"            # 09:00 Asia/Tehran daily digest (canonical)
+    - cron: "30 8,11,14,17,20 * * *"  # 12:00/15:00/18:00/21:00/00:00 Tehran
   workflow_dispatch:
 
 concurrency:
@@ -95,7 +99,7 @@ jobs:
 
       - name: Run pipeline
         env:
-          NEWS_CURATOR_DIGEST: ${{ github.event.schedule == '30 3 * * *' }}
+          NEWS_CURATOR_DIGEST: ${{ github.event.schedule == '30 5 * * *' }}
           NEWS_CURATOR_REPORT_DIR: reports
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}

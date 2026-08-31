@@ -154,4 +154,4 @@ digest going quiet after ~2 months is this, not a failure — commit something.
 - "time not stated" = the source publishes dates without times. Never a
   clock time for those.
 - "Nothing new since the last run." = exactly that.
-- The 07:00 Tehran message is the daily digest (header says so).
+- The 09:00 Tehran message is the daily digest (header says so).

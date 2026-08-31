@@ -120,6 +120,44 @@ def test_chosen_csv_records_every_fate(tmp_path):
     assert float(by_key[ctx.clusters[0].key]["score"]) >= 8
 
 
+def test_run_csv_carries_per_provider_stats(tmp_path):
+    # 2026-08-30: who carried the run and who failed it, in the artifact.
+    class _Stats:
+        def as_dict(self):
+            return {"bai": {"calls": 7, "failed": 2},
+                    "gemini": {"calls": 3, "failed": 3}}
+
+    ctx = _Ctx(tmp_path)
+    ctx.router = type("R", (), {"stats": _Stats()})()
+    written = {p.name.split("_")[0]: p for p in write_run_reports(ctx, tmp_path)}
+    rows = _rows(written["run"])
+    assert rows[0]["calls_bai"] == "7"
+    assert rows[0]["fails_bai"] == "2"
+    assert rows[0]["calls_gemini"] == "3"
+    assert rows[0]["fails_gemini"] == "3"
+
+
+def test_run_csv_without_router_has_no_stat_columns(tmp_path):
+    ctx = _Ctx(tmp_path)  # no router attribute
+    written = {p.name.split("_")[0]: p for p in write_run_reports(ctx, tmp_path)}
+    rows = _rows(written["run"])
+    assert not any(k.startswith("calls_") for k in rows[0])
+
+
+def test_chosen_csv_carries_text_for_event_rows(tmp_path):
+    # The Masafer Yatta lesson: a drop is unjudgeable without the words
+    # the gate saw. Event-bearing rows carry headline/summary; pre-event
+    # fates (clickbait) carry empty strings.
+    ctx = _Ctx(tmp_path)
+    written = {p.name.split("_")[0]: p for p in write_run_reports(ctx, tmp_path)}
+    by_key = {r["cluster_key"]: r for r in _rows(written["chosen"])}
+    assert by_key[ctx.clusters[0].key]["headline"] == "تیتر اصلی"
+    assert by_key[ctx.clusters[0].key]["summary"] == "خلاصه نظامی."
+    assert by_key[ctx.clusters[2].key]["summary"] == "يك خلاصة."
+    assert by_key[ctx.clusters[3].key]["headline"] == ""  # clickbait: no event
+    assert by_key[ctx.clusters[3].key]["summary"] == ""
+
+
 def test_summaries_csv_contains_only_sent_events(tmp_path):
     ctx = _Ctx(tmp_path)
     written = {p.name.split("_")[0]: p for p in write_run_reports(ctx, tmp_path)}

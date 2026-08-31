@@ -41,7 +41,7 @@ class RunContext:
     router: object | None = None                    # mock in dry-run
     embedder: object | None = None                  # Embedder protocol
     db: object | None = None                        # sqlite3 conn
-    daily_digest: bool = False                      # 07:00 canonical run
+    daily_digest: bool = False                      # 09:00 Tehran canonical run
     leads_channel_id: str | None = None             # optional lead channel
     report_dir: Path | None = None                  # CSV observability output
 

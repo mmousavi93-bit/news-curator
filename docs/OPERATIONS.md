@@ -2,7 +2,7 @@
 
 The system runs itself: every 3 hours it fetches 50 sources, dedupes,
 clusters, summarises, validates, and sends ONE message to your private
-Telegram channel. A daily digest lands at 07:00 Tehran. Your PC can be off;
+Telegram channel. A daily digest lands at 09:00 Tehran. Your PC can be off;
 everything runs on GitHub's US runners, free.
 
 ## What you see
