@@ -192,6 +192,20 @@ def test_kept_path_appends_fallback_as_footer():
     assert "پدافند در تنگه هرمز فعال شد" in ctx.messages[0]
 
 
+def test_pezeshkian_sco_trip_passes_relevance_gate():
+    # Regression for the 2026-08-31 over-cut: the Iranian president's
+    # summit trip gated out because neither «ایران» nor his name was in
+    # the relevance keywords (the Masafer Yatta disease). His name now
+    # sits in iran_direct.
+    ctx = _Ctx(config=_config())
+    event = _with_cluster(ctx, _event(
+        "بزشکیان برای شرکت در نشست‌های سازمان شانگهای به قرقیزستان سفر کرد",
+        category="politics"))
+    ctx.events = [event]
+    ComposeStage(_Log()).run(ctx)
+    assert event.event_key not in {e.event_key for e in ctx.relevance_dropped}
+
+
 def test_fallback_respects_max_items():
     ctx = _Ctx(config=_config())
     ctx.llm_failed = True
