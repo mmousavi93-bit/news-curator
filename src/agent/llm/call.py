@@ -60,8 +60,10 @@ def attempt(
       _OK     -> 200 and parseable; result is the answer
       _ROTATE -> 429 / 5xx / timeout / connection; router rotates
       _SAME   -> 200 but schema-invalid; router retries this provider once
-      _FATAL  -> 400/401/403 or a build_request programming error; router
-                 stops -- rotating on a bad key burns three quotas (§3)
+      _FATAL  -> 400/401/403 or a build_request programming error. THIS
+                 PROVIDER is dead for the run (the breaker counts it), but
+                 the CALL rotates on to the next one -- see the 2026-09-05
+                 note below and in failover.py.
     """
     name = provider.name
     try:
@@ -133,20 +135,24 @@ def attempt(
         return _ROTATE, LlmResult(
             ok=False, status=UNAVAILABLE, provider=name, http_status=status)
 
-    # 400/401/403 (and any other non-200 we did not classify above): the
-    # request or key is wrong, and it is wrong identically on every
-    # provider. Rotating turns one visible fault into three wasted calls
-    # and a misleading log (§3) -- so this call's RESULT is fatal and the
-    # loop stops HERE. But the provider itself is dead for this run: the
-    # breaker counts the failure so that after two fatal responses the
-    # provider is skipped instead of re-burned once per cluster
-    # (2026-08-30: a 403-blocked OpenRouter was called 34 times in one
-    # run -- one fatal call per remaining cluster, ~90s of dead air).
+    # 400/401/403 (and any other non-200 we did not classify above): this
+    # PROVIDER cannot serve this request -- a rejected model id, a payload
+    # shape it does not accept, a key or balance policy that says no.
+    #
+    # It is NOT a cross-provider fact. The old §3 doctrine claimed "wrong
+    # identically on every provider" and stopped the loop; 2026-09-05
+    # falsified it (bai_deepseek 400 / openrouter 403 on prompts groq and
+    # gemini answered fine), so failover.py now rotates. The breaker still
+    # counts the failure, which is what actually bounds the waste: after
+    # two fatal responses the provider is skipped for the rest of the run
+    # instead of re-burned once per cluster (2026-08-30: a 403-blocked
+    # OpenRouter was called 34 times in one run, ~90s of dead air).
     breaker.failure(name)
     log_call(logger, call_index, stage, provider, prompt_hash,
              f"status_{status}", latency_ms, None)
     logger.error(
-        "llm: fatal response status=%s from provider=%s -- not rotating", status, name
+        "llm: provider-fatal status=%s from provider=%s -- retiring it for "
+        "this run, rotating to the next provider", status, name
     )
     return _FATAL, LlmResult(
         ok=False, status=FATAL, provider=name, model=provider.adapter.model,

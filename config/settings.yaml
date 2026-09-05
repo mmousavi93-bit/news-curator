@@ -305,7 +305,18 @@ llm:
   # -- a dead gateway costs a few extra calls, bounded by the cap.
   # openrouter sits absolute-last: its zero-balance policy is dead,
   # recheck monthly, and it must not tax the budget before deepseek does.
-  order: ["gemini", "groq", "bai", "bai_deepseek", "openrouter"]
+  # Cascade order. bai_deepseek and openrouter REMOVED 2026-09-05 -- both
+  # answered nothing but errors and each one cost a cluster:
+  #   bai_deepseek  400 on 2/2 calls (model id "deepseek-v4-flash" is not
+  #                 accepted by the bai gateway, or its payload shape
+  #                 differs). Killed the run's most-corroborated story.
+  #   openrouter    403 on 1/1 call -- the zero-balance policy verdict
+  #                 already recorded 2026-08-30 ("DEAD under constraint 1").
+  #                 It should not have still been in this list.
+  # Re-add bai_deepseek only after confirming the exact model id in the bai
+  # console; re-add openrouter only if the balance policy changes.
+  # Their provider blocks below are kept, unused, so re-enabling is one edit.
+  order: ["gemini", "groq", "bai"]
 
   stages:
     vision:    { provider: "gemini" }

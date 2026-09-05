@@ -71,6 +71,7 @@ class UnderstandStage:
         cluster_fates: list[tuple[str, str]] = []
         saw_success = False
         unavailable_total = 0
+        skipped_statuses: dict[str, int] = {}
         # Provider provenance per cluster/event (owner 2026-08-31: the
         # labeled-last-rung debugging trail -- which model answered what).
         ctx.cluster_provider = {}
@@ -94,6 +95,9 @@ class UnderstandStage:
                     )
                     break
                 unavailable_total += 1
+                skipped_statuses[result.status] = (
+                    skipped_statuses.get(result.status, 0) + 1
+                )
                 if unavailable_total == 1:
                     # One per-cluster line names the evidence; the rest are
                     # the same sentence with a different hash (2026-08-30:
@@ -162,9 +166,17 @@ class UnderstandStage:
             events.append(event)
 
         if unavailable_total > 1:
+            # Report the ACTUAL statuses. The old line hardcoded
+            # "unavailable", so the 2026-09-05 run's three provider-fatal
+            # losses read as generic outage and the real cause (a
+            # bai_deepseek 400) stayed invisible until the CSV was diffed.
+            breakdown = ", ".join(
+                f"{status}={count}"
+                for status, count in sorted(skipped_statuses.items())
+            )
             self._logger.error(
-                "understand: %d more cluster(s) skipped (status=unavailable)",
-                unavailable_total - 1,
+                "understand: %d more cluster(s) skipped without an LLM answer (%s)",
+                unavailable_total - 1, breakdown,
             )
         ctx.events = events
         ctx.cluster_fates = cluster_fates

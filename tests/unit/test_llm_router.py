@@ -126,15 +126,41 @@ def test_connection_error_rotates_to_next_provider():
     assert result.provider == "groq"
 
 
-def test_401_does_not_rotate():
-    # A bad key fails identically on every provider: rotating turns one
-    # visible fault into three wasted calls (PHASE_5_BRIEF §3).
-    transport = MockHttpTransport(responses=[HttpResponse(401, {})])
+def test_provider_fatal_rotates_to_next_provider():
+    # REVISED 2026-09-05. The old rule ("a 4xx fails identically on every
+    # provider, so stop") was falsified in production: bai_deepseek 400'd
+    # and openrouter 403'd on prompts groq and gemini answered seconds
+    # later, and the early return destroyed three clusters -- one of them
+    # the run's most-corroborated story (7 members, 5 independent sources).
+    # A 4xx is a PROVIDER fact. Rotate; the breaker bounds the waste.
+    transport = MockHttpTransport(responses=[HttpResponse(400, {}), _GROQ_OK])
+    result = _router([_gemini(), _groq()], transport).complete("hello")
+    assert result.ok is True
+    assert result.provider == "groq"
+    assert len(transport.calls) == 2
+
+
+def test_all_providers_fatal_surfaces_fatal_status():
+    # When every candidate is fatal the caller must still learn WHY, so the
+    # fate column reads "fatal" rather than a generic "unavailable".
+    transport = MockHttpTransport(
+        responses=[HttpResponse(400, {}), HttpResponse(403, {})]
+    )
     result = _router([_gemini(), _groq()], transport).complete("hello")
     assert result.ok is False
     assert result.status == FATAL
-    assert len(transport.calls) == 1
-    assert GEMINI_URL_PREFIX in transport.calls[0]["url"]  # provider 2 never contacted
+
+
+def test_fatal_provider_is_not_retried_within_the_same_call():
+    # Rotating must not mean re-queueing: a malformed request does not
+    # become well-formed on a retry. Gemini gets exactly one shot.
+    transport = MockHttpTransport(
+        responses=[HttpResponse(400, {}), HttpResponse(500, {}), _GROQ_OK]
+    )
+    result = _router([_gemini(), _groq()], transport).complete("hello")
+    assert result.ok is True
+    gemini_calls = [c for c in transport.calls if GEMINI_URL_PREFIX in c["url"]]
+    assert len(gemini_calls) == 1
 
 
 def test_404_rotates_to_next_provider():

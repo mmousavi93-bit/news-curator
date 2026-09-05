@@ -3,10 +3,16 @@
 The policy these classes encode (PHASE_5_BRIEF §3, §6):
 
   - Retryable  -> rotate to the next provider: 429, 5xx, timeout, connection.
-  - Fatal      -> surface it and STOP: 400, 401, 403. A bad key or a malformed
-                  request fails identically on every provider, so rotating
-                  turns one visible fault into three wasted calls and a
-                  misleading log.
+  - Fatal      -> 400, 401, 403: THIS provider cannot serve the request (bad
+                  model id for its gateway, payload shape, key or balance
+                  policy). Retire the provider for the run via the breaker,
+                  but ROTATE the call onward.
+                  Revised 2026-09-05: the original rule said "fails identically
+                  on every provider, so STOP". False -- bai_deepseek 400'd and
+                  openrouter 403'd on prompts groq and gemini answered seconds
+                  later, and stopping destroyed three clusters including the
+                  run's most-corroborated story. Same reasoning already applied
+                  to 404 in call.py. Do not re-add the early return.
   - SchemaError-> HTTP 200 but the body is not the shape the adapter expects.
                   A model failure, not a transport one: retry once on the same
                   provider, then rotate.

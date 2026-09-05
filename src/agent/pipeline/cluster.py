@@ -1,16 +1,13 @@
-"""Greedy cosine clustering with deterministic ordering, a priority rank,
-and the enforced cluster cap (session-5 decision 1).
+"""Greedy cosine clustering with deterministic ordering.
 
 Determinism is a hard requirement: identical input must produce identical
 clusters, or Phase 10's tuning and every trend comparison become noise.
 Input items are sorted by a fixed key before clustering; ties break on
 url, so there are no coin flips.
 
-The cap: `max_clusters_per_run` was prose until this file. Clusters beyond
-the cap are DROPPED, not deferred -- a budget that only fires on the
-busiest news day must not rely on tomorrow being quieter. Priority is
-tier-then-recency-then-size (tier weights from settings.scoring, already
-validated config). Dropped keys are logged once; they get no LLM call.
+Priority ranking and the `max_clusters_per_run` cap moved to
+`pipeline/priority.py` on 2026-09-05 (constraint 12: this file was doing
+two jobs). They are re-exported below so existing callers are unaffected.
 """
 
 from __future__ import annotations
@@ -23,6 +20,10 @@ from typing import Mapping, Sequence
 
 from agent.collectors.base import Item
 from agent.config import Config
+from agent.pipeline.priority import (  # noqa: F401  (re-exported for callers)
+    rank_and_truncate,
+    split_at_cap,
+)
 
 # Items with no published_at sort as ancient, so undated items cluster last
 # rather than crowding out dated coverage.
@@ -76,6 +77,20 @@ class Cluster:
             default=0.0,
         )
 
+    def independent_count(self, credibility) -> int:
+        """Distinct credibility GROUPS behind this cluster -- the same
+        independence rule the rulebook's Step 1 uses, so Reuters + AP on one
+        wire, or BBC English + BBC Persian, count once. `group: null` falls
+        back to the source's own id (fully independent), matching
+        pipeline/validate.py. Leads never count (LEAD_HANDLING.md)."""
+        groups = set()
+        for member in self.members:
+            entry = credibility.get(member.source_id)
+            if entry is None or entry.tier == "lead":
+                continue
+            groups.add(entry.group or f"__self__:{member.source_id}")
+        return len(groups)
+
 
 def _cosine(a: Sequence[float], b: Sequence[float]) -> float:
     # Vectors are unit-normalised upstream (FakeEmbedder and MiniLM with
@@ -108,46 +123,6 @@ def cluster_items(
     return clusters
 
 
-def _priority_key(config: Config):
-    """Sort key for a cluster: tier weight desc, then recency desc, then
-    size desc. Full ordering -- no coin flips (determinism requirement)."""
-    multipliers = config.settings.scoring.tier_multipliers
-    credibility = config.credibility
-
-    def key(cluster: Cluster) -> tuple[float, float, int]:
-        return (
-            -cluster.max_tier_weight(credibility, multipliers),
-            -cluster.latest().timestamp(),
-            -len(cluster.members),
-        )
-
-    return key
-
-
-def rank_and_truncate(
-    clusters: list[Cluster],
-    max_clusters: int,
-    config: Config,
-    logger: logging.Logger,
-) -> list[Cluster]:
-    """Priority-ordered spending (session-5 decision 1): tier, then recency,
-    then size. Returns at most `max_clusters` clusters, highest priority
-    first -- the order the understand stage should spend calls in. Overflow
-    is DROPPED, never deferred: a budget that only fires on the busiest
-    news day must not rely on tomorrow being quieter."""
-    ranked = sorted(clusters, key=_priority_key(config))
-    if len(ranked) <= max_clusters:
-        return ranked
-    kept = ranked[:max_clusters]
-    dropped = ranked[max_clusters:]
-    logger.error(
-        "cluster cap: %d clusters, keeping %d, dropping %d keys: %s",
-        len(clusters), len(kept), len(dropped),
-        ", ".join(c.key for c in dropped),
-    )
-    return kept
-
-
 class ClusterStage:
     """Embeds -> clusters -> cap. Reads ctx.items and ctx.embeddings
     (aligned by index); writes ctx.clusters in priority order."""
@@ -172,11 +147,12 @@ class ClusterStage:
         clusters = cluster_items(
             items, vectors, self._config.settings.pipeline.cluster_similarity_threshold
         )
-        clusters = rank_and_truncate(
+        clusters, dropped = split_at_cap(
             clusters, self._config.settings.pipeline.max_clusters_per_run,
             self._config, self._logger,
         )
         ctx.clusters = clusters
+        ctx.clusters_cap_dropped = dropped
         ctx.counters["cluster"] = len(clusters)
         self._logger.info(
             "cluster: %d items -> %d clusters (threshold %.2f)",
