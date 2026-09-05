@@ -115,7 +115,7 @@ def test_llm_failed_flag_swaps_one_liner_for_ai_unavailable():
 
 def test_header_is_persian_with_jalali_date_and_tehran():
     ctx = _Ctx(config=_config())
-    ctx.events = [_with_cluster(ctx, _event("خلاصه نظامی."))]
+    ctx.events = [_with_cluster(ctx, _event("خلاصه نظامی اسرائیل."))]
     ComposeStage(_Log()).run(ctx)
     assert "مرور اخبار" in ctx.messages[0]
     assert "تهران" in ctx.messages[0]
@@ -124,11 +124,11 @@ def test_header_is_persian_with_jalali_date_and_tehran():
 
 def test_digest_marker_only_when_flagged():
     ctx = _Ctx(config=_config(), daily_digest=True)
-    ctx.events = [_with_cluster(ctx, _event("خلاصه نظامی."))]
+    ctx.events = [_with_cluster(ctx, _event("خلاصه نظامی اسرائیل."))]
     ComposeStage(_Log()).run(ctx)
     assert "مرور روزانه" in ctx.messages[0]
     ctx2 = _Ctx(config=_config(), daily_digest=False)
-    ctx2.events = [_with_cluster(ctx2, _event("خلاصه نظامی."))]
+    ctx2.events = [_with_cluster(ctx2, _event("خلاصه نظامی اسرائیل."))]
     ComposeStage(_Log()).run(ctx2)
     assert "مرور روزانه" not in ctx2.messages[0]
 
@@ -175,16 +175,31 @@ def test_fallback_excludes_judged_clusters():
     assert "مو قرمز" not in message
 
 
+def test_fallback_covers_cap_refused_and_fatal_fates():
+    # 2026-09-05 review: _UNCOVERED_FATES listed "refused_cap"/"lang_dropped"
+    # but understand.py writes "cap_refused"/"fatal" -- cap-exhausted and
+    # fatal clusters therefore never surfaced in the raw fallback. Pinned.
+    ctx = _Ctx(config=_config())
+    ctx.llm_failed = True
+    key_cap = _raw_cluster(ctx, "خبر نپوشیده با اتمام سهمیه")
+    key_fatal = _raw_cluster(ctx, "خبر نپوشیده با خطای مرگبار")
+    ctx.cluster_fates = [(key_cap, "cap_refused"), (key_fatal, "fatal")]
+    ComposeStage(_Log()).run(ctx)
+    message = ctx.messages[0]
+    assert "خبر نپوشیده با اتمام سهمیه" in message
+    assert "خبر نپوشیده با خطای مرگبار" in message
+
+
 def test_fallback_absent_when_everything_covered():
     ctx = _Ctx(config=_config())
-    ctx.events = [_with_cluster(ctx, _event("خلاصه نظامی."))]
+    ctx.events = [_with_cluster(ctx, _event("خلاصه نظامی اسرائیل."))]
     ComposeStage(_Log()).run(ctx)
     assert "عناوین خام" not in ctx.messages[0]
 
 
 def test_kept_path_appends_fallback_as_footer():
     ctx = _Ctx(config=_config())
-    ctx.events = [_with_cluster(ctx, _event("خلاصه نظامی."))]
+    ctx.events = [_with_cluster(ctx, _event("خلاصه نظامی اسرائیل."))]
     key = _raw_cluster(ctx, "پدافند در تنگه هرمز فعال شد")
     ctx.cluster_fates = [(key, "unavailable")]
     ComposeStage(_Log()).run(ctx)
@@ -201,6 +216,28 @@ def test_pezeshkian_sco_trip_passes_relevance_gate():
     event = _with_cluster(ctx, _event(
         "بزشکیان برای شرکت در نشست‌های سازمان شانگهای به قرقیزستان سفر کرد",
         category="politics"))
+    ctx.events = [event]
+    ComposeStage(_Log()).run(ctx)
+    assert event.event_key not in {e.event_key for e in ctx.relevance_dropped}
+
+
+def test_generic_military_noun_without_anchor_drops():
+    # 2026-09-05 regression: the Greek F-4 airshow crash ("جنگنده") and the
+    # Pentagon polygraph story ("تسلیحات") LED the digest on the generic
+    # military nouns alone. Strategic is anchor-only now: an unplaced
+    # "fighter jet"/"arms" is off-mission and must not pass the gate.
+    ctx = _Ctx(config=_config())
+    event = _with_cluster(ctx, _event(
+        "سقوط یک جنگنده در نمایش هوایی.", category="military"))
+    ctx.events = [event]
+    ComposeStage(_Log()).run(ctx)
+    assert event.event_key in {e.event_key for e in ctx.relevance_dropped}
+
+
+def test_regional_anchor_military_event_passes_relevance_gate():
+    ctx = _Ctx(config=_config())
+    event = _with_cluster(ctx, _event(
+        "حمله اسرائیل به مواضعی در لبنان.", category="military"))
     ctx.events = [event]
     ComposeStage(_Log()).run(ctx)
     assert event.event_key not in {e.event_key for e in ctx.relevance_dropped}
@@ -237,7 +274,7 @@ def test_fallback_respects_max_items():
 def test_importance_order_military_before_economy():
     ctx = _Ctx(config=_config())
     economy = _event("خلاصه اقتصادی نفت.", category="economy")
-    military = _event("خلاصه نظامی.", category="military")
+    military = _event("خلاصه نظامی اسرائیل.", category="military")
     ctx.events = [
         _with_cluster(ctx, economy),
         _with_cluster(ctx, military),
@@ -249,17 +286,34 @@ def test_importance_order_military_before_economy():
 
 def test_military_rumour_survives_threshold_with_shaye_label():
     # Strategic military rumour from a tier-3 channel: the relevance tier
-    # (نظامی -> strategic 4) leads, so 4+2+0+3 = 9 >= min_score. A military
+    # (regional anchor -> strategic 4) leads, so 4+2+0+3 = 9 >= min_score. A military
     # rumour WITHOUT a strategic keyword now drops -- the owner's 2026-08-30
     # relevance-first decision demoted category from 6 to 2.
     # Softer-category rumours (politics/security) score below and drop --
     # also asserted below.
     ctx = _Ctx(config=_config())
-    event = _event("خلاصه نظامی تئییدنشده.", category="military",
+    event = _event("خلاصه نظامی اسرائیل تئییدنشده.", category="military",
                    independent=0, claim_status="rumour")
     ctx.events = [_with_cluster(ctx, event, source_id="t3")]
     ComposeStage(_Log()).run(ctx)
     assert "شایعه" in ctx.messages[0]
+
+
+def test_single_source_event_renders_unconfirmed_marker():
+    # 2026-09-05 fix 2: a kept single-source (unconfirmed) event is marked
+    # «تک‌منبع» (single source), NOT «شایعه» -- the grade means "fewer than
+    # 2 independent sources", and the label states the fact without inflating
+    # confidence (constraint 10). Owner picked «تک‌منبع» over «تأییدنشده» /
+    # «نسبتا تایید شده» 2026-09-05.
+    from agent.pipeline.labels import labels_for
+    ctx = _Ctx(config=_config())
+    event = _event("خلاصه نظامی اسرائیل.", category="military",
+                   independent=1, claim_status="unconfirmed")
+    ctx.events = [_with_cluster(ctx, event, source_id="t2")]
+    ComposeStage(_Log()).run(ctx)
+    text = ctx.messages[0]
+    assert labels_for("fa")["unconfirmed"] in text
+    assert labels_for("fa")["rumour"] not in text
 
 
 def test_soft_category_rumour_drops_below_threshold():
@@ -273,7 +327,7 @@ def test_soft_category_rumour_drops_below_threshold():
 
 def test_date_only_cluster_says_time_not_stated():
     ctx = _Ctx(config=_config())
-    event = _event("خلاصه نظامی.", category="security")
+    event = _event("خلاصه نظامی اسرائیل.", category="security")
     ctx.events = [_with_cluster(ctx, event, date_only=True)]
     ComposeStage(_Log()).run(ctx)
     assert "زمان اعلام نشده" in ctx.messages[0]
@@ -297,8 +351,8 @@ def test_llm_headline_is_the_title_summary_is_detail():
 def test_category_icons_render():
     ctx = _Ctx(config=_config())
     ctx.events = [
-        _with_cluster(ctx, _event("خلاصه نظامی.", category="military")),
-        _with_cluster(ctx, _event("خلاصه سیاسی جنگ.", category="politics")),
+        _with_cluster(ctx, _event("خلاصه نظامی اسرائیل.", category="military")),
+        _with_cluster(ctx, _event("خلاصه سیاسی اسرائیل.", category="politics")),
     ]
     ComposeStage(_Log()).run(ctx)
     assert "⚔️" in ctx.messages[0]
@@ -317,7 +371,7 @@ def test_below_threshold_events_never_reach_the_message():
 def test_busy_day_splits_into_multiple_messages_within_char_cap():
     ctx = _Ctx(config=_config())
     for i in range(25):
-        event = _event(f"خبر شماره {i}. نظامی " + "جزئیات " * 40, category="security")
+        event = _event(f"خبر شماره {i}. نظامی اسرائیل " + "جزئیات " * 40, category="security")
         ctx.events.append(_with_cluster(ctx, event))
     ComposeStage(_Log()).run(ctx)
     assert 1 < len(ctx.messages) <= 6  # max_messages is the safety valve (2026-08-30)
@@ -329,7 +383,7 @@ def test_non_persian_event_dropped_others_kept():
     # Live-sample regression (2026-08-30): an Arabic-source cluster came
     # back fully Arabic. The gate drops it; the Persian event ships.
     ctx = _Ctx(config=_config())
-    persian = _event("خلاصه نظامی.", category="military")
+    persian = _event("خلاصه نظامی اسرائیل.", category="military")
     arabic = _event("يك خلاصة جنگ.", category="military")
     ctx.events = [
         _with_cluster(ctx, persian, source_id="t1"),
@@ -345,12 +399,17 @@ def test_non_persian_event_dropped_others_kept():
 def test_all_non_persian_events_produce_lang_dropped_one_liner():
     # Constraint 11: when events existed but none rendered Persian, the
     # message says so -- "nothing new" would be a lie about the world.
+    # 2026-09-05 fix 1: the lang-dropped event's raw title is ALSO shown
+    # (the fallback footer), so the owner sees what was collected even
+    # though none of it rendered Persian -- it previously vanished.
     from agent.pipeline.labels import labels_for
     ctx = _Ctx(config=_config())
     arabic = _event("يك خلاصة جنگ.", category="military")
     ctx.events = [_with_cluster(ctx, arabic, source_id="t1")]
     ComposeStage(_Log()).run(ctx)
-    assert ctx.messages == [labels_for("fa")["lang_dropped"]]
+    text = ctx.messages[0]
+    assert text.startswith(labels_for("fa")["lang_dropped"])
+    assert labels_for("fa")["raw_fallback"] in text
     assert ctx.counters["compose_lang_drops"] == 1
     assert ctx.compose_kept_keys == []
 
@@ -361,7 +420,7 @@ def test_kept_events_recorded_for_delivery():
     # (review finding 2026-08-30 -- marking here would re-create ghost
     # suppression on send failure).
     ctx = _Ctx(config=_config())
-    ctx.events = [_with_cluster(ctx, _event("خلاصه نظامی.", category="military"))]
+    ctx.events = [_with_cluster(ctx, _event("خلاصه نظامی اسرائیل.", category="military"))]
     ComposeStage(_Log()).run(ctx)
     assert ctx.compose_kept_keys == [ctx.events[0].event_key]
 

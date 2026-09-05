@@ -45,6 +45,7 @@ keywords:
     - "جمهوری اسلامی"
     - "پزشکیان"
     - "بزشکیان"
+    - "برجام"
     - "خلیج فارس"
     - "تنگه هرمز"
     - "iran"
@@ -55,37 +56,23 @@ keywords:
     - "persian gulf"
     - "strait of hormuz"
   strategic:
-    # Calibrated 2026-08-30 by two independent pro-agent evaluations of the 9
-    # delivered events (labels aggregated by the orchestrator). The regional
-    # "ring" states ride here deliberately: E4/E6 (the MUST-class events)
-    # carry them. اسرائیل/israel is in the ring by design: it gates in ALL
-    # Israel-mentioning items (including street crime) -- the crime-blotter
-    # defense is the understand prompt's routine-crime rule, and the digest
-    # prefers a rare leaked blotter item over permanently blinding itself to
-    # West-Bank/settler violence (2026-08-30 over-cut: the Masafer Yatta
-    # abduction was gated because this keyword was missing). DELIBERATELY
-    # ABSENT -- blotter magnets that caught only DROPs in the evaluation:
-    # بازداشت (arrest), سلاح/اسلحه (weapon), بمب (bomb), نتانیاهو (a person
-    # is not a signal), نشست/وزیران (routine diplomacy floods). The
-    # evaluation also left زندانی/اسیر out: the Ben Gvir prison item split
-    # the evaluators, and the owner's rule is drop when unsure.
-    - "جنگ"
-    - "حمله"
-    - "موشک"
-    - "پهپاد"
-    - "هسته‌ای"
-    - "اتمی"
+    # Anchors only (2026-09-05). Previously the generic military nouns
+    # (جنگ، حمله، موشک، جنگنده، تسلیحات…) fired strategic on their own, so
+    # a Greek airshow crash ("جنگنده") and a Pentagon polygraph story
+    # ("تسلیحات") LED the digest with zero Iran relevance. Strategic now
+    # means a REGIONAL anchor is named: a ring state, Palestine/Gaza, a
+    # regional actor, a maritime/diplomatic instrument. An unplaced
+    # "attack"/"fighter jet"/"missile" is off-mission and drops -- the same
+    # detection-is-not-relevance rule, enforced here instead of the prompt.
+    # Kept from the 2026-08-30 calibration: the ring states (E4/E6),
+    # اسرائیل/israel (crime-blotter defense lives in the understand prompt),
+    # and the deliberately-absent blotter magnets (بازداشت، سلاح، بمب،
+    # نتانیاهو، نشست/وزیران، زندانی/اسیر). Added: غزه/فلسطین (the Masafer
+    # Yatta class of gap -- a Gaza ceasefire had no anchor), برجام to
+    # iran_direct (the nuclear anchor).
     - "پیمان"
-    - "دفاع"
-    - "نظامی"
-    - "ارتش"
-    - "آتش‌بس"
-    - "جنگنده"
     - "نفتکش"
     - "محاصره"
-    - "بمباران"
-    - "تسلیحات"
-    - "پدافند"
     - "هشدار سفر"
     - "ممنوعیت سفر"
     - "وزارت خارجه"
@@ -104,18 +91,10 @@ keywords:
     - "قطر"
     - "امارات"
     - "کویت"
-    - "war"
-    - "strike"
-    - "missile"
-    - "drone"
-    - "nuclear"
-    - "military"
-    - "defense"
-    - "navy"
+    - "غزه"
+    - "فلسطین"
+    - "کرانه باختری"
     - "blockade"
-    - "bombing"
-    - "arms deal"
-    - "air defense"
     - "travel advisory"
     - "travel warning"
     - "state department"
@@ -134,6 +113,9 @@ keywords:
     - "qatar"
     - "uae"
     - "kuwait"
+    - "gaza"
+    - "palestine"
+    - "west bank"
   economy:
     - "نفت"
     - "اوپک"

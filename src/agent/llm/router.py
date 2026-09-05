@@ -7,7 +7,11 @@ provider; no exception from this package reaches a caller (PHASE_5_BRIEF
 §6) -- every outcome is an LlmResult.
 
 Policy (PHASE_5_BRIEF §3):
-  rotate on 429 / 5xx / timeout / connection failure;
+  rotate on 5xx / timeout / connection failure;
+  429 retries the same provider after a cooldown, up to max_429_retries,
+    UNLESS a ready alternative is waiting -- it then rotates (2026-09-05:
+    rotating on 429 burned the cascade, but same-provider-only retries
+    starve a healthy downstream provider);
   never rotate on 400 / 401 / 403 -- fatal is fatal, surface it and stop;
   a schema-invalid parse retries once on the same provider, then rotates;
   total attempts bounded by backoff.max_retries + 1;
@@ -53,6 +57,7 @@ class Router:
         max_calls: int = 51,
         max_retries: int = 3,
         base_delay_seconds: float = 2.0,
+        max_429_retries: int = 2,
         breaker_threshold: int = 5,
         provider_limits: Mapping[str, ProviderBudget] | None = None,
         rpm_by_provider: Mapping[str, int | None] | None = None,
@@ -70,6 +75,7 @@ class Router:
         self._breaker = CircuitBreaker(breaker_threshold, self._logger)
         self._max_retries = max_retries
         self._base_delay = base_delay_seconds
+        self._max_429_retries = max_429_retries
         self._call_index = 0
         # Breaker-skip lines are logged once per provider per RUN, not once
         # per cluster (2026-08-30: 54 identical lines in one run's log).

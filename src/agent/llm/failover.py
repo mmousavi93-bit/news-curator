@@ -54,6 +54,7 @@ def failover(
     prompt_hash = hashlib.sha256(prompt.encode("utf-8")).hexdigest()[:16]
     queue: deque[Provider] = deque(candidates)
     attempts = 0
+    consecutive_429: dict[str, int] = {}
 
     while queue and attempts < router._max_retries + 1:
         provider = queue.popleft()
@@ -110,12 +111,34 @@ def failover(
             continue
         provider.schema_retried = False
         if getattr(result, "http_status", None) == 429:
-            if not router._cooldowns.is_cooling(name, now):
+            # 429 = "slow down, I'll be back". Cool the provider, then
+            # retry it AFTER one cooldown ONLY if no ready alternative is
+            # waiting -- a healthy downstream provider must not be starved
+            # by a walled mid-cascade one (2026-09-05 review finding: the
+            # always-retry form burned the whole attempt budget on Groq's
+            # wall while a healthy bai sat idle). Bounded by
+            # max_429_retries, then rotate.
+            now = router._clock()  # fresh: pacer wait + attempt have elapsed
+            router._cooldowns.cool(name, now)
+            consecutive_429[name] = consecutive_429.get(name, 0) + 1
+            ready_alt = any(
+                q.name != name
+                and not router._breaker.is_open(q.name)
+                and not router._cooldowns.is_cooling(q.name, now)
+                for q in queue
+            )
+            if not ready_alt and consecutive_429[name] <= router._max_429_retries:
                 router._logger.info(
-                    "llm: provider %s 429 -- cooling %ds (token wall, not sickness)",
+                    "llm: provider %s 429 -- waiting %ds then retrying same "
+                    "provider (token wall, not sickness)",
                     name, router._cooldown_seconds,
                 )
-            router._cooldowns.cool(name, now)
+                queue.appendleft(provider)
+                router._sleep(router._cooldown_seconds)
+                continue
+            consecutive_429[name] = 0
+        else:
+            consecutive_429[name] = 0
         queue.append(provider)  # rotate: this provider goes to the back
         router._sleep(backoff_delay(attempts, router._base_delay))
 
