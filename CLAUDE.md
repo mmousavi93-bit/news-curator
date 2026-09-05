@@ -635,14 +635,22 @@ cleaning + momentum semantics; independent adversarial review before push.
 ## Pending / unresolved
 
 - [ ] **NEXT SESSION — owner workflow: push → verify → flash go-live →
-      analysis.** The 9l.2 + 9m + 9n batches AND the 2026-09-05 Gemini-quota
-      fix (daily RPD enforcement + gemini 5 RPM/20 RPD + Pacific-midnight
-      day key — suite 686, shim-green, two-round adversarial review
-      approved) are the unpushed work: `git add -A && git commit && git
-      push`, then `git show origin/main:src/agent/flash/momentum.py | findstr
+      analysis.** The 9l.2 + 9m + 9n batches AND the 2026-09-05 batch
+      (a) Gemini-quota fix: daily RPD enforcement + gemini 5 RPM/20 RPD +
+      Pacific-midnight day key; (b) provider-cascade hardening: 429
+      `ready_alt` failover (retry same only when no ready alternative),
+      lang-drop raw-title fallback, «تک‌منبع» single-source marker,
+      anchor-only strategic relevance, `_UNCOVERED_FATES` correction,
+      compose.py→render.py split — suite 692, shim-green, two-round
+      adversarial review 36/40 SHIP) are the unpushed work: `git add -A &&
+      git commit && git push`, then `git show
+      origin/main:src/agent/llm/failover.py | findstr ready_alt`,
+      `git show origin/main:src/agent/pipeline/render.py | findstr
+      cap_refused`,
+      `git show origin/main:src/agent/flash/momentum.py | findstr
       DE-ESCALATION` and
       `git show origin/main:.github/workflows/flash-alert.yml | findstr flash.ok`
-      must both print; CI must be green at 686. Flash go-live: NO new
+      must all print; CI must be green at 692. Flash go-live: NO new
       secrets needed (FLASH_CHANNEL_ID optional); first boot is
       self-bootstrapping; then dispatch `flash-alert` manually once and
       confirm a clean run + flash-reports artifact. Tuning loop: download
@@ -654,6 +662,12 @@ cleaning + momentum semantics; independent adversarial review before push.
       tiers, `cluster_similarity_threshold` (0.55 KEEP for now), source
       pruning -- all owner-editable YAML. Gates in progress: 3-run gate,
       1-week gate, 60-day cron reset (RUNBOOK.md §6–8).
+- [ ] **Deferred follow-up (2026-09-05 review, MINOR, not a blocker):**
+      `ready_alt` treats a down-but-not-open provider as "ready" for ~1-2
+      clusters until its breaker opens (worst-case day loses ~1-2 clusters'
+      coverage before self-correcting). Candidate fix: let a 503 also
+      register a short cooldown, or weight just-5xx'd providers lower in
+      `ready_alt`.
 - [ ] **Flash watchdog DEFERRED (session 9n).** No in-band signal when
       the monitor dies (60-day cron auto-disable, config `enabled: false`,
       broken edit). Interim: if no flash-reports artifact for >24h the

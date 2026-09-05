@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from agent.llm import errors
 from agent.llm.errors import FATAL, UNAVAILABLE, LlmResult
-from agent.llm.providers import GeminiAdapter, GroqAdapter
+from agent.llm.providers import BaiAdapter, GeminiAdapter, GroqAdapter
 from agent.llm.router import Router
 from agent.llm.transport import HttpError, HttpTimeout, HttpResponse, MockHttpTransport
 
@@ -37,6 +37,10 @@ def _gemini(key="k" * 16):
 
 def _groq():
     return GroqAdapter("llama-3.3-70b-versatile", "k" * 16)
+
+
+def _bai():
+    return BaiAdapter("qwen3.8-flash", "k" * 16)
 
 
 # ---------------------------------------------------------------------------
@@ -281,8 +285,10 @@ def test_attempts_bounded_by_max_retries():
 
 def test_backoff_sleep_between_retryable_failures():
     sleeps: list[float] = []
+    # 429 is special-cased (cooldown sleep, same-provider retry) since
+    # 2026-09-05; 500 is the retryable failure that exercises backoff.
     transport = MockHttpTransport(
-        responses=[HttpResponse(429, {}), HttpResponse(429, {}), _GEMINI_OK]
+        responses=[HttpResponse(500, {}), HttpResponse(500, {}), _GEMINI_OK]
     )
     result = _router([_gemini(), _groq()], transport, sleep=sleeps.append).complete("hello")
     assert result.ok is True
@@ -303,6 +309,49 @@ def test_consecutive_429s_do_not_open_the_breaker():
     result = _router([_gemini()], transport, breaker_threshold=2).complete("hello")
     assert result.ok is True
     assert result.provider == "gemini"
+
+
+def test_429_retries_same_provider_after_cooldown():
+    # 2026-09-05: a 429 means "slow down, I'll be back", not "hand the
+    # cluster to the next provider". The 2026-09-05 run wasted its cascade
+    # on this -- Groq (the only healthy provider) walled, and each 429
+    # rotated into bai/gemini/openrouter, which 502/503/403'd, dropping the
+    # cluster while Groq sat cooling. Now a 429 retries the SAME provider
+    # after one cooldown wait, before any rotation.
+    sleeps: list[float] = []
+    clock = {"t": 0.0}
+
+    def advance(s: float) -> None:
+        sleeps.append(s)
+        clock["t"] += s
+
+    transport = MockHttpTransport(responses=[HttpResponse(429, {}), _GEMINI_OK])
+    router = _router([_gemini()], transport, clock=lambda: clock["t"], sleep=advance)
+    result = router.complete("hello")
+    assert result.ok is True
+    assert result.provider == "gemini"  # the SAME provider, not a rotation
+    assert len(transport.calls) == 2
+    assert all(GEMINI_URL_PREFIX in c["url"] for c in transport.calls)
+    assert sleeps == [30.0]  # one cooldown wait, then the same-provider retry
+
+
+def test_429_does_not_starve_ready_downstream_provider():
+    # 2026-09-05 review regression: the always-retry-same-provider form of
+    # the 429 fix burned the whole attempt budget on a walled mid-cascade
+    # provider (Groq) while a HEALTHY one (bai) sat idle. A 429 retries the
+    # same provider ONLY when no ready alternative is waiting; here bai is
+    # ready, so the walled groq rotates and bai serves.
+    transport = MockHttpTransport(responses=[
+        HttpResponse(503, {}),   # gemini overload -> rotate
+        HttpResponse(429, {}),   # groq token wall -> rotate (bai ready)
+        _GROQ_OK,                # bai serves (OpenAI shape)
+    ])
+    result = _router([_gemini(), _groq(), _bai()], transport).complete("hello")
+    assert result.ok is True
+    assert result.provider == "bai"
+    assert len(transport.calls) == 3
+    # bai's own URL, not another groq retry.
+    assert "api.b.ai" in transport.calls[2]["url"]
 
 
 # The call-cap, vision-gating, reservation and provider-spend tests live in

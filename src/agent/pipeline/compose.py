@@ -8,6 +8,10 @@ and never "news anchor" dramatisation. Tone lives in config/prompts; this
 stage owns ORDER, LABELS and BUDGET. Order comes from pipeline/rank.py
 (deterministic -- NOT the Phase-11 risk engine). Dates are Jalali, Tehran
 wall-clock, display-only; date_only items say the time was not stated.
+
+The pure text helpers (_headline, _raw_fallback, _when_text) live in
+pipeline/render.py -- split out 2026-09-05 to keep this file under the
+~200-line cap (constraint 12).
 """
 
 from __future__ import annotations
@@ -20,69 +24,8 @@ from agent.delivery.message import Item, Message
 from agent.pipeline.labels import category_icon, category_name, labels_for
 from agent.pipeline.langgate import split_persian
 from agent.pipeline.rank import rank_events
+from agent.pipeline.render import _headline, _raw_fallback, _when_text
 from agent.util.jalali import format_jalali
-
-
-def _headline(summary: str) -> str:
-    """First sentence of the summary, capped -- informative, not truncated
-    into nonsense: the cap cuts at a word boundary near 140 chars."""
-    first = summary.split(". ")[0].strip(" .")
-    if len(first) <= 140:
-        return first
-    cut = first[:137].rsplit(" ", 1)[0]
-    return cut + "…"
-
-
-_RAW_TITLE_CAP = 110
-# Understand-stage PROVIDER failures only — an inclusion list on purpose:
-# validate judgments (lang/rank/repeat drops) have events and their own
-# fates; a repeat-drop is not a provider failure.
-_UNCOVERED_FATES = {"unavailable", "refused_cap", "unparseable", "oversized"}
-
-
-def _raw_fallback(clusters: list, event_keys: set, fates: dict, labels: dict,
-                  max_items: int) -> str:
-    """Raw-title section for clusters the LLM could not cover (move 1,
-    2026-08-31: the product survives total LLM loss). Content-filtered
-    clusters (clickbait/irrelevant) are judgments, not failures — they
-    stay out. Source titles are quoted text, displayed as-is; the
-    formatter (or the plain-text path) escapes them."""
-    lines: list[str] = []
-    for cluster in clusters:
-        fate = fates.get(cluster.key)
-        if cluster.key in event_keys:
-            continue
-        if fate not in _UNCOVERED_FATES and fate is not None:
-            continue  # judged (clickbait/irrelevant) or another stage's drop
-        title = cluster.members[0].title.strip()
-        if not title:
-            # Telegram posts carry no title: the body lead stands in —
-            # an empty bullet is worse than nothing (owner 2026-08-31).
-            title = (cluster.members[0].body or "").strip()[:_RAW_TITLE_CAP]
-        if not title:
-            continue
-        if len(title) > _RAW_TITLE_CAP:
-            title = title[:_RAW_TITLE_CAP] + "…"
-        lines.append(f"• {title}")
-        if len(lines) >= max_items:
-            break
-    if not lines:
-        return ""
-    return labels["raw_fallback"] + "\n" + "\n".join(lines)
-
-
-def _when_text(cluster, labels) -> str:
-    """Jalali display of the event's latest time. If EVERY member is
-    date_only, the feed gave no time -- say so rather than invent one."""
-    dated = [m for m in cluster.members if m.published_at is not None]
-    if not dated:
-        return labels["date_unknown"]
-    latest = max(m.published_at for m in dated)
-    shown = to_tehran(latest)
-    when = format_jalali(shown, with_time=True)
-    if all(m.date_only for m in dated):
-        return f"{when.split(' — ')[0]} ({labels['time_not_stated']})"
-    return when
 
 
 class ComposeStage:
@@ -119,11 +62,14 @@ class ComposeStage:
 
         # Raw fallback section (move 1, 2026-08-31): clusters the LLM
         # could not cover, as escaped raw source titles. lang-dropped
-        # events were judged -- their keys stay out of the fallback.
+        # events are INCLUDED: their prose failed the Persian gate, but
+        # the event is real and its raw source title still informs (the
+        # 2026-09-05 run lost its best item -- Israel/Lebanon, 17.794 --
+        # this way).
         fates = dict(getattr(ctx, "cluster_fates", None) or [])
         raw_fallback = _raw_fallback(
             list(getattr(ctx, "clusters", None) or []),
-            {e.event_key for e in events} | {e.event_key for e in lang_dropped},
+            {e.event_key for e in events},
             fates, labels, settings.digest_rank.fallback_max_items,
         )
 
@@ -188,6 +134,8 @@ class ComposeStage:
             headline = event.headline.strip() if event.headline else _headline(event.summary)
             if event.claim_status == "rumour":
                 headline = f"{labels['rumour']} · {headline}"
+            elif event.claim_status == "unconfirmed":
+                headline = f"{labels['unconfirmed']} · {headline}"
             headline = f"{category_icon(event.category)} {headline}"
             detail_bits = [name, when, event.summary] if when else [name, event.summary]
             items.append(Item(
