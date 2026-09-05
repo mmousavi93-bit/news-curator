@@ -11,10 +11,11 @@ Owner constraints locked: public GitHub repo, encrypted state, 8 pipeline runs/d
 
 Before the diagrams, the reasoning that matters. Everything else follows from these.
 
-**Cluster before you summarize.** The Gemini free tier allows 10 requests per minute and
-1,500 per day. A naive design calls the LLM once per article. At roughly 800 articles
-collected per run that is 80 minutes of pure rate-limit waiting per run and 6,400 requests
-per day against a 1,500 ceiling. The system would be dead on arrival. So clustering happens
+**Cluster before you summarize.** Gemini free tier is 5 RPM / 250K TPM / 20 RPD
+(3.8 Flash, corrected 2026-09-05; Groq's 14,400 RPD is the workhorse). A naive design calls
+the LLM once per article. At roughly 800 articles collected per run that is 80 minutes of
+pure rate-limit waiting per run and 6,400 requests per day against a 20/day ceiling. The
+system would be dead on arrival. So clustering happens
 first, using local embeddings that cost nothing and have no rate limit, and the LLM is only
 ever shown a *cluster* — ten articles about the same event arrive as one prompt. That drops
 the run from ~800 LLM calls to roughly 40, which fits inside the free tier with a 3x safety
@@ -121,9 +122,10 @@ The numbers are the point. Each stage must survive the free tier.
 | Compose | top events | 1 message | 1 Gemini call |
 | **Total LLM** | | | **~36 calls/run, ~288/day** |
 
-Against a 1,500/day ceiling that leaves 5x headroom for retries, backfill and debugging.
-Against 10 RPM it means roughly 4 minutes of the run is rate-limit-bound, which is
-acceptable and is the single largest component of runtime.
+Against Gemini's 20/day ceiling the budget is provider-shared: gemini covers ~20
+top-priority clusters a day and Groq (14,400 RPD) carries the rest, so total runtime is
+bound by Groq's per-minute wall and wall-clock, not Gemini. At 5 RPM, gemini's 20 calls
+cost ~4 minutes of pacing — the single largest fixed cost of the run.
 
 ## 3. Component responsibilities
 
@@ -235,7 +237,7 @@ No file should exceed roughly 200 lines. If one does, it is doing two jobs.
 |---|---|---|
 | Plain Python, no agent framework | The pipeline is a fixed linear sequence with no branching decisions. There is no agentic loop to orchestrate. | LangGraph — the spec asks for it, but it adds a dependency, a mental model and a failure surface to solve routing that a `for` loop already solves. Revisit only if v2 adds conversational Q&A over the RAG. |
 | SQLite + NumPy | ~900 vectors. Brute force is microseconds. Single file, trivially encryptable, zero services. | Chroma/Qdrant/pgvector — service dependency and quota for zero measurable gain. |
-| sentence-transformers, multilingual MiniLM, local | No rate limit, deterministic, free, works offline in tests. Preserves the scarce Gemini quota for reasoning. | Gemini embedding API — burns the same 10 RPM budget that the summarisation stage needs. |
+| sentence-transformers, multilingual MiniLM, local | No rate limit, deterministic, free, works offline in tests. Preserves the scarce Gemini quota for reasoning. | Gemini embedding API — burns the same 20 RPD quota that the summarisation stage needs. |
 | Gemini Flash vision | Reads en/fa/ar/he natively, interprets maps and charts, already in the stack. | Tesseract — poor RTL accuracy, cannot read a chart, system binary + 4 language packs. |
 | `t.me/s/` web preview | No auth, no secret, no ban risk. | Telethon MTProto — risks the owner's personal account. |
 | age encryption | Single static binary, one keypair, no GPG keyring ceremony. | GPG — painful in CI, more moving parts. |
@@ -250,9 +252,9 @@ Verified August 2026.
 
 | Service | Free limit | Our usage | Margin |
 |---|---|---|---|
-| Gemini Flash | 10 RPM, 1,500 RPD, no card | ~36/run, ~288/day | 5.2x |
-| Gemini vision | included in above | ~10/run | — |
-| Groq (fallback) | 30 RPM, 14,400 RPD, no card | 0 unless Gemini fails | large |
+| Gemini Flash | 5 RPM, 250K TPM, 20 RPD, no card | ~20/day (top-priority) | head-start only |
+| Gemini vision | included in above | inert in v1 (NoopStage) | — |
+| Groq (workhorse) | 30 RPM, 14,400 RPD, no card | ~220/day (the bulk) | large |
 | OpenRouter (fallback 2) | 20 RPM, **50 RPD**, roster rotates weekly | emergency only | thin — third tier only |
 | GitHub Actions, public repo | unlimited minutes | ~1,450 min/month | n/a |
 | Actions cache | 10 GB | ~500 MB (model + pip) | 20x |
@@ -268,8 +270,9 @@ data may ever enter a prompt.
 
 ## 7. Bottlenecks
 
-The binding constraint is Gemini's 10 RPM, which puts a floor of roughly 4 minutes on every
-run and caps events per run at about 40 before the run starts stretching. Mitigation is the
+The binding constraint is Groq's per-minute token wall (~13-14 calls/run) and wall-clock.
+Gemini's 20/day quota makes it a premium head-start, not capacity. A healthy run still
+covers ~40 clusters — gemini first, then groq carries the tail. Mitigation is the
 cluster-first design plus a hard cap on clusters per run, with overflow deferred to the next
 run rather than dropped.
 

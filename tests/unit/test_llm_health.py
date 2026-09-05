@@ -76,3 +76,77 @@ def test_load_corrupt_health_returns_empty(tmp_path):
         assert health.load_health(conn) == {}
     finally:
         conn.close()
+
+
+# ---------------------------------------------------------------------------
+# Daily quota persistence (llm/limits.py seeds ProviderBudget from this)
+# ---------------------------------------------------------------------------
+
+
+def test_daily_roundtrip_and_merge_same_day(tmp_path):
+    conn = _db(tmp_path)
+    try:
+        health.save_daily(conn, {"gemini": {"calls": 5, "failed": 1}}, NOW)
+        assert health.load_daily(conn, NOW) == {"gemini": 5}
+        health.save_daily(conn, {"gemini": {"calls": 3, "failed": 0}},
+                          NOW + timedelta(hours=1))
+        assert health.load_daily(conn, NOW + timedelta(hours=1)) == {"gemini": 8}
+    finally:
+        conn.close()
+
+
+def test_daily_rollover_resets_to_zero(tmp_path):
+    conn = _db(tmp_path)
+    try:
+        health.save_daily(conn, {"gemini": {"calls": 20, "failed": 0}}, NOW)
+        next_day = NOW + timedelta(days=1)
+        assert health.load_daily(conn, next_day) == {}
+        health.save_daily(conn, {"gemini": {"calls": 2, "failed": 0}}, next_day)
+        assert health.load_daily(conn, next_day) == {"gemini": 2}
+    finally:
+        conn.close()
+
+
+def test_daily_absent_provider_counts_zero(tmp_path):
+    conn = _db(tmp_path)
+    try:
+        health.save_daily(conn, {"gemini": {"calls": 5, "failed": 0}}, NOW)
+        assert health.load_daily(conn, NOW).get("groq", 0) == 0
+    finally:
+        conn.close()
+
+
+def test_load_corrupt_daily_returns_empty(tmp_path):
+    conn = _db(tmp_path)
+    try:
+        conn.execute("INSERT INTO meta (key, value) VALUES (?, ?)",
+                     ("provider_daily_v1", "not json"))
+        conn.commit()
+        assert health.load_daily(conn, NOW) == {}
+    finally:
+        conn.close()
+
+
+def test_daily_key_aligns_to_pacific_midnight(tmp_path):
+    # 05:30 UTC on Sep 5 is 22:30 PDT on Sep 4 -- the canonical digest sits
+    # BEFORE Google's Pacific-midnight reset, so its calls must land on the
+    # prior quota day, not a fresh one. 07:01 UTC is 00:01 PDT Sep 5.
+    conn = _db(tmp_path)
+    try:
+        before_reset = datetime(2026, 9, 5, 5, 30, tzinfo=timezone.utc)
+        health.save_daily(conn, {"gemini": {"calls": 1, "failed": 0}}, before_reset)
+        assert health.load_daily(conn, before_reset) == {"gemini": 1}
+        after_reset = datetime(2026, 9, 5, 7, 1, tzinfo=timezone.utc)
+        assert health.load_daily(conn, after_reset) == {}
+    finally:
+        conn.close()
+
+
+def test_daily_empty_stats_does_not_wipe(tmp_path):
+    conn = _db(tmp_path)
+    try:
+        health.save_daily(conn, {"gemini": {"calls": 5, "failed": 0}}, NOW)
+        health.save_daily(conn, {}, NOW + timedelta(hours=1))
+        assert health.load_daily(conn, NOW + timedelta(hours=1)) == {"gemini": 5}
+    finally:
+        conn.close()

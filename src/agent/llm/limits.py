@@ -91,12 +91,13 @@ class CallBudget:
 class ProviderBudget:
     """Constraint #15 guard rails, per provider (PHASE_5_BRIEF §10).
 
-    Cross-run accounting is deliberately NOT built (brief §2): the failure
-    constraint 15 exists to stop is a RETRY LOOP, which is a within-run
-    event, so per-run accounting stops the actual threat. A metered
-    provider's max_spend_usd_per_month is enforced as a per-run ceiling at
-    the same dollar value -- a run that would burn a month of budget in one
-    night halts instead, which is the right failure direction.
+    Per-run accounting (calls, spend) stops the retry loop, which is the
+    within-run threat. The daily quota (`max_calls_per_day`, fed by the
+    provider's `rpd`) is the one cross-run guard: free tiers reset per day,
+    so a provider that is fine per-run but quota-bound per-day must be
+    refused once its day's allowance is spent. The count arrives seeded
+    (`daily_calls_used`) from the persisted record in health.py -- the
+    router is stateless between runs by construction.
     """
 
     def __init__(
@@ -109,6 +110,8 @@ class ProviderBudget:
         input_usd_per_mtok: float,
         output_usd_per_mtok: float,
         logger: logging.Logger,
+        max_calls_per_day: int | None = None,
+        daily_calls_used: int = 0,
     ) -> None:
         self.name = name
         self._max_calls = max_calls_per_run
@@ -117,13 +120,27 @@ class ProviderBudget:
         self._in_price = input_usd_per_mtok
         self._out_price = output_usd_per_mtok
         self._logger = logger
+        self._max_calls_day = max_calls_per_day
+        # Seeded from the persisted daily record (health.py): the router is
+        # stateless between runs, so today's prior attempts arrive at build
+        # time. Bounds the provider's requests-per-day, not its spend.
+        self.daily_calls = daily_calls_used
         self.calls = 0
         self.spend_usd = 0.0
         self.halted = False
         self._warned = False
+        self._warned_day = False
 
     def acquire(self) -> bool:
         if self.halted:
+            return False
+        if self._max_calls_day is not None and self.daily_calls >= self._max_calls_day:
+            if not self._warned_day:
+                self._warned_day = True
+                self._logger.error(
+                    "llm provider %s: daily quota (%d) reached -- skipping "
+                    "for the rest of today", self.name, self._max_calls_day,
+                )
             return False
         if self._max_calls is not None and self.calls >= self._max_calls:
             if not self._warned:
@@ -134,6 +151,7 @@ class ProviderBudget:
                 )
             return False
         self.calls += 1
+        self.daily_calls += 1
         return True
 
     def record_usage(self, in_tokens: int, out_tokens: int) -> None:
@@ -160,12 +178,12 @@ class ProviderBudget:
 
 class RpmPacer:
     """Proactive pacing (PHASE_5_BRIEF §5). RPM binds long before RPD:
-    40 Gemini calls at 10 RPM is a four-minute wall-clock floor. A pacer
+    40 Gemini calls at 5 RPM is an eight-minute wall-clock floor. A pacer
     that waits for 429s spends the run budget on retries and discovers the
     limit the expensive way.
 
     Calls are serial and stay serial: parallelism would break the pacer and
-    buys nothing against a 10 RPM ceiling.
+    buys nothing against a 5 RPM ceiling.
     """
 
     def __init__(self, clock: Callable[[], float], sleep: Callable[[float], None]) -> None:

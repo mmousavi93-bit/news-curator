@@ -236,7 +236,8 @@ TASK QUEUE
 1. BLOCKER — provider access from Iran. The owner is in Asia/Tehran. Determine per provider
    whether ACCOUNT CREATION is possible from Iran and whether payment rails work. Google AI
    Studio is already CONFIRMED — key in hand, AI Studio project, no billing, free tier
-   10 RPM / 1,500 RPD. Do not re-research it. Remaining: Groq, OpenRouter, FRED free API
+   (2026-09-05: 3.8 Flash = 5 RPM / 250K TPM / 20 RPD — re-check the per-project page in
+   AI Studio, it is the only place the number lives). Remaining: Groq, OpenRouter, FRED free API
    key, Telegram Bot API, GitHub Actions. Pipeline EXECUTION runs from GitHub's US runners and is not at issue — only
    signup and payment are. Write `analysis/provider_access.csv` with columns
    provider, signup_from_iran, payment_required, evidence_url, status — where status is

@@ -147,6 +147,32 @@ class _Log:
         self.messages.append(msg % args if args else msg)
 
 
+def test_daily_exhausted_provider_skipped_to_next():
+    # gemini already spent its 20/day; the router must skip it (without a
+    # request) and serve from groq instead of returning UNAVAILABLE.
+    log = _Log()
+    transport = MockHttpTransport(responses=[_GROQ_OK])
+    limits = {
+        "gemini": ProviderBudget(
+            name="gemini",
+            max_calls_per_run=None,
+            max_spend_usd=None,
+            halt_on_exceeded=False,
+            input_usd_per_mtok=0.0,
+            output_usd_per_mtok=0.0,
+            max_calls_per_day=20,
+            daily_calls_used=20,  # today's quota fully spent
+            logger=log,
+        ),
+    }
+    router = _router([_gemini(), _groq()], transport, provider_limits=limits)
+    result = router.complete("a")
+    assert result.ok is True
+    assert result.provider == "groq"
+    assert len(transport.calls) == 1  # gemini was never attempted
+    assert any("daily quota (20) reached" in m for m in log.messages)
+
+
 def test_metered_provider_halt_stops_further_calls_to_it():
     log = _Log()
     transport = MockHttpTransport(responses=[

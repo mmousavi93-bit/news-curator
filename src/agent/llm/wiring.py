@@ -94,6 +94,7 @@ def build_router(
     sleep: Callable[[float], None] = _time.sleep,
     logger: logging.Logger | None = None,
     health: Mapping[str, Mapping] | None = None,
+    daily: Mapping[str, int] | None = None,
 ) -> Router:
     """Build a production router from the validated `llm:` settings block.
 
@@ -104,6 +105,10 @@ def build_router(
     `health` (llm/health.py, owner-approved move 2, 2026-08-31) reorders
     the cascade: providers measurably sick in the last 7 days start last,
     so priority clusters hit the provider that actually worked yesterday.
+
+    `daily` (llm/health.py load_daily) seeds each provider's daily quota
+    with today's prior attempts, so a free tier's requests-per-day ceiling
+    (e.g. gemini's 20) is enforced ACROSS runs, not re-armed per run.
     """
     logger = logger or get_logger("agent.llm.router")
     order = cascade_order(settings.order, health or {})
@@ -117,7 +122,9 @@ def build_router(
             # Connect timeout is shared; only the read leg is overridable
             # (2026-08-30 decision: primary reads time out at 20s).
             timeout_map[name] = (DEFAULT_TIMEOUT[0], float(cfg.read_timeout_seconds))
-        if cfg.max_calls_per_run is not None or cfg.max_spend_usd_per_month is not None:
+        if (cfg.max_calls_per_run is not None
+                or cfg.max_spend_usd_per_month is not None
+                or cfg.rpd is not None):
             limits[name] = ProviderBudget(
                 name=name,
                 max_calls_per_run=cfg.max_calls_per_run,
@@ -125,6 +132,10 @@ def build_router(
                 halt_on_exceeded=bool(cfg.halt_on_budget_exceeded),
                 input_usd_per_mtok=cfg.input_usd_per_mtok or 0.0,
                 output_usd_per_mtok=cfg.output_usd_per_mtok or 0.0,
+                # Daily quota (rpd) is enforced across runs via the seeded
+                # `daily` record (health.py) -- the one cross-run guard.
+                max_calls_per_day=cfg.rpd,
+                daily_calls_used=(daily or {}).get(name, 0),
                 logger=logger,
             )
     return Router(

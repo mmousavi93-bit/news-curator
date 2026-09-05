@@ -283,12 +283,20 @@ llm:
   # OWNER DECISION 2026-08-31 (session 9o): ceiling 51 -> 70. Evidence: the
   # 13:03 run exhausted 51 calls having processed only 21 of 40 clusters
   # (2.4 calls/cluster -- 429 thrash + slow bai), while groq was still
-  # answering. 6 runs/day x 70 = 420 calls vs Gemini's 1,500 RPD; groq's
-  # 14,400 RPD has 34x headroom. The binding limits on gemini-dead days are
-  # groq's per-minute wall and wall-clock, not this cap. Enforcement is
-  # real, not advisory: llm/router.py refuses call N+1 before a request is
-  # built (CLAUDE.md constraint #2).
+  # answering. 6 runs/day x 70 = 420 calls ceiling; groq's 14,400 RPD has
+  # 34x headroom. Gemini's old 1,500 RPD is GONE (free tier is now 20 RPD
+  # -- see the gemini provider block): groq is the workhorse now. The
+  # binding limits on gemini-dead days are groq's per-minute wall and
+  # wall-clock, not this cap. Enforcement is real, not advisory:
+  # llm/router.py refuses call N+1 before a request is built (constraint #2).
   max_calls_per_run: 70
+  # gemini stays FIRST despite its 20/day cap: it serves the highest-
+  # priority clusters (understand runs clusters in priority order) until its
+  # quota-day allowance is spent, then llm/limits.py skips it and groq
+  # carries the tail. Quota resets at Pacific midnight (~10:30 Tehran), so
+  # the 09:00 digest draws the TAIL of the prior quota day -- the fresh 20
+  # typically lands on the 12:00 run. Still worth it: gemini always covers
+  # the top stories of whatever run has allowance.
   # deepseek rides the bai gateway as its OWN rung (bai_deepseek, owner
   # 2026-08-31: "get at least something", labeled): it fires only when
   # everything else fails, its answers carry provider provenance in the
@@ -320,9 +328,20 @@ llm:
       # cannot be retired. Pin a specific model only when v1.5 scoring
       # arrives and output stability starts to matter; the pipeline log's
       # "List available Gemini models" step is the ground truth on every run.
+      #
+      # FREE-TIER LIMITS 2026-09-05 (owner, from the AI Studio per-project
+      # page): 3.8 Flash = 5 RPM / 250,000 TPM / 20 RPD. The old 10 RPM /
+      # 1,500 RPD was the pre-2026 free tier and is GONE. At 20 RPD gemini
+      # is a premium HEAD-START, not a workhorse: it serves the day's ~20
+      # highest-priority clusters, then the daily cap in llm/limits.py
+      # refuses call 21+ (enforced, not advisory -- constraint 15) and groq
+      # carries the rest. TPM is NOT a schema field: at 5 RPM and ~3.4K
+      # tokens/call, 250K TPM is ~72 calls/min, so RPM binds ~14x earlier.
+      # 5 RPM = 12s pacing per call (RpmPacer): 20 calls cost ~4 min of
+      # whichever run spends them -- the price of "gold".
       model: "gemini-flash-latest"
-      rpm: 10
-      rpd: 1500
+      rpm: 5
+      rpd: 20
       supports_vision: true
       # DECISION 2026-08-30 (first automated run, POSTMORTEMS.md): read
       # timeout 20s, not the 60s default. Evidence: Gemini hung until the

@@ -89,7 +89,7 @@ llm:
     compose: { provider: "gemini" }
     understand: { provider: "gemini", cascade_enabled: false }
   providers:
-    gemini: { model: "gemini-flash-latest", rpm: 10, rpd: 1500, supports_vision: true }
+    gemini: { model: "gemini-flash-latest", rpm: 5, rpd: 20, supports_vision: true }
     groq: { model: "qwen/qwen3.8-27b", rpm: 30, rpd: 14400, supports_vision: false }
     openrouter: { model: "meta-llama/llama-3.1-8b-instruct:free", rpm: 20, rpd: 50, supports_vision: false }
   backoff:

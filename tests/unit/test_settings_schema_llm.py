@@ -33,7 +33,8 @@ def test_real_settings_yaml_has_owner_decided_ceiling():
     settings = Settings.from_dict(raw)
     # Owner decision 2026-08-31 (session 9o): 51 -> 70. Evidence: the 13:03
     # run exhausted 51 calls having processed 21 of 40 clusters while groq
-    # was still answering. 70 x 6 runs = 420/day vs Gemini's 1,500 RPD.
+    # was still answering. 70 x 6 runs = 420/day ceiling; Gemini's free tier
+    # is now 20 RPD (see the gemini provider block). Groq carries the bulk.
     # Do not change without re-checking the arithmetic in the comment.
     assert settings.llm.max_calls_per_run == 70
 
