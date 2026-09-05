@@ -18,9 +18,11 @@ key**, then **Create API key in new project**. Copy the key. It starts with `AIz
 
 Save as: `GEMINI_API_KEY`
 
-Free tier gives you 10 requests per minute and 1,500 per day. The system is designed to use
-about 290 per day, so you have room. Note that Google may use free-tier prompts to improve
-their models — we only ever send public news content, never anything personal.
+Free tier gives you 5 requests per minute and 20 per day (3.8 Flash — the exact limits are
+on the AI Studio per-project page; they changed in 2026). The system is designed so Gemini
+covers only ~20 top-priority stories a day; Groq (14,400/day, see below) does the bulk.
+Note that Google may use free-tier prompts to improve their models — we only ever send
+public news content, never anything personal.
 
 ## 2. Groq — the backup brain (3 min)
 

@@ -21,9 +21,9 @@ silently work around them.
 
 1. **Zero cost. Zero credit cards.** Any dependency requiring payment or a card at signup is
    rejected, no exceptions.
-2. **Cluster before you summarize.** Gemini free tier is 10 RPM / 1,500 RPD. Never call an
-   LLM per article. The LLM sees clusters (~25–40 per run), never raw article lists.
-   Budget: **max ~40 LLM calls per run**. Exceeding this breaks the system.
+2. **Cluster before you summarize.** Gemini free tier is 20 RPD (see Decided facts). Never
+   call an LLM per article. The LLM sees clusters (~25–40 per run), never raw article
+   lists. Budget: **max ~40 LLM calls per run**. Exceeding this breaks the system.
 3. **Risk scores are deterministic Python, never LLM output.** The LLM extracts discrete
    signals only. `risk/engine.py` computes scores from `config/risk_weights.yaml`. Identical
    input must always produce an identical score, or trend deltas are meaningless.
@@ -54,8 +54,12 @@ silently work around them.
 
 ## Decided facts (verified 2026-08-01)
 
-- Gemini Flash free: **10 RPM, 1,500 RPD**, no card, vision included, may train on prompts →
-  public news content only, never personal data.
+- Gemini 3.8 Flash free: **5 RPM, 250K TPM, 20 RPD** — corrected 2026-09-05 from the
+  AI Studio per-project page; the old 10 RPM / 1,500 RPD was the pre-2026 tier. No card,
+  vision included, may train on prompts → public news content only, never personal data.
+  Enforced in code as a daily cap keyed to Pacific midnight (health.py `_quota_day`).
+  Gemini 3.5 Flash Lite reports **500 RPD** (owner, UNVERIFIED: exact model id, RPM, TPM
+  unknown — do not wire until all three are confirmed).
 - Groq free: 30 RPM, 14,400 RPD, no card. Second-tier fallback. No vision.
 - OpenRouter free: 20 RPM but only **50 requests/day**, model roster rotates weekly.
   Emergency parachute only, not a real fallback.
@@ -631,11 +635,14 @@ cleaning + momentum semantics; independent adversarial review before push.
 ## Pending / unresolved
 
 - [ ] **NEXT SESSION — owner workflow: push → verify → flash go-live →
-      analysis.** The 9l.2 + 9m + 9n batches (suite 659, shim-green) are
-      the unpushed work: `git add -A && git commit && git push`, then
-      `git show origin/main:src/agent/flash/momentum.py | findstr DE-ESCALATION`
-      and `git show origin/main:.github/workflows/flash-alert.yml | findstr flash.ok`
-      must both print; CI must be green at 674. Flash go-live: NO new
+      analysis.** The 9l.2 + 9m + 9n batches AND the 2026-09-05 Gemini-quota
+      fix (daily RPD enforcement + gemini 5 RPM/20 RPD + Pacific-midnight
+      day key — suite 686, shim-green, two-round adversarial review
+      approved) are the unpushed work: `git add -A && git commit && git
+      push`, then `git show origin/main:src/agent/flash/momentum.py | findstr
+      DE-ESCALATION` and
+      `git show origin/main:.github/workflows/flash-alert.yml | findstr flash.ok`
+      must both print; CI must be green at 686. Flash go-live: NO new
       secrets needed (FLASH_CHANNEL_ID optional); first boot is
       self-bootstrapping; then dispatch `flash-alert` manually once and
       confirm a clean run + flash-reports artifact. Tuning loop: download

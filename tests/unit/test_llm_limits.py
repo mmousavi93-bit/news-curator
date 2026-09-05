@@ -112,6 +112,30 @@ def test_provider_budget_per_run_call_cap():
     assert any("per-run call cap (2) reached" in m[1] for m in budget._logger.messages)
 
 
+def test_provider_budget_daily_cap_seeded_and_enforced():
+    # 19 of the day's 20 already spent; one call is allowed, then refused.
+    budget = _provider_budget(max_calls_per_run=None, max_spend_usd=None,
+                              max_calls_per_day=20, daily_calls_used=19)
+    assert budget.acquire() is True
+    assert budget.acquire() is False
+    assert any("daily quota (20) reached" in m[1] for m in budget._logger.messages)
+
+
+def test_provider_budget_daily_cap_from_zero():
+    budget = _provider_budget(max_calls_per_run=None, max_spend_usd=None,
+                              max_calls_per_day=3)
+    assert budget.acquire() is True
+    assert budget.acquire() is True
+    assert budget.acquire() is True
+    assert budget.acquire() is False
+
+
+def test_provider_budget_no_daily_cap_means_unlimited_across_days():
+    budget = _provider_budget(max_calls_per_run=None, max_spend_usd=None)
+    for _ in range(50):
+        assert budget.acquire() is True
+
+
 def test_provider_budget_spend_halt_stops_further_calls():
     budget = _provider_budget()
     budget.acquire()
