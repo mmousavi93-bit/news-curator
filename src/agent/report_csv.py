@@ -100,7 +100,17 @@ def _fate_for(cluster_key: str, events_by_key: dict, ctx) -> tuple[str, str]:
 
 def _write_chosen(ctx, path: Path) -> Path:
     clusters = list(getattr(ctx, "clusters", None) or [])
+    # ctx.events is the SURVIVING set -- validate physically removes repeats
+    # from it, so a repeat_dropped row used to be written with empty
+    # headline/summary and the drop was unjudgeable (2026-09-05: seven
+    # events dropped at cosine 0.56-0.67, one of them the run's largest
+    # cluster, and there was no text to tell over-cut from correct). Fold
+    # the dropped sets back in for TEXT only; _fate_for still decides fate.
     events_by_key = {e.event_key: e for e in getattr(ctx, "events", None) or []}
+    for attr in ("repeat_dropped", "lang_dropped", "rank_dropped",
+                 "relevance_dropped", "lead_events"):
+        for event in getattr(ctx, attr, None) or []:
+            events_by_key.setdefault(event.event_key, event)
     credibility = ctx.config.credibility
     with path.open("w", encoding="utf-8-sig", newline="") as fh:
         writer = csv.writer(fh)
@@ -127,6 +137,21 @@ def _write_chosen(ctx, path: Path) -> Path:
                 # Empty for fates recorded before an event existed.
                 getattr(event, "headline", "") if event else "",
                 getattr(event, "summary", "") if event else "",
+            ])
+        # Clusters the cap cut before any LLM saw them. They are not in
+        # ctx.clusters, so without this block they left only hex keys in one
+        # log line -- 36 of them on 2026-09-05, unauditable. The raw source
+        # title goes in the headline column on purpose: `grep` over this one
+        # file is the audit, and it has to reach cap losses too.
+        for cluster in getattr(ctx, "clusters_cap_dropped", None) or []:
+            title = (cluster.members[0].title or cluster.members[0].body or "").strip()
+            writer.writerow([
+                cluster.key, "cap_dropped",
+                "over max_clusters_per_run; no LLM call. headline = raw source title",
+                len(cluster.members), _sources(cluster), "",
+                _best_tier(cluster, credibility),
+                "", "", cluster.independent_count(credibility), "",
+                title[:300], "",
             ])
     return path
 

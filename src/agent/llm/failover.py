@@ -55,6 +55,9 @@ def failover(
     queue: deque[Provider] = deque(candidates)
     attempts = 0
     consecutive_429: dict[str, int] = {}
+    # The last provider-fatal result, kept so an all-fatal call still
+    # surfaces the diagnostic status instead of a generic "unavailable".
+    fatal_result: LlmResult | None = None
 
     while queue and attempts < router._max_retries + 1:
         provider = queue.popleft()
@@ -103,7 +106,25 @@ def failover(
                 )
             return result
         if outcome == FATAL:
-            return result
+            # 400/401/403 is a PROVIDER fact, not a request fact. The old
+            # doctrine ("it fails identically everywhere, so stop") was
+            # falsified on 2026-09-05: bai_deepseek 400'd and openrouter
+            # 403'd on prompts groq and gemini answered seconds later, and
+            # the early return destroyed three clusters -- one of them the
+            # run's most-corroborated story (7 members, 5 sources: US
+            # strikes on Iranian oil tankers) -- while three healthy
+            # providers sat in the queue. A 400 means "this gateway
+            # rejected this model id or payload shape"; a 403 means "this
+            # account's policy says no". Both are per-provider, exactly
+            # like the 404 case already rotated for the same reason.
+            #
+            # Cost is bounded WITHOUT the early return: call.py counted the
+            # failure against the breaker, so after two fatals the provider
+            # is skipped for the rest of the run -- ~2 wasted calls per
+            # provider per RUN, not one per cluster. Do not re-queue: a
+            # malformed request will not become well-formed on a retry.
+            fatal_result = result
+            continue
 
         if outcome == _SAME and not provider.schema_retried:
             provider.schema_retried = True
@@ -147,4 +168,8 @@ def failover(
         router._logger.error(
             "llm: stage=%s unavailable after %d attempt(s)", stage, attempts
         )
+    if fatal_result is not None:
+        # Every candidate was fatal: keep the diagnostic status so the
+        # caller's fate column says WHY, not just "unavailable".
+        return fatal_result
     return LlmResult(ok=False, status=UNAVAILABLE)

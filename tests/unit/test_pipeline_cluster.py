@@ -16,7 +16,9 @@ from pathlib import Path
 
 from agent.collectors.base import Item
 from agent.config import Config, SourceCredibility
-from agent.pipeline.cluster import ClusterStage, cluster_items, rank_and_truncate
+from agent.pipeline.cluster import (
+    ClusterStage, cluster_items, rank_and_truncate, split_at_cap,
+)
 from agent.settings import Settings
 
 _FIXTURE = Path(__file__).parent.parent / "fixtures" / "settings_minimal.yaml"
@@ -161,7 +163,62 @@ def test_cap_truncates_and_orders_tier_before_recency():
     # Tier ties break on recency: the two newest tier-3 clusters survive.
     kept_sources = {c.members[0].source_id for c in kept}
     assert kept_sources == {"t1", "t3_d", "t3_c"}
-    assert any("dropping 2 keys" in m for m in log.messages)
+    assert any("dropping 2 " in m for m in log.messages)
+
+
+def test_cap_keeps_corroborated_cluster_over_fresher_single_source():
+    # The 2026-09-05 16:18 regression, in miniature. The old priority key
+    # was (tier, recency, size): size was the LAST tiebreak and, because
+    # timestamps are effectively always distinct, it never fired -- inside a
+    # tier the ranking was pure recency. That run cut 36 of 76 clusters and
+    # left 23 single-member clusters standing simply because they were
+    # fresher. Independence now sits ahead of recency: a three-outlet story
+    # must not lose a cap slot to a newer one-outlet post.
+    credibility = {
+        "wire_a": SourceCredibility(tier=2, group="a"),
+        "wire_b": SourceCredibility(tier=2, group="b"),
+        "wire_c": SourceCredibility(tier=2, group="c"),
+        "solo": SourceCredibility(tier=2, group="d"),
+    }
+    config = _config(credibility, max_clusters_per_run=1)
+    items = [
+        _item("wire_a", "https://x/1", T0 - timedelta(hours=6)),
+        _item("wire_b", "https://x/2", T0 - timedelta(hours=5)),
+        _item("wire_c", "https://x/3", T0 - timedelta(hours=4)),
+        _item("solo", "https://x/4", T0 - timedelta(hours=1)),  # freshest
+    ]
+    same, other = _unit(1, 0), _unit(0, 1)
+    clusters = cluster_items(items, [same, same, same, other], 0.62)
+    assert sorted(len(c.members) for c in clusters) == [1, 3]
+
+    kept, dropped = split_at_cap(clusters, 1, config, _Log())
+    assert len(kept) == 1
+    assert len(kept[0].members) == 3, "the 3-source cluster must win the slot"
+    assert kept[0].independent_count(credibility) == 3
+    # The overflow is returned, not discarded, so it can be audited in
+    # chosen.csv instead of vanishing into a line of hex keys.
+    assert [c.members[0].source_id for c in dropped] == ["solo"]
+
+
+def test_independent_count_collapses_shared_groups_and_ignores_leads():
+    # Reuters + AP on one wire, or BBC English + BBC Persian, is ONE
+    # independent source (rulebook Step 1). Leads never count at all.
+    credibility = {
+        "bbc_en": SourceCredibility(tier=1, group="bbc"),
+        "bbc_fa": SourceCredibility(tier=1, group="bbc"),
+        "unlisted": SourceCredibility(tier=3, group=None),
+        "tipster": SourceCredibility(tier="lead", group=None),
+    }
+    items = [
+        _item("bbc_en", "https://x/1"), _item("bbc_fa", "https://x/2"),
+        _item("unlisted", "https://x/3"), _item("tipster", "https://x/4"),
+    ]
+    same = _unit(1, 0)
+    clusters = cluster_items(items, [same] * 4, 0.62)
+    assert len(clusters) == 1
+    # bbc_en + bbc_fa collapse to one; unlisted (group None) stands alone;
+    # tipster is a lead and contributes nothing.
+    assert clusters[0].independent_count(credibility) == 2
 
 
 def test_under_cap_logs_nothing_and_keeps_priority_order():

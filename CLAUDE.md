@@ -191,7 +191,7 @@ Prompts live in `config/prompts/*.txt` — edit those, never hardcode prompt tex
 | `.github/workflows/dump-body.yml` | Manual `workflow_dispatch` run of `dump_body.py`. Diagnostic, asserts nothing, always exits 0. Also fetches `telegram.org/robots.txt` and greps it for `/s/`. Body returns as an artifact; `config/_body_dump.bin` is gitignored and must never be committed. |
 | `config/sources_probe_<tag>.csv` | Probe output, one file per environment (`local` = owner's PC in Iran, `ci` = GitHub US runner). |
 | `src/agent/collectors/` | One file per source type, all implement `base.py`. |
-| `src/agent/pipeline/` | **Phases 6–7 built 2026-08-29:** `filter.py` (topic gate), `embed.py` (Embedder protocol + MiniLM + FakeEmbedder), `cluster.py` (greedy cosine + priority rank + enforced cap), `understand.py` (one router call per cluster + clickbait/irrelevance filter + events write), `langretry.py` (retry-once forced-Persian, 9m), `collect.py` (fetch → dedup → store → ctx.items), `compose.py` (events → one budgeted message; date_only respected), `deliver.py` (Telegram or mock), `build_stages()` in `__init__.py` wires them; vision/validate/score stay no-ops until their phases. Full pipe: `python -m agent.run --db state.db`. |
+| `src/agent/pipeline/` | **Phases 6–7 built 2026-08-29:** `filter.py` (topic gate), `embed.py` (Embedder protocol + MiniLM + FakeEmbedder), `cluster.py` (greedy cosine algorithm + `Cluster.independent_count`) + **`priority.py`** (split out 2026-09-05: priority key + `split_at_cap` returning kept/dropped), `understand.py` (one router call per cluster + clickbait/irrelevance filter + events write), `langretry.py` (retry-once forced-Persian, 9m), `collect.py` (fetch → dedup → store → ctx.items), `compose.py` (events → one budgeted message; date_only respected), `deliver.py` (Telegram or mock), `build_stages()` in `__init__.py` wires them; vision/validate/score stay no-ops until their phases. Full pipe: `python -m agent.run --db state.db`. |
 | `src/agent/memory/` | **Phase 4 closed 2026-08-21; extended Phases 6–10.** `schema.sql` (13 tables, `SCHEMA_VERSION = 2` — lead_outcomes added additively), `db.py` (additive-only upgrades), `models.py`, `event_models.py` (Phase 6), `lead_models.py` + `source_health.py` (Phase 9/10), `dedup.py` (layers 1–3), `retention.py`, `crypto.py`. Journal mode DELETE not WAL, on purpose. `open_db` refuses to create by default — constraint 14. |
 | `src/agent/risk/` | Deterministic scoring. No LLM calls permitted in this package. |
 | `src/agent/llm/` | **Phase 5, built + gate-green 2026-08-29.** `errors.py` (typed outcomes, LlmResult), `transport.py` (lazy requests + recording mock), `limits.py` (CallBudget, ProviderBudget, RpmPacer), `breaker.py` (backoff + circuit breaker), `call.py` (one attempt + structured logging), `providers.py` (Gemini/Groq/OpenRouter/Bai adapters), `router.py` (failover loop), `stats.py` (per-provider attempt counters → run.csv, 9m), `wiring.py` (build_router + build_adapters). Clock/sleep injected everywhere. |
@@ -600,6 +600,45 @@ cleaning + momentum semantics; independent adversarial review before push.
    ALERTED buckets only, reading the wave's full bucket list (new
    `buckets` column, additive ALTER on existing flash DBs).
 
+## Session 9p (2026-09-05) — 16:18-run review: fatal rotates, cascade trimmed, cap ranks corroboration. Suite 696 (owner to push)
+
+Forensic: POSTMORTEMS.md top entry. Five defects from one run's artifacts.
+
+1. **Provider-fatal no longer ends the call.** `failover.py` returned on FATAL;
+   `bai_deepseek` 400 and `openrouter` 403 killed 3 clusters — including the
+   run's most-corroborated story (7 members, 5 independent sources: US strikes
+   on Iranian tankers) — on prompts groq/gemini answered seconds later. FATAL
+   now rotates; the provider is not re-queued; the breaker (2 strikes) bounds
+   waste to ~2 calls per provider per RUN. All-fatal returns the fatal status,
+   not a generic `unavailable`. **Standing rule: an outcome class may only
+   terminate the failover loop with evidence that it is provider-independent.**
+2. **Cascade trimmed to `gemini, groq, bai`.** bai_deepseek 400 on 2/2 (gateway
+   rejects model id `deepseek-v4-flash`); openrouter 403 (zero-balance verdict
+   was recorded 2026-08-30 and never removed from `order`). Blocks kept in
+   settings.yaml — re-enabling is one edit.
+3. **Cluster cap now ranks independence ahead of recency.** Old key
+   `(tier, recency, size)`: size never fired, so inside a tier the order was
+   pure recency — 36 of 76 cut, 23 single-member clusters kept for being newer.
+   New key `(tier, min(independent_count, 3), recency, size)`;
+   `Cluster.independent_count` = distinct credibility GROUPS (rulebook Step 1,
+   leads excluded). Ceiling 3 is deliberate.
+4. **`pipeline/priority.py` split out of cluster.py** (constraint 12: 251 lines).
+5. **Observability:** cap-dropped clusters get `cap_dropped` rows in chosen.csv
+   (was a line of hex keys, 36/run); `repeat_dropped`/`lang_dropped`/
+   `rank_dropped`/`relevance_dropped`/`lead_events` rows now carry headline+summary
+   (Masafer Yatta lesson, re-learned: **a new fate must carry its text**).
+   understand.py no longer reports every skip as `status=unavailable`.
+6. **NOT tuned, on purpose:** `event_match_threshold: 0.55` (7 repeat-drops at
+   0.56–0.67, one of them the 15-member cluster — unjudgeable until (5) lands)
+   and `digest_rank.min_score: 8` (ranks 6–10 scored 9.65–9.70 and were all
+   trivia; ~10 would cut exactly those, but the rule is 2–3 CLEAN runs first).
+7. **Flash monitor could not be reviewed — zero flash output exists.** No
+   `flash-reports` artifact, no `flash.db`, no `flash_*.csv`, against 13
+   downloaded pipeline artifacts in the same folder. Config `enabled: true`,
+   cron `*/15`, and `run_flash.py:158` writes the CSV on the LIVE path, so an
+   artifact should exist every run. **Owner action: open Actions → flash-alert.**
+   Promotes the deferred watchdog from nice-to-have to the top flash item.
+
 ## Phases 6–10 (2026-08-29) — v1 CODE COMPLETE. Suite 522, 0 failed, shim-verified
 
 - Owner's mandate this session: push to done. Built per briefs: Phase 6 Understand
@@ -642,8 +681,13 @@ cleaning + momentum semantics; independent adversarial review before push.
       lang-drop raw-title fallback, «تک‌منبع» single-source marker,
       anchor-only strategic relevance, `_UNCOVERED_FATES` correction,
       compose.py→render.py split — suite 692, shim-green, two-round
-      adversarial review 36/40 SHIP) are the unpushed work: `git add -A &&
+      adversarial review 36/40 SHIP) **and the 9p batch (2026-09-05: FATAL
+      rotates, cascade → gemini/groq/bai, independence-before-recency cap,
+      priority.py split, cap_dropped + gate-text CSV rows — suite 696,
+      shim-green)** are the unpushed work: `git add -A &&
       git commit && git push`, then `git show
+      origin/main:src/agent/pipeline/priority.py | findstr independent_count`,
+      `git show
       origin/main:src/agent/llm/failover.py | findstr ready_alt`,
       `git show origin/main:src/agent/pipeline/render.py | findstr
       cap_refused`,
@@ -653,7 +697,10 @@ cleaning + momentum semantics; independent adversarial review before push.
       must all print; CI must be green at 692. Flash go-live: NO new
       secrets needed (FLASH_CHANNEL_ID optional); first boot is
       self-bootstrapping; then dispatch `flash-alert` manually once and
-      confirm a clean run + flash-reports artifact. Tuning loop: download
+      confirm a clean run + flash-reports artifact. **2026-09-05: this is
+      now a BLOCKER, not a step — zero flash artifacts exist against 13
+      pipeline ones, so the monitor is presumed not running. Check the
+      flash-alert workflow's run history FIRST.** Tuning loop: download
       flash-reports CSVs for 2-3 days, tune `config/flash_alert.yaml`
       with me (the dry-run dispatch exists for keyword testing). Then the
       digest analysis session needs 2-3 MORE clean-run CSVs (no
@@ -687,12 +734,23 @@ cleaning + momentum semantics; independent adversarial review before push.
 - [ ] **Owner decision — approve `ARCHITECTURE.md`, or close the question.**
       Open since session 1; all ten phases were built and shipped against it.
       Either way this line dies. (Merges the two duplicate approval items.)
-- [ ] **Owner decision — line cap on six files.** `tools/check_feeds.py` (217),
+- [ ] **Owner decision — line cap on eight files.** `tools/check_feeds.py` (217),
       `tools/dump_body.py` (213), `tools/pytest_shim.py` (465),
       `memory/schema.sql` (226, comment-only), `tests/unit/test_pipeline_compose.py`
-      (295), `tests/unit/test_pipeline_validate.py` (378). Overage is comments and
-      test growth, no logic split needed. Decide: trim, split, or grant explicit
-      exceptions per category (dev tools / schema comments / tests).
+      (295), `tests/unit/test_pipeline_validate.py` (378), plus
+      `pipeline/understand.py` (217) and `report_csv.py` (226) — the only two that
+      are PRODUCTION logic and therefore the only two the cap was actually written
+      for. Decide: trim, split, or grant explicit exceptions per category
+      (dev tools / schema comments / tests).
+- [ ] **Flash watchdog — promote from deferred to next feature (proposed
+      2026-09-05, NOT built, needs owner approval per the architecture-first
+      rule).** Design: the digest step in pipeline.yml runs
+      `git fetch origin flash-state`, exports the last commit's age in minutes,
+      and render.py prepends a one-line Persian warning when it exceeds a
+      threshold (or when the branch is absent). No GitHub API, no new secret,
+      ~15 lines of YAML + ~12 of Python + 2 tests. Rationale: an emergency
+      alerter whose liveness depends on the owner remembering to open the
+      Actions tab is not an emergency alerter — proven this session.
 - [ ] **v1.5 (Phase 11) scope — risk engine, accuracy gate, markets fetcher.**
       Hand-label the 5 backtest scenario dates, measure Gemini extraction
       precision/recall BEFORE paying any adjudicator; paid cascade stays disabled.

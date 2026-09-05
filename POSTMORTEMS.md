@@ -5,6 +5,123 @@ session; this file does not. Nothing here is deleted or condensed — it is the 
 record of what broke, why, and what rule came out of it. Read it when working on the
 phase or subsystem it covers. CLAUDE.md keeps the operational core and points here.
 
+## 2026-09-05 (16:18 run) — provider-fatal killed the call; the cap ranked corroboration last
+
+Owner: "review and fix llm calls problems ... review flash alerts and output quality
+and iterate". Five defects, all in the same run's artifacts.
+
+### P0 — one provider's 4xx destroyed the whole cluster
+
+`failover.py` did `if outcome == FATAL: return result`. The doctrine was "a 4xx is a
+REQUEST fact — it fails identically on every provider, so stop." That was falsified in
+production: `bai_deepseek` returned 400 on 2/2 calls and `openrouter` returned 403 on
+1/1, on prompts `groq` and `gemini` answered seconds later. The early return ended the
+call while three healthy providers sat unqueued.
+
+Cost: three clusters lost. One of them was cluster `7e40551096d29469` — 7 members,
+5 independent sources (al_jazeera, al_monitor, iran_international, reuters_gnews,
+tg_vira_university), the run's second-largest and most-corroborated story: **US strikes
+on Iranian oil tankers after an IRGC attack on American naval ships**. It survived the
+cap, then died to a single 400 and reached the owner only as a raw English title in the
+fallback footer (`_UNCOVERED_FATES` includes `fatal`, which is the only reason it
+appeared at all — the footer did its job).
+
+Fix: FATAL now `continue`s to the next provider. The provider is NOT re-queued (a
+malformed request does not become well-formed on retry), and `call.py` still counts the
+failure against the breaker — so a genuinely broken provider costs ~2 calls per RUN, not
+one per cluster. When every candidate is fatal, the last fatal result is returned rather
+than a generic UNAVAILABLE, so the fate column says why. The same reasoning had already
+been applied to 404 on 2026-08-29 and simply was not generalised.
+
+Standing lesson: **an outcome class that terminates the failover loop must be justified
+by evidence that the outcome is provider-independent.** We had that evidence for
+schema errors (retry same, then rotate) and never had it for 4xx.
+
+### P1 — two dead rungs still in the cascade
+
+`bai_deepseek` 400 on 2/2 (the gateway does not accept model id `deepseek-v4-flash`) and
+`openrouter` 403 on 1/1 — the zero-balance verdict was recorded 2026-08-30 and the rung
+was never removed from `llm.order`. Every cluster paid for both before reaching a
+provider that answers. Cascade trimmed to `gemini, groq, bai`; provider blocks kept in
+settings.yaml so re-enabling is one edit, with the failure and date in the comment.
+
+### P2 — the cluster cap ranked corroboration LAST
+
+`_priority_key` was `(tier, recency, size)`. Size was the final tiebreak and, because
+timestamps are effectively always distinct, it never fired — inside a tier the ordering
+was pure recency. The run clustered 76 and cut 36; 23 of the 40 survivors were
+single-member clusters that won their slot only by being newer. Collect already drops
+date-only items past 72h, so everything in a run is roughly "today" and recency is a
+weak discriminator, while the count of INDEPENDENT outlets carrying a story is the
+strongest importance signal available before an LLM has read anything.
+
+New key: `(tier, min(independent_count, 3), recency, size)`. `Cluster.independent_count`
+uses the rulebook's Step 1 rule — distinct credibility GROUPS, `group: null` falls back
+to the source's own id, leads never count — so Reuters + AP on one wire, or BBC English
++ BBC Persian, count once. The ceiling of 3 is deliberate: independence must protect a
+corroborated story from the cap, not let one pile-up dominate the whole ordering.
+
+Constraint 12 fallout: cluster.py hit 251 lines, so priority/cap policy split out to
+`pipeline/priority.py` (95). cluster.py owns the ALGORITHM (what is one story),
+priority.py owns the POLICY (which stories are worth a call). Re-exported, callers
+unchanged; `TYPE_CHECKING` import avoids the cycle.
+
+### P3 — the two blind spots that made P0 and P2 hard to see
+
+- **Cap-dropped clusters left only a line of hex keys.** 36 clusters a run, no sources,
+  no titles — no way to tell whether the cap was cutting noise or cutting the story of
+  the day. `split_at_cap` now returns `(kept, dropped)` and report_csv writes a
+  `cap_dropped` row per cluster with member count, sources, best tier, independent
+  count and the raw title.
+- **`repeat_dropped` rows carried no text.** `events_by_key` was built from `ctx.events`
+  (survivors only), so the 7 events dropped at cosine 0.56–0.67 had empty headline and
+  summary columns. The `event_match_threshold: 0.55` question was therefore unauditable.
+  Now seeded from `repeat_dropped`, `lang_dropped`, `rank_dropped`, `relevance_dropped`
+  and `lead_events` too. This is the Masafer Yatta lesson again: **gate forensics need
+  text.** The rule keeps being learned one gate at a time — when a new fate is added,
+  the CSV row must carry the text with it.
+
+### P4 — a log line that lied
+
+`understand.py` hardcoded `status=unavailable` in its summary line, so three
+provider-fatal losses read as a generic outage. Now counts a breakdown per status.
+
+### Deliberately NOT changed — no evidence yet
+
+- `event_match_threshold: 0.55`. Seven events dropped as repeats at 0.56–0.67, including
+  the run's largest cluster (15 members). Without headline text there is no way to tell
+  over-cut from correct. P3 fixes the evidence; tune on the next clean run, not now.
+- `digest_rank.min_score: 8`. Delivered ranks 6–10 scored 9.65–9.70 and were all trivia
+  (Netanyahu helicopter video, an ambassador presenting credentials in Rome, an HMRC
+  lawsuit, Likud coalition arithmetic, an Iraqi central bank item). Raising to ~10 would
+  cut exactly those five and keep the six substantive ones — but the project's own rule
+  is 2–3 clean-run CSVs before touching a tuned constant, and this run was not clean.
+
+### Flash monitor — cannot be reviewed, and that is the finding
+
+Asked to review flash alerts, found **no flash output of any kind**: no
+`flash-reports` artifact, no `flash.db`, no `flash_*.csv` anywhere in the workspace —
+while the same folder holds 13 downloaded `run-reports`/`state-db` artifacts from the
+pipeline. `config/flash_alert.yaml` has `enabled: true`, the workflow crons `*/15`, and
+`run_flash.py:158` writes the tuning CSV on the LIVE path (not only under `--dry-run`),
+so an artifact should exist on every single run.
+
+13 pipeline artifacts to 0 flash artifacts is not a sampling accident. Either the
+workflow has never been dispatched, or it is failing before the upload step. This is
+exactly the failure the deferred flash-watchdog item predicts, and the interim rule
+("no artifact for >24h = dead, check Actions") only works if someone remembers to look.
+An emergency alerter whose liveness is checked by human habit is not an emergency
+alerter. Resolving it needs the owner in the Actions tab; the durable fix is the
+in-band watchdog line in the 09:00 digest.
+
+Also noted, not changed: `cancel-in-progress: true` on a 15-min cron with a 10-min
+timeout. A cancellation between `evaluate` (which sends) and the state push would
+re-fire the same alert next tick. `timeout-minutes: 10` makes the overlap window
+effectively unreachable on schedule, so this is a latent path, not a live defect.
+
+Suite 692 → **696**. Deleted `test_401_does_not_rotate` (it encoded the falsified
+doctrine); added fatal-rotation ×3, cap-keeps-corroborated-cluster, independence-groups.
+
 ## 2026-08-31 (session 9o) — the supply batch: cooldown, cap 70, labeled Chinese rung
 
 Owner decision ("go 1 & 2" + "chinese ones to get at least sthh, but label them"):
