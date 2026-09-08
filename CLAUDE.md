@@ -192,7 +192,7 @@ Prompts live in `config/prompts/*.txt` — edit those, never hardcode prompt tex
 | `config/sources_probe_<tag>.csv` | Probe output, one file per environment (`local` = owner's PC in Iran, `ci` = GitHub US runner). |
 | `src/agent/collectors/` | One file per source type, all implement `base.py`. |
 | `src/agent/pipeline/` | **Phases 6–7 built 2026-08-29:** `filter.py` (topic gate), `embed.py` (Embedder protocol + MiniLM + FakeEmbedder), `cluster.py` (greedy cosine algorithm + `Cluster.independent_count`) + **`priority.py`** (split out 2026-09-05: priority key + `split_at_cap` returning kept/dropped), `understand.py` (one router call per cluster + clickbait/irrelevance filter + events write), `langretry.py` (retry-once forced-Persian, 9m), `collect.py` (fetch → dedup → store → ctx.items), `compose.py` (events → one budgeted message; date_only respected), `deliver.py` (Telegram or mock), `build_stages()` in `__init__.py` wires them; vision/validate/score stay no-ops until their phases. Full pipe: `python -m agent.run --db state.db`. |
-| `src/agent/memory/` | **Phase 4 closed 2026-08-21; extended Phases 6–10.** `schema.sql` (13 tables, `SCHEMA_VERSION = 2` — lead_outcomes added additively), `db.py` (additive-only upgrades), `models.py`, `event_models.py` (Phase 6), `lead_models.py` + `source_health.py` (Phase 9/10), `dedup.py` (layers 1–3), `retention.py`, `crypto.py`. Journal mode DELETE not WAL, on purpose. `open_db` refuses to create by default — constraint 14. |
+| `src/agent/memory/` | **Phase 4 closed 2026-08-21; extended Phases 6–10.** `schema.sql` (13 tables, `SCHEMA_VERSION = 3` — verified 2026-09-08; bumped 2→3 in `89c1dd9` 2026-08-30, all upgrades additive), `db.py` (additive-only upgrades), `models.py`, `event_models.py` (Phase 6), `lead_models.py` + `source_health.py` (Phase 9/10), `dedup.py` (layers 1–3), `retention.py`, `crypto.py`. Journal mode DELETE not WAL, on purpose. `open_db` refuses to create by default — constraint 14. |
 | `src/agent/risk/` | Deterministic scoring. No LLM calls permitted in this package. |
 | `src/agent/llm/` | **Phase 5, built + gate-green 2026-08-29.** `errors.py` (typed outcomes, LlmResult), `transport.py` (lazy requests + recording mock), `limits.py` (CallBudget, ProviderBudget, RpmPacer), `breaker.py` (backoff + circuit breaker), `call.py` (one attempt + structured logging), `providers.py` (Gemini/Groq/OpenRouter/Bai adapters), `router.py` (failover loop), `stats.py` (per-provider attempt counters → run.csv, 9m), `wiring.py` (build_router + build_adapters). Clock/sleep injected everywhere. |
 | `src/agent/delivery/` | Telegram client and message formatter. |
@@ -239,210 +239,45 @@ Phase-by-phase status, all defect forensics, probe-round findings and standing l
 live in `POSTMORTEMS.md`. Read it before touching a phase or a subsystem it covers.
 Do not re-add that content here — this file loads on every turn.
 
-## Session 3 decisions (2026-08-12) — owner-confirmed, these override earlier text
+## Standing decisions from sessions 3, 5, 8, 9 and 9n — narrative in POSTMORTEMS.md
 
-1. **v1 scope = curator, not scorer.** Owner chose "curator now, scoring later". Ship
-   collect → dedupe → cluster → filter noise → label rumours → send. STRAT/TACT/MSTRESS
-   are NOT built in v1. The DB schema and extraction fields stay wired so Phases 7–8 bolt
-   on with no rework, but no risk-engine code is written until the curator is running
-   unattended. Rationale: the owner's stated goal is less noise, and none of the scoring
-   machinery reduces noise. Specs stay on disk, unbuilt.
-2. **Output = a private Telegram channel**, not a direct chat. Supersedes the "one private
-   Telegram chat" line at the top of this file. Channel ID lives in an env var only, never
-   a literal in any file. Gives scrollable, searchable history that survives phone changes.
-3. **A settings-editing bot is v2, explicitly deferred.** v1 config is YAML edits. A bot
-   that writes config needs auth, git write-back and validation — not worth it before the
-   owner knows which settings he actually touches.
-4. **Topic priority: Iran regional + military first.** Macro second. Other topics later and
-   likely in separate channels or sub-topics, not mixed into the first feed.
-5. **Clustering is a first-class v1 requirement**, not a nice-to-have. It is the mechanism
-   the owner is actually asking for when he says "duplicates" and "not overwhelming".
-6. **New `lead` source class — see DECISION 7 in `credibility.yaml`.** The owner will supply
-   Telegram channels he does not trust but finds early-warning value in. `lead` = weight
-   0.0, cannot corroborate, cannot score, never appears in output alone; it only marks a
-   topic for verification against tier 1/2. Do not let a lead become a fact.
-7. **Phase order re-cut for a thin end-to-end slice** — see the revised table in
-   `ARCHITECTURE.md § Implementation phases`. Telegram delivery moves ahead of the
-   40-source build so a real message lands on the phone in week 1.
+Full text of all five blocks is in `POSTMORTEMS.md` §Sessions 3, 5, 8, 9, 9n.
+Sessions **9b, 9c, 9i, 9j+9k, 9l, 9m** were moved the same day and live in
+`POSTMORTEMS.md` §Session narrative moved out of CLAUDE.md. Only what still
+binds is restated here.
 
-## Session 5 decisions (2026-08-17) — owner-confirmed, these override earlier text
-
-1. **Volume control = enforced hard cap + topic prefilter. NOT source pruning.** An earlier
-   line in this file said "56 feeds cannot fit the ≤40-cluster LLM budget without pruning"
-   and told the owner to cut to ~20–25. **That framing was wrong and is withdrawn.**
-   Embedding is *local* (MiniLM on CPU, ARCHITECTURE.md line 238) — zero API cost, no rate
-   limit — so raw item volume costs nothing at the embed stage. The chain that actually
-   binds is narrower: more items → more distinct stories → more clusters → **one Gemini
-   call per cluster**. The funnel assumes 800 raw → 120 unseen → ~25 clusters → 25 calls;
-   at 1,984 raw it is ~300 unseen and plausibly 40–60 clusters, i.e. ~55–75 calls/run
-   against a hard cap of 40.
-   **The real defect: constraint 2's ~40 calls/run is an estimate in prose, enforced by no
-   code.** Same class as constraint 15, which already demanded a hard counter for metered
-   providers. Pruning does not fix it — it makes the overrun rarer, which is worse, because
-   a fault that only fires on the busiest news day is discovered unattended during exactly
-   the event this system exists for. Phase 6 must enforce a cluster/call cap that truncates
-   by priority, and topic-gate the six feeds marked `TOPIC-GATE` in `sources.yaml`
-   (`aawsat` 300, `dw` 137, `reuters_gnews` 100, `ap_gnews` 100, `state_dept_travel` 87,
-   `france24` 29 — 753 items, 37% of the corpus, reduced reversibly instead of deleted).
-2. **5 sources cut, owner-approved: `seeking_alpha`, `cnbc`, `oilprice`, `npr`, `wotr`.**
-   Off-mission rather than merely noisy — market colour and commentary, not event detection.
-   `oilprice` is redundant because the oil *number* comes from stooq; `wotr` is 100 items
-   that comment on reports rather than witnessing anything. 185 items removed, zero unique
-   regional or language coverage lost. Rationale per source in
-   `config/source_prune_sheet.csv`. 56 usable → **51 in `sources.yaml`**.
-3. **`mee` was plaintext `http://` through all four probe rounds.** Changed to `https://`
-   **unverified** — it is `enabled: false` and must be probed before Phase 8 enables it.
-   Matters because plaintext transport lets any network hop inject content into a body that
-   is fed to an LLM, and this was the only source whose transport was unauthenticated.
-   Failing to https is the safe direction: a wrong scheme errors loudly at Phase 8 instead
-   of carrying the vector into production. `sources.yaml` now asserts the scheme.
-4. **The probe UA and the collector UA do not match — this will burn Phase 3 if missed.**
-   All 51 urls were verified with the full browser UA in `tools/check_feeds.py` line 48,
-   after the `Mozilla/5.0 (compatible; …)` crawler form was found to draw Cloudflare 403s.
-   `config/settings.yaml` line 47 still sends
-   `user_agent: "news-curator/1.0 (personal research agent)"`. **A source that answered 200
-   to the probe may 403 the collector.** Align settings.yaml to the probe UA in Phase 3.
-
-## Session 8 decisions (2026-08-29) — owner-confirmed, these override earlier text
-
-1. **`llm.max_calls_per_run = 51`.** Owner's rule, in his words: "keep the project free,
-   use free tools' caps." Worst case (40 clusters + 10 vision + 1 compose) never
-   truncates; 9 runs/day × 51 = 459 calls vs Gemini's 1,500 RPD; RPM 10 paced
-   proactively. Enforcement is real, not advisory: `CallBudget` refuses call N+1 before
-   a request is built, refusal logged once, run continues degraded. Priority-ordered
-   spending: the pipeline can `reserve(1, "compose")` so the final message can never be
-   starved. Arithmetic comment lives in `settings.yaml` next to the value — do not
-   change the number without re-checking it.
-2. **Phase 5 BUILT and gate-green 2026-08-29.** Suite **361** (274 baseline + 87 new).
-   Predicted 362, reconciled: one test miscounted (providers file has 20, not 21), none
-   missing — stated before running, per gate item 10. Two test-expectation bugs of mine
-   found by the shim and fixed (first-call-never-sleeps; OpenAI-shaped body given to the
-   Gemini adapter). All 10 brief gates pass, incl. the redaction trap where a simulated
-   provider error echoes the request URL with `?key=` in it.
-3. **New modules, all under the 200-line cap:** `llm/wiring.py` (build_router +
-   build_adapters — adapter factory moved out of providers.py when it crossed the cap),
-   `llm/breaker.py` (backoff + CircuitBreaker), `llm/call.py` (one attempt + structured
-   logging), `settings_llm.py` + `leaf_types.py` (nested `llm:` block validation; leaf
-   type checks shared between settings.py and settings_llm.py — no import cycle).
-   `settings_schema.py` and `settings.py` edited to use them; the generic `_check` now
-   passes nested dataclass annotations through to the section builder.
-4. **`dates.py` split shipped** (was 211, the flagged pending item): `tz.py` (98 lines:
-   Israel rule, Tehran constant, display helper) + `dates.py` (133 lines, re-exports for
-   compatibility). Suite green after; `tz.py` added to OFFLINE_MODULES.
-5. **Gate false-positive fixed before it fired:** `report.py` now carries
-   `date_only_count` per source and computes `all_timestamps_identical` over REAL
-   timestamps only. `collect-test.yml` condition-4 comment documents the exemption.
-   The every-source null-date and 14-day staleness assertions were already shipped
-   2026-08-19 — the CLAUDE.md pending item was stale; only the fresh-dispatch
-   verification remains (still in Pending).
-6. **`tools/pytest_shim.py` (465 lines) is now permanent** — replaces the throwaway /tmp
-   shim from session 7; same falsifiable-count discipline. Joins the tools line-cap
-   pending decision (see Pending).
-7. **OpenRouter `model` placeholder added** (`meta-llama/llama-3.1-8b-instruct:free`):
-   the adapter refuses to run without a model line and the roster rotates weekly —
-   owner-editable, loud if wrong.
-8. **Anthropic budget guardrails wired in config** (`input/output_usd_per_mtok` from the
-   rate card, per-run enforcement in `ProviderBudget`); adapter still not implemented,
-   per brief.
-
-## Session 9 decisions (2026-08-30) — owner-confirmed ("finalize decisions based on understanding")
-
-Closes the two open decisions from the first automated run's provider cascade. Forensic: POSTMORTEMS.md top entry.
-
-1. **Per-call read timeout 60s → 20s for the primary** — `read_timeout_seconds: 20`
-   on the `providers.gemini` block in settings.yaml. Connect stays 10s everywhere;
-   Groq/OpenRouter keep DEFAULT_TIMEOUT (10, 60). Reason: a dead Gemini cost ~8 min
-   of an ~8-min run before the breaker opened (4 attempts × 2 failures × 60s); at
-   20s that path is ~160s and a merely-slow Gemini still survives. Plumbing:
-   `ProviderSettings.read_timeout_seconds` (int, strict-validated) → wiring
-   `timeout_map` → Router `timeout_by_provider` → `Provider.timeout` →
-   transport.post. MockHttpTransport now records the timeout so tests assert the
-   real value handed to requests. Suite 522 → **528** (3 validation + 3 flow tests,
-   `tests/unit/test_llm_timeout.py`).
-2. **Groq's free-tier ~13-call ceiling ACCEPTED as the degradation floor**, not a
-   bug to fix — 30 RPM pacing was correct; the free tier's token-per-minute wall is
-   the limit. On Gemini-outage days each run covers its priority-ordered top
-   ~14/40 clusters. Documented next to groq's rpm/rpd in settings.yaml ("a 429
-   here is NOT a pacing bug") and in POSTMORTEMS.md. OpenRouter stays a parachute
-   (50 req/day ≈ 1 run), not capacity. **Adding a third provider is a v1.5
-   decision taken with failure-rate data, not a knee-jerk patch after one bad
-   day.**
-3. **Provider-addition question (DeepSeek V4-Flash / V4-Pro) researched
-   2026-08-30 and REJECTED for now.** Full dossier: `analysis/deepseek_v4_eval.md`.
-   One-liner: the 5M-free-token question is MOOT (wholesale fresh load ~7.4M
-   tokens/mo > 5M in every branch — the repo's 3.3M counted input only); quality
-   research found family-level disqualifiers for this pipeline's extraction task
-   (topic-selective censorship on war/geopolitics = silent intelligence failure,
-   documented JSON-discipline defects, Chinese-first behavior on Persian).
-   V4-Pro costs ~3x and fixes none of these. Revisit only via the v1.5
-   accuracy-gate pilot in cascade position, if Gemini flakiness recurs.
-
-## Session 9b (2026-08-30) — owner's local run reviewed; 4 fixes shipped, suite 528 → 532
-
-Owner mandate: "review all, think deeply on quality and optimization and iterate."
-The run was the day's SECOND provider cascade (Gemini fast-503s; Groq again hit
-the ~13-call ceiling at exactly 13 — the accepted floor re-confirmed). Forensic:
-POSTMORTEMS.md top entry. Fixes:
-1. **`date_only_max_age_hours: 72`** (collection block) — collect drops date-only
-   items older than this BEFORE dedup. The 9-day-old Lebanon advisory defect:
-   `url_hashes_days=7` is shorter than the State Dept listing horizon, so items
-   looped back into the digest every ~7 days forever.
-2. **summaries.csv `rank` = delivered digest position** (shared `event_order_key`
-   in `pipeline/rank.py`) — it was creation order, meaningless against the message.
-3. **understand.txt hardened** (contract unchanged): no-new-event clusters →
-   `irrelevant`; routine crime → `irrelevant` unless terror/organised violence/
-   weapons; when unsure between keeping and dropping, drop.
-4. **Router breaker-skip logged once per provider per run** (was 54 lines/run).
-
-## Session 9c (2026-08-30) — owner decision: relevance FILTERS, importance SORTS, count is dynamic
-
-Validated by two independent pro-agent evaluations of the 9 delivered events
-(labels aggregated by the orchestrator; disagreements reconciled: Mecca pact =
-pass, Ben Gvir prison = drop). Design: an event whose highest relevance tier
-(`config/relevance.yaml`: `iran_direct` 8 / `strategic` 4 / `economy` 3) is
-below `min_relevance` (3) never reaches the digest — `pipeline/relevance.py`
-matches deterministically (zero LLM calls) over headline+summary+entities. The
-keyword lists carry the evaluators' calibrations (travel-advisory instrument
-terms, the regional state ring) and deliberately exclude blotter magnets
-(بازداشت، سلاح، بمب، نتانیاهو — they caught only noise in the evaluation).
-Within the gate, importance (restored category 6/4/3/2/0 + corroboration +
-tier + recency) sorts; `min_score` 8 is the importance floor; the shown count
-is whatever survives both — `max_messages` 3 → 6 as a safety valve only.
-`chosen.csv` gains the `relevance_dropped` fate. Suite 532 → **545**.
-Detection is not relevance: a commentary piece mentioning Iran still matches
-`iran_direct` — the understand prompt's commentary rule is the first defense.
-Real calibration still needs the clean-run CSVs.
-
-## Session 9i (2026-08-30) — run-6 evidence: ramble cap, same-run dups, model probe, bai gateway
-
-1. **`max_tokens: 700` on the chat adapters** — nemotron-3.5-lightning generated
-   ~16.5K tokens on a ~400-token task (8-minute calls; continuous bytes kept the
-   read timeout fed). Truncated JSON fails loudly instead. OpenRouter model
-   swapped to inkling-small:free (nemotron disqualified).
-2. **Same-run duplicate collapse in validate** — the same Hormuz tanker incident
-   was delivered twice in one digest: new events were never compared against
-   each other, only against previous runs. Pairwise cosine over summaries; the
-   larger cluster survives.
-3. **`tools/probe_free_models.py` + `probe-models.yml`** — measures every
-   OpenRouter :free model against the real understand prompt, deterministic
-   checks only. Manual dispatch; ~28 calls = the parachute quota — never run on
-   a Gemini-down day. Joins the tools line-cap owner decision (237 lines).
-4. **bai gateway wired** — cascade gemini → groq → bai → openrouter; model
-   `qwen3.8-flash` (swap list in the settings comment). Free only; gpt-5.2
-   stays out until constraint-15 caps. Env var `BAI_API_KEY`. Suite 547 → 558.
-
-## Sessions 9j+9k (2026-08-30) — null-content crash, state persistence, OpenRouter verdict
-
-1. **content:null crash fixed at both boundaries** — adapters raise SchemaError
-   on null content; _extract_json raises ValueError on non-str. "Provider did
-   not answer" is now retry → rotate, never a crash.
-2. **Crashed runs persist state** — pipeline.yml encrypt/backup/push steps run
-   `if: always()` with self-guards; BAI_API_KEY added to the run env.
-3. **OpenRouter is DEAD under zero cost** — 404/404/403 sequence settled it
-   (403 on a live-list model = balance policy). Parachute role is now bai's;
-   the settings comment carries the runbook (404 = swap ID, 402/403 = policy).
-4. **Fatal responses open the breaker** — the 403 run burned 34 identical
-   fatal calls; after two, the provider is skipped for the run. Suite 562.
+- **ALL owner-stated times are IRAN time.** Tehran = UTC+3:30, fixed, no DST.
+  Workflow crons are UTC. Convert every time the owner states; never assume UTC.
+- **v1 is a curator, not a scorer** (session 3). STRAT/TACT/MSTRESS stay unbuilt;
+  the schema stays wired so Phase 11 bolts on with no rework. Specs on disk.
+- **Output is a private Telegram channel**, ID in an env var only, never a literal
+  in any file.
+- **`lead` source class = weight 0**: cannot corroborate, cannot score, never
+  appears alone. A lead must never become a fact. Spec: `analysis/LEAD_HANDLING.md`.
+- **Volume control is an enforced cap + topic prefilter, NOT source pruning**
+  (session 5). Embedding is local and free; the binding chain is clusters → one
+  LLM call each. Pruning only makes an overrun rarer, which is worse — it moves
+  the fault to the busiest news day, unattended.
+- **LLM budget policy** (session 8, value revised by 9o): "keep the project free,
+  use the free tools' caps." `max_calls_per_run` is enforced in `CallBudget`
+  before a request is built — real, not advisory — and compose can `reserve(1)`
+  so the final message is never starved. Current value 70; arithmetic sits next
+  to it in `settings.yaml`.
+- **Groq's call ceiling is MODEL-DEPENDENT, not a Groq-wide floor** (9n item 5c,
+  supersedes session 9 item 2): qwen3.8-27b carried 23 calls where the earlier
+  model stopped at ~13. Measure per model from run.csv's `calls_<p>` columns.
+- **429s must never count toward the circuit breaker.** Rate-limit pacing is
+  transient, not sickness; treating it as a fault once cost a run its only
+  healthy provider and collapsed the digest.
+- **DeepSeek rejected for extraction**: topic-selective censorship on war and
+  geopolitics is a silent intelligence failure. Dossier:
+  `analysis/deepseek_v4_eval.md`. Revisit only via the v1.5 accuracy gate.
+- **GitHub cron is ~10–20 min late at the median.** Nothing here is real-time; do
+  not promise latency the platform cannot deliver.
+- **Never register a short string with the redaction filter.** A 1-character
+  token redacts every occurrence of that character in every later log record.
+- CLOSED, verified 2026-09-08: the session-5 probe/collector user-agent mismatch.
+  `config/settings.yaml` line 97 now carries the same browser UA the probes used.
 
 ## Session 9o (2026-08-31) — supply batch: 429 cooldown, cap 70, labeled DeepSeek rung
 
@@ -457,148 +292,6 @@ provenance columns in chosen.csv/summaries.csv; quality flags on record;
 direct signup MOOT (owner added deepseek to his bai services).
 (4) Split: router.py (224, over cap) → `failover.py` owns the loop, router
 owns the machine. Suite 669 → 674.
-
-## Session 9l (2026-08-30) — bai live; output contract enforced in the pipeline
-
-First run with BAI_API_KEY: full chain worked (gemini down, groq 13 clusters,
-bai caught the 429-rotations, digest shipped). Bai's live answers rambled
-(6,587 / 2,626 tokens on a ~400-token task) -- the gateway ignores max_tokens,
-so `within_bounds` (headline 2-25 / summary 2-60 words) now runs after parse;
-violations skip the cluster with an `oversized` fate. The probe measures the
-same contract. Suite 562 → 564.
-
-## Session 9m (2026-08-30) — batch-2 built, suite 590 (owner to push): lang retry, ceremony rule, chosen text, provider counters
-
-Owner phase refocus: "empower llm call and api usage — ensure the service
-is not corrupted by api limits or changes." Findings + build:
-
-1. **`pipeline/langretry.py` — retry-once forced-Persian.** The 18:54 clean
-   run (cascade-free, the tuning dataset) lost its best tier-2 item (AJ
-   Arabic: Sudan/Kordofan displacement, score 9.14) to `lang_dropped` --
-   the provider answered in Arabic despite the prompt. Now: non-Persian
-   headline/summary triggers ONE extra router call with a forced-Persian
-   line; on any failure the original event survives (compose's gate still
-   drops it from the message). Cost ~1 call/drift, inside budget.
-2. **Ceremonial rule in `understand.txt`**: commemorations/ceremonies →
-   `irrelevant` unless equipment unveiling or concrete military action
-   (kills the air-defense-day PR-item class).
-3. **`chosen.csv` gains headline/summary** for event-bearing fates — the
-   Masafer Yatta lesson (gate forensics need text).
-4. **`outputs/` gitignored** — run CSVs are artifact-only; `git rm -r
-   --cached outputs/` on the owner's next commit.
-5. **`llm/stats.py` → run.csv `calls_<p>`/`fails_<p>` columns.** Passive
-   per-provider attempt counters: bai's ceiling measured like Groq's ~13
-   was, Gemini degradation trended, OpenRouter resurrection detected --
-   from artifacts, not logs.
-6. **Provider research on record** (owner asked why gemini/openrouter
-   failed; bai limits): Gemini's day-long 429/503 = free-tier throttling
-   (Google changed Gemini access/limits in 2026 -- support page +
-   tier-downgrade forum threads); OpenRouter verdict stands (404 = roster
-   rot, 403 on live-list model = zero-balance policy — dead under
-   constraint 1); bai limits UNKNOWN and unreadable (reseller, docs
-   egress-blocked) → measured via (5), never guessed.
-7. **Rumour policy answered, no change**: tier-3 never corroborates
-   (validate.py, rulebook Step 1). OSINT repetition = amplification, not
-   evidence; the delivery mechanism for "explosion near islands" is the
-   existing شایعه label within 3h. No multi-channel-OSINT tier.
-8. **Tuning findings from the 18:54 clean run**: cluster threshold 0.55
-   KEEP (1.77 items/cluster; Bennett-series fragmentation died downstream
-   anyway); min_score 8 no change (small n); delivered set was 100%
-   tier-3 rumour BECAUSE the one tier-2 item died at the lang gate —
-   fix (1) changes that composition. Full forensic: POSTMORTEMS.md.
-
-Remaining this phase: labeled pilot (needs 2–3 more clean-run CSVs),
-then cascade-order decision on evidence.
-
-## Session 9n (2026-08-30/31) — Iran-time schedule + flash monitor, suite 646 (owner to push)
-
-Owner directives: all stated times are IRAN time (Tehran = UTC+3:30 fixed,
-no DST); digest 09:00 Tehran + 3-hourly through 00:00, silent overnight
-(6 runs/day, LLM budget 306/day); near-instant unverified Tehran-explosion
-AND escalation alerts (Larak attack live 2026-08-30: US struck Iranian
-launchers on Larak Island, AP-confirmed), 15-min scans, 24/7, burst
-cleaning + momentum semantics; independent adversarial review before push.
-
-1. **Schedule**: pipeline.yml crons `30 5 * * *` (09:00 Tehran digest,
-   canonical) + `30 8,11,14,17,20 * * *`; digest detection via the
-   schedule-string comparison; lookback_hours 12 (declared, still
-   unconsumed by code).
-2. **`src/agent/flash/`** — zero-LLM deterministic monitor. matcher
-   (classes × term-bucket × location-ring; ring precedence then
-   longest-token; normalization applied to BOTH text and keywords;
-   120-min freshness gate); policy (burst collapse 30min, follow-ups at
-   3/8 sources, cap 3/h with defer-never-drop ENFORCED, per-class quiet
-   windows, ack-gating); momentum (day-3 background rule for repeated
-   buckets, novel-target restore, slow de-escalation certified only
-   after ≥3 quiet alerted-days, convergence notes — WAR_SIGNALS_PAPER
-   applied); store+schema.sql+history (own flash.db on its own
-   `flash-state` branch — NEVER the pipeline's state branch, two
-   force-pushers would race); run_flash (--dry-run tuning CSV, no sends;
-   --system-down). Config: `config/flash_alert.yaml`, owner-editable,
-   strictly validated. Channel: FLASH_CHANNEL_ID secret overrides,
-   TELEGRAM_CHANNEL_ID is the fallback (owner moves alerts by adding ONE
-   secret). Escalation buckets mined from WAR_SIGNALS_PAPER: maritime
-   (24-72h resumption law), strike, posture, apparatus (0-3d lead),
-   ultimatum, response_threat.
-3. **Independent adversarial review** (fresh context, owner mandate):
-   REJECT with 4 blocking findings — first-boot empty-file false-alarm
-   loop, cap-deferral silently dropping events, HTML parse-mode without
-   escaping, two line-cap violations — + 6 should-fix. ALL fixed, each
-   pinned by a new test. Standing lesson: never register a short string
-   with the redaction filter (a 1-char token redacts every occurrence
-   of that char in every later log record).
-4. Latency honesty: GitHub cron ≈ 10-20 min median, not real-time; a bot
-   button is impossible without a hosted server. Owner accepted the
-   monitor as the mechanism.
-5. **LLM robustness moves 1+2 (owner-approved 2026-08-31, suite 659):**
-   (a) raw-title fallback digest — clusters the LLM could not cover
-   (`unavailable`/`refused_cap`/`unparseable`/`oversized`) render as
-   escaped raw source titles in a compose footer / on the one-liner;
-   `digest_rank.fallback_max_items` (5) caps them; the product survives
-   total LLM loss by construction. (b) health-aware cascade —
-   `llm/health.py` persists per-provider calls/failed in the state DB
-   meta table (7-day window; ≥4 samples and ≥50% failure → demoted to
-   cascade end); run.py now opens the DB BEFORE the router.
-   (c) Owner's 05:10 UTC run log (2026-08-31) read: **Groq carried 23
-   calls on qwen/qwen3.8-27b — the old ~13-call ceiling is
-   MODEL-DEPENDENT, not a Groq-wide floor** (supersedes part of the
-   session-9 accepted conclusion); gemini soft-throttled (3 ok / 3×429,
-   interleaved); bai functional but 10-36s latency and up to 3.7K
-   output tokens — a ramble answer flipping `clickbait=True` is the
-   hypothesis; chosen.csv forensic queued.
-6. **CSV forensic (owner's 08:48 run, 2026-08-31):** bai's 46.5s /
-   3,989-token answer was spent on meme posts (tg_fighter_radar) and the
-   clickbait verdict was CORRECT — bai's token count is gateway-inflated,
-   not a bounds hole; `bai.read_timeout_seconds: 20` added anyway (the
-   46s call was a third of the run). Real over-cut found: the Pezeshkian
-   SCO-trip item relevance-gated because neither «ایران» nor his name
-   was in the keywords (Masafer Yatta disease) — پزشکیان/بزشکیان added
-   to `relevance.yaml` iran_direct, pinned by a regression test.
-   Suite 667.
-8. **Cascade-death fixes (owner's 09:36 run, 2026-08-31, suite 669):**
-   (a) **429s no longer count toward the circuit breaker** — rate-limit
-   pacing is transient, not sickness; the run lost Groq (its only
-   healthy provider) to the breaker over TWO pacing 429s and collapsed
-   into 24 skipped clusters. Pinned by a test. (b) bai
-   `read_timeout_seconds` 20 → 45 — the 20s cap was MY own-goal: bai's
-   median answer is ~19-20s and both 09:36 calls timed out exactly at
-   20s. (c) raw fallback uses the body lead for untitled TG posts (no
-   more empty bullets). (d) flash first-template rumour line shortened
-   to «شایعه — تأیید نشده» per owner. The health-aware cascade was
-   VALIDATED live in the same run: gemini demoted → groq started.
-7. **Flash live-feedback fixes (owner's first live run 2026-08-31,
-   suite 666):** the escalation class fired 6 first-alerts in ~2h for
-   one wave. Fixes: escalation burst is CLASS-LEVEL (one open state,
-   180-min collapse; novelty re-alert only after `novelty_min_gap_minutes`
-   120 of quiet — "once per momentum change is enough"); per-bucket
-   `ring_requirements` (strike/maritime/posture must hit iran_geo —
-   Gaza-front coverage no longer fires; statement buckets may match
-   actors); headline = title or body-lead (TG posts have no title);
-   «(عربی)»/«(انگلیسی)» prefix on non-Persian headlines; token-END
-   location matching (Arabic definite article: «الإيراني»); "us"
-   removed from actors (pronoun false positive); convergence counts
-   ALERTED buckets only, reading the wave's full bucket list (new
-   `buckets` column, additive ALTER on existing flash DBs).
 
 ## Session 9p (2026-09-05) — 16:18-run review: fatal rotates, cascade trimmed, cap ranks corroboration. Suite 696 (owner to push)
 
@@ -671,9 +364,48 @@ Forensic: POSTMORTEMS.md top entry. Four rounds of adversarial review, 27 → 33
    proved the folding change left the matcher byte-identical (43 matches → 43).
 7. **`min_score` HELD at 8, Hebrew keywords CLOSED, `event_match_threshold` unchanged.**
    Reasons in POSTMORTEMS. Do not re-tune any of the three on this run's data.
-8. **`tg_alo_entekhab` + `tg_tsepress` staged in `config/sources_candidates_r7.csv`,
-   UNVERIFIED** (sandbox egress to t.me blocked). Needs a manual `probe-feeds.yml`
-   dispatch with `tag=ci`. Neither may be given tier 2.
+8. **Owner's two channels PROBED (ci-r7, 2026-09-08), verdicts in
+   `config/sources_candidates_r7.csv`.** `tg_alo_entekhab` = **CUT_NO_PREVIEW**
+   (200/0 items/NOT_FEED — preview disabled or join-required; same signature as
+   tg_parvaz_capital; constraint 6 forbids the only alternative). `tg_tsepress` =
+   **USE_GATED**, 19 items: enable as tier 3 + `topic_gate: true`, never tier 2,
+   and **HOLD until 9q is verified** — ~114 items/day of Iranian market copy all
+   scoring `on_mission=1` would re-create the LLM-budget starvation 9q just fixed.
+   One variable at a time.
+
+## Session 9r (2026-09-08) — same-run gate aligned to the HIGH band, flash watchdog built, CLAUDE.md 814 → 505. Suite 753 → 769 (owner to push)
+
+1. **`samerun_dedup.py` now collapses on `digest_rank.event_repeat_threshold`
+   (0.80), not `pipeline.event_match_threshold` (0.55).** 9q proved 0.55 cannot
+   mean "the same story" and built the two-band gate for the CROSS-run path;
+   the WITHIN-run path was left on the old threshold and kept silently deleting
+   MID-band events — no score bypass, no compact «پیگیری» render, no recovery.
+   A strike and the retaliation answering it sit at 0.6–0.65 and can both land
+   in one 3-hour window. One constant now defines "same story" for both passes.
+   **UNVERIFIED:** the 2026-08-30 Hormuz double-send's actual cosine was never
+   recorded, so it is not proven to clear 0.80. Every drop writes
+   `same_run_dup sim=` to chosen.csv — measure before touching the number.
+2. **Non-transitive deletion fixed** (the 9q filed item (a)): the inner loop now
+   breaks when `event` itself is the loser, so an already-dropped event stops
+   deleting later ones. Both fixes pinned by tests verified to FAIL first.
+3. **Flash watchdog BUILT** — `pipeline/flash_watchdog.py` (73 lines, pure, no
+   clock/network/filesystem), `delivery.flash_watchdog_enabled` +
+   `flash_watchdog_max_age_minutes` (180 = 12 missed */15 scans), fa/en
+   `flash_stale`/`flash_missing` labels, and a `Flash-state age` step in
+   pipeline.yml that exports the `flash-state` branch's last-commit age.
+   **Deviations from the 9p sketch, both deliberate:** it runs on EVERY run,
+   not just the 09:00 digest (a monitor dying at 09:30 would otherwise go
+   23.5h unreported), and it rides the honest one-liner too — a "nothing new"
+   run is indistinguishable from a dead system without it. Unknown age is
+   SILENT by design; warning on unknown would fire on every local run and
+   train the owner to skim the line. The warning is prepended BEFORE budgeting
+   (constraint 8), never after the split.
+4. **CLAUDE.md 814 → 505.** Eleven session blocks (9b, 9c, 9i, 9j+9k, 9l, 9m,
+   then 3, 5, 8, 9, 9n) moved verbatim to POSTMORTEMS.md; the last five were
+   replaced by the standing-decisions digest above. Content integrity spot-
+   checked by string search, not by trusting the mover.
+5. **Suite 769, predicted 769** (753 + 2 validate + 11 watchdog + 3 compose)
+   — stated before running, reconciled exactly.
 
 ## Phases 6–10 (2026-08-29) — v1 CODE COMPLETE. Suite 522, 0 failed, shim-verified
 
@@ -685,7 +417,7 @@ Forensic: POSTMORTEMS.md top entry. Four rounds of adversarial review, 27 → 33
 - Standing decisions that override earlier text: `circuit_breaker_failures: 5 → 2`
   (max_retries=3 caps the loop at 4 attempts); sentence-transformers is an OPTIONAL
   `[embeddings]` extra (CI test job must NOT install it); `--dry-run` implies mock
-  wiring; `items` table survives (events = post-understand store); SCHEMA_VERSION 2
+  wiring; `items` table survives (events = post-understand store); SCHEMA_VERSION 3
   (additive lead_outcomes); 50/51 sources enabled (tg_ukmto_mirror dormant);
   accuracy gate re-filed to v1.5/Phase 11 (session-3 scope cut).
 - **v1 CODE IS COMPLETE.** Remaining gates are owner/clock-bound — RUNBOOK.md §0–§8:
@@ -709,32 +441,41 @@ Forensic: POSTMORTEMS.md top entry. Four rounds of adversarial review, 27 → 33
 
 ## Pending / unresolved
 
-- [ ] **UNPUSHED: all of session 9q (suite 753).** Owner pushes; agents run no
-      git here. Next session is EVIDENCE work, not build work:
-      **(1) Verify 9q on 2–3 live runs.** The one number that matters is
+- [ ] **UNPUSHED: session 9r (suite 769).** Owner pushes; agents run no git here.
+      Suite re-verified independently 2026-09-08 19:33 in a clean sandbox
+      (`PYTHONPATH=src python3 tools/pytest_shim.py tests`): **769 passed, 0
+      failed, 0 skipped**. The count is measured, not predicted — do not re-run
+      it to "check". `RUN_ME_9r.ps1` sits in the repo root, unrun; 17 paths
+      still dirty.
+      9q IS pushed — `cb74744` is on `origin/main`, verified 2026-09-08. The old
+      "9q unpushed" item was stale for two days and inverted the plan.
+- [ ] **THE BLOCKER: no run artifacts exist in the working folder.** Zero
+      `chosen.csv` / `run.csv` / `summaries.csv` / `read.csv` / `flash_*.csv`.
+      Every remaining item of value is evidence work and none of it can start
+      until the owner downloads the pipeline + flash-reports artifacts from
+      GitHub Actions into the folder. This is the highest-value 2 minutes on
+      the project. Once they exist:
+      **(1) Verify 9q + 9r on 2–3 live runs.** The one number that matters is
       delivered-event count: expect ~2–4 on a quiet run, ~14–20 across 2
       messages on an escalation run. Then tune, ONE variable at a time, from
-      `chosen.csv`: `event_repeat_threshold` 0.80 (a guess — measure the sim
-      distribution of `repeat_dropped` vs what should have survived), then
-      `digest_rank.min_score` 8, then source pruning from read.csv.
-      **(2) Flash tuning loop** — the monitor is alive (9q item 6); 2–3 days of
-      flash-reports CSVs → tune `config/flash_alert.yaml`. Open flash defects:
-      class-level burst discipline still over-fires, untranslated English on
-      CENTCOM-style confirmations, ~42 `stale` rows concentrated in
-      tg_wfwitness/tg_tabzlive.
+      `chosen.csv`: `event_repeat_threshold` 0.80 (a guess, and now shared by
+      TWO consumers — measure the sim distribution of `repeat_dropped` AND
+      `same_run_dup` rows), then `digest_rank.min_score` 8, then source pruning
+      from read.csv.
+      **(2) Flash tuning loop** — 2–3 days of flash-reports CSVs → tune
+      `config/flash_alert.yaml`. Open flash defects: class-level burst
+      discipline still over-fires, untranslated English on CENTCOM-style
+      confirmations, ~42 `stale` rows concentrated in tg_wfwitness/tg_tabzlive.
       **(3) Standing gates:** 3-run, 1-week, 60-day cron reset (RUNBOOK §6–8).
-- [ ] **Filed 9q, NOT fixed — three known-open items.**
-      (a) `pipeline/samerun_dedup.py:48-63` is non-transitive: an event already
-      dropped keeps deleting others, so A beats B, B beats C leaves only A even
-      when A and C are unrelated. Exposure roughly doubled by the cap fix
-      (more same-family clusters now reach understand). Fix = skip already-dropped
-      events as sources.
+      **(4) `tg_tsepress`** — probed USE_GATED, still HELD until (1) passes.
+- [ ] **Filed 9q, still open — two items.** (Item (a), samerun non-transitivity,
+      was FIXED in 9r.)
       (b) Two 9q fixes shipped with NO regression test — flash `location_display`
       (unfolded spelling in the rendered alert) and novelty stability across a
       pre-folding history row. Contradicts the standing "every fix carries a test
       that fails before" rule; the display path is cosmetic, the novelty one is not.
-      (c) Suite arithmetic unreconciled: +7 delta against 5 claimed new tests.
-      Current state verified directly as 753 passed / 0 failed / 0 skipped.
+      (c) 9q's suite arithmetic was never reconciled (+7 against 5 claimed tests).
+      9r's reconciles exactly: 753 + 16 predicted, 769 measured.
 - [ ] **Owner decision — the persona / "why it matters" field.** Owner asked
       (2026-09-06) for one line of background on a named figure so an
       Iran-resident reader learns why an Israeli cabinet change matters.
@@ -746,27 +487,19 @@ Forensic: POSTMORTEMS.md top entry. Four rounds of adversarial review, 27 → 33
       prompt forbids any date/number/quote/third party absent from the source
       text, omit rather than guess, zero extra LLM calls. The "when it occurred
       matters" half is Phase-11 risk-engine work, not v1.
-- [ ] **CLAUDE.md is 767 lines — its own rule (c) says split past ~400.**
-      Prune the superseded session blocks (9b/9c/9i/9j/9l/9m overlap heavily
-      and their forensics are already in POSTMORTEMS.md). Measured once at
-      ~15,200 tokens/turn saved on the last split; this is the biggest token
-      lever on the project.
+- [ ] **CLAUDE.md is 505 lines — still over its own ~400 rule, but the cheap
+      cuts are spent.** 2026-09-08 split took it 814 → 505 (eleven session
+      blocks moved to POSTMORTEMS.md, five of them condensed into the standing-
+      decisions digest above). What remains is constraints, decided facts, the
+      file map, the working agreement, the three most recent sessions and this
+      list — all genuinely hot. Next lever is retiring session 9o/9p once their
+      decisions are folded into the standing digest, worth ~55 lines.
 - [ ] **Deferred follow-up (2026-09-05 review, MINOR, not a blocker):**
       `ready_alt` treats a down-but-not-open provider as "ready" for ~1-2
       clusters until its breaker opens (worst-case day loses ~1-2 clusters'
       coverage before self-correcting). Candidate fix: let a 503 also
       register a short cooldown, or weight just-5xx'd providers lower in
       `ready_alt`.
-- [ ] **Flash watchdog DEFERRED (session 9n).** No in-band signal when
-      the monitor dies (60-day cron auto-disable, config `enabled: false`,
-      broken edit). Interim: if no flash-reports artifact for >24h the
-      monitor is dead — check Actions. Proper fix later: a one-liner in
-      the 09:00 digest reporting the flash-state branch's last-commit age.
-- [ ] **Batch-2 accepted edges, self-correcting ≤2026-09-02.** First run after
-      deploy had no delivered markers for the last 72h (one near-duplicate may
-      re-surface); format_split truncation over-marks lowest-priority items
-      ≤72h. POSTMORTEMS 2026-08-30 (batch 2) references this line as the
-      documentation. Delete this item once past 2026-09-02.
 - [ ] **Owner decision — the `group: null` contradiction is now executed code.**
       `pipeline/validate.py` resolves null → own-id (fully independent) per the
       documented fallback, and 17 owner channels still carry `group: null` in
@@ -776,23 +509,16 @@ Forensic: POSTMORTEMS.md top entry. Four rounds of adversarial review, 27 → 33
 - [ ] **Owner decision — approve `ARCHITECTURE.md`, or close the question.**
       Open since session 1; all ten phases were built and shipped against it.
       Either way this line dies. (Merges the two duplicate approval items.)
-- [ ] **Owner decision — line cap on eight files.** `tools/check_feeds.py` (217),
+- [ ] **Owner decision — line cap on nine files.** `tools/check_feeds.py` (217),
       `tools/dump_body.py` (213), `tools/pytest_shim.py` (465),
       `memory/schema.sql` (226, comment-only), `tests/unit/test_pipeline_compose.py`
-      (295), `tests/unit/test_pipeline_validate.py` (378), plus
-      `pipeline/understand.py` (217) and `report_csv.py` (226) — the only two that
-      are PRODUCTION logic and therefore the only two the cap was actually written
-      for. Decide: trim, split, or grant explicit exceptions per category
-      (dev tools / schema comments / tests).
-- [ ] **Flash watchdog — promote from deferred to next feature (proposed
-      2026-09-05, NOT built, needs owner approval per the architecture-first
-      rule).** Design: the digest step in pipeline.yml runs
-      `git fetch origin flash-state`, exports the last commit's age in minutes,
-      and render.py prepends a one-line Persian warning when it exceeds a
-      threshold (or when the branch is absent). No GitHub API, no new secret,
-      ~15 lines of YAML + ~12 of Python + 2 tests. Rationale: an emergency
-      alerter whose liveness depends on the owner remembering to open the
-      Actions tab is not an emergency alerter — proven this session.
+      (~345), `tests/unit/test_pipeline_validate.py` (~465), **`settings_schema.py`
+      (205, crossed by 9r's two delivery keys — pure dataclass declarations, and
+      splitting a schema registry to satisfy a line count is worse than the
+      violation)**, plus `pipeline/understand.py` (217) and `report_csv.py` (226) —
+      the only two that are PRODUCTION LOGIC and therefore the only two the cap was
+      actually written for. Decide: trim, split, or grant explicit exceptions per
+      category (dev tools / schema declarations / tests).
 - [ ] **v1.5 (Phase 11) scope — risk engine, accuracy gate, markets fetcher.**
       Hand-label the 5 backtest scenario dates, measure Gemini extraction
       precision/recall BEFORE paying any adjudicator; paid cascade stays disabled.

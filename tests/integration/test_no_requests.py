@@ -57,6 +57,7 @@ OFFLINE_MODULES = (
     "agent.llm.wiring",
     # Phase 6: the pipeline stages and the event store.
     "agent.pipeline",
+    "agent.pipeline.flash_watchdog",
     "agent.pipeline.filter",
     "agent.pipeline.embed",
     "agent.pipeline.cluster",

@@ -140,6 +140,11 @@ class DeliverySettings:
     truncate_priority: Sequence[str]
     output_language: str
     source_languages: Sequence[str]
+    # Flash-monitor liveness line (9r, 2026-09-08). Lives here rather than in
+    # its own section because it controls one line of the delivered message,
+    # which is exactly what this section owns. See pipeline/flash_watchdog.py.
+    flash_watchdog_enabled: bool
+    flash_watchdog_max_age_minutes: int
 
 
 @dataclass(frozen=True, slots=True)
@@ -189,7 +194,8 @@ SECTIONS: tuple[tuple[str, type, tuple[str, ...]], ...] = (
       "fallback_max_items", "event_repeat_threshold", "repeat_bypass_score")),
     ("delivery", DeliverySettings,
      ("telegram_max_chars", "char_budget", "truncate_priority", "output_language",
-      "source_languages")),
+      "source_languages", "flash_watchdog_enabled",
+      "flash_watchdog_max_age_minutes")),
     ("ops", OpsSettings,
      ("mock_mode", "dry_run", "halt_on_state_decrypt_failure",
       "halt_on_db_integrity_failure", "require_signal_coverage_check",

@@ -97,9 +97,32 @@ jobs:
           fi
           rm -f /tmp/age-key.txt
 
+      # Flash-monitor watchdog (9r, 2026-09-08). flash-alert.yml force-pushes
+      # a commit to the orphan `flash-state` branch on every successful run
+      # (*/15 cron), so that commit's age IS the monitor's heartbeat. No
+      # GitHub API, no new secret, no new permission -- `contents: read` on
+      # our own repo is already there. Never fails the job: a watchdog that
+      # can break the digest is worse than no watchdog, so every path exits 0
+      # and the worst case is the literal `missing`, which the digest reports
+      # honestly rather than guessing the monitor is fine.
+      - name: Flash-state age
+        id: flash_age
+        continue-on-error: true
+        run: |
+          age=missing
+          if git fetch origin flash-state --quiet 2>/dev/null; then
+            ts=$(git log -1 --format=%ct FETCH_HEAD 2>/dev/null || echo "")
+            if [ -n "$ts" ]; then
+              age=$(( ( $(date -u +%s) - ts ) / 60 ))
+            fi
+          fi
+          echo "flash-state age: $age"
+          echo "age=$age" >> "$GITHUB_OUTPUT"
+
       - name: Run pipeline
         env:
           NEWS_CURATOR_DIGEST: ${{ github.event.schedule == '30 5 * * *' }}
+          NEWS_CURATOR_FLASH_AGE_MINUTES: ${{ steps.flash_age.outputs.age }}
           NEWS_CURATOR_REPORT_DIR: reports
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
