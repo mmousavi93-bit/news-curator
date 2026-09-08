@@ -95,7 +95,8 @@ markets: { fred_api_key_env: "x", daily_series: [], intraday_series: [],
            daily_stale_after_hours: 1, triggers: {} }
 llm: { order: [], stages: {}, providers: {}, backoff: {} }
 delivery: { telegram_max_chars: 4096, char_budget: {}, truncate_priority: [],
-            output_language: "en", source_languages: [] }
+            output_language: "en", source_languages: [],
+            flash_watchdog_enabled: false, flash_watchdog_max_age_minutes: 180 }
 """,
         encoding="utf-8",
     )

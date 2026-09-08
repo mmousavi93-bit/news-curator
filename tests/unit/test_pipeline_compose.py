@@ -113,6 +113,60 @@ def test_llm_failed_flag_swaps_one_liner_for_ai_unavailable():
     assert NOTHING_NEW_FA not in ctx.messages[0]
 
 
+def _with_flash_age(value):
+    """os.environ set/restore -- the shim has no monkeypatch fixture and the
+    watchdog reads the workflow-exported age from the environment."""
+    import os
+    from agent.pipeline.flash_watchdog import ENV_AGE
+    previous = os.environ.get(ENV_AGE)
+    os.environ[ENV_AGE] = value
+    def restore():
+        if previous is None:
+            os.environ.pop(ENV_AGE, None)
+        else:
+            os.environ[ENV_AGE] = previous
+    return restore
+
+
+def test_flash_watchdog_warning_rides_above_the_digest_header():
+    # 9r: the flash monitor's liveness line must reach the delivered message,
+    # inside the character budget (constraint 8), above the header -- it is a
+    # statement about the system, not the news.
+    restore = _with_flash_age("400")
+    try:
+        ctx = _Ctx(config=_config())
+        ctx.events = [_with_cluster(ctx, _event("خلاصه نظامی اسرائیل."))]
+        ComposeStage(_Log()).run(ctx)
+    finally:
+        restore()
+    assert "پایش هشدار فوری" in ctx.messages[0]
+    assert ctx.messages[0].index("پایش هشدار فوری") < ctx.messages[0].index("مرور اخبار")
+    assert len(ctx.messages[0]) <= 4096
+
+
+def test_flash_watchdog_warning_rides_the_honest_one_liner_too():
+    # The case that matters most: a quiet run says "nothing new", which is
+    # indistinguishable from a dead system unless the warning is on it.
+    restore = _with_flash_age("400")
+    try:
+        ctx = _Ctx(config=_config())
+        ComposeStage(_Log()).run(ctx)
+    finally:
+        restore()
+    assert "پایش هشدار فوری" in ctx.messages[0]
+    assert NOTHING_NEW_FA in ctx.messages[0]
+
+
+def test_healthy_flash_monitor_adds_nothing_to_the_digest():
+    restore = _with_flash_age("40")
+    try:
+        ctx = _Ctx(config=_config())
+        ComposeStage(_Log()).run(ctx)
+    finally:
+        restore()
+    assert ctx.messages == [NOTHING_NEW_FA]
+
+
 def test_header_is_persian_with_jalali_date_and_tehran():
     ctx = _Ctx(config=_config())
     ctx.events = [_with_cluster(ctx, _event("خلاصه نظامی اسرائیل."))]

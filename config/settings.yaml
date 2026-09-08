@@ -520,6 +520,19 @@ digest_rank:
   # pending owner tuning once a few more clean-run CSVs exist; nudge it from
   # chosen.csv's `reason` column (band=/sim=/score= fields on every repeat
   # gate outcome, kept or dropped).
+  #
+  # TWO CONSUMERS since 2026-09-08 (9r fix 1). Besides the cross-run gate
+  # above, pipeline/samerun_dedup.py now uses this same constant as its
+  # collapse threshold -- one definition of "the same story" for both the
+  # cross-run and the within-run pass. It previously deleted at
+  # pipeline.event_match_threshold (0.55), i.e. it was still doing exactly
+  # what the two-band gate was written to stop, on the one path that fix
+  # missed. A same-run drop is SILENT (no score bypass, no compact follow-up
+  # line), so raising it is the conservative direction. Watch chosen.csv for
+  # `same_run_dup sim=` rows: if a genuine double-send of one incident
+  # re-appears, its similarity is recorded there and this is the number to
+  # lower -- one variable at a time, and lowering it re-widens the cross-run
+  # gate too, which is the trade to weigh.
   event_repeat_threshold: 0.80
   repeat_bypass_score: 11.0
 
@@ -537,6 +550,18 @@ delivery:
   # labels, Jalali dates).
   output_language: "fa"
   source_languages: ["en", "fa", "ar", "he"]
+  # Flash-monitor watchdog (9r, 2026-09-08). The flash workflow force-pushes a
+  # commit to the `flash-state` branch on every successful run, so that
+  # commit's age is the monitor's heartbeat; pipeline.yml measures it and the
+  # digest carries one warning line while it is stale. Set enabled: false to
+  # silence the line (it does NOT stop the monitor).
+  #
+  # 180 minutes = 12 missed */15 scans. Chosen to be unambiguous rather than
+  # twitchy: GitHub's cron is 10-20 min late at the median and skips runs
+  # under load, so 30-60 min would cry wolf on a healthy monitor. A dead
+  # monitor is detected within 3 hours, i.e. inside one pipeline interval.
+  flash_watchdog_enabled: true
+  flash_watchdog_max_age_minutes: 180
 
 # ---------------------------------------------------------------------------
 # OPERATIONS

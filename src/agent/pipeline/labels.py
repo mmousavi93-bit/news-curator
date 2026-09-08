@@ -52,6 +52,14 @@ LABELS: Mapping[str, Mapping[str, str]] = {
             "هوش مصنوعی در این اجرا در دسترس نبود؛ خبرها جمعآوری و "
             "ذخیره شدند اما خلاصهای ساخته نشد."
         ),
+        # Flash-monitor watchdog (9r). Stated as a fact about the monitor,
+        # not as an emergency -- the tone contract forbids drama, and the
+        # thing that is broken is the plumbing, not the world.
+        "flash_stale": (
+            "⚠️ پایش هشدار فوری پاسخ نمی‌دهد — "
+            "آخرین ثبت وضعیت حدود {hours} ساعت پیش."
+        ),
+        "flash_missing": "⚠️ پایش هشدار فوری هیچ وضعیتی ثبت نکرده است.",
         "time_not_stated": "زمان اعلام نشده",
         "date_unknown": "تاریخ نامعلوم",
         "rumour": "شایعه",
@@ -74,6 +82,11 @@ LABELS: Mapping[str, Mapping[str, str]] = {
             "Events were collected this run but could not be rendered in "
             "Persian; they are stored and will be covered by later runs."
         ),
+        "flash_stale": (
+            "⚠️ Flash monitor is not reporting — last state about "
+            "{hours}h ago."
+        ),
+        "flash_missing": "⚠️ Flash monitor has never reported state.",
         "time_not_stated": "time not stated",
         "date_unknown": "date unknown",
         "rumour": "RUMOUR",

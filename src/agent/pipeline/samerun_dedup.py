@@ -9,6 +9,36 @@ summaries, zero LLM calls; the survivor is chosen on (independent_count,
 member count), NEVER member count alone (round-2 review, fix 2): three
 reposting tier-3/lead channels must not outnumber and delete a single
 corroborated tier-1/2 report of the same story.
+
+SESSION 9r (2026-09-08), fix 1 -- THIS PASS NOW USES THE HIGH BAND.
+It previously deleted on `pipeline.event_match_threshold` (0.55). That is
+the same defect 9q's two-band gate was built to fix, left live on the one
+path 9q did not touch: repeats.py now classifies 0.55 <= sim < 0.80 as a
+related but DIFFERENT story that must survive, while this module was still
+treating 0.55 as proof of sameness and deleting one side outright -- with
+NO score bypass and NO compact «پیگیری» render, so a same-run drop is a
+silent, unrecoverable delete. A strike and the retaliation answering it sit
+at cosine 0.6-0.65 (repeats.py's measured range) and CAN both land inside
+one 3-hour window during an escalation; that is the exact story class this
+system exists to surface. The gate is now
+`digest_rank.event_repeat_threshold` -- the same constant, one definition of
+"the same story" for both passes. No new knob: a two-band same-run gate
+would collapse to precisely this, because MID means "different story, keep
+both" and there is no cross-run development test to apply within one run.
+
+UNVERIFIED and deliberately measurable: the 2026-08-30 Hormuz pair's actual
+cosine was never recorded, so it is not proven to clear 0.80. Every drop
+still writes `same_run_dup sim=<f>` into chosen.csv -- if a true double-send
+re-appears, its similarity is in the artifact and the constant is one edit.
+Do not pre-emptively lower it on a hunch (9q rule: one variable at a time).
+
+SESSION 9r, fix 2 -- NON-TRANSITIVE DELETION. The inner loop did not stop
+when `event` itself lost: an already-dropped event kept being compared as
+the SOURCE, so A losing to B did not prevent A from then deleting C. A
+beats B, B beats C left only A's winner standing even when B and C were
+unrelated -- a corpse deleting survivors. 9q's cluster-cap fix roughly
+doubled the exposure by letting more same-family clusters reach understand.
+The loop now breaks the moment `event` is the loser.
 """
 
 from __future__ import annotations
@@ -39,7 +69,11 @@ def drop_same_run_dups(
     """
     if getattr(ctx, "embedder", None) is None or len(events) < 2:
         return events, [], {}
-    threshold = ctx.config.settings.pipeline.event_match_threshold
+    # HIGH band only (9r fix 1) -- see the module docstring. settings.py's
+    # cross-section check already refuses a config where this is below
+    # pipeline.event_match_threshold, so it can never widen past the
+    # cross-run gate's floor.
+    threshold = ctx.config.settings.digest_rank.event_repeat_threshold
     vectors = ctx.embedder.embed([e.summary for e in events])
     clusters_by_key = {c.key: c for c in getattr(ctx, "clusters", None) or []}
 
@@ -67,6 +101,11 @@ def drop_same_run_dups(
                 "corroborated/larger cluster (sim %.2f)",
                 loser.event_key[:8], similarity,
             )
+            if loser is event:
+                # 9r fix 2: `event` is dead -- it must not go on deleting
+                # later events. Without this break the pass is
+                # non-transitive (A loses to B, then still deletes C).
+                break
     return (
         [e for e in events if e.event_key not in dropped_keys],
         [e for e in events if e.event_key in dropped_keys],

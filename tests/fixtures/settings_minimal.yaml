@@ -123,6 +123,8 @@ delivery:
   truncate_priority: ["watchlist", "top_events", "risk_block"]
   output_language: "fa"
   source_languages: ["en", "fa", "ar", "he"]
+  flash_watchdog_enabled: true
+  flash_watchdog_max_age_minutes: 180
 
 ops:
   mock_mode: true

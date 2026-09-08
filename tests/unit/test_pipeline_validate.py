@@ -434,6 +434,93 @@ def test_same_run_distinct_events_both_survive(tmp_path):
     assert ctx.repeat_dropped == []
 
 
+def test_same_run_mid_band_pair_both_survive(tmp_path):
+    # 9r fix 1. drop_same_run_dups deleted on pipeline.event_match_threshold
+    # (0.55) while repeats.py's two-band gate classifies 0.55 <= sim < 0.80 as
+    # a related but DIFFERENT story that survives. A strike and the
+    # retaliation answering it sit at cosine 0.6-0.65 and can both land inside
+    # one 3-hour window; under the old gate one was silently deleted, with no
+    # score bypass and no compact follow-up render. cos = 0.64 -- MID band.
+    # FAILS BEFORE THE FIX: the smaller cluster was dropped.
+    credibility = _cred(
+        ga=SourceCredibility(tier=2, group="ga"),
+        gb=SourceCredibility(tier=2, group="gb"),
+    )
+    conn = memory_db.open_db(tmp_path / "state.db", create_if_absent=True)
+    strike = _cluster([_item("ga", "https://x/s1"), _item("gb", "https://x/s2")])
+    reply = _cluster([_item("ga", "https://x/r1")])
+    embedder = _DictEmbedder({
+        "strike on the island": [1.0, 0.0, 0.0],
+        "retaliation for the strike": [0.64, 0.768375, 0.0],
+    })
+    ctx = _Ctx(
+        clusters=[strike, reply],
+        events=[
+            Event(event_key=strike.key, summary="strike on the island",
+                  category="military", source_count=2,
+                  first_seen_at=NOW, last_updated_at=NOW),
+            Event(event_key=reply.key, summary="retaliation for the strike",
+                  category="military", source_count=1,
+                  first_seen_at=NOW, last_updated_at=NOW),
+        ],
+    )
+    ctx.db = conn
+    ctx.embedder = embedder
+    ctx.config = _ctx_config()
+    try:
+        _stage(credibility).run(ctx)
+    finally:
+        conn.close()
+    assert sorted(e.summary for e in ctx.events) == [
+        "retaliation for the strike", "strike on the island",
+    ]
+    assert ctx.repeat_dropped == []
+
+
+def test_same_run_dropped_event_cannot_delete_a_later_event(tmp_path):
+    # 9r fix 2 -- non-transitive deletion. A loses to B, but the old inner
+    # loop kept comparing the already-dead A against later events, so A went
+    # on to delete C. B and C are NOT duplicates of each other (cos 0.6724,
+    # below the 0.80 gate), so C must survive on its own merits.
+    #   cos(A, B) = 0.82  -> A dropped (B has 2 groups, A has 1)
+    #   cos(A, C) = 0.82  -> would drop C under the old loop (C ranks below A)
+    #   cos(B, C) = 0.6724 -> below the gate, they never collide
+    # FAILS BEFORE THE FIX: ctx.events == [B] and C is in repeat_dropped.
+    credibility = _cred(
+        ga=SourceCredibility(tier=2, group="ga"),
+        gb=SourceCredibility(tier=2, group="gb"),
+    )
+    conn = memory_db.open_db(tmp_path / "state.db", create_if_absent=True)
+    a = _cluster([_item("ga", "https://x/a1"), _item("ga", "https://x/a2")])
+    b = _cluster([_item("ga", "https://x/b1"), _item("gb", "https://x/b2")])
+    c = _cluster([_item("ga", "https://x/c1")])
+    embedder = _DictEmbedder({
+        "event a": [1.0, 0.0, 0.0],
+        "event b": [0.82, 0.572364, 0.0],
+        "event c": [0.82, 0.0, 0.572364],
+    })
+    ctx = _Ctx(
+        clusters=[a, b, c],
+        events=[
+            Event(event_key=a.key, summary="event a", category="military",
+                  source_count=2, first_seen_at=NOW, last_updated_at=NOW),
+            Event(event_key=b.key, summary="event b", category="military",
+                  source_count=2, first_seen_at=NOW, last_updated_at=NOW),
+            Event(event_key=c.key, summary="event c", category="military",
+                  source_count=1, first_seen_at=NOW, last_updated_at=NOW),
+        ],
+    )
+    ctx.db = conn
+    ctx.embedder = embedder
+    ctx.config = _ctx_config()
+    try:
+        _stage(credibility).run(ctx)
+    finally:
+        conn.close()
+    assert sorted(e.summary for e in ctx.events) == ["event b", "event c"]
+    assert [e.event_key for e in ctx.repeat_dropped] == [a.key]
+
+
 def test_this_runs_own_rows_are_not_self_repeat_dropped(tmp_path):
     """Regression 2026-08-30: the production sequence is understand
     INSERTING this run's events into the events table BEFORE validate
@@ -519,10 +606,15 @@ def test_repeat_reason_survives_a_same_run_duplicate_drop(tmp_path):
         "old summary": [1.0, 0.0, 0.0],
         # cos(A, old) = 0.7 -- MID band (0.55 <= sim < 0.80).
         "event a": [0.7, 0.714143, 0.0],
-        # cos(A, B) = 0.638486 -- above event_match_threshold (0.55), so
+        # cos(A, B) = 0.8213 -- at/above event_repeat_threshold (0.80), so
         # drop_same_run_dups treats them as the same story; cos(B, old) =
-        # 0.3, below 0.55, so B never touches the repeat gate at all.
-        "event b": [0.3, 0.6, 0.74162],
+        # 0.5, below 0.55, so B never touches the repeat gate at all.
+        # Vectors re-solved 2026-09-08 (9r fix 1): B was [0.3, 0.6, 0.74162]
+        # giving cos(A, B) = 0.638, which was a same-run DELETE under the old
+        # 0.55 gate and is a KEEP under the HIGH band. What this test asserts
+        # -- that a same-run reason does not overwrite the repeat-gate reason
+        # -- is unchanged; only the collision had to be made a real one.
+        "event b": [0.5, 0.66, 0.560714],
     })
     event_a = Event(event_key=cluster_a.key, summary="event a",
                     category="military", source_count=1,

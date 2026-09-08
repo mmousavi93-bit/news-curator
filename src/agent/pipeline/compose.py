@@ -23,6 +23,7 @@ import logging
 from agent.collectors.tz import to_tehran
 from agent.delivery.formatter import escape_html, format_split_tracked
 from agent.delivery.message import Message
+from agent.pipeline.flash_watchdog import flash_warning
 from agent.pipeline.labels import labels_for
 from agent.pipeline.langgate import split_persian
 from agent.pipeline.rank import rank_events
@@ -46,6 +47,12 @@ class ComposeStage:
         events = list(getattr(ctx, "events", None) or [])
         clusters = {c.key: c for c in getattr(ctx, "clusters", None) or []}
         ctx.compose_kept_keys = []
+        # Flash-monitor liveness (9r). Computed BEFORE any budgeting so the
+        # line is inside the character budget, never appended after the split
+        # (constraint 8: never discover the 4,096 cap at send time). It rides
+        # the honest one-liner too -- a "nothing new" run is exactly when a
+        # dead alerter is most dangerous and least visible.
+        warning = flash_warning(settings, labels)
         # Built FIRST: a lead-only run (main events empty -- nothing
         # corroborated) must still deliver leads, which is exactly the
         # scenario the leads channel exists for (fix 2026-08-30).
@@ -88,7 +95,7 @@ class ComposeStage:
                 text = labels["nothing_new"]
             if raw_fallback:
                 text += "\n\n" + escape_html(raw_fallback)
-            ctx.messages = [text]
+            ctx.messages = [f"{warning}\n\n{text}" if warning else text]
             ctx.counters["compose"] = 0
             self._logger.info("compose: no events -- honest one-liner")
             return
@@ -109,7 +116,7 @@ class ComposeStage:
             )
             if raw_fallback:
                 text += "\n\n" + escape_html(raw_fallback)
-            ctx.messages = [text]
+            ctx.messages = [f"{warning}\n\n{text}" if warning else text]
             ctx.counters["compose"] = 0
             self._logger.info(
                 "compose: all %d event(s) below min_score -- honest one-liner", len(events)
@@ -125,6 +132,10 @@ class ComposeStage:
             f"{labels['header']} — {format_jalali(now_tehran, with_time=True)}"
             f" {labels['tehran']}{marker}"
         )
+        if warning:
+            # Above the digest header on purpose: it is a statement about the
+            # system, not about the news, and it must be the first thing read.
+            header = f"{warning}\n{header}"
 
         # Follow-up priority + item construction: pipeline/render.py's
         # build_digest_items (moved out 2026-09-06 when this file crossed
