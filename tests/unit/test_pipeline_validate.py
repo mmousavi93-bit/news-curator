@@ -101,13 +101,35 @@ def test_tier3_and_lead_never_corroborate():
     assert groups == {"g"}
 
 
-def test_null_group_falls_back_to_own_id():
+def test_null_group_falls_back_to_prefixed_self_id():
+    # Fix F, 2026-09-06 review: the fallback must be a PREFIXED
+    # self-identifier (matching cluster.py's `__self__:<id>` convention),
+    # not the bare source id -- see the collision test below for why.
     credibility = _cred(
         a=SourceCredibility(tier=2, group=None),
         b=SourceCredibility(tier=2, group=None),
     )
     groups = independent_groups(["a", "b"], credibility)
-    assert groups == {"a", "b"}
+    assert groups == {"__self__:a", "__self__:b"}
+
+
+def test_null_group_fallback_does_not_collide_with_a_real_group_name():
+    # The bug fix F closes: 19 strings in credibility.yaml are
+    # simultaneously a source id (with group: null) and another source's
+    # EXPLICIT `group:` value. A bare-id fallback for "al_jazeera" would
+    # silently merge with a second, unrelated source explicitly declaring
+    # group: "al_jazeera" -- two independent reports would count as one,
+    # UNDER-counting corroboration. With the source-id fallback (pre-fix),
+    # independent_groups(["al_jazeera", "other_outlet"], ...) would wrongly
+    # return a single group ({"al_jazeera"}). The prefixed fallback keeps
+    # them apart.
+    credibility = _cred(
+        al_jazeera=SourceCredibility(tier=2, group=None),
+        other_outlet=SourceCredibility(tier=2, group="al_jazeera"),
+    )
+    groups = independent_groups(["al_jazeera", "other_outlet"], credibility)
+    assert groups == {"__self__:al_jazeera", "al_jazeera"}
+    assert len(groups) == 2
 
 
 def test_single_tier2_source_is_unconfirmed_not_rumour():
@@ -207,8 +229,14 @@ def test_repeat_follow_up_is_dropped(tmp_path):
     credibility = _cred(t2=SourceCredibility(tier=2, group="g"))
     conn = memory_db.open_db(tmp_path / "state.db", create_if_absent=True)
     from agent.memory.event_models import insert_events, mark_delivered
+    # independent_count=1 / claim_status="unconfirmed" match what a real
+    # single-tier-2-source event would have been validated to (fix 1,
+    # 2026-09-06): with the DEFAULT independent_count=0 the new event's
+    # own independent_count=1 would exceed it and bypass condition (b)
+    # would fire, turning this into a kept follow-up instead of a drop.
     insert_events(conn, [Event(event_key="o" * 16, summary="old summary",
                                category="politics", source_count=1,
+                               independent_count=1, claim_status="unconfirmed",
                                first_seen_at=NOW, last_updated_at=NOW)])
     # The repeat window matches DELIVERED events only (owner decision
     # 2026-08-30) -- this prior event was received.
@@ -246,6 +274,53 @@ def test_repeat_follow_up_is_dropped(tmp_path):
     assert "a different event entirely" in kept_summaries
 
 
+def test_lead_event_bypasses_the_repeat_gate_entirely(tmp_path):
+    """Fix D REVERTED, round-2 review 2026-09-06 (see validate.py's ValidateStage.run
+    comment for the full rationale): a round-1 change routed lead events through
+    drop_repeats/drop_same_run_dups so a repeating lead would eventually be
+    hard-dropped. That never worked -- a lead event never enters
+    ctx.compose_kept_keys (compose.py excludes leads from the received-marker
+    keys by design), so it is never mark_delivered, so the 72h repeat window
+    (which matches DELIVERED events only) could never contain a lead prior in
+    the first place; the "old lead summary" prior below, even though it embeds
+    identically to the new one, is UNREACHABLE by construction. Leads are split
+    out during classification and never touch either anti-repetition pass:
+    ctx.lead_events carries this event through completely unchanged, and it
+    must never appear in ctx.repeat_dropped."""
+    credibility = _cred(lead=SourceCredibility(tier="lead", group="leadg"))
+    conn = memory_db.open_db(tmp_path / "state.db", create_if_absent=True)
+    from agent.memory.event_models import insert_events, mark_delivered
+    insert_events(conn, [Event(event_key="o" * 16, summary="old lead summary",
+                               category="military", source_count=1,
+                               independent_count=0, claim_status="unconfirmed",
+                               first_seen_at=NOW, last_updated_at=NOW)])
+    mark_delivered(conn, ["o" * 16], NOW)
+    conn.close()
+
+    lead_cluster = _cluster([_item("lead", "https://x/followup")])
+    embedder = _DictEmbedder({
+        "old lead summary": [1.0, 0.0, 0.0],
+        "new lead summary": [1.0, 0.0, 0.0],  # identical -> would match, if reachable
+    })
+    lead_event = Event(event_key=lead_cluster.key, summary="new lead summary",
+                       category="military", source_count=1,
+                       first_seen_at=NOW, last_updated_at=NOW)
+    ctx = _Ctx(clusters=[lead_cluster], events=[lead_event])
+    ctx.db = memory_db.open_db(tmp_path / "state.db", create_if_absent=False)
+    ctx.embedder = embedder
+    ctx.config = _ctx_config()
+    try:
+        _stage(credibility).run(ctx)
+    finally:
+        ctx.db.close()
+
+    assert ctx.events == []
+    assert ctx.repeat_dropped == []
+    assert len(ctx.lead_events) == 1
+    assert ctx.lead_events[0].event_key == lead_cluster.key
+    assert ctx.lead_events[0].summary == "new lead summary"
+
+
 def test_same_run_duplicate_pair_collapses_to_larger_cluster(tmp_path):
     # 2026-08-30: the same Hormuz tanker incident was delivered twice in one
     # digest -- _drop_repeats only compares against PREVIOUS runs, so two new
@@ -279,6 +354,53 @@ def test_same_run_duplicate_pair_collapses_to_larger_cluster(tmp_path):
         conn.close()
     assert [e.summary for e in ctx.events] == ["tanker hit in hormuz"]
     assert [e.event_key for e in ctx.repeat_dropped] == [small.key]
+
+
+def test_same_run_dedup_ranks_independent_count_ahead_of_member_count(tmp_path):
+    # Fix 2 part 2, round-2 review: drop_same_run_dups' survivor was chosen on
+    # len(cluster.members) ALONE, with zero tier awareness -- a pile of
+    # tier-3 reposts could outnumber and delete a single corroborated
+    # tier-1/2 report of the same story. Pile-up: 3 tier-3 members, no two
+    # groups ever count (tier 3 never corroborates -- classify_event yields
+    # independent_count=0). Corroborated: 1 tier-2 member, one group
+    # (independent_count=1). Same story (identical embedding vector) -- the
+    # corroborated single-member cluster must survive despite having FEWER
+    # members.
+    credibility = _cred(
+        t3a=SourceCredibility(tier=3, group="ga"),
+        t3b=SourceCredibility(tier=3, group="gb"),
+        t3c=SourceCredibility(tier=3, group="gc"),
+        t2=SourceCredibility(tier=2, group="g"),
+    )
+    conn = memory_db.open_db(tmp_path / "state.db", create_if_absent=True)
+    pile = _cluster([
+        _item("t3a", "https://x/p1"), _item("t3b", "https://x/p2"), _item("t3c", "https://x/p3"),
+    ])
+    corroborated = _cluster([_item("t2", "https://x/c1")])
+    embedder = _DictEmbedder({
+        "pile-up repost": [1.0, 0.0, 0.0],
+        "corroborated report": [1.0, 0.0, 0.0],  # identical story
+    })
+    ctx = _Ctx(
+        clusters=[pile, corroborated],
+        events=[
+            Event(event_key=pile.key, summary="pile-up repost",
+                  category="military", source_count=3,
+                  first_seen_at=NOW, last_updated_at=NOW),
+            Event(event_key=corroborated.key, summary="corroborated report",
+                  category="military", source_count=1,
+                  first_seen_at=NOW, last_updated_at=NOW),
+        ],
+    )
+    ctx.db = conn
+    ctx.embedder = embedder
+    ctx.config = _ctx_config()
+    try:
+        _stage(credibility).run(ctx)
+    finally:
+        conn.close()
+    assert [e.summary for e in ctx.events] == ["corroborated report"]
+    assert [e.event_key for e in ctx.repeat_dropped] == [pile.key]
 
 
 def test_same_run_distinct_events_both_survive(tmp_path):
@@ -322,8 +444,13 @@ def test_this_runs_own_rows_are_not_self_repeat_dropped(tmp_path):
     credibility = _cred(t2=SourceCredibility(tier=2, group="g"))
     conn = memory_db.open_db(tmp_path / "state.db", create_if_absent=True)
     from agent.memory.event_models import insert_events, mark_delivered
+    # independent_count=1 / claim_status="unconfirmed" (fix 1, 2026-09-06):
+    # see test_repeat_follow_up_is_dropped -- the default independent_count=0
+    # would let bypass condition (b) turn followup_event into a kept
+    # follow-up instead of the excluded row this test asserts.
     insert_events(conn, [Event(event_key="o" * 16, summary="old summary",
                                category="politics", source_count=1,
+                               independent_count=1, claim_status="unconfirmed",
                                first_seen_at=NOW, last_updated_at=NOW)])
     # The prior event was RECEIVED, so it belongs in the repeat window.
     mark_delivered(conn, ["o" * 16], NOW)
@@ -358,6 +485,75 @@ def test_this_runs_own_rows_are_not_self_repeat_dropped(tmp_path):
 
     kept_summaries = [e.summary for e in ctx.events]
     assert kept_summaries == ["fresh summary"]
+
+
+def test_repeat_reason_survives_a_same_run_duplicate_drop(tmp_path):
+    # Round-3 review, fix 4: validate.py's OLD `{**repeat_reasons,
+    # **same_run_reasons}` merge let a same-run drop silently overwrite the
+    # cross-run repeat-gate reason for the same event_key. Event A survives
+    # drop_repeats as a MID-band follow-up (matches a delivered prior at
+    # sim=0.70, inside [event_match_threshold=0.55, event_repeat_threshold=
+    # 0.80) -- floor met, no development required) but is then itself
+    # dropped by drop_same_run_dups against event B, a more-corroborated
+    # same-run event (sim=0.638 >= event_match_threshold). The merged reason
+    # must carry BOTH the repeat-gate context (which prior it matched) and
+    # the same-run-dup context (which same-run event beat it) -- neither
+    # pass's information may be silently dropped.
+    credibility = _cred(
+        ga=SourceCredibility(tier=2, group="ga"),
+        gb1=SourceCredibility(tier=2, group="gb1"),
+        gb2=SourceCredibility(tier=2, group="gb2"),
+    )
+    conn = memory_db.open_db(tmp_path / "state.db", create_if_absent=True)
+    from agent.memory.event_models import insert_events, mark_delivered
+    insert_events(conn, [Event(event_key="o" * 16, summary="old summary",
+                               category="politics", source_count=1,
+                               independent_count=1, claim_status="unconfirmed",
+                               first_seen_at=NOW, last_updated_at=NOW)])
+    mark_delivered(conn, ["o" * 16], NOW)
+    conn.close()
+
+    cluster_a = _cluster([_item("ga", "https://x/a1")])
+    cluster_b = _cluster([_item("gb1", "https://x/b1"), _item("gb2", "https://x/b2")])
+    embedder = _DictEmbedder({
+        "old summary": [1.0, 0.0, 0.0],
+        # cos(A, old) = 0.7 -- MID band (0.55 <= sim < 0.80).
+        "event a": [0.7, 0.714143, 0.0],
+        # cos(A, B) = 0.638486 -- above event_match_threshold (0.55), so
+        # drop_same_run_dups treats them as the same story; cos(B, old) =
+        # 0.3, below 0.55, so B never touches the repeat gate at all.
+        "event b": [0.3, 0.6, 0.74162],
+    })
+    event_a = Event(event_key=cluster_a.key, summary="event a",
+                    category="military", source_count=1,
+                    first_seen_at=NOW, last_updated_at=NOW)
+    event_b = Event(event_key=cluster_b.key, summary="event b",
+                    category="military", source_count=2,
+                    first_seen_at=NOW, last_updated_at=NOW)
+    ctx = _Ctx(clusters=[cluster_a, cluster_b], events=[event_a, event_b])
+    ctx.db = memory_db.open_db(tmp_path / "state.db", create_if_absent=False)
+    ctx.embedder = embedder
+    ctx.config = _ctx_config()
+    try:
+        _stage(credibility).run(ctx)
+    finally:
+        ctx.db.close()
+
+    # B (independent_count=2, two members) outranks A (independent_count=1,
+    # one member) in drop_same_run_dups' (independent_count, size) key -- A
+    # is the one dropped, B survives.
+    assert [e.summary for e in ctx.events] == ["event b"]
+    assert [e.event_key for e in ctx.repeat_dropped] == [cluster_a.key]
+
+    reason = ctx.repeat_drop_reasons[cluster_a.key]
+    # The repeat-gate half: A matched the delivered prior in the MID band
+    # and cleared the score floor (military, fresh, 1 group -> 13 >= 11).
+    assert "band=mid" in reason
+    assert "kept=above_floor" in reason
+    # The same-run-dedup half: A was then cut as a same-run duplicate of B.
+    assert "same_run_dup" in reason
+    # Both halves present, joined, neither overwriting the other.
+    assert reason.index("band=mid") < reason.index("same_run_dup")
 
 
 def _ctx_config():

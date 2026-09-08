@@ -43,6 +43,49 @@ def _range_ok(value: Any) -> bool:
     return not (isinstance(value, (int, float)) and not isinstance(value, bool) and value < 0)
 
 
+def _cross_section_errors(built: dict[str, Any]) -> list[str]:
+    """Round-3 review, fix 3: settings.yaml invites the owner to nudge
+    `event_match_threshold`/`event_repeat_threshold`/`max_messages` (the
+    comment block next to them says so), but the per-leaf check above only
+    verifies type and non-negativity -- it cannot see relationships BETWEEN
+    sections, or that a threshold is a fraction, not just a positive float.
+    Runs only once every leaf has already validated clean (see from_dict),
+    so every attribute read here is guaranteed present."""
+    errors: list[str] = []
+    pipeline = built["pipeline"]
+    digest_rank = built["digest_rank"]
+
+    def _fraction(path: str, value: float) -> None:
+        if not (0.0 <= value <= 1.0):
+            errors.append(f"{path}: must be between 0.0 and 1.0, got {value!r}")
+
+    _fraction("settings.pipeline.event_match_threshold", pipeline.event_match_threshold)
+    _fraction("settings.digest_rank.event_repeat_threshold", digest_rank.event_repeat_threshold)
+
+    if (
+        0.0 <= pipeline.event_match_threshold <= 1.0
+        and 0.0 <= digest_rank.event_repeat_threshold <= 1.0
+        and digest_rank.event_repeat_threshold < pipeline.event_match_threshold
+    ):
+        errors.append(
+            "settings.digest_rank.event_repeat_threshold "
+            f"({digest_rank.event_repeat_threshold!r}) must be >= "
+            "settings.pipeline.event_match_threshold "
+            f"({pipeline.event_match_threshold!r}) -- the repeat gate's "
+            "HIGH ('same story') band cannot be looser than its MID "
+            "('worth comparing') floor, see pipeline/repeats.py"
+        )
+
+    if digest_rank.max_messages < 1:
+        errors.append(
+            "settings.digest_rank.max_messages: must be at least 1, got "
+            f"{digest_rank.max_messages!r} -- 0 crashes delivery/budget.py "
+            "on an empty page list"
+        )
+
+    return errors
+
+
 def _check(
     path: str, raw: Any, fields: tuple[str, ...], dc: type, errors: list[str]
 ) -> dict[str, Any]:
@@ -141,4 +184,9 @@ class Settings:
             raise SettingsError("; ".join(errors))
 
         built = {name: dc(**section_kwargs[name]) for name, dc, _ in SECTIONS}
+
+        cross_errors = _cross_section_errors(built)
+        if cross_errors:
+            raise SettingsError("; ".join(cross_errors))
+
         return cls(version=version, **built)

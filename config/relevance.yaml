@@ -18,10 +18,31 @@
 #                  wallets.
 # Anything matching no tier gets no bonus -- category and recency decide.
 #
-# Keywords are Persian AND English (entities can arrive in either; the
-# output contract says Persian, the fallback model does not always obey).
-# Matching is case-insensitive substring. Persian spelling follows the
-# output contract (ی/ک, never ي/ك). Add variants here -- no code change.
+# Keywords are Persian, English AND Hebrew (entities can arrive in any of
+# these; the output contract says Persian, the fallback model does not
+# always obey; two tier-2 sources -- walla, maariv -- are Hebrew). Added
+# 2026-09-06 (round-3 review, fix 1b): the scorer previously had zero
+# Hebrew anchors, so every Hebrew item scored 0 regardless of content.
+# Matching is over agent.flash.textnorm.normalize()'d text against
+# normalize()'d keywords (fix 1a) -- NFC + ZWNJ-strip + Arabic->Persian
+# orthography folding + digit folding + lowercase, so Arabic and Persian
+# spellings of the same word meet in the same space (إيران/ایران,
+# غزة/غزه, إسرائيل/اسرائیل). Persian spelling follows the output contract
+# (ی/ک, never ي/ك) but Arabic-spelled variants now match too -- add new
+# variants here, no code change. Hebrew has no case and is unaffected by
+# the folding table.
+#
+# Round-4 review, fix 4 (2026-09-08): Arabic has no پ/گ/ژ/چ, so Arabic
+# sources write Persian names/terms with the nearest Arabic letter --
+# ب for پ, ك (folds to ک) for گ, ز for ژ, ج for چ. That substitution is a
+# SPELLING CHOICE by the source, not an orthographic variant the fold
+# table can absorb (folding پ->ب in code would make every legitimate
+# Arabic ب match پ-words too broadly). Fix: explicit substituted keyword
+# next to each Persian original that contains one of those four letters --
+# same precedent as بزشکیان next to پزشکیان (2026-09-06). Measured:
+# al_manar's two Putin/Trump-envoy items (بوتين) scored 0.0 before this
+# fix, 4.0 after (config/relevance.yaml:100-103 already made US-Russia
+# dealmaking on-mission for the Persian spelling).
 weights:
   iran_direct: 8
   strategic: 4
@@ -39,7 +60,9 @@ keywords:
     - "ایرانی"
     - "تهران"
     - "سپاه"
+    - "سباه"
     - "پاسدار"
+    - "باسدار"
     - "خامنه"
     - "رهبری"
     - "جمهوری اسلامی"
@@ -48,6 +71,7 @@ keywords:
     - "برجام"
     - "خلیج فارس"
     - "تنگه هرمز"
+    - "تنکه هرمز"
     - "iran"
     - "iranian"
     - "tehran"
@@ -55,6 +79,14 @@ keywords:
     - "khamenei"
     - "persian gulf"
     - "strait of hormuz"
+    # Hebrew anchors (fix 1b, 2026-09-06) -- iran_direct = Iran-proper terms.
+    - "איראן"
+    - "איראני"
+    - "טהראן"
+    - "משמרות המהפכה"
+    - "חמינאי"
+    - "מיצר הורמוז"
+    - "המפרץ הפרסי"
   strategic:
     # Anchors only (2026-09-05). Previously the generic military nouns
     # (جنگ، حمله، موشک، جنگنده، تسلیحات…) fired strategic on their own, so
@@ -70,7 +102,43 @@ keywords:
     # نتانیاهو، نشست/وزیران، زندانی/اسیر). Added: غزه/فلسطین (the Masafer
     # Yatta class of gap -- a Gaza ceasefire had no anchor), برجام to
     # iran_direct (the nuclear anchor).
+    #
+    # Added 2026-09-06 (fix 4), two measured gaps:
+    # (1) "یمن"/"yemen" already anchors the COUNTRY, but a Yemen-war story
+    #     datelined to a specific actor or city never says the country name
+    #     -- انصارالله/ansarullah, حوثی/houthi, تعز/taiz, صنعا/sanaa,
+    #     الحدیده/hodeidah close that.
+    # (2) Putin/Witkoff/Kushner Moscow talks (importance 10.99) were
+    #     relevance-gated out entirely -- US-Russia dealmaking over
+    #     Ukraine reshapes sanctions and oil markets Iran depends on, so it
+    #     is a strategic anchor the same way the Mecca Defense Pact is.
+    #     DELIBERATELY NOT ADDED: bare اوکراین/ukraine, کییف/kyiv,
+    #     زلنسکی/zelensky -- two Kyiv air-raid OSINT-spam clusters must
+    #     stay off-mission; only the US-Russia NEGOTIATION actors are
+    #     Iran-relevant, not the war itself.
+    - "انصارالله"
+    - "ansarullah"
+    - "حوثی"
+    - "houthi"
+    - "تعز"
+    - "taiz"
+    - "صنعا"
+    - "sanaa"
+    - "الحدیده"
+    - "hodeidah"
+    - "پوتین"
+    - "بوتین"
+    - "putin"
+    - "ویتکاف"
+    - "witkoff"
+    - "کوشنر"
+    - "kushner"
+    - "مسکو"
+    - "moscow"
+    - "کرملین"
+    - "kremlin"
     - "پیمان"
+    - "بیمان"
     - "نفتکش"
     - "محاصره"
     - "هشدار سفر"
@@ -94,6 +162,7 @@ keywords:
     - "غزه"
     - "فلسطین"
     - "کرانه باختری"
+    - "باکستان"
     - "blockade"
     - "travel advisory"
     - "travel warning"
@@ -116,9 +185,29 @@ keywords:
     - "gaza"
     - "palestine"
     - "west bank"
+    # Hebrew anchors (fix 1b, 2026-09-06) -- the regional ring, mirroring
+    # the Persian/English list above (walla, maariv are tier-2 Hebrew).
+    - "ישראל"
+    - "לבנון"
+    - "חיזבאללה"
+    - "עזה"
+    - "פלסטין"
+    - "חות'ים"
+    - "תימן"
+    - "סוריה"
+    - "עיראק"
+    - "ירדן"
+    - "ערב הסעודית"
+    - "טורקיה"
+    - "קטאר"
+    - "איחוד האמירויות"
+    - "כווית"
+    - "בחריין"
+    - "פקיסטן"
   economy:
     - "نفت"
     - "اوپک"
+    - "اوبک"
     - "ریال"
     - "ارز"
     - "دلار"

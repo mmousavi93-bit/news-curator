@@ -9,6 +9,8 @@ import json
 import sqlite3
 from datetime import datetime
 
+from agent.flash.textnorm import normalize
+
 
 def url_hash(url: str) -> str:
     return hashlib.sha256(url.encode("utf-8")).hexdigest()
@@ -59,13 +61,20 @@ def first_seen_since(conn: sqlite3.Connection, class_name: str,
 def location_tokens_since(conn: sqlite3.Connection, class_name: str,
                           bucket: str, since: str) -> set[str]:
     """Distinct ALERTED location tokens a bucket fired on since `since` —
-    novelty detection (a new target domain restores escalation weight)."""
+    novelty detection (a new target domain restores escalation weight).
+    Re-normalized at READ time (round-4 review, fix 3): a config-spelling
+    change (e.g. textnorm folding «آ» -> «ا») makes OLD rows, written under
+    the prior spelling, register as spuriously "novel" against NEW matches
+    that were normalized differently -- each affected token then fires one
+    immediate false alert on first deploy, bypassing the quiet window.
+    Normalizing both sides here is migration-free: already-normalized rows
+    are idempotent, stale-spelling rows compare equal to new ones."""
     rows = conn.execute(
         "SELECT DISTINCT location_token FROM bursts WHERE class_name = ? AND "
         "term_bucket = ? AND first_seen_at >= ? AND alert_sent = 1",
         (class_name, bucket, since),
     ).fetchall()
-    return {r["location_token"] for r in rows}
+    return {normalize(r["location_token"]) for r in rows}
 
 
 def recent_distinct_buckets(conn: sqlite3.Connection, class_name: str,

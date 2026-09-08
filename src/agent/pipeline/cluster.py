@@ -20,6 +20,7 @@ from typing import Mapping, Sequence
 
 from agent.collectors.base import Item
 from agent.config import Config
+from agent.pipeline.independence import independent_groups
 from agent.pipeline.priority import (  # noqa: F401  (re-exported for callers)
     rank_and_truncate,
     split_at_cap,
@@ -78,11 +79,17 @@ class Cluster:
         )
 
     def independent_count(self, credibility) -> int:
-        """Distinct credibility GROUPS behind this cluster -- the same
-        independence rule the rulebook's Step 1 uses, so Reuters + AP on one
-        wire, or BBC English + BBC Persian, count once. `group: null` falls
-        back to the source's own id (fully independent), matching
-        pipeline/validate.py. Leads never count (LEAD_HANDLING.md)."""
+        """Distinct credibility GROUPS behind this cluster, across EVERY
+        non-lead tier (1, 2, AND 3) -- report_csv.py's chosen.csv column, a
+        raw corroboration-PLUS-amplification count, NOT a claim-status
+        input. `group: null` falls back to the source's own id. Leads
+        never count (LEAD_HANDLING.md).
+
+        Docstring corrected 2026-09-06 (round-3 review, fix 5): this used
+        to claim parity with pipeline/validate.py's rule, which counts
+        tier-1/2 groups ONLY (tier-3 repost volume is amplification, not
+        evidence). `corroborating_count` below is the method that actually
+        matches validate.py."""
         groups = set()
         for member in self.members:
             entry = credibility.get(member.source_id)
@@ -90,6 +97,19 @@ class Cluster:
                 continue
             groups.add(entry.group or f"__self__:{member.source_id}")
         return len(groups)
+
+    def corroborating_count(self, credibility) -> int:
+        """Distinct credibility GROUPS among TIER-1/2 members ONLY -- the
+        rulebook Step 1 definition pipeline/validate.py uses for
+        claim_status (tier-3 and lead members never corroborate, they only
+        amplify). Added 2026-09-06 (fix 3) for priority.py's cap ordering:
+        NOT the same signal as independent_count above, which counts every
+        tier including 3 and is what report_csv persists to chosen.csv
+        (stable meaning, unchanged here) -- 17 owner Telegram channels
+        (tier 3, group: null) were letting repost volume out-rank a
+        genuinely corroborated tier-1/2 story for a cap slot."""
+        source_ids = [m.source_id for m in self.members]
+        return len(independent_groups(source_ids, credibility))
 
 
 def _cosine(a: Sequence[float], b: Sequence[float]) -> float:

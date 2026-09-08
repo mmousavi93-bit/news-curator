@@ -114,3 +114,76 @@ def test_nested_section_is_immutable():
     settings = Settings.from_dict(raw)
     with pytest.raises(FrozenInstanceError):
         settings.ops.mock_mode = False  # type: ignore[misc]
+
+
+# --- round-3 review, fix 3: cross-section threshold validation -------------
+# settings.yaml's comment block next to these values explicitly invites the
+# owner to nudge them; the per-leaf check only verified type/non-negativity,
+# so a typo like "1.5" or "0" passed clean and broke invariants other code
+# relies on silently (a >1.0 threshold never gates anything; max_messages=0
+# crashes delivery/budget.py on pages[-1]).
+
+def test_event_match_threshold_above_one_rejected():
+    raw = copy.deepcopy(_load(_FIXTURE))
+    raw["pipeline"]["event_match_threshold"] = 1.5
+    with pytest.raises(SettingsError, match=r"event_match_threshold: must be between 0.0 and 1.0"):
+        Settings.from_dict(raw)
+
+
+def test_event_match_threshold_negative_rejected():
+    # Caught by the pre-existing generic non-negative check (runs before
+    # the new cross-section fraction check) -- still rejected, just with
+    # the older message. Pinned so fix 3's test class documents the full
+    # [0.0, 1.0] requirement, upper bound AND lower.
+    raw = copy.deepcopy(_load(_FIXTURE))
+    raw["pipeline"]["event_match_threshold"] = -0.1
+    with pytest.raises(SettingsError, match=r"event_match_threshold: must not be negative"):
+        Settings.from_dict(raw)
+
+
+def test_event_repeat_threshold_above_one_rejected():
+    raw = copy.deepcopy(_load(_FIXTURE))
+    raw["digest_rank"]["event_repeat_threshold"] = 1.2
+    with pytest.raises(SettingsError, match=r"event_repeat_threshold: must be between 0.0 and 1.0"):
+        Settings.from_dict(raw)
+
+
+def test_event_repeat_threshold_below_match_threshold_rejected():
+    # The repeat gate's HIGH ("same story") band must not be looser than
+    # its MID ("worth comparing") floor -- see pipeline/repeats.py's
+    # two-band design. Fixture ships event_match_threshold=0.55.
+    raw = copy.deepcopy(_load(_FIXTURE))
+    raw["digest_rank"]["event_repeat_threshold"] = 0.50
+    with pytest.raises(SettingsError, match=r"event_repeat_threshold \(0.5\) must be >= "
+                                            r"settings.pipeline.event_match_threshold \(0.55\)"):
+        Settings.from_dict(raw)
+
+
+def test_event_repeat_threshold_equal_to_match_threshold_is_allowed():
+    # >= , not >: a MID band of zero width (every match is HIGH) is a valid
+    # owner choice, not a config error.
+    raw = copy.deepcopy(_load(_FIXTURE))
+    raw["pipeline"]["event_match_threshold"] = 0.6
+    raw["digest_rank"]["event_repeat_threshold"] = 0.6
+    settings = Settings.from_dict(raw)
+    assert settings.digest_rank.event_repeat_threshold == 0.6
+
+
+def test_max_messages_zero_rejected():
+    # max_messages=0 currently crashes delivery/budget.py on pages[-1] --
+    # this must be caught at config-load time, not at send time.
+    raw = copy.deepcopy(_load(_FIXTURE))
+    raw["digest_rank"]["max_messages"] = 0
+    with pytest.raises(SettingsError, match=r"max_messages: must be at least 1, got 0"):
+        Settings.from_dict(raw)
+
+
+def test_repeat_bypass_score_negative_still_rejected_by_generic_check():
+    # Not new logic -- the existing generic non-negative check on every
+    # numeric leaf already covers this field; pinned here so fix 3's test
+    # class documents the full requirement list, not just the two new
+    # cross-section rules.
+    raw = copy.deepcopy(_load(_FIXTURE))
+    raw["digest_rank"]["repeat_bypass_score"] = -1.0
+    with pytest.raises(SettingsError, match=r"repeat_bypass_score: must not be negative"):
+        Settings.from_dict(raw)

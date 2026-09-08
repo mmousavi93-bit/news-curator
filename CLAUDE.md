@@ -639,6 +639,42 @@ Forensic: POSTMORTEMS.md top entry. Five defects from one run's artifacts.
    artifact should exist every run. **Owner action: open Actions → flash-alert.**
    Promotes the deferred watchdog from nice-to-have to the top flash item.
 
+## Session 9q (2026-09-06/08) — the 22:12 run delivered 2 of 905 items during a naval war. Suite 696 → 753 (owner to push)
+
+Forensic: POSTMORTEMS.md top entry. Four rounds of adversarial review, 27 → 33/40, 0 BLOCKING.
+
+1. **Two-band repeat gate** (`pipeline/repeats.py` + new `repeat_decision.py`). 12 of 16
+   events were dropped as repeats, ALL at sim 0.55–0.70 — including the IRGC retaliation,
+   killed *because* the strike it answered had been delivered. Root cause:
+   `event_match_threshold: 0.55` was doing double duty as "same story". Now HIGH
+   (`sim >= digest_rank.event_repeat_threshold`, **0.80**) = retold → drop unless
+   `repeat_bypass_score` 11.0 AND development, renders compact «پیگیری» last; MID
+   (0.55–0.80) = different story → normal full entry on the score floor alone.
+   **0.80 is a GUESS** — settings.yaml says so; tune from chosen.csv.
+2. **Cap term `on_mission`** (`pipeline/priority.py`, key
+   `(-on_mission, -tier_weight, -corroborating_count, -recency, -size)`). 24 of 40 LLM
+   calls were spent on lifestyle copy while corroborated Hormuz clusters were cut. The
+   flag is BINARY and gated on `tier_weight > 0`; the relevance-tier VALUE was measured
+   and rejected as a ladder. `relevance.py` now normalizes text AND keywords through
+   `flash/textnorm.py` (Arabic on-mission 9% → 47%); Hebrew anchors + Arabic
+   transliteration variants added to `relevance.yaml`.
+3. **`Cluster.corroborating_count()`** = tier-1/2 groups only, distinct from
+   `independent_count()` (all non-lead tiers). The cap sorts on the former.
+4. **Same-run dedup split to `samerun_dedup.py`**, survivor now tier-aware.
+   Truncated items no longer marked delivered (`compose.py` + `render.py` return
+   `ordered_events`). `report_csv.py` split into 3 files (was 233, cap violation);
+   `cap_dropped` rows carry `on_mission=` and `corroborating_count=`.
+5. **`settings.py` cross-section validation** — rejects
+   `event_repeat_threshold < event_match_threshold` at load.
+6. **FLASH MONITOR IS ALIVE.** Three `flash_2026090*.csv` artifacts exist; the §9p
+   "presumed dead" blocker is CLOSED. A differential replay over the 177-item corpus
+   proved the folding change left the matcher byte-identical (43 matches → 43).
+7. **`min_score` HELD at 8, Hebrew keywords CLOSED, `event_match_threshold` unchanged.**
+   Reasons in POSTMORTEMS. Do not re-tune any of the three on this run's data.
+8. **`tg_alo_entekhab` + `tg_tsepress` staged in `config/sources_candidates_r7.csv`,
+   UNVERIFIED** (sandbox egress to t.me blocked). Needs a manual `probe-feeds.yml`
+   dispatch with `tag=ci`. Neither may be given tier 2.
+
 ## Phases 6–10 (2026-08-29) — v1 CODE COMPLETE. Suite 522, 0 failed, shim-verified
 
 - Owner's mandate this session: push to done. Built per briefs: Phase 6 Understand
@@ -673,42 +709,48 @@ Forensic: POSTMORTEMS.md top entry. Five defects from one run's artifacts.
 
 ## Pending / unresolved
 
-- [ ] **NEXT SESSION — owner workflow: push → verify → flash go-live →
-      analysis.** The 9l.2 + 9m + 9n batches AND the 2026-09-05 batch
-      (a) Gemini-quota fix: daily RPD enforcement + gemini 5 RPM/20 RPD +
-      Pacific-midnight day key; (b) provider-cascade hardening: 429
-      `ready_alt` failover (retry same only when no ready alternative),
-      lang-drop raw-title fallback, «تک‌منبع» single-source marker,
-      anchor-only strategic relevance, `_UNCOVERED_FATES` correction,
-      compose.py→render.py split — suite 692, shim-green, two-round
-      adversarial review 36/40 SHIP) **and the 9p batch (2026-09-05: FATAL
-      rotates, cascade → gemini/groq/bai, independence-before-recency cap,
-      priority.py split, cap_dropped + gate-text CSV rows — suite 696,
-      shim-green)** are the unpushed work: `git add -A &&
-      git commit && git push`, then `git show
-      origin/main:src/agent/pipeline/priority.py | findstr independent_count`,
-      `git show
-      origin/main:src/agent/llm/failover.py | findstr ready_alt`,
-      `git show origin/main:src/agent/pipeline/render.py | findstr
-      cap_refused`,
-      `git show origin/main:src/agent/flash/momentum.py | findstr
-      DE-ESCALATION` and
-      `git show origin/main:.github/workflows/flash-alert.yml | findstr flash.ok`
-      must all print; CI must be green at 692. Flash go-live: NO new
-      secrets needed (FLASH_CHANNEL_ID optional); first boot is
-      self-bootstrapping; then dispatch `flash-alert` manually once and
-      confirm a clean run + flash-reports artifact. **2026-09-05: this is
-      now a BLOCKER, not a step — zero flash artifacts exist against 13
-      pipeline ones, so the monitor is presumed not running. Check the
-      flash-alert workflow's run history FIRST.** Tuning loop: download
-      flash-reports CSVs for 2-3 days, tune `config/flash_alert.yaml`
-      with me (the dry-run dispatch exists for keyword testing). Then the
-      digest analysis session needs 2-3 MORE clean-run CSVs (no
-      `status=unavailable`): the 18:54 clean run is already analysed
-      (session 9m §8); tune `digest_rank.min_score`, `config/relevance.yaml`
-      tiers, `cluster_similarity_threshold` (0.55 KEEP for now), source
-      pruning -- all owner-editable YAML. Gates in progress: 3-run gate,
-      1-week gate, 60-day cron reset (RUNBOOK.md §6–8).
+- [ ] **UNPUSHED: all of session 9q (suite 753).** Owner pushes; agents run no
+      git here. Next session is EVIDENCE work, not build work:
+      **(1) Verify 9q on 2–3 live runs.** The one number that matters is
+      delivered-event count: expect ~2–4 on a quiet run, ~14–20 across 2
+      messages on an escalation run. Then tune, ONE variable at a time, from
+      `chosen.csv`: `event_repeat_threshold` 0.80 (a guess — measure the sim
+      distribution of `repeat_dropped` vs what should have survived), then
+      `digest_rank.min_score` 8, then source pruning from read.csv.
+      **(2) Flash tuning loop** — the monitor is alive (9q item 6); 2–3 days of
+      flash-reports CSVs → tune `config/flash_alert.yaml`. Open flash defects:
+      class-level burst discipline still over-fires, untranslated English on
+      CENTCOM-style confirmations, ~42 `stale` rows concentrated in
+      tg_wfwitness/tg_tabzlive.
+      **(3) Standing gates:** 3-run, 1-week, 60-day cron reset (RUNBOOK §6–8).
+- [ ] **Filed 9q, NOT fixed — three known-open items.**
+      (a) `pipeline/samerun_dedup.py:48-63` is non-transitive: an event already
+      dropped keeps deleting others, so A beats B, B beats C leaves only A even
+      when A and C are unrelated. Exposure roughly doubled by the cap fix
+      (more same-family clusters now reach understand). Fix = skip already-dropped
+      events as sources.
+      (b) Two 9q fixes shipped with NO regression test — flash `location_display`
+      (unfolded spelling in the rendered alert) and novelty stability across a
+      pre-folding history row. Contradicts the standing "every fix carries a test
+      that fails before" rule; the display path is cosmetic, the novelty one is not.
+      (c) Suite arithmetic unreconciled: +7 delta against 5 claimed new tests.
+      Current state verified directly as 753 passed / 0 failed / 0 skipped.
+- [ ] **Owner decision — the persona / "why it matters" field.** Owner asked
+      (2026-09-06) for one line of background on a named figure so an
+      Iran-resident reader learns why an Israeli cabinet change matters.
+      Collides with constraints 10 and 11: unsourced background about real named
+      people, generated by providers with documented ramble defects, is the
+      highest hallucination surface in the system. Proposed fence, needs
+      approval: optional field in the `understand.txt` JSON contract, ONE
+      sentence, «چرا مهم است:» prefix marking it as context not reporting,
+      prompt forbids any date/number/quote/third party absent from the source
+      text, omit rather than guess, zero extra LLM calls. The "when it occurred
+      matters" half is Phase-11 risk-engine work, not v1.
+- [ ] **CLAUDE.md is 767 lines — its own rule (c) says split past ~400.**
+      Prune the superseded session blocks (9b/9c/9i/9j/9l/9m overlap heavily
+      and their forensics are already in POSTMORTEMS.md). Measured once at
+      ~15,200 tokens/turn saved on the last split; this is the biggest token
+      lever on the project.
 - [ ] **Deferred follow-up (2026-09-05 review, MINOR, not a blocker):**
       `ready_alt` treats a down-but-not-open provider as "ready" for ~1-2
       clusters until its breaker opens (worst-case day loses ~1-2 clusters'

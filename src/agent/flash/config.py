@@ -26,7 +26,11 @@ class AlertClass:
     name: str
     label: str
     terms: Mapping[str, tuple[str, ...]]
-    locations: Mapping[str, tuple[str, ...]]
+    # (normalized, display) pairs -- round-4 review, fix 2: matching needs
+    # the NORMALIZED form (so «آمریکایی»/«امریکایی» collapse to one token),
+    # but the alert the owner reads must show the spelling he configured,
+    # not the folded form. See check_location_map.
+    locations: Mapping[str, tuple[tuple[str, str], ...]]
     quiet_hours: int
     quiet_requires_sources: int
     burst_scope: str                 # "signature" | "class"
@@ -95,6 +99,29 @@ def check_lang_map(value: object, label: str,
     return tuple(merged)
 
 
+def check_location_map(value: object, label: str,
+                       errors: list[str]) -> tuple[tuple[str, str], ...]:
+    """Like check_lang_map, but for `locations` blocks only: the matcher
+    needs the NORMALIZED form (so config and item text meet in the same
+    space), but the alert the owner reads must show the spelling HE
+    configured, not the folded form (round-4 review, fix 2 -- the round-3
+    "آ" folding made a Tehran-explosion alert print "امریکایی" for
+    «آمریکایی» and "میدان ازادی" for «میدان آزادی»). Returns
+    (normalized, display) pairs; `terms`/`exclusions` keep check_lang_map
+    since their display never reaches the owner."""
+    if not isinstance(value, dict):
+        errors.append(f"flash_alert.yaml: '{label}' must be a lang mapping")
+        return ()
+    merged: list[tuple[str, str]] = []
+    for lang, kws in value.items():
+        if lang not in _LANGS:
+            errors.append(f"flash_alert.yaml: '{label}' unknown lang {lang!r}")
+            continue
+        for kw in check_str_list(kws, f"{label}.{lang}", errors):
+            merged.append((normalize(kw), kw))
+    return tuple(merged)
+
+
 def check_class(raw: object, name: str, errors: list[str]) -> AlertClass | None:
     if not isinstance(raw, dict):
         errors.append(f"flash_alert.yaml: classes.{name} must be a mapping")
@@ -118,7 +145,7 @@ def check_class(raw: object, name: str, errors: list[str]) -> AlertClass | None:
                 terms[bucket] = merged
 
     locations_raw = raw.get("locations")
-    locations: dict[str, tuple[str, ...]] = {}
+    locations: dict[str, tuple[tuple[str, str], ...]] = {}
     if not isinstance(locations_raw, dict):
         errors.append(f"flash_alert.yaml: classes.{name}.locations must be a mapping")
     else:
@@ -128,7 +155,7 @@ def check_class(raw: object, name: str, errors: list[str]) -> AlertClass | None:
                     f"flash_alert.yaml: classes.{name} unknown location ring {ring!r}"
                 )
                 continue
-            merged = check_lang_map(langs, f"classes.{name}.locations.{ring}", errors)
+            merged = check_location_map(langs, f"classes.{name}.locations.{ring}", errors)
             if merged:
                 locations[ring] = merged
 

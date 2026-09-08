@@ -52,6 +52,7 @@ def test_burst_lifecycle_and_alert_count_window(tmp_path):
 
         match = Match(class_name="tehran", term_bucket="explosion",
                       location_ring="city", location_token="تهران",
+                      location_display="تهران",
                       item=type("I", (), {"title": "انفجار", "body": "",
                                           "source_id": "tg_a"})(),
                       signature="tehran|explosion|city")
@@ -75,6 +76,7 @@ def test_prune_removes_old_closed_bursts_and_urls(tmp_path):
 
         match = Match(class_name="tehran", term_bucket="explosion",
                       location_ring="city", location_token="تهران",
+                      location_display="تهران",
                       item=type("I", (), {"title": "انفجار", "body": "",
                                           "source_id": "tg_a"})(),
                       signature="tehran|explosion|city")
@@ -110,6 +112,7 @@ def test_insert_burst_uses_body_when_title_empty(tmp_path):
 
         match = Match(class_name="tehran", term_bucket="explosion",
                       location_ring="city", location_token="تهران",
+                      location_display="تهران",
                       item=type("I", (), {
                           "title": "",
                           "body": "صدای انفجار در تهران شنیده شد — جزئیات بعدا",

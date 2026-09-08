@@ -36,22 +36,25 @@ def _term_bucket(text: str, alert_class: AlertClass) -> str | None:
 
 
 def _location(text: str, alert_class: AlertClass,
-              allowed_rings: tuple[str, ...]) -> tuple[str, str] | None:
-    """(ring, token) or None. Single-word terms are whole-token matches;
-    multi-word phrases are substring matches. RING PRECEDENCE FIRST: the
-    rings are ordered by importance in the config (iran_geo before
-    actors), so «حمله آمریکا به لارک» displays لارک (the target), never
-    آمریکا (the attacker). WITHIN a ring the most specific token wins:
-    longest, ties broken by earliest occurrence. `allowed_rings` is the
-    bucket's ring_requirements — action buckets must hit Iran territory,
-    statement buckets may match actors (owner live feedback 2026-08-31:
-    routine Gaza-front coverage is not escalation)."""
+              allowed_rings: tuple[str, ...]) -> tuple[str, str, str] | None:
+    """(ring, token, display) or None. `token` is the NORMALIZED form (used
+    for matching, history and novelty comparison); `display` is the
+    spelling the owner configured (round-4 review, fix 2 — the alert must
+    show what he typed, not the folded form). Single-word terms are
+    whole-token matches; multi-word phrases are substring matches. RING
+    PRECEDENCE FIRST: the rings are ordered by importance in the config
+    (iran_geo before actors), so «حمله آمریکا به لارک» displays لارک (the
+    target), never آمریکا (the attacker). WITHIN a ring the most specific
+    token wins: longest, ties broken by earliest occurrence. `allowed_rings`
+    is the bucket's ring_requirements — action buckets must hit Iran
+    territory, statement buckets may match actors (owner live feedback
+    2026-08-31: routine Gaza-front coverage is not escalation)."""
     tokens = _tokens(text)
     for ring, locations in alert_class.locations.items():
         if ring not in allowed_rings:
             continue
-        best: tuple[int, int, str] | None = None  # (len, -index, loc)
-        for loc in locations:
+        best: tuple[int, int, str, str] | None = None  # (len, -index, loc, display)
+        for loc, display in locations:
             if " " in loc:
                 index = text.find(loc)
                 if index < 0:
@@ -70,9 +73,9 @@ def _location(text: str, alert_class: AlertClass,
                 continue
             key = (candidate_len, -index)
             if best is None or key > (best[0], best[1]):
-                best = (candidate_len, -index, loc)
+                best = (candidate_len, -index, loc, display)
         if best is not None:
-            return ring, best[2]
+            return ring, best[2], best[3]
     return None
 
 
@@ -82,6 +85,9 @@ class Match:
     term_bucket: str
     location_ring: str
     location_token: str
+    # Owner's configured spelling, for DISPLAY only (round-4 review, fix 2)
+    # -- location_token stays normalized for matching/history/novelty.
+    location_display: str
     item: object
     signature: str  # class-level for burst_scope: class, else class|bucket|ring
 
@@ -127,14 +133,15 @@ def match_items(items, config: FlashConfig, now: datetime):
                 # is unmet — killed here, exactly as designed.
                 kills.append((item.source_id, f"{class_name}:no_location"))
                 continue
-            ring, token = location
+            ring, token, display = location
             signature = (
                 class_name if alert_class.burst_scope == "class"
                 else f"{class_name}|{bucket}|{ring}"
             )
             matches.append(Match(
                 class_name=class_name, term_bucket=bucket,
-                location_ring=ring, location_token=token, item=item,
+                location_ring=ring, location_token=token,
+                location_display=display, item=item,
                 signature=signature,
             ))
             break  # class precedence: first matching class wins

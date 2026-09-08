@@ -7,6 +7,30 @@ confirmation); claim_status = likely / unconfirmed / rumour from that
 count; lead-only clusters split into ctx.lead_events and never reach the
 main message (gate: a lead alone never reaches output).
 
+This is NOT the same count as pipeline/cluster.py's
+`Cluster.independent_count()`, which spans every non-lead tier (1/2/3) for
+chosen.csv's raw corroboration-plus-amplification column.
+`Cluster.corroborating_count()` is the method over there that mirrors
+THIS module's rule exactly (round-3 review, fix 5 -- the two docstrings
+had drifted apart and cluster.py wrongly claimed parity with this file).
+
+CLASSIFICATION RUNS BEFORE THE REPEAT GATE (fix 1, 2026-09-06, reordered
+from the original run()): pipeline/repeats.py's bypass logic needs
+independent_count and claim_status to decide whether a matched "repeat" is
+a development worth keeping, and the OLD order dropped repeats first, so a
+matched event was judged on Event() constructor defaults
+(independent_count=0, claim_status="unconfirmed") rather than its real
+corroboration -- this is exactly how the 2026-09-05 run suppressed a
+genuine IRGC-retaliation follow-up. Both loops are pure functions of
+ctx.clusters/ctx.events and neither depends on the OTHER's output except
+in this one direction, so the reorder has no other effect.
+
+The two anti-repetition passes live in their own modules -- split out
+2026-09-06 when this file crossed the ~200-line cap (constraint 12):
+cross-run repeat gate in pipeline/repeats.py, same-run duplicate collapse
+in pipeline/samerun_dedup.py (repeats.py itself later crossed the cap on
+its own, hence the further split).
+
 Lead outcomes are written silently -- see memory/lead_models.py.
 """
 
@@ -14,42 +38,36 @@ from __future__ import annotations
 
 import logging
 from dataclasses import replace
-from typing import Mapping, Sequence
+from typing import Mapping
 
-from agent.memory.event_models import Event, read_recent_events, update_validation
+from agent.memory.event_models import Event, update_validation
 from agent.memory.lead_models import LeadOutcome, insert_lead_outcomes
-from agent.pipeline.cluster import Cluster
+from agent.pipeline.independence import _tier, independent_groups
+from agent.pipeline.repeats import drop_repeats
+from agent.pipeline.samerun_dedup import drop_same_run_dups
 
 
-def _tier(credibility: Mapping[str, object], source_id: str) -> str:
-    entry = credibility.get(source_id)
-    if entry is None:
-        return "3"  # unlisted = tier 3 fallback (the join check prevents this)
-    return str(getattr(entry, "tier", "3"))
-
-
-def _group(credibility: Mapping[str, object], source_id: str) -> str:
-    entry = credibility.get(source_id)
-    group = getattr(entry, "group", None) if entry is not None else None
-    # group: null resolves to the source's own id -- fully independent by
-    # default (credibility.yaml's documented fallback).
-    return group if isinstance(group, str) and group else source_id
-
-
-def independent_groups(
-    source_ids: Sequence[str], credibility: Mapping[str, object]
-) -> set[str]:
-    """Distinct corroborating groups among tier-1/2 members. Tier 3 and
-    lead members never corroborate (rulebook Step 1)."""
-    groups: set[str] = set()
-    for sid in source_ids:
-        if _tier(credibility, sid) in ("1", "2"):
-            groups.add(_group(credibility, sid))
-    return groups
+def _merge_reasons(
+    repeat_reasons: dict[str, str], same_run_reasons: dict[str, str]
+) -> dict[str, str]:
+    """Union of both drop-reason dicts, APPENDING rather than overwriting
+    when the same event_key appears in both (round-3 review, fix 4): an
+    event that survived the cross-run repeat gate as a MID-band follow-up
+    (recorded in repeat_reasons -- band=/sim=/score=/prior=) can still be
+    dropped moments later as a same-run duplicate of another kept event
+    (same_run_reasons) -- the old `{**repeat_reasons, **same_run_reasons}`
+    let the same-run reason silently overwrite the repeat-gate context for
+    that key, so the owner lost exactly the information fix 2 just added.
+    Repeat-gate reason first (it ran first); both stay independently
+    greppable."""
+    merged = dict(repeat_reasons)
+    for key, reason in same_run_reasons.items():
+        merged[key] = f"{merged[key]} | {reason}" if key in merged else reason
+    return merged
 
 
 def classify_event(
-    cluster: Cluster, credibility: Mapping[str, object]
+    cluster, credibility: Mapping[str, object]
 ) -> tuple[str, set[str], set[str]]:
     """Returns (claim_status, corroborating_groups, lead_source_ids).
     Lead-only clusters return claim_status 'lead_only' -- they are split
@@ -68,9 +86,13 @@ def classify_event(
 
 class ValidateStage:
     """Splits ctx.clusters' events: validated events into ctx.events,
-    lead-only into ctx.lead_events; drops repeat follow-ups (owner decision
-    2026-08-29); persists claim_status/independent_count and lead_outcomes
-    when ctx.db is present."""
+    lead-only into ctx.lead_events. The repeat gate (owner decision
+    2026-08-29, refined 2026-09-06 -- fix 1, pipeline/repeats.py) drops a
+    matched follow-up ONLY IF it shows no material development; a
+    developing story ships as a compact `follow_up` line instead
+    (compose.py), never a full entry ("a change that produces more output
+    is probably wrong"). Persists claim_status/independent_count and
+    lead_outcomes when ctx.db is present."""
 
     name = "validate"
 
@@ -78,111 +100,20 @@ class ValidateStage:
         self._credibility = credibility
         self._logger = logger
 
-    @staticmethod
-    def _cosine(a, b) -> float:
-        # Vectors are unit-normalised upstream (same contract as
-        # pipeline/cluster.py) -- cosine is the dot product.
-        return sum(x * y for x, y in zip(a, b))
-
-    def _drop_repeats(
+    def _classify(
         self, ctx, events: list[Event]
-    ) -> tuple[list[Event], list[Event]]:
-        """Anti-repetition: a follow-up story on an event the owner already
-        RECEIVED must not appear again (owner decision 2026-08-30 -- a
-        story he never saw, dropped below min_score, as a repeat, or by
-        the Persian output gate, must not suppress its own follow-ups).
-        Match each new event's summary against PREVIOUS runs' DELIVERED
-        summaries with the LOCAL embedder (zero LLM calls, zero quota);
-        drop matches at/above event_match_threshold. This run's own rows
-        are excluded by event_key: the understand stage inserts them
-        before validate runs, so an unfiltered read would match every
-        event against itself (sim 1.0) and drop everything.
-        Skipped when the db or embedder is absent (dry-run / mock)."""
-        if getattr(ctx, "db", None) is None or getattr(ctx, "embedder", None) is None:
-            return events, []
-        window = ctx.config.settings.digest_rank.repeat_window_hours
-        new_keys = {e.event_key for e in events}
-        recent = [
-            e for e in read_recent_events(
-                ctx.db, hours=window, now=ctx.now, delivered_only=True
-            )
-            if e.event_key not in new_keys
-        ]
-        if not recent or not events:
-            return events, []
-        threshold = ctx.config.settings.pipeline.event_match_threshold
-        new_vectors = ctx.embedder.embed([e.summary for e in events])
-        old_vectors = ctx.embedder.embed([e.summary for e in recent])
-        kept: list[Event] = []
-        dropped: list[Event] = []
-        for event, vector in zip(events, new_vectors):
-            best = max((self._cosine(vector, old) for old in old_vectors), default=0.0)
-            if best >= threshold:
-                self._logger.info(
-                    "validate: %s dropped as a repeat (sim %.2f)", event.event_key[:8], best
-                )
-                dropped.append(event)
-                continue
-            kept.append(event)
-        return kept, dropped
-
-    def _drop_same_run_dups(
-        self, ctx, events: list[Event]
-    ) -> tuple[list[Event], list[Event]]:
-        """Two events from the SAME run telling the same story must not both
-        reach the digest (2026-08-30: the same Hormuz tanker incident was
-        delivered twice -- _drop_repeats only compares against PREVIOUS runs'
-        delivered summaries). Pairwise cosine over the LLM-written Persian
-        summaries, which are more normalised than raw items; the larger
-        cluster survives, ties keep the first. Zero LLM calls."""
-        if getattr(ctx, "embedder", None) is None or len(events) < 2:
-            return events, []
-        threshold = ctx.config.settings.pipeline.event_match_threshold
-        vectors = ctx.embedder.embed([e.summary for e in events])
+    ) -> tuple[list[Event], list[Event], list[LeadOutcome]]:
+        """Splits events into (main, lead_only) and stamps claim_status /
+        independent_count on the main set. MUST run before the repeat gate
+        -- see the module docstring."""
         clusters_by_key = {c.key: c for c in getattr(ctx, "clusters", None) or []}
-
-        def _size(key: str) -> int:
-            cluster = clusters_by_key.get(key)
-            return len(cluster.members) if cluster is not None else 0
-
-        dropped_keys: set[str] = set()
-        for i, event in enumerate(events):
-            if event.event_key in dropped_keys:
-                continue
-            for j in range(i + 1, len(events)):
-                other = events[j]
-                if other.event_key in dropped_keys:
-                    continue
-                similarity = self._cosine(vectors[i], vectors[j])
-                if similarity < threshold:
-                    continue
-                loser = event if _size(event.event_key) < _size(other.event_key) else other
-                dropped_keys.add(loser.event_key)
-                self._logger.info(
-                    "validate: %s dropped as same-run duplicate of a larger "
-                    "cluster (sim %.2f)", loser.event_key[:8], similarity,
-                )
-        return (
-            [e for e in events if e.event_key not in dropped_keys],
-            [e for e in events if e.event_key in dropped_keys],
-        )
-
-    def run(self, ctx) -> None:
-        clusters = list(getattr(ctx, "clusters", None) or [])
-        events = list(getattr(ctx, "events", None) or [])
-        by_key = {c.key: c for c in clusters}
-        events, repeat_dropped = self._drop_repeats(ctx, events)
-        events, same_run_dropped = self._drop_same_run_dups(ctx, events)
-        ctx.repeat_dropped = repeat_dropped + same_run_dropped
-
-        kept: list[Event] = []
+        classified: list[Event] = []
         lead_events: list[Event] = []
         lead_outcomes: list[LeadOutcome] = []
-
         for event in events:
-            cluster = by_key.get(event.event_key)
+            cluster = clusters_by_key.get(event.event_key)
             if cluster is None:
-                kept.append(event)
+                classified.append(event)
                 continue
             status, groups, leads = classify_event(cluster, self._credibility)
             if status == "lead_only":
@@ -193,19 +124,50 @@ class ValidateStage:
                         outcome="raised", observed_at=ctx.now,
                     ))
                 continue
-            updated = replace(event, claim_status=status,
-                              independent_count=len(groups))
-            kept.append(updated)
+            updated = replace(event, claim_status=status, independent_count=len(groups))
+            classified.append(updated)
             for lead_id in leads:
                 lead_outcomes.append(LeadOutcome(
                     lead_source_id=lead_id, event_key=event.event_key,
                     outcome="confirmed" if status == "likely" else "unconfirmed",
                     observed_at=ctx.now,
                 ))
+        return classified, lead_events, lead_outcomes
+
+    def run(self, ctx) -> None:
+        events = list(getattr(ctx, "events", None) or [])
+        classified, lead_events, lead_outcomes = self._classify(ctx, events)
+        # Fix D REVERTED, round-2 review 2026-09-06: leads must NOT enter
+        # the repeat gate. Two independent reasons the 2026-09-06 "fix D"
+        # was wrong: (a) it never achieved its stated purpose -- a lead
+        # event never enters ctx.compose_kept_keys (compose.py excludes
+        # leads from the received-marker keys by design), so it is never
+        # mark_delivered, so read_recent_events(delivered_only=True) could
+        # never return a lead prior anyway -- leads kept repeating
+        # regardless of whether they passed through drop_repeats; (b)
+        # drop_same_run_dups picks its survivor on cluster size with no
+        # tier awareness (fixed below to rank corroboration first, but
+        # leads still contribute zero corroboration by definition), so
+        # letting leads INTO that pass risked several reposting lead
+        # channels outnumbering and deleting a genuinely corroborated
+        # tier-1/2 report on the same story -- inverting the rule that a
+        # lead alone must never reach output. Leads are therefore split out
+        # and left untouched; only classified (tier-1/2/3) events pass
+        # through the anti-repetition gates.
+        kept, repeat_dropped, repeat_reasons = drop_repeats(
+            ctx, self._credibility, classified, self._logger
+        )
+        kept, same_run_dropped, same_run_reasons = drop_same_run_dups(ctx, kept, self._logger)
+        ctx.repeat_dropped = repeat_dropped + same_run_dropped
+        # Fix E, 2026-09-06 review: per-event drop reasons for chosen.csv's
+        # `reason` column (report_csv.py's repeat_dropped fate). Merge
+        # APPENDS rather than overwrites on key collision (fix 4, round-3
+        # review) -- see _merge_reasons.
+        ctx.repeat_drop_reasons = _merge_reasons(repeat_reasons, same_run_reasons)
 
         ctx.events = kept
         ctx.lead_events = lead_events
-        ctx.counters["validate"] = len(kept)
+        ctx.counters["validate"] = len(ctx.events)
         if ctx.db is not None:
             if kept:
                 update_validation(ctx.db, kept)
@@ -217,7 +179,7 @@ class ValidateStage:
             )
         self._logger.info(
             "validate: %d event(s) -> %d likely / %d unconfirmed / %d rumour",
-            len(events),
+            len(classified),
             sum(1 for e in kept if e.claim_status == "likely"),
             sum(1 for e in kept if e.claim_status == "unconfirmed"),
             sum(1 for e in kept if e.claim_status == "rumour"),

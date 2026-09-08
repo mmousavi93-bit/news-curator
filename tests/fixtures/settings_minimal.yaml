@@ -109,6 +109,8 @@ digest_rank:
   max_messages: 6
   repeat_window_hours: 72
   fallback_max_items: 5
+  event_repeat_threshold: 0.80
+  repeat_bypass_score: 11.0
 
 delivery:
   telegram_max_chars: 4096

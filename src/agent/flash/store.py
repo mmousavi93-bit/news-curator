@@ -39,6 +39,7 @@ class BurstRow:
     signature: str
     term_bucket: str
     location_token: str
+    location_display: str
     headline: str
     first_source: str
     first_seen_at: str
@@ -78,6 +79,13 @@ def open_flash_db(path: Path, *, create_if_absent: bool = False) -> sqlite3.Conn
     if "buckets" not in cols:
         conn.execute("ALTER TABLE bursts ADD COLUMN buckets TEXT NOT NULL DEFAULT '[]'")
         conn.commit()
+    # Additive upgrade for DBs created before location_display (round-4
+    # review, fix 2 -- display spelling separated from the normalized
+    # matching token). Same pattern as buckets above.
+    if "location_display" not in cols:
+        conn.execute(
+            "ALTER TABLE bursts ADD COLUMN location_display TEXT NOT NULL DEFAULT ''")
+        conn.commit()
     row = conn.execute("SELECT value FROM meta WHERE key = ?",
                        (_VERSION_KEY,)).fetchone()
     if row is None:
@@ -110,6 +118,8 @@ def _burst(row: sqlite3.Row) -> BurstRow:
     return BurstRow(
         id=row["id"], class_name=row["class_name"], signature=row["signature"],
         term_bucket=row["term_bucket"], location_token=row["location_token"],
+        location_display=(row["location_display"]
+                          if "location_display" in row.keys() else ""),
         headline=row["headline"], first_source=row["first_source"],
         first_seen_at=row["first_seen_at"], last_seen_at=row["last_seen_at"],
         source_ids=tuple(json.loads(row["source_ids"])),
@@ -131,12 +141,12 @@ def insert_burst(conn: sqlite3.Connection, match, now: datetime,
     headline = (match.item.title or "").strip() or (match.item.body or "").strip()[:120]
     cursor = conn.execute(
         """INSERT INTO bursts (class_name, signature, term_bucket, location_ring,
-           location_token, headline, first_source, first_seen_at, last_seen_at,
-           source_ids, buckets, requires_sources)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+           location_token, location_display, headline, first_source, first_seen_at,
+           last_seen_at, source_ids, buckets, requires_sources)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
         (
             match.class_name, match.signature, match.term_bucket,
-            match.location_ring, match.location_token,
+            match.location_ring, match.location_token, match.location_display,
             headline, match.item.source_id,
             _iso(now), _iso(now), json.dumps([match.item.source_id]),
             json.dumps([match.term_bucket]), requires_sources,

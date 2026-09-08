@@ -123,6 +123,14 @@ class DigestRankSettings:
     max_messages: int
     repeat_window_hours: int
     fallback_max_items: int
+    # Round-2 review, 2026-09-06, fix 1 -- TWO-BAND repeat gate. A matched
+    # "repeat" ships as a follow-up line instead of a hard drop when its OWN
+    # importance score clears repeat_bypass_score AND (only in the HIGH,
+    # same-story band, sim >= event_repeat_threshold) it shows material
+    # development. Full arithmetic documented next to the values in
+    # settings.yaml.
+    event_repeat_threshold: float
+    repeat_bypass_score: float
 
 
 @dataclass(frozen=True, slots=True)
@@ -178,7 +186,7 @@ SECTIONS: tuple[tuple[str, type, tuple[str, ...]], ...] = (
      ("category_weights", "corroboration_weight", "tier_bonus",
       "recency_max_bonus", "recency_window_hours", "size_boost_per_member",
       "size_boost_cap", "min_score", "max_messages", "repeat_window_hours",
-      "fallback_max_items")),
+      "fallback_max_items", "event_repeat_threshold", "repeat_bypass_score")),
     ("delivery", DeliverySettings,
      ("telegram_max_chars", "char_budget", "truncate_priority", "output_language",
       "source_languages")),
