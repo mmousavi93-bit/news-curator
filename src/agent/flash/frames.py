@@ -48,7 +48,11 @@ def render_first(burst: store.BurstRow, config: FlashConfig, now: datetime,
     return config.templates["first"].format(
         label=config.classes[burst.class_name].label,
         headline=headline(burst),
-        location_token=escape_html(burst.location_token),
+        # Round-4 review, fix 2: show the owner's configured spelling, not
+        # the normalized form used for matching -- `location_display` is
+        # empty on pre-fix rows (additive column default), so fall back to
+        # the token rather than rendering a blank pin.
+        location_token=escape_html(burst.location_display or burst.location_token),
         first_source=burst.first_source,
         more_sources=f" (+{extra} منبع دیگر)" if extra else "",
         convergence=convergence,

@@ -209,6 +209,118 @@ def test_provider_provenance_columns_record_who_answered(tmp_path):
     assert summaries[0]["provider"] == "deepseek"
 
 
+def test_repeat_dropped_reason_carries_calibration_fields(tmp_path):
+    # Fix E, 2026-09-06 review: every OTHER fate still writes "" in the
+    # reason column, but repeat_dropped must carry similarity, the new
+    # event's score and which conjunction term failed -- the owner's only
+    # way to calibrate event_match_threshold / repeat_bypass_score without
+    # re-deriving the drop from repeats.py.
+    ctx = _Ctx(tmp_path)
+    repeat_key = ctx.clusters[4].key
+    ctx.repeat_drop_reasons = {
+        repeat_key: "sim=0.65 score=11.74 blocked=no_development",
+    }
+    written = {p.name.split("_")[0]: p for p in write_run_reports(ctx, tmp_path)}
+    by_key = {r["cluster_key"]: r for r in _rows(written["chosen"])}
+    assert by_key[repeat_key]["fate"] == "repeat_dropped"
+    assert by_key[repeat_key]["reason"] == "sim=0.65 score=11.74 blocked=no_development"
+    # Every other fate is untouched -- reason stays "".
+    assert by_key[ctx.clusters[1].key]["reason"] == ""
+
+
+def test_repeat_dropped_reason_defaults_to_empty_when_unset(tmp_path):
+    # No ctx.repeat_drop_reasons at all (older/mocked ctx) must not crash
+    # _fate_for and must fall back to the pre-fix "" behaviour.
+    ctx = _Ctx(tmp_path)
+    assert not hasattr(ctx, "repeat_drop_reasons")
+    written = {p.name.split("_")[0]: p for p in write_run_reports(ctx, tmp_path)}
+    by_key = {r["cluster_key"]: r for r in _rows(written["chosen"])}
+    assert by_key[ctx.clusters[4].key]["fate"] == "repeat_dropped"
+    assert by_key[ctx.clusters[4].key]["reason"] == ""
+
+
+def test_sent_event_carries_repeat_gate_reason_when_matched(tmp_path):
+    # Fix 5, round-2 review: a SURVIVING event that matched the repeat gate
+    # (bypassed, HIGH or MID band) must carry the same band/sim/score
+    # reason a dropped one does -- the owner needs both sides of the gate
+    # to calibrate event_repeat_threshold / repeat_bypass_score, not just
+    # the drops.
+    ctx = _Ctx(tmp_path)
+    sent_key = ctx.clusters[0].key
+    ctx.repeat_drop_reasons = {
+        sent_key: "band=mid sim=0.65 score=11.74 kept=above_floor",
+    }
+    written = {p.name.split("_")[0]: p for p in write_run_reports(ctx, tmp_path)}
+    by_key = {r["cluster_key"]: r for r in _rows(written["chosen"])}
+    assert by_key[sent_key]["fate"] == "sent"
+    assert by_key[sent_key]["reason"] == "band=mid sim=0.65 score=11.74 kept=above_floor"
+
+
+def test_truncated_event_has_its_own_fate_and_is_not_sent(tmp_path):
+    # Fix 3/5, round-2 review: an event cut by the character budget must not
+    # appear as "sent" (compose_kept_keys excludes it by construction, since
+    # it never rendered) and must not fall through to the "event_unresolved"
+    # anomaly -- it gets its own "truncated" fate, with headline/summary
+    # preserved (the Masafer Yatta lesson: a drop is unjudgeable without
+    # the text the gate saw).
+    ctx = _Ctx(tmp_path)
+    truncated_cluster = _cluster("u", "t2", "https://x/truncated")
+    ctx.clusters.append(truncated_cluster)
+    truncated_event = Event(
+        event_key=truncated_cluster.key, headline="بریده‌شده", summary="خلاصه بریده.",
+        category="military", claim_status="unconfirmed",
+        independent_count=1, source_count=1,
+        first_seen_at=NOW, last_updated_at=NOW,
+    )
+    ctx.compose_truncated = [truncated_event]
+    written = {p.name.split("_")[0]: p for p in write_run_reports(ctx, tmp_path)}
+    by_key = {r["cluster_key"]: r for r in _rows(written["chosen"])}
+    assert by_key[truncated_cluster.key]["fate"] == "truncated"
+    assert (by_key[truncated_cluster.key]["reason"]
+            == "cut by the character budget; not marked delivered")
+    assert by_key[truncated_cluster.key]["headline"] == "بریده‌شده"
+    assert by_key[truncated_cluster.key]["summary"] == "خلاصه بریده."
+    assert truncated_cluster.key not in set(ctx.compose_kept_keys)
+
+
+def test_cap_dropped_reason_carries_on_mission_and_corroborating_count(tmp_path):
+    # Fix 5, round-4 review: priority.py's actual cap sort key ranks on
+    # (on_mission, tier_weight, corroborating_count, recency, size) --
+    # NOT the independent_count column (a different, wider, every-tier
+    # count kept for its own stable meaning). Before this fix the
+    # cap_dropped reason carried neither term, so a cap_dropped row could
+    # not be checked against the sort that actually produced it.
+    import dataclasses
+
+    from agent.pipeline.relevance import validate_relevance
+
+    ctx = _Ctx(tmp_path)
+    ctx.config = dataclasses.replace(ctx.config, relevance=validate_relevance({
+        "weights": {"iran_direct": 8},
+        "keywords": {"iran_direct": ["ایران"]},
+    }))
+    on_mission_cluster = Cluster(key="")
+    on_mission_cluster.add(
+        Item(source_id="t1", url="https://x/cap1", title="ایران در آستانه توافق",
+             body="", published_at=NOW, lang="fa", raw_hash="a" * 8),
+        [1.0],
+    )
+    on_mission_cluster.add(_item("t2", "https://x/cap1b"), [1.0])
+    off_mission_cluster = _cluster("cap2", "t3", "https://x/cap2")
+    ctx.clusters_cap_dropped = [on_mission_cluster, off_mission_cluster]
+    written = {p.name.split("_")[0]: p for p in write_run_reports(ctx, tmp_path)}
+    by_key = {r["cluster_key"]: r for r in _rows(written["chosen"])}
+
+    on_row = by_key[on_mission_cluster.key]
+    assert on_row["fate"] == "cap_dropped"
+    assert "on_mission=1" in on_row["reason"]
+    assert "corroborating_count=2" in on_row["reason"]  # t1 + t2 groups
+
+    off_row = by_key[off_mission_cluster.key]
+    assert "on_mission=0" in off_row["reason"]
+    assert "corroborating_count=0" in off_row["reason"]  # t3 never corroborates
+
+
 def test_run_csv_records_counters_and_digest_flag(tmp_path):
     ctx = _Ctx(tmp_path)
     written = {p.name.split("_")[0]: p for p in write_run_reports(ctx, tmp_path)}

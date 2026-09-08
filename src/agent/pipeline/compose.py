@@ -9,8 +9,10 @@ stage owns ORDER, LABELS and BUDGET. Order comes from pipeline/rank.py
 (deterministic -- NOT the Phase-11 risk engine). Dates are Jalali, Tehran
 wall-clock, display-only; date_only items say the time was not stated.
 
-The pure text helpers (_headline, _raw_fallback, _when_text) live in
-pipeline/render.py -- split out 2026-09-05 to keep this file under the
+The pure text helpers (_headline, _raw_fallback, _when_text, build_digest_
+items) live in pipeline/render.py; the lead channel message builder
+(build_lead_message) lives in pipeline/render_leads.py -- split out
+2026-09-05 / 2026-09-06 / 2026-09-08 to keep these files under the
 ~200-line cap (constraint 12).
 """
 
@@ -19,12 +21,13 @@ from __future__ import annotations
 import logging
 
 from agent.collectors.tz import to_tehran
-from agent.delivery.formatter import escape_html, format_split
-from agent.delivery.message import Item, Message
-from agent.pipeline.labels import category_icon, category_name, labels_for
+from agent.delivery.formatter import escape_html, format_split_tracked
+from agent.delivery.message import Message
+from agent.pipeline.labels import labels_for
 from agent.pipeline.langgate import split_persian
 from agent.pipeline.rank import rank_events
-from agent.pipeline.render import _headline, _raw_fallback, _when_text
+from agent.pipeline.render import _raw_fallback, build_digest_items
+from agent.pipeline.render_leads import build_lead_message
 from agent.util.jalali import format_jalali
 
 
@@ -46,7 +49,7 @@ class ComposeStage:
         # Built FIRST: a lead-only run (main events empty -- nothing
         # corroborated) must still deliver leads, which is exactly the
         # scenario the leads channel exists for (fix 2026-08-30).
-        self._build_lead_message(ctx, settings)
+        build_lead_message(ctx, settings, self._logger)
 
         lang_dropped: list = []
         if events:
@@ -123,79 +126,57 @@ class ComposeStage:
             f" {labels['tehran']}{marker}"
         )
 
-        items = []
-        for index, event in enumerate(kept):
-            cluster = clusters.get(event.event_key)
-            when = _when_text(cluster, labels) if cluster is not None else ""
-            name = category_name(settings.delivery.output_language, event.category)
-            # The LLM's own informative headline is the title; the summary
-            # is the detail BEYOND it. Fallback (no headline field): the
-            # summary's first sentence, as before.
-            headline = event.headline.strip() if event.headline else _headline(event.summary)
-            if event.claim_status == "rumour":
-                headline = f"{labels['rumour']} · {headline}"
-            elif event.claim_status == "unconfirmed":
-                headline = f"{labels['unconfirmed']} · {headline}"
-            headline = f"{category_icon(event.category)} {headline}"
-            detail_bits = [name, when, event.summary] if when else [name, event.summary]
-            items.append(Item(
-                headline=headline,
-                priority=index,
-                detail=" · ".join(detail_bits),
-            ))
+        # Follow-up priority + item construction: pipeline/render.py's
+        # build_digest_items (moved out 2026-09-06 when this file crossed
+        # the ~200-line cap -- see that function's docstring for the
+        # fix-1/fix-C rationale). Builds exactly one Item per event, no
+        # skips, but round-4 review's fix 1 reorders HIGH-band compact
+        # lines to the end -- `ordered_events` is the event list in the
+        # SAME order as `items`, not `kept`'s order, and the
+        # truncation-tracking below must enumerate `ordered_events`.
+        items, ordered_events = build_digest_items(kept, clusters, settings, labels)
 
         message = Message(header=header, items=tuple(items),
                           footer=raw_fallback or None)
         max_units = settings.delivery.telegram_max_chars
-        # format_split budgets and splits by priority; the digest may span
-        # up to digest_rank.max_messages messages (owner decision).
-        ctx.messages = format_split(
+        # format_split_tracked budgets and splits by priority; the digest may
+        # span up to digest_rank.max_messages messages (owner decision).
+        # `truncated_orders` are `message.items` indices that never rendered
+        # into any page (round-2 review, fix 3): the OLD unconditional
+        # `ctx.compose_kept_keys = [e.event_key for e in kept]` marked EVERY
+        # kept event delivered regardless, including ones the budget cut
+        # entirely. Fix 1 makes a follow-up the always-first-cut priority
+        # class, so a truncated follow-up would have been marked delivered
+        # unseen AND permanently raised its story's high-water mark --
+        # silently suppressing it for the rest of the 72h window. `items`
+        # was built with exactly one Item per event, in order, with no
+        # skips, matching `ordered_events` (round-4 review, fix 1: HIGH-band
+        # compact lines move to the end of `items`, so `ordered_events` --
+        # NOT `kept` -- is the list whose index i maps 1:1 to items[i]).
+        ctx.messages, truncated_orders = format_split_tracked(
             message, max_units=max_units, max_messages=settings.digest_rank.max_messages
         )
         ctx.counters["compose"] = len(kept)
+        delivered = [e for i, e in enumerate(ordered_events) if i not in truncated_orders]
+        ctx.compose_truncated = [
+            e for i, e in enumerate(ordered_events) if i in truncated_orders
+        ]
         # Received-marker keys for the anti-repetition window, recorded
         # after the rank cut (below-threshold events were never seen and
-        # must not suppress their own follow-ups). The deliver stage writes
-        # the markers itself, only after real sends succeeded -- marking
-        # here would re-create the ghost suppression on send failure
-        # (review finding 2026-08-30). Known edge: on the busiest days
-        # format_split may truncate the lowest-priority items -- those are
-        # then over-marked for at most the 72h repeat window. Accepted
-        # (rare, low-priority, self-correcting).
-        ctx.compose_kept_keys = [e.event_key for e in kept]
+        # must not suppress their own follow-ups) AND after truncation
+        # (fix 3 above) -- only events that actually rendered into a sent
+        # message may enter this list. The deliver stage writes the markers
+        # itself, only after real sends succeeded -- marking here would
+        # re-create the ghost suppression on send failure (review finding
+        # 2026-08-30).
+        ctx.compose_kept_keys = [e.event_key for e in delivered]
+        if ctx.compose_truncated:
+            self._logger.info(
+                "compose: %d event(s) truncated by the character budget -- "
+                "not marked delivered: %s",
+                len(ctx.compose_truncated),
+                ", ".join(e.event_key[:8] for e in ctx.compose_truncated),
+            )
         self._logger.info(
             "compose: %d event(s) -> %d message(s)", len(kept), len(ctx.messages)
         )
-
-    def _build_lead_message(self, ctx, settings) -> None:
-        """Leads channel message. Lead events are gated by the Persian
-        output gate like main events, but are NEVER marked delivered:
-        their corroborated confirmation must reach the main feed
-        (schema.sql note)."""
-        labels = labels_for(settings.delivery.output_language)
-        lead_events = list(getattr(ctx, "lead_events", None) or [])
-        if lead_events:
-            lead_events, lead_lang_dropped = split_persian(lead_events)
-            if lead_lang_dropped:
-                self._logger.warning(
-                    "compose: %d lead event(s) dropped -- output not Persian: %s",
-                    len(lead_lang_dropped),
-                    ", ".join(e.event_key[:8] for e in lead_lang_dropped),
-                )
-        if not (lead_events and getattr(ctx, "leads_channel_id", None)):
-            return
-        lead_items = []
-        for index, event in enumerate(lead_events):
-            lead_items.append(Item(
-                headline=f"📡 {labels['lead_prefix']} · {_headline(event.summary)}",
-                priority=index,
-                detail=event.summary,
-            ))
-        lead_message = Message(
-            header=labels["lead_header"], items=tuple(lead_items), footer=None
-        )
-        ctx.lead_message = format_split(
-            lead_message,
-            max_units=settings.delivery.telegram_max_chars,
-            max_messages=1,
-        )[0]

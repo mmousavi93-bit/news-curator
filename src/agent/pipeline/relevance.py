@@ -13,7 +13,19 @@ Shape-checked strictly (same house rule as topics.yaml): a typo'd tier
 name or a non-string keyword must fail the run at config load, never
 silently drop a tier to zero -- a silent zero is an order change with no
 error anywhere.
-"""
+
+NORMALIZED both sides as of 2026-09-06 (round-3 review, fix 1): this
+module used plain `.casefold()` substring matching, which is a language
+DETECTOR for Persian/English, not a relevance test -- Arabic orthography
+differs from Persian (إيران vs ایران, غزة vs غزه, إسرائيل vs اسرائیل) and
+there were zero Hebrew keywords. Measured against the run-14 CSV: Arabic
+9% on-mission, Hebrew 0%, Persian 83%, English 77% -- with `on_mission` as
+the TOP term in priority.py's cap sort key, that inverted the cap in favor
+of whatever matched Persian/English keywords regardless of source tier.
+Reuses agent.flash.textnorm.normalize (same fix class as the flash
+monitor's 2026-08-31 ZWNJ defect: one normalizer, one direction, applied
+to BOTH the keywords (at load time, here) and the scored text (at score
+time, in score_relevance)."""
 
 from __future__ import annotations
 
@@ -21,6 +33,7 @@ from dataclasses import dataclass
 from typing import Mapping
 
 from agent.config import ConfigError
+from agent.flash.textnorm import normalize
 
 _VALID_TIERS = ("iran_direct", "strategic", "economy")
 
@@ -81,7 +94,10 @@ def validate_relevance(raw: object) -> RelevanceConfig:
                 f"relevance.yaml: keywords.{tier} must be a list of non-empty strings"
             )
             continue
-        keywords[tier] = tuple(kws)
+        # Normalized at load time (fix 1) -- the same transform score_relevance
+        # applies to scored text, so Arabic/Persian orthography variants and
+        # ZWNJ-carrying keywords meet the text in the same space.
+        keywords[tier] = tuple(normalize(k) for k in kws)
 
     for tier in _VALID_TIERS:
         if tier in weights and tier not in keywords:
@@ -97,13 +113,18 @@ def validate_relevance(raw: object) -> RelevanceConfig:
 
 def score_relevance(cfg: RelevanceConfig | None, text: str) -> float:
     """The highest matching tier's weight, 0.0 when nothing matches or no
-    config is loaded. Case-insensitive substring matching."""
+    config is loaded. Matching is over `normalize()`d text against
+    `normalize()`d keywords (fix 1, 2026-09-06) -- NFC + ZWNJ-strip +
+    Arabic->Persian orthography folding + digit folding + lowercase, so
+    Arabic and Persian spellings of the same word meet in the same space.
+    Hebrew has no case and no entries in the folding table, so it passes
+    through unaffected."""
     if cfg is None or not text:
         return 0.0
-    lowered = text.casefold()
+    normalized = normalize(text)
     best = 0.0
     for tier, weight in cfg.weights.items():
-        if any(keyword.casefold() in lowered for keyword in cfg.keywords.get(tier, ())):
+        if any(keyword in normalized for keyword in cfg.keywords.get(tier, ())):
             best = max(best, weight)
     return best
 

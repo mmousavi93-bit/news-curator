@@ -20,6 +20,7 @@ from agent.delivery.budget import (
     Fragment,
     fit_single,
     fit_split,
+    fit_split_tracked,
 )
 from agent.delivery.message import Item, Message
 
@@ -74,3 +75,17 @@ def format_split(
     each <= max_units, splitting by priority instead of truncating."""
     header_text, fragments, footer_text = _prepare(message)
     return fit_split(header_text, fragments, footer_text, max_units, max_messages)
+
+
+def format_split_tracked(
+    message: Message,
+    max_units: int = DEFAULT_MAX_UNITS,
+    max_messages: int = DEFAULT_MAX_MESSAGES,
+) -> tuple[list[str], set[int]]:
+    """Same as `format_split`, plus the SET of `message.items` INDICES that
+    were truncated -- never rendered into any page (round-2 review, fix 3).
+    Item order is `message.items`' enumerate index, matching
+    `_render_fragment`'s `order` -- compose.py maps these straight back to
+    the events that produced them."""
+    header_text, fragments, footer_text = _prepare(message)
+    return fit_split_tracked(header_text, fragments, footer_text, max_units, max_messages)

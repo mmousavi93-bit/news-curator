@@ -131,7 +131,12 @@ pipeline:
   # owner-editable -- nudge again after the clean-run CSVs arrive.
   cluster_similarity_threshold: 0.55
 
-  # Matching a new cluster to an already-open event in memory.
+  # Matching a new cluster to an already-open event in memory. Also the
+  # FLOOR of the repeat gate's MID band (digest_rank.event_repeat_threshold
+  # is the ceiling) -- round-2 review, fix 1: this number alone cannot also
+  # mean "same story", because a strike and the retaliation answering it
+  # share enough vocabulary to land right above it (measured 0.55-0.70) while
+  # plainly being two different events.
   event_match_threshold: 0.55
 
   # Images below this are logos/avatars, never sent to vision.
@@ -484,6 +489,39 @@ digest_rank:
   max_messages: 6                # safety valve; count is dynamic by design
   fallback_max_items: 5          # LLM-outage raw-title section (move 1)
   repeat_window_hours: 72        # events matching a recent stored event are repeats
+  # TWO-BAND REPEAT GATE (round-2 review, 2026-09-06, fix 1 -- REPLACES the
+  # 2026-09-06 fix-1 single conjunction, whose comment here previously
+  # claimed paths existed that never survived code review; read this block,
+  # not that history). In plain terms: a new event that resembles something
+  # already sent is judged differently depending on HOW MUCH it resembles it.
+  #
+  #   - Similarity >= event_repeat_threshold (below, 0.80): this is the SAME
+  #     story told again. It only ships as a short follow-up line if BOTH
+  #     (a) its own importance score clears repeat_bypass_score below, AND
+  #     (b) it is a genuine development -- more independent sources than
+  #     anything already sent on this story, or a claim upgrade (rumour ->
+  #     unconfirmed -> likely). Otherwise it is a pure re-tell and is dropped.
+  #   - Similarity between event_match_threshold (0.55) and
+  #     event_repeat_threshold (0.80): this is a RELATED but DIFFERENT story
+  #     (a strike and the retaliation answering it land here at ~0.6-0.65 --
+  #     they share vocabulary but are not the same event). No development
+  #     test applies -- ratcheting a new story against an old one's
+  #     corroboration proved meaningless. It ships as a follow-up on the
+  #     score floor (repeat_bypass_score) alone.
+  #
+  # Evidence for both numbers: a measured run had 12 repeat-drops, ALL at
+  # similarity 0.55-0.70 (so entirely inside the "related but different"
+  # band above, and zero ever reached the "same story" band -- proof the
+  # old single threshold of 0.55 was being asked to do a job it could not
+  # do). Of those 12: 5 scored above 11.0 and should have shipped as
+  # follow-ups (one of them the IRGC-retaliation story this fix restores);
+  # 7 scored below and correctly stay dropped.
+  # event_repeat_threshold is UNVERIFIED -- 0.80 is a first placeholder
+  # pending owner tuning once a few more clean-run CSVs exist; nudge it from
+  # chosen.csv's `reason` column (band=/sim=/score= fields on every repeat
+  # gate outcome, kept or dropped).
+  event_repeat_threshold: 0.80
+  repeat_bypass_score: 11.0
 
 delivery:
   telegram_max_chars: 4096

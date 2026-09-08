@@ -16,6 +16,9 @@ CREATE TABLE IF NOT EXISTS bursts (
     term_bucket    TEXT NOT NULL,
     location_ring  TEXT NOT NULL,
     location_token TEXT NOT NULL,
+    location_display TEXT NOT NULL DEFAULT '',  -- owner's configured spelling
+                                     -- (round-4 review, fix 2): location_token
+                                     -- stays normalized for matching/history.
     headline       TEXT NOT NULL,
     first_source   TEXT NOT NULL,
     first_seen_at  TEXT NOT NULL,

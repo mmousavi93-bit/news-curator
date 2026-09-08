@@ -19,11 +19,20 @@ from agent.config import Config, SourceCredibility
 from agent.pipeline.cluster import (
     ClusterStage, cluster_items, rank_and_truncate, split_at_cap,
 )
+from agent.pipeline.relevance import validate_relevance
 from agent.settings import Settings
 
 _FIXTURE = Path(__file__).parent.parent / "fixtures" / "settings_minimal.yaml"
 
 T0 = datetime(2026, 8, 20, 12, 0, tzinfo=timezone.utc)
+
+# Minimal relevance config for fix-2 tests -- "hormuz"/"هرمز" is on-mission,
+# anything else scores 0. Not the real config/relevance.yaml: these tests
+# are about the on_mission SORT MECHANISM, not real keyword coverage.
+_RELEVANCE = validate_relevance({
+    "weights": {"iran_direct": 8},
+    "keywords": {"iran_direct": ["hormuz", "هرمز"]},
+})
 
 
 def _settings(**overrides) -> Settings:
@@ -33,8 +42,9 @@ def _settings(**overrides) -> Settings:
     return Settings.from_dict(raw)
 
 
-def _config(credibility: dict, **overrides) -> Config:
-    return Config(settings=_settings(**overrides), credibility=credibility)
+def _config(credibility: dict, relevance=None, **overrides) -> Config:
+    return Config(settings=_settings(**overrides), credibility=credibility,
+                  relevance=relevance)
 
 
 def _item(source_id: str, url: str, published_at=None) -> Item:
@@ -260,3 +270,150 @@ def test_length_mismatch_raises_loudly():
     ctx = _Ctx(config=config, items=[_item("s", "https://x/1")], embeddings=[])
     with pytest.raises(ValueError, match="embeddings"):
         ClusterStage(config, _Log()).run(ctx)
+
+
+# --- Cluster.corroborating_count (fix 3, 2026-09-06) -----------------------
+# independent_count (above) measures amplification across ALL tiers -- 17
+# owner Telegram channels carry group: null, so a pile-up of reposts counts
+# as "independence" there. corroborating_count is the rulebook Step 1
+# definition validate.py already used for claim_status: distinct GROUPS
+# among tier-1/2 members only. priority.py's cap key uses this one, not
+# independent_count, so a tier-3 repost pile-up cannot out-rank a real
+# two-source story.
+
+def test_corroborating_count_ignores_pure_tier3_pileup():
+    credibility = {
+        "t3_a": SourceCredibility(tier=3, group=None),
+        "t3_b": SourceCredibility(tier=3, group=None),
+        "t3_c": SourceCredibility(tier=3, group=None),
+    }
+    items = [_item("t3_a", "https://x/1"), _item("t3_b", "https://x/2"),
+             _item("t3_c", "https://x/3")]
+    clusters = cluster_items(items, [_unit(1, 0)] * 3, 0.62)
+    assert len(clusters) == 1
+    # independent_count (all tiers) would be 3 here -- corroborating_count
+    # must be 0: none of them is tier-1/2.
+    assert clusters[0].independent_count(credibility) == 3
+    assert clusters[0].corroborating_count(credibility) == 0
+
+
+def test_corroborating_count_collapses_same_group_tier2():
+    credibility = {
+        "wire_en": SourceCredibility(tier=2, group="wire"),
+        "wire_fa": SourceCredibility(tier=2, group="wire"),
+    }
+    items = [_item("wire_en", "https://x/1"), _item("wire_fa", "https://x/2")]
+    clusters = cluster_items(items, [_unit(1, 0)] * 2, 0.62)
+    assert len(clusters) == 1
+    assert clusters[0].corroborating_count(credibility) == 1
+
+
+def test_corroborating_count_mixed_cluster_counts_only_tier12():
+    credibility = {
+        "wire_a": SourceCredibility(tier=1, group="a"),
+        "wire_b": SourceCredibility(tier=2, group="b"),
+        "unlisted_tg": SourceCredibility(tier=3, group=None),
+    }
+    items = [_item("wire_a", "https://x/1"), _item("wire_b", "https://x/2"),
+             _item("unlisted_tg", "https://x/3")]
+    clusters = cluster_items(items, [_unit(1, 0)] * 3, 0.62)
+    assert len(clusters) == 1
+    assert clusters[0].corroborating_count(credibility) == 2
+
+
+def test_corroborating_count_never_counts_leads():
+    credibility = {
+        "wire_a": SourceCredibility(tier=2, group="a"),
+        "tipster": SourceCredibility(tier="lead", group=None),
+    }
+    items = [_item("wire_a", "https://x/1"), _item("tipster", "https://x/2")]
+    clusters = cluster_items(items, [_unit(1, 0)] * 2, 0.62)
+    assert len(clusters) == 1
+    assert clusters[0].corroborating_count(credibility) == 1
+
+
+# --- on_mission cap ordering (fix 2, 2026-09-06) ---------------------------
+# The 2026-09-05 16:18 run made tier an absolute wall in the cap key, cutting
+# 24 of 40 kept clusters that later came back irrelevant/clickbait while
+# corroborated Iranian-naval-escalation clusters were cut with no LLM call.
+# on_mission (binary, from config/relevance.yaml scoring) now leads the key
+# as a DEMOTION -- off-mission still gets a slot on a quiet day.
+
+def _hormuz_item(source_id: str, url: str, published_at=None) -> Item:
+    return Item(source_id=source_id, url=url, title="Hormuz strait incident",
+                body="Naval escalation near hormuz", published_at=published_at,
+                lang="en", raw_hash="h" * 8)
+
+
+def test_on_mission_outranks_higher_tier_off_mission():
+    credibility = {
+        "t1": SourceCredibility(tier=1, group=None),   # off-mission, tier 1
+        "t3": SourceCredibility(tier=3, group=None),   # on-mission, tier 3
+    }
+    config = _config(credibility, relevance=_RELEVANCE, max_clusters_per_run=1)
+    items = [
+        _item("t1", "https://x/1", T0),          # no "hormuz" -- off-mission
+        _hormuz_item("t3", "https://x/2", T0),   # on-mission
+    ]
+    clusters = cluster_items(items, [_unit(1, 0), _unit(0, 1)], 0.62)
+    assert len(clusters) == 2
+
+    kept, dropped = split_at_cap(clusters, 1, config, _Log())
+    assert len(kept) == 1
+    assert kept[0].members[0].source_id == "t3", (
+        "on-mission tier-3 must outrank off-mission tier-1"
+    )
+    assert dropped[0].members[0].source_id == "t1"
+
+
+def test_off_mission_still_kept_below_cap():
+    # A demotion, never a drop: on a quiet day (nothing to compete with) the
+    # off-mission cluster still survives the cap.
+    credibility = {"t1": SourceCredibility(tier=1, group=None)}
+    config = _config(credibility, relevance=_RELEVANCE, max_clusters_per_run=5)
+    items = [_item("t1", "https://x/1", T0)]
+    clusters = cluster_items(items, [_unit(1, 0)], 0.62)
+    kept, dropped = split_at_cap(clusters, 5, config, _Log())
+    assert len(kept) == 1
+    assert dropped == []
+
+
+def test_on_mission_lead_cannot_outrank_off_mission_tier():
+    # Round-3 review, fix 1c: on_mission is now gated on tier_weight > 0 --
+    # a `lead` cluster (weight 0.0, LEAD_HANDLING.md: leads cannot drive
+    # priority) that matches a relevance keyword must NOT be promoted ahead
+    # of an off-mission tier-2 cluster just because on_mission is the top
+    # sort term.
+    credibility = {
+        "t2": SourceCredibility(tier=2, group=None),      # off-mission, tier 2
+        "lead1": SourceCredibility(tier="lead", group=None),  # on-mission, lead
+    }
+    config = _config(credibility, relevance=_RELEVANCE, max_clusters_per_run=1)
+    items = [
+        _item("t2", "https://x/1", T0),               # no "hormuz" -- off-mission
+        _hormuz_item("lead1", "https://x/2", T0),      # on-mission but a lead
+    ]
+    clusters = cluster_items(items, [_unit(1, 0), _unit(0, 1)], 0.62)
+    assert len(clusters) == 2
+
+    kept, dropped = split_at_cap(clusters, 1, config, _Log())
+    assert kept[0].members[0].source_id == "t2", (
+        "a lead cluster must never be promoted by on_mission"
+    )
+    assert dropped[0].members[0].source_id == "lead1"
+
+
+def test_on_mission_ordering_is_deterministic():
+    credibility = {
+        "t1": SourceCredibility(tier=1, group=None),
+        "t3": SourceCredibility(tier=3, group=None),
+    }
+    config = _config(credibility, relevance=_RELEVANCE, max_clusters_per_run=2)
+    items = [
+        _item("t1", "https://x/1", T0),
+        _hormuz_item("t3", "https://x/2", T0),
+    ]
+    clusters = cluster_items(items, [_unit(1, 0), _unit(0, 1)], 0.62)
+    first = [c.key for c in rank_and_truncate(clusters, 2, config, _Log())]
+    second = [c.key for c in rank_and_truncate(clusters, 2, config, _Log())]
+    assert first == second

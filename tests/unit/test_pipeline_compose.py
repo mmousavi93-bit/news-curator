@@ -465,3 +465,337 @@ def test_lead_only_run_delivers_lead_message():
     ComposeStage(_Log()).run(ctx)
     assert ctx.messages == [NOTHING_NEW_FA]  # main feed stays honest
     assert getattr(ctx, "lead_message", None) is not None
+
+
+def test_follow_up_event_renders_as_compact_line_not_full_entry():
+    # Fix 1, 2026-09-06: a repeat-gate bypass (validate.py's follow_up flag)
+    # ships as ONE compact "پیگیری · headline" line -- no category icon, no
+    # claim-status label, no detail/summary -- never a full entry ("a
+    # change that produces more output is probably wrong").
+    from dataclasses import replace
+
+    from agent.pipeline.labels import labels_for
+
+    ctx = _Ctx(config=_config())
+    normal = _with_cluster(ctx, _event("خلاصه نظامی اسرائیل.", category="military"))
+    # Summary carries "اسرائیل" so it clears the real relevance gate like
+    # every other event in this file -- the point under test is compact
+    # rendering, not relevance scoring.
+    base = _event(
+        "این خلاصه کامل پیگیری اسرائیل است که نباید به عنوان جزئیات نمایش داده شود.",
+        category="military",
+    )
+    base = Event(event_key=base.event_key, summary=base.summary,
+                headline="تیتر پیگیری کوتاه اسرائیل", entities=base.entities,
+                category=base.category, independent_count=base.independent_count,
+                claim_status=base.claim_status, source_count=base.source_count,
+                first_seen_at=base.first_seen_at, last_updated_at=base.last_updated_at)
+    # source_id="t1" (distinct from the normal event's default "t2") so the
+    # two single-member clusters get distinct keys -- no url collision.
+    followup_event = _with_cluster(ctx, base, source_id="t1")
+    # HIGH band (same story retold): compact line. round-4 review, fix 1 --
+    # follow_up alone no longer implies compact rendering, only
+    # follow_up_high does (see test_mid_band_follow_up_renders_as_full_entry
+    # for the MID-band contrast).
+    followup_event = replace(followup_event, follow_up=True, follow_up_high=True)
+    ctx.events = [normal, followup_event]
+    ComposeStage(_Log()).run(ctx)
+    text = ctx.messages[0]
+    assert labels_for("fa")["follow_up"] in text
+    assert "تیتر پیگیری کوتاه اسرائیل" in text
+    assert "این خلاصه کامل پیگیری اسرائیل است که نباید" not in text
+
+
+def test_mid_band_follow_up_renders_as_full_entry_above_lower_scoring_normal():
+    # Round-4 review, fix 1: a MID-band survivor (follow_up=True,
+    # follow_up_high=False) is a related but DIFFERENT story
+    # (repeat_decision.py's own docstring), not a retelling -- it must
+    # render as a FULL entry, sorted by its OWN importance score like any
+    # other event, never pinned below every normal entry. Score
+    # construction: military/tier1/indep3 = 6+6+3+3+0 = 18 for the MID
+    # event vs politics/tier2/indep1 = 3+2+2+3+0 = 10 for the normal one --
+    # the MID event outscores the normal one and must render FIRST, detail
+    # line intact. Before this fix, EVERY follow_up (both bands) was
+    # pinned at worst_normal_priority with no detail -- this exact
+    # scenario would have put the day's highest-scoring story at the
+    # bottom as a headline-only line.
+    from dataclasses import replace
+
+    ctx = _Ctx(config=_config())
+    normal_summary = "این خلاصه سیاسی عادی است اسرائیل."
+    normal = _with_cluster(
+        ctx, _event(normal_summary, category="politics", independent=1),
+        source_id="t2",
+    )
+    mid_base = _event(
+        "این خلاصه میانباند باید کامل نمایش داده شود اسرائیل.",
+        category="military", independent=3, claim_status="likely",
+    )
+    mid_base = Event(
+        event_key=mid_base.event_key, summary=mid_base.summary,
+        headline="تیتر داستان میانباند اسرائیل", entities=mid_base.entities,
+        category=mid_base.category, independent_count=mid_base.independent_count,
+        claim_status=mid_base.claim_status, source_count=mid_base.source_count,
+        first_seen_at=mid_base.first_seen_at, last_updated_at=mid_base.last_updated_at,
+    )
+    mid = _with_cluster(ctx, mid_base, source_id="t1")
+    mid = replace(mid, follow_up=True, follow_up_high=False)
+    ctx.events = [normal, mid]
+    ComposeStage(_Log()).run(ctx)
+    text = ctx.messages[0]
+    assert "این خلاصه میانباند باید کامل نمایش داده شود" in text  # detail survives
+    assert text.index("تیتر داستان میانباند اسرائیل") < text.index("این خلاصه سیاسی عادی است")
+
+
+def test_high_band_follow_up_renders_below_every_normal_entry_regardless_of_score():
+    # Round-4 review, fix 1: the HIGH band is the compact one-liner, pinned
+    # below every normal entry (worst priority) even when its own
+    # importance score would otherwise sort it first -- the "DO NOT FIX"
+    # contract (repeat_decision.py: HIGH band is the SAME story retold,
+    # the reader is not owed a second full entry for it). Same score
+    # construction as the MID-band test above (18 vs 10) to prove the
+    # pin-to-bottom survives even when the HIGH-band item would otherwise
+    # rank first.
+    from dataclasses import replace
+
+    ctx = _Ctx(config=_config())
+    normal_summary = "این خلاصه سیاسی عادی است اسرائیل."
+    normal = _with_cluster(
+        ctx, _event(normal_summary, category="politics", independent=1),
+        source_id="t2",
+    )
+    high_base = _event(
+        "این خلاصه هرگز نباید کامل نمایش داده شود اسرائیل.",
+        category="military", independent=3, claim_status="likely",
+    )
+    high_base = Event(
+        event_key=high_base.event_key, summary=high_base.summary,
+        headline="تیتر باند بالا اسرائیل", entities=high_base.entities,
+        category=high_base.category, independent_count=high_base.independent_count,
+        claim_status=high_base.claim_status, source_count=high_base.source_count,
+        first_seen_at=high_base.first_seen_at, last_updated_at=high_base.last_updated_at,
+    )
+    high = _with_cluster(ctx, high_base, source_id="t1")
+    high = replace(high, follow_up=True, follow_up_high=True)
+    ctx.events = [normal, high]
+    ComposeStage(_Log()).run(ctx)
+    text = ctx.messages[0]
+    assert "تیتر باند بالا اسرائیل" in text
+    assert "این خلاصه هرگز نباید کامل نمایش داده شود" not in text  # detail dropped
+    assert text.index("این خلاصه سیاسی عادی است") < text.index("تیتر باند بالا اسرائیل")
+
+
+def test_full_entry_survives_tight_budget_over_a_lower_priority_followup():
+    # Fix C, 2026-09-06 review: the old follow-up priority was
+    # `max(normal_count - 1, 0)` -- the SAME priority as the last normal
+    # entry -- so budget.py's (priority, order) tie-break let a follow-up
+    # that scores MORE important than a normal entry (and therefore sits
+    # earlier in `kept`, with a lower `order`) win the greedy-pack race and
+    # starve a lower-ranked, never-before-delivered normal story of its
+    # budget. Fix: follow-up priority = normal_count, strictly worse than
+    # every normal entry (0..normal_count-1) regardless of importance order.
+    #
+    # The normal event's summary is TWO sentences on purpose: `_headline()`
+    # only takes the first, so the second sentence is proof the FULL body
+    # (not a headline-only degrade) made it into the message.
+    from dataclasses import replace as dc_replace
+
+    from agent.delivery.budget import utf16_len
+
+    normal_summary = (
+        "این خلاصه کوتاه است. "
+        "این بخش اضافی فقط در نسخه کامل دیده میشود اسرائیل."
+    )
+    DETAIL_ONLY_TEXT = "این بخش اضافی فقط در نسخه کامل دیده میشود"
+
+    # Calibration: render with ONLY the normal event at a generous budget to
+    # measure its exact rendered size -- the tight budget below is set from
+    # real output, not a hand-counted guess.
+    baseline_ctx = _Ctx(config=_config())
+    normal_baseline = _with_cluster(
+        baseline_ctx, _event(normal_summary, category="politics", independent=1),
+        source_id="t2",
+    )
+    baseline_ctx.events = [normal_baseline]
+    ComposeStage(_Log()).run(baseline_ctx)
+    baseline_units = utf16_len(baseline_ctx.messages[0])
+
+    # score: politics(3) + corrob 2*min(1,3)=2 + tier2_bonus(2) + recency(3,
+    # fresh) + size(0) = 10 -- clears min_score(8), so it reaches `kept`.
+    ctx = _Ctx(config=_config())
+    normal = _with_cluster(
+        ctx, _event(normal_summary, category="politics", independent=1),
+        source_id="t2",
+    )
+    followup_base = _event(
+        "این متن پیگیری هرگز نباید در بودجه فشرده دیده شود اسرائیل.",
+        category="military", independent=3,
+    )
+    followup_base = Event(
+        event_key=followup_base.event_key, summary=followup_base.summary,
+        headline="تیتر پیگیری که باید حذف شود اسرائیل",
+        entities=followup_base.entities, category=followup_base.category,
+        independent_count=followup_base.independent_count,
+        claim_status=followup_base.claim_status,
+        source_count=followup_base.source_count,
+        first_seen_at=followup_base.first_seen_at,
+        last_updated_at=followup_base.last_updated_at,
+    )
+    # score: military(6) + corrob 2*min(3,3)=6 + tier1_bonus(3) + recency(3)
+    # + size(0) = 18 -- HIGHER than the normal event's 10, so it sorts
+    # BEFORE the normal event in `kept` (lower `order`) -- exactly the
+    # ordering that let the old tied-priority bug win the tie-break.
+    followup = _with_cluster(ctx, followup_base, source_id="t1")
+    # HIGH band: this test is specifically about the compact-line /
+    # worst-priority behavior, which round-4 review fix 1 scoped to
+    # follow_up_high only.
+    followup = dc_replace(followup, follow_up=True, follow_up_high=True)
+    ctx.events = [normal, followup]
+
+    # Tight budget: enough for the normal entry's full text plus the
+    # dropped-item overflow marker room budget.py always reserves, but far
+    # short of also fitting the follow-up's own compact line.
+    marker_reserve = utf16_len("\n\n… +2 more")
+    tight_units = baseline_units + marker_reserve + 5
+    ctx.config = dc_replace(
+        ctx.config,
+        settings=dc_replace(
+            ctx.config.settings,
+            delivery=dc_replace(
+                ctx.config.settings.delivery, telegram_max_chars=tight_units,
+            ),
+            digest_rank=dc_replace(
+                ctx.config.settings.digest_rank, max_messages=1,
+            ),
+        ),
+    )
+    ComposeStage(_Log()).run(ctx)
+    text = ctx.messages[0]
+    assert DETAIL_ONLY_TEXT in text
+    assert "تیتر پیگیری که باید حذف شود" not in text
+
+
+def test_escalation_run_character_budget_holds_for_full_mid_band_entries():
+    # Round-4 review, fix 1: MID-band survivors now render as FULL entries
+    # (detail line included) instead of the old one-liner -- a busier day
+    # spends more characters per follow-up than before. Confirm the budget
+    # math rather than assert it: an escalation run with ~18 full entries
+    # (15 normal + 3 MID-band survivors, ~300 chars each including icon/
+    # category/detail) must fit well inside max_messages(6) * telegram_max_
+    # chars(4096) = 24,576 units and not need the truncation path at all.
+    from dataclasses import replace
+
+    from agent.delivery.budget import utf16_len
+
+    ctx = _Ctx(config=_config())
+    for i in range(15):
+        event = _with_cluster(
+            ctx,
+            _event(f"خبر شماره {i} اسرائیل. " + "جزئیات رویداد امنیتی منطقه‌ای " * 6,
+                  category="security"),
+            source_id=f"n{i}",
+        )
+        ctx.events.append(event)
+    for i in range(3):
+        mid_base = _event(
+            f"این خلاصه میانباند شماره {i} اسرائیل. " + "توسعه تازه در میدان نبرد " * 6,
+            category="military", independent=3, claim_status="likely",
+        )
+        mid_base = Event(
+            event_key=mid_base.event_key, summary=mid_base.summary,
+            headline=f"تیتر میانباند {i} اسرائیل", entities=mid_base.entities,
+            category=mid_base.category, independent_count=mid_base.independent_count,
+            claim_status=mid_base.claim_status, source_count=mid_base.source_count,
+            first_seen_at=mid_base.first_seen_at, last_updated_at=mid_base.last_updated_at,
+        )
+        mid = _with_cluster(ctx, mid_base, source_id=f"m{i}")
+        mid = replace(mid, follow_up=True, follow_up_high=False)
+        ctx.events.append(mid)
+
+    ComposeStage(_Log()).run(ctx)
+
+    total_units = sum(utf16_len(text) for text in ctx.messages)
+    max_budget = 6 * 4096  # settings_minimal.yaml: max_messages=6, telegram_max_chars=4096
+    # The brief's own estimate (~14-20 full entries at ~300 chars each =
+    # ~4,200-6,000 chars) -- 18 entries here, so the measured total must
+    # land inside a generously wide band around that estimate and, more
+    # importantly, well under the 24,576-unit ceiling with room to spare.
+    assert 3000 <= total_units <= 12000
+    assert total_units < max_budget
+    assert len(ctx.messages) <= 6
+    assert getattr(ctx, "compose_truncated", []) == []  # nothing cut
+
+
+def test_truncated_followup_is_absent_from_the_delivered_key_set():
+    # Fix 3, round-2 review: the OLD unconditional
+    # `ctx.compose_kept_keys = [e.event_key for e in kept]` marked every
+    # RANKED event delivered regardless of whether the character budget
+    # actually rendered it -- a follow-up cut entirely by a tight budget
+    # (exactly the scenario in test_full_entry_survives_tight_budget_over_a_
+    # lower_priority_followup above) would have been marked delivered unseen
+    # AND permanently raised its story's high-water mark, silently
+    # suppressing a real development for the rest of the 72h repeat window.
+    # Same calibration pattern as that test: measure the normal entry's real
+    # rendered size, then set a budget that fits it plus the drop-marker
+    # room but not the follow-up's own compact line.
+    from dataclasses import replace as dc_replace
+
+    from agent.delivery.budget import utf16_len
+
+    normal_summary = (
+        "این خلاصه کوتاه است. "
+        "این بخش اضافی فقط در نسخه کامل دیده میشود اسرائیل."
+    )
+
+    baseline_ctx = _Ctx(config=_config())
+    normal_baseline = _with_cluster(
+        baseline_ctx, _event(normal_summary, category="politics", independent=1),
+        source_id="t2",
+    )
+    baseline_ctx.events = [normal_baseline]
+    ComposeStage(_Log()).run(baseline_ctx)
+    baseline_units = utf16_len(baseline_ctx.messages[0])
+
+    ctx = _Ctx(config=_config())
+    normal = _with_cluster(
+        ctx, _event(normal_summary, category="politics", independent=1),
+        source_id="t2",
+    )
+    followup_base = _event(
+        "این متن پیگیری هرگز نباید در بودجه فشرده دیده شود اسرائیل.",
+        category="military", independent=3,
+    )
+    followup_base = Event(
+        event_key=followup_base.event_key, summary=followup_base.summary,
+        headline="تیتر پیگیری که باید حذف شود اسرائیل",
+        entities=followup_base.entities, category=followup_base.category,
+        independent_count=followup_base.independent_count,
+        claim_status=followup_base.claim_status,
+        source_count=followup_base.source_count,
+        first_seen_at=followup_base.first_seen_at,
+        last_updated_at=followup_base.last_updated_at,
+    )
+    followup = _with_cluster(ctx, followup_base, source_id="t1")
+    followup = dc_replace(followup, follow_up=True, follow_up_high=True)
+    ctx.events = [normal, followup]
+
+    marker_reserve = utf16_len("\n\n… +2 more")
+    tight_units = baseline_units + marker_reserve + 5
+    ctx.config = dc_replace(
+        ctx.config,
+        settings=dc_replace(
+            ctx.config.settings,
+            delivery=dc_replace(
+                ctx.config.settings.delivery, telegram_max_chars=tight_units,
+            ),
+            digest_rank=dc_replace(
+                ctx.config.settings.digest_rank, max_messages=1,
+            ),
+        ),
+    )
+    ComposeStage(_Log()).run(ctx)
+    # Sanity: reproduces the same cut as the sibling test above.
+    assert "تیتر پیگیری که باید حذف شود" not in ctx.messages[0]
+    assert followup.event_key not in ctx.compose_kept_keys
+    assert normal.event_key in ctx.compose_kept_keys
+    assert [e.event_key for e in ctx.compose_truncated] == [followup.event_key]

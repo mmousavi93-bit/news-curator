@@ -14,6 +14,12 @@ The fate capture happens in the stages themselves (understand/validate/
 compose record what they dropped and why); this module only renders. No
 LLM calls, no clock reads (ctx.now), no secrets -- news text only.
 Reporting failure must never break a run: run.py wraps the call.
+
+chosen.csv's row-building (_fate_for, _write_chosen) lives in
+report_csv_chosen.py -- split out 2026-09-06 (round-2 review, fix 5) when
+this file crossed the ~200-line cap; the three tiny per-cluster field
+helpers both modules need live in report_csv_helpers.py to avoid an import
+cycle between the two writer modules.
 """
 
 from __future__ import annotations
@@ -23,23 +29,11 @@ from pathlib import Path
 from typing import Iterable
 
 from agent.pipeline.rank import event_order_key, score_event
+from agent.report_csv_chosen import _write_chosen
+from agent.report_csv_helpers import _best_tier, _sources, _when_utc
 
 _BODY_CAP = 400
 _TIMESTAMP_FMT = "%Y%m%dT%H%M%SZ"
-
-
-def _sources(cluster) -> str:
-    return "|".join(sorted({m.source_id for m in cluster.members}))
-
-
-def _best_tier(cluster, credibility) -> int:
-    from agent.pipeline.rank import best_tier
-    return best_tier(cluster, credibility)
-
-
-def _when_utc(cluster) -> str:
-    stamps = [m.published_at for m in cluster.members if m.published_at is not None]
-    return max(stamps).isoformat() if stamps else ""
 
 
 def write_run_reports(ctx, out_dir: Path) -> list[Path]:
@@ -70,88 +64,6 @@ def _write_read(ctx, path: Path) -> Path:
                 item.source_id, item.url, item.title, body,
                 item.published_at.isoformat() if item.published_at else "",
                 int(bool(item.date_only)), item.lang,
-            ])
-    return path
-
-
-def _fate_for(cluster_key: str, events_by_key: dict, ctx) -> tuple[str, str]:
-    """(fate, reason) for one cluster -- the deterministic story of what
-    happened to it this run. Precedence follows the pipeline order."""
-    fates = dict(getattr(ctx, "cluster_fates", None) or [])
-    if cluster_key in fates:
-        return fates[cluster_key], ""
-    sent_keys = set(getattr(ctx, "compose_kept_keys", None) or [])
-    if cluster_key in sent_keys:
-        return "sent", ""
-    for fate_attr, fate in (
-        ("lang_dropped", "lang_dropped"),
-        ("rank_dropped", "rank_dropped"),
-        ("relevance_dropped", "relevance_dropped"),
-        ("repeat_dropped", "repeat_dropped"),
-        ("lead_events", "lead_only"),
-    ):
-        dropped = getattr(ctx, fate_attr, None) or []
-        if cluster_key in {e.event_key for e in dropped}:
-            return fate, ""
-    if cluster_key in events_by_key:
-        return "event_unresolved", "event exists but no fate recorded -- anomaly"
-    return "no_event", "cluster produced no event and no recorded drop"
-
-
-def _write_chosen(ctx, path: Path) -> Path:
-    clusters = list(getattr(ctx, "clusters", None) or [])
-    # ctx.events is the SURVIVING set -- validate physically removes repeats
-    # from it, so a repeat_dropped row used to be written with empty
-    # headline/summary and the drop was unjudgeable (2026-09-05: seven
-    # events dropped at cosine 0.56-0.67, one of them the run's largest
-    # cluster, and there was no text to tell over-cut from correct). Fold
-    # the dropped sets back in for TEXT only; _fate_for still decides fate.
-    events_by_key = {e.event_key: e for e in getattr(ctx, "events", None) or []}
-    for attr in ("repeat_dropped", "lang_dropped", "rank_dropped",
-                 "relevance_dropped", "lead_events"):
-        for event in getattr(ctx, attr, None) or []:
-            events_by_key.setdefault(event.event_key, event)
-    credibility = ctx.config.credibility
-    with path.open("w", encoding="utf-8-sig", newline="") as fh:
-        writer = csv.writer(fh)
-        writer.writerow(["cluster_key", "fate", "reason", "n_members", "sources",
-                         "provider", "best_tier", "category", "claim_status",
-                         "independent_count", "score", "headline", "summary"])
-        providers = getattr(ctx, "cluster_provider", None) or {}
-        for cluster in clusters:
-            event = events_by_key.get(cluster.key)
-            fate, reason = _fate_for(cluster.key, events_by_key, ctx)
-            score = ""
-            if event is not None:
-                score = f"{score_event(event, cluster, credibility, ctx.config.settings, ctx.now):.3f}"
-            writer.writerow([
-                cluster.key, fate, reason, len(cluster.members),
-                _sources(cluster), providers.get(cluster.key, ""),
-                _best_tier(cluster, credibility),
-                getattr(event, "category", "") if event else "",
-                getattr(event, "claim_status", "") if event else "",
-                getattr(event, "independent_count", "") if event else "",
-                score,
-                # Gate forensics need the text (the Masafer Yatta lesson:
-                # a drop is unjudgeable without the words the gate saw).
-                # Empty for fates recorded before an event existed.
-                getattr(event, "headline", "") if event else "",
-                getattr(event, "summary", "") if event else "",
-            ])
-        # Clusters the cap cut before any LLM saw them. They are not in
-        # ctx.clusters, so without this block they left only hex keys in one
-        # log line -- 36 of them on 2026-09-05, unauditable. The raw source
-        # title goes in the headline column on purpose: `grep` over this one
-        # file is the audit, and it has to reach cap losses too.
-        for cluster in getattr(ctx, "clusters_cap_dropped", None) or []:
-            title = (cluster.members[0].title or cluster.members[0].body or "").strip()
-            writer.writerow([
-                cluster.key, "cap_dropped",
-                "over max_clusters_per_run; no LLM call. headline = raw source title",
-                len(cluster.members), _sources(cluster), "",
-                _best_tier(cluster, credibility),
-                "", "", cluster.independent_count(credibility), "",
-                title[:300], "",
             ])
     return path
 

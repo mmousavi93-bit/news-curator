@@ -5,6 +5,139 @@ session; this file does not. Nothing here is deleted or condensed — it is the 
 record of what broke, why, and what rule came out of it. Read it when working on the
 phase or subsystem it covers. CLAUDE.md keeps the operational core and points here.
 
+## 2026-09-06/08 — the 22:12 run delivered 2 trivia items during a naval war. Four rounds of adversarial review. Suite 696 → 753
+
+Owner: "read / optimize / score, review and iterate till we get one step forward."
+Artifacts: `outputs/*_20260905T221247Z.csv`. Funnel: 905 fetched → 204 new → 77 clusters
+→ 40 LLM calls → 16 events → **2 delivered** (0.22%). The two were a Netanya border-police
+shooting (10.52) and a satellite-imagery shipping note (8.55). Suppressed the same run:
+Israeli strike S. Lebanon + Hormuz exchange (12.00, 13 members), US Navy struck three
+Iranian oil tankers (11.97, 12), IRGC targeted US vessels IN RESPONSE (11.75, 11), IRGC
+attacked six ships near Hormuz (11.74, 9).
+
+### Defect 1 — the repeat gate deleted the war
+
+12 of 16 events dropped. The retaliation was killed at sim 0.65 *because* the strike it
+answered had already been delivered. The failure mode STRENGTHENS as an escalation deepens:
+heavier coverage tightens the semantic neighbourhood, so the more important the story, the
+more certainly its developments are suppressed.
+
+Root cause was not the gate logic — it was `event_match_threshold: 0.55` doing two jobs.
+**All 12 drops sat at sim 0.55–0.70.** 0.55 answers "worth comparing"; it was being read as
+"same story". A strike and the retaliation answering it share vocabulary and land ~0.65.
+(§9p left this threshold untuned "on purpose" pending observability. This was the evidence.)
+
+Fix: **two-band gate** on max similarity across ALL matched priors.
+- HIGH (`sim >= digest_rank.event_repeat_threshold`, 0.80) = same story retold → drop
+  unless `score >= repeat_bypass_score` (11.0) AND development (independent_count or
+  claim rank above the high-water). Renders as a compact «پیگیری · headline» one-liner,
+  priority strictly below every full entry, first cut under truncation.
+- MID (0.55 ≤ sim < 0.80) = related but DIFFERENT story → survives as a **normal full
+  entry** in importance order if score ≥ 11.0. No development test: a ratchet against a
+  prior is meaningless when the events are not the same story.
+- `sim < 0.55` → unchanged.
+
+`0.80` is a GUESS and `settings.yaml` says so. Tune it from `chosen.csv`.
+
+### Defect 2 — the cluster cap was a tier wall, then a language detector
+
+All 40 kept clusters were tier 2. **24 of 40 LLM calls (60% of budget) returned
+irrelevant/clickbait** — Al Jazeera Arabic lifestyle, Walla filler ×4, Sky News Arabia ×3 —
+while corroborated IRGC-naval clusters were cut without a call. Fix: a binary `on_mission`
+flag became the top cap term.
+
+Then round 3 measured that fix against `read.csv` and found it was **a language detector**.
+`relevance.yaml` held Persian/English keywords matched by plain casefold substring;
+Arabic orthography never matched («إيران» vs «ایران»), Hebrew had no keywords at all:
+
+| lang | items | on_mission before | after |
+|---|---|---|---|
+| ar | 32 | 3 (9%) | 15 (47%) |
+| he | 9 | 0 (0%) | 1 (11%) |
+| fa | 42 | 35 (83%) | 35 |
+| en | 94 | 72 (77%) | 72 |
+
+Because `on_mission` sits ABOVE tier, this promoted a `tier: lead` FX-spam channel above
+Al Jazeera Arabic reporting an IRGC threat to close Hormuz and above Israeli-press
+reporting of a strike on Iranian nuclear sites — both cut without a call. Same blackout
+as the original defect, new cause. Fixes: route `score_relevance` through the existing
+`flash/textnorm.py` on BOTH text and keywords; Hebrew anchors; and `on_mission` gated on
+`tier_weight > 0` so a lead can never be promoted by it.
+
+**Hebrew adjudicated and CLOSED, do not re-tune on this run.** The single Hebrew item
+scoring on-mission matched `לבנון` because the town is Lebanon, New Hampshire. The other
+eight are the Bayeux tapestry, the Ig Nobels, a traffic accident, a teacher's trial.
+Zero true positives in the sample. But the keywords DO fire on real Hebrew military copy
+(`צה"ל תקף... בדרום לבנון` → 4.0; Iranian-navy and IRGC sentences → 8.0). Nothing real is
+suppressed. walla/maariv are feeding lifestyle copy — a source-prune question, not a
+keyword gap.
+
+Arabic residual: 14 of the 17 remaining zeros are correctly off-mission (Premier League,
+Bayeux, lobster tagging). Three are wrong, all one class — Arabic has no پ/گ/ژ/چ so it
+writes «بوتين» for «پوتین». Fixed by adding transliteration VARIANTS to `relevance.yaml`,
+NOT by folding ب→پ, which would match far too broadly.
+
+### Defect 3 — `independent_count` meant two things
+
+`priority.py` counted all tiers with a group-null fallback (i.e. Telegram reposts counted
+as corroboration); `validate.py` counted tier-1/2 groups only. New `corroborating_count()`
+is the tier-1/2 one and is what the cap sorts on. `independent_count` behaviour left
+untouched — `chosen.csv` writes it and its meaning had to stay stable.
+
+### Defect 4 — relevance gate cut Putin/Witkoff/Kushner Moscow talks (10.99)
+
+Third instance of the Masafer Yatta class. Yemen actor/place terms and Russia–US
+dealmaking terms added to `strategic`. Bare ukraine/kyiv/zelensky deliberately EXCLUDED
+so Kyiv air-raid OSINT spam stays off-mission.
+
+### Flash monitor is ALIVE — top standing blocker closed
+
+Three `flash_2026090*.csv` artifacts exist. The §9p "presumed dead" blocker is retired.
+Round 4 proved by differential replay over the 177-item corpus that the folding change
+left the flash matcher byte-identical: 43 matches before, 43 after, zero kill deltas;
+the only delta was displayed token spelling, fixed via `location_display`.
+
+### Standing lessons
+
+1. **A keyword tier that fires on any mention cannot be used as a promotion ladder.**
+   My first design made the relevance tier VALUE the cap key. Measurement falsified it:
+   `iran_direct` (weight 8) fires on any mention of Iran, so Telegram gossip about
+   Mojtaba Khamenei and a personal essay scored 8.0 and outranked BBC reporting. Binary
+   on-mission is the correct shape. **Measure a proposed sort key against a real corpus
+   before shipping it — the mechanism test will pass either way.**
+2. **A test that builds a synthetic config cannot validate a data fix.**
+   `test_on_mission_outranks_higher_tier_off_mission` pinned the mechanism with a
+   synthetic relevance config and said so in a comment. 724 tests were green while
+   `on_mission` was a language detector. The tell was in the comment. Any fix whose
+   correctness depends on `config/*.yaml` needs at least one test loading the REAL file.
+3. **One normalizer, both sides, whole repo.** `flash/textnorm.py` exists because the
+   flash monitor had this exact bug in §9n. `pipeline/relevance.py` did not use it. The
+   lesson was written down and still re-occurred in a sibling module.
+4. **An outcome class may only terminate a decision with evidence it is decisive.**
+   Restated from §9p. Round 1's `score >= 11.0` bypass was an importance test masquerading
+   as a development test — it never referenced the prior at all.
+5. **A conjunction of two weak signals is not a strong signal.** Round 2 replaced the
+   disjunction with `score AND corroboration-growth`, which drops the motivating IRGC case:
+   `independent_count` distributes `{0:28, 1:47, 2:1, 3:1}` — effectively binary — and
+   because delivery is score-selected and score rewards corroboration, the delivered prior
+   is systematically the family maximum, so the ratchet can never be beaten. A 72h blackout,
+   worse than the bug it replaced. **Check a proposed gate against the distribution of the
+   variable it gates on.**
+6. **Adversarial review has no natural stop.** Four rounds scored 27 → 24 → 26 → 33/40.
+   Rounds 3 and 4 each found a defect in code an earlier round had passed, which is real
+   value — but each round also changed code and so manufactured the next round's surface.
+   Set a round budget before starting. Rounds 1–3 earned their cost; round 4's tail did not.
+
+### Volume expectation after the change
+
+Quiet run: ~2–4 full entries, one message. Escalation run: ~14–20 full entries across
+2 messages, measured at 4,389 UTF-16 units against the 24,576 ceiling. That is MORE
+output than the 2 this run delivered, and it is correct: 2 was not low volume, it was a
+blackout. `min_score` HELD at 8 — at 10 the run's 8.551 casualty (satellite imagery of a
+shipping collapse at Iranian ports) is the most decision-relevant item in the set while
+the 10.521 survivor is a domestic shooting. The score does not discriminate in the 8–11
+band. Tune on 2–3 clean runs, one variable at a time.
+
 ## 2026-09-05 (16:18 run) — provider-fatal killed the call; the cap ranked corroboration last
 
 Owner: "review and fix llm calls problems ... review flash alerts and output quality

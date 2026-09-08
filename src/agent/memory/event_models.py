@@ -66,6 +66,28 @@ class Event:
     confidence: float | None = None
     first_seen_at: datetime | None = None
     last_updated_at: datetime | None = None
+    # Repeat-gate bypass (fix 1, 2026-09-06; band split round-4 review, fix
+    # 1): True when this event matched a previously DELIVERED story and
+    # survived the two-band repeat gate (pipeline/repeat_decision.py) as a
+    # follow-up rather than a hard drop -- covers BOTH bands, so chosen.csv's
+    # `sent_followup` fate can still be grepped from one flag. In-memory
+    # only, like headline/category: not persisted, the events table
+    # predates it.
+    follow_up: bool = False
+    # Which band produced the bypass (round-4 review, fix 1): the two bands
+    # are DIFFERENT claims and must render differently.
+    #   MID band  (event_match_threshold <= sim < event_repeat_threshold):
+    #     a related but DIFFERENT story (repeat_decision.py's own docstring)
+    #     -- renders as a FULL normal entry, sorted by importance like any
+    #     other event, just carrying the "پیگیری" continuity marker.
+    #   HIGH band (sim >= event_repeat_threshold): genuinely the SAME story
+    #     retold with material development -- renders as the compact
+    #     one-liner, pinned below every normal entry, first cut under
+    #     truncation. `follow_up_high` is True only for this band.
+    # Overloading one boolean for both was the round-3 defect: it pinned
+    # MID-band survivors (a different, possibly more important story) below
+    # every full entry with zero character pressure required.
+    follow_up_high: bool = False
 
 
 def event_to_row(event: Event) -> tuple:
