@@ -199,7 +199,12 @@ def _raw_cluster(ctx: _Ctx, title: str) -> str:
     return cluster.key
 
 
-def test_llm_failed_run_includes_escaped_raw_fallback_titles():
+def test_llm_failed_run_includes_raw_fallback_count_not_titles():
+    # Session 9s: the raw-title section is gone -- the 22:56Z escalation
+    # run dumped untranslated English and Arabic headlines into both
+    # Persian messages. The honest replacement is a COUNT of uncovered
+    # stories, which is a fact (constraint 11). Raw titles never reach
+    # output.
     ctx = _Ctx(config=_config())
     ctx.llm_failed = True
     key1 = _raw_cluster(ctx, "انفجار در تهران & کرج گزارش شد")
@@ -208,12 +213,12 @@ def test_llm_failed_run_includes_escaped_raw_fallback_titles():
     ComposeStage(_Log()).run(ctx)
     message = ctx.messages[0]
     assert "هوش مصنوعی" in message
-    assert "عناوین خام" in message
-    assert "انفجار در تهران &amp; کرج" in message  # HTML-escaped
-    assert "Hormuz" in message
+    assert "۲ خبر بدون خلاصه ماند" in message  # Persian-digit count
+    assert "Hormuz" not in message
+    assert "انفجار در تهران" not in message
 
 
-def test_fallback_excludes_judged_clusters():
+def test_fallback_counts_uncovered_not_judged_clusters():
     ctx = _Ctx(config=_config())
     ctx.llm_failed = True
     key_clickbait = _raw_cluster(ctx, "کلیک‌بیت خالص")
@@ -224,15 +229,17 @@ def test_fallback_excludes_judged_clusters():
                          (key_uncovered, "unavailable")]
     ComposeStage(_Log()).run(ctx)
     message = ctx.messages[0]
-    assert "حمله آمریکا به لارک" in message
+    assert "۱ خبر بدون خلاصه ماند" in message  # only the uncovered one
+    assert "حمله آمریکا به لارک" not in message
     assert "کلیک" not in message
     assert "مو قرمز" not in message
 
 
-def test_fallback_covers_cap_refused_and_fatal_fates():
+def test_fallback_counts_cap_refused_and_fatal_fates():
     # 2026-09-05 review: _UNCOVERED_FATES listed "refused_cap"/"lang_dropped"
     # but understand.py writes "cap_refused"/"fatal" -- cap-exhausted and
-    # fatal clusters therefore never surfaced in the raw fallback. Pinned.
+    # fatal clusters therefore never surfaced in the fallback. Pinned.
+    # Session 9s: "surfaced" now means COUNTED, not title-listed.
     ctx = _Ctx(config=_config())
     ctx.llm_failed = True
     key_cap = _raw_cluster(ctx, "خبر نپوشیده با اتمام سهمیه")
@@ -240,25 +247,24 @@ def test_fallback_covers_cap_refused_and_fatal_fates():
     ctx.cluster_fates = [(key_cap, "cap_refused"), (key_fatal, "fatal")]
     ComposeStage(_Log()).run(ctx)
     message = ctx.messages[0]
-    assert "خبر نپوشیده با اتمام سهمیه" in message
-    assert "خبر نپوشیده با خطای مرگبار" in message
+    assert "۲ خبر بدون خلاصه ماند" in message
 
 
 def test_fallback_absent_when_everything_covered():
     ctx = _Ctx(config=_config())
     ctx.events = [_with_cluster(ctx, _event("خلاصه نظامی اسرائیل."))]
     ComposeStage(_Log()).run(ctx)
-    assert "عناوین خام" not in ctx.messages[0]
+    assert "بدون خلاصه" not in ctx.messages[0]
 
 
-def test_kept_path_appends_fallback_as_footer():
+def test_kept_path_appends_fallback_count_as_footer():
     ctx = _Ctx(config=_config())
     ctx.events = [_with_cluster(ctx, _event("خلاصه نظامی اسرائیل."))]
     key = _raw_cluster(ctx, "پدافند در تنگه هرمز فعال شد")
     ctx.cluster_fates = [(key, "unavailable")]
     ComposeStage(_Log()).run(ctx)
-    assert "عناوین خام" in ctx.messages[0]
-    assert "پدافند در تنگه هرمز فعال شد" in ctx.messages[0]
+    assert "۱ خبر بدون خلاصه ماند" in ctx.messages[0]
+    assert "پدافند در تنگه هرمز" not in ctx.messages[0]
 
 
 def test_pezeshkian_sco_trip_passes_relevance_gate():
@@ -297,9 +303,10 @@ def test_regional_anchor_military_event_passes_relevance_gate():
     assert event.event_key not in {e.event_key for e in ctx.relevance_dropped}
 
 
-def test_fallback_uses_body_lead_when_title_empty():
-    # Owner 2026-08-31: the raw-title section shipped an EMPTY bullet
-    # for an untitled Telegram post. Body lead stands in; no empty lines.
+def test_fallback_counts_untitled_cluster_too():
+    # Session 9s: the raw-title section (and its empty-bullet defect for
+    # untitled Telegram posts, owner 2026-08-31) is gone; the count line
+    # has no titles to be empty. An untitled cluster still COUNTS.
     ctx = _Ctx(config=_config())
     ctx.llm_failed = True
     ctx.cluster_fates = []
@@ -310,11 +317,14 @@ def test_fallback_uses_body_lead_when_title_empty():
     ctx.clusters.append(cluster)
     ctx.cluster_fates.append((cluster.key, "unavailable"))
     ComposeStage(_Log()).run(ctx)
-    assert "پست تلگرامی بدون عنوان" in ctx.messages[0]
-    assert "•\n" not in ctx.messages[0]
+    assert "۱ خبر بدون خلاصه ماند" in ctx.messages[0]
+    assert "•" not in ctx.messages[0]
 
 
-def test_fallback_respects_max_items():
+def test_fallback_counts_every_uncovered_cluster_no_cap():
+    # Session 9s: the old raw-title section capped at fallback_max_items
+    # (5 bullets). A count needs no cap -- and truncating a count would
+    # be a lie about how many stories went uncovered.
     ctx = _Ctx(config=_config())
     ctx.llm_failed = True
     ctx.cluster_fates = []
@@ -322,7 +332,8 @@ def test_fallback_respects_max_items():
         key = _raw_cluster(ctx, f"خبر پوشش‌داده‌نشده شماره {i}")
         ctx.cluster_fates.append((key, "unavailable"))
     ComposeStage(_Log()).run(ctx)
-    assert ctx.messages[0].count("•") == 5
+    assert "۶ خبر بدون خلاصه ماند" in ctx.messages[0]
+    assert "•" not in ctx.messages[0]
 
 
 def test_importance_order_military_before_economy():
@@ -463,7 +474,8 @@ def test_all_non_persian_events_produce_lang_dropped_one_liner():
     ComposeStage(_Log()).run(ctx)
     text = ctx.messages[0]
     assert text.startswith(labels_for("fa")["lang_dropped"])
-    assert labels_for("fa")["raw_fallback"] in text
+    # Session 9s: the fallback is a count line, not a raw-title list.
+    assert "۱ خبر بدون خلاصه ماند" in text
     assert ctx.counters["compose_lang_drops"] == 1
     assert ctx.compose_kept_keys == []
 

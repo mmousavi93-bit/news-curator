@@ -37,6 +37,7 @@ from agent.llm.failover import failover
 from agent.llm.limits import CallBudget, ProviderBudget, RpmPacer
 from agent.llm.providers import DEFAULT_TIMEOUT, ImageInput, ProviderAdapter
 from agent.llm.stats import ProviderStats
+from agent.llm.token_pacer import TokenPacer
 from agent.llm.transport import HttpTransport, RequestsHttpTransport
 from agent.util.logging import get_logger
 
@@ -61,6 +62,7 @@ class Router:
         breaker_threshold: int = 5,
         provider_limits: Mapping[str, ProviderBudget] | None = None,
         rpm_by_provider: Mapping[str, int | None] | None = None,
+        tpm_by_provider: Mapping[str, int | None] | None = None,
         timeout_by_provider: Mapping[str, tuple[float, float]] | None = None,
         clock: Callable[[], float] = _time.monotonic,
         sleep: Callable[[float], None] = _time.sleep,
@@ -72,6 +74,9 @@ class Router:
         self._sleep = sleep
         self._budget = CallBudget(max_calls, self._logger)
         self._pacer = RpmPacer(clock, sleep)
+        # Token-aware pacing (session 9s): the 60s token window that
+        # actually binds on groq (TPM 8K). Charged on every attempt.
+        self._token_pacer = TokenPacer(clock, sleep, self._logger)
         self._breaker = CircuitBreaker(breaker_threshold, self._logger)
         self._max_retries = max_retries
         self._base_delay = base_delay_seconds
@@ -88,12 +93,14 @@ class Router:
         self._cooldowns = CooldownRegister(_COOLDOWN_SECONDS)
         self._cooldown_seconds = _COOLDOWN_SECONDS
         rpm_map = rpm_by_provider or {}
+        tpm_map = tpm_by_provider or {}
         limits = provider_limits or {}
         timeout_map = timeout_by_provider or {}
         self._providers = [
             Provider(
                 p.name, p, rpm_map.get(p.name), limits.get(p.name),
                 timeout=timeout_map.get(p.name, DEFAULT_TIMEOUT),
+                tpm=tpm_map.get(p.name),
             ) for p in providers
         ]
         # Per-provider attempt counters, rendered into run.csv (report_csv).

@@ -80,7 +80,7 @@ class ComposeStage:
         raw_fallback = _raw_fallback(
             list(getattr(ctx, "clusters", None) or []),
             {e.event_key for e in events},
-            fates, labels, settings.digest_rank.fallback_max_items,
+            fates, labels,
         )
 
         if not events:

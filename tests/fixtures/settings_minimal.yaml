@@ -27,6 +27,7 @@ pipeline:
   vision_min_image_bytes: 20000
   embed_model: "paraphrase-multilingual-MiniLM-L12-v2"
   item_body_chars: 600
+  samerun_pair_log_floor: 0.40
 
 retention:
   url_hashes_days: 7
@@ -83,6 +84,7 @@ markets:
 
 llm:
   max_calls_per_run: 70
+  batch_size: 5
   order: ["gemini", "groq", "openrouter"]
   stages:
     vision: { provider: "gemini" }
@@ -108,7 +110,6 @@ digest_rank:
   min_score: 8
   max_messages: 6
   repeat_window_hours: 72
-  fallback_max_items: 5
   event_repeat_threshold: 0.80
   repeat_bypass_score: 11.0
 

@@ -61,4 +61,10 @@ def tmp_config_dir(tmp_path: Path) -> Path:
         repo_root / "config" / "prompts" / "understand.txt",
         prompts_dir / "understand.txt",
     )
+    # Session 9s: the batch contract. settings_minimal.yaml carries
+    # batch_size: 5, so build_stages loads it exactly as production does.
+    shutil.copy(
+        repo_root / "config" / "prompts" / "understand_batch.txt",
+        prompts_dir / "understand_batch.txt",
+    )
     return dest

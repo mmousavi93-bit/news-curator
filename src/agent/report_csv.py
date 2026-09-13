@@ -31,13 +31,14 @@ from typing import Iterable
 from agent.pipeline.rank import event_order_key, score_event
 from agent.report_csv_chosen import _write_chosen
 from agent.report_csv_helpers import _best_tier, _sources, _when_utc
+from agent.report_csv_pairs import write_pairs
 
 _BODY_CAP = 400
 _TIMESTAMP_FMT = "%Y%m%dT%H%M%SZ"
 
 
 def write_run_reports(ctx, out_dir: Path) -> list[Path]:
-    """Render the four CSVs for one run. Returns the written paths."""
+    """Render the per-run CSVs for one run. Returns the written paths."""
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     stamp = ctx.now.strftime(_TIMESTAMP_FMT)
@@ -46,6 +47,11 @@ def write_run_reports(ctx, out_dir: Path) -> list[Path]:
         _write_chosen(ctx, out_dir / f"chosen_{stamp}.csv"),
         _write_summaries(ctx, out_dir / f"summaries_{stamp}.csv"),
         _write_run(ctx, out_dir / f"run_{stamp}.csv"),
+        # Session 9s: same-run pair observations (samerun_dedup.py).
+        write_pairs(
+            out_dir / f"pairs_{stamp}.csv",
+            list(getattr(ctx, "samerun_pairs", None) or []),
+        ),
     ]
     return written
 

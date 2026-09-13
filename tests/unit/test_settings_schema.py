@@ -187,3 +187,68 @@ def test_repeat_bypass_score_negative_still_rejected_by_generic_check():
     raw["digest_rank"]["repeat_bypass_score"] = -1.0
     with pytest.raises(SettingsError, match=r"repeat_bypass_score: must not be negative"):
         Settings.from_dict(raw)
+
+
+# ---------------------------------------------------------------------------
+# Session 9s: batch_size + per-provider tpm guard (settings_guard.py)
+# ---------------------------------------------------------------------------
+
+
+def test_batch_size_zero_rejected():
+    raw = copy.deepcopy(_load(_FIXTURE))
+    raw["llm"]["batch_size"] = 0
+    with pytest.raises(SettingsError, match=r"batch_size: must be at least 1"):
+        Settings.from_dict(raw)
+
+
+def test_batch_size_one_is_the_allowed_rollback_path():
+    # Brief requirement 3: 1 must remain a valid value -- the guard skips
+    # it entirely, whatever the tpms are.
+    raw = copy.deepcopy(_load(_FIXTURE))
+    raw["llm"]["batch_size"] = 1
+    raw["llm"]["providers"]["groq"]["tpm"] = 8000
+    settings = Settings.from_dict(raw)
+    assert settings.llm.batch_size == 1
+
+
+def test_batch_size_exceeding_smallest_tpm_rejected():
+    # The brief's arithmetic table: nominal batch = ~2,300 template + ~700
+    # per cluster. batch 12 => ~10,700 > groq's 8,000 TPM => a batch that
+    # 429s permanently regardless of pacing. Refused at load.
+    raw = copy.deepcopy(_load(_FIXTURE))
+    raw["llm"]["batch_size"] = 12
+    raw["llm"]["providers"]["groq"]["tpm"] = 8000
+    with pytest.raises(SettingsError, match=r"permanently"):
+        Settings.from_dict(raw)
+
+
+def test_batch_size_within_tpm_allowed():
+    # batch 7 => ~7,200 <= 8,000: the brief's "fits, no headroom" row.
+    raw = copy.deepcopy(_load(_FIXTURE))
+    raw["llm"]["batch_size"] = 7
+    raw["llm"]["providers"]["groq"]["tpm"] = 8000
+    settings = Settings.from_dict(raw)
+    assert settings.llm.batch_size == 7
+
+
+def test_providers_without_tpm_do_not_bind_the_guard():
+    # bai's tpm is unrecorded (settings.yaml): missing tpm = unconstrained,
+    # so a batch fits whatever groq/gemini allow and bai never binds.
+    raw = copy.deepcopy(_load(_FIXTURE))
+    raw["llm"]["batch_size"] = 5
+    settings = Settings.from_dict(raw)  # fixture providers carry no tpm
+    assert settings.llm.batch_size == 5
+
+
+def test_samerun_pair_log_floor_must_be_a_fraction():
+    raw = copy.deepcopy(_load(_FIXTURE))
+    raw["pipeline"]["samerun_pair_log_floor"] = 1.5
+    with pytest.raises(SettingsError, match=r"samerun_pair_log_floor: must be between"):
+        Settings.from_dict(raw)
+
+
+def test_tpm_must_be_int():
+    raw = copy.deepcopy(_load(_FIXTURE))
+    raw["llm"]["providers"]["groq"]["tpm"] = "8000"
+    with pytest.raises(SettingsError, match=r"tpm: expected int"):
+        Settings.from_dict(raw)

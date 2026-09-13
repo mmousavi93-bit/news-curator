@@ -115,9 +115,21 @@ def build_router(
     adapters = build_adapters(order, settings.providers, env, logger)
     limits: dict[str, ProviderBudget] = {}
     rpm_map: dict[str, int | None] = {}
+    tpm_map: dict[str, int | None] = {}
     timeout_map: dict[str, tuple[float, float]] = {}
     for name, cfg in settings.providers.items():
         rpm_map[name] = cfg.rpm
+        # Missing tpm = unconstrained (TokenPacer no-op), logged once per
+        # run so a silently-unpaced provider is visible in the Actions log
+        # (brief req 3: "treat a missing value as unconstrained but log it
+        # once"). The settings guard only ever compares providers that
+        # DECLARE one.
+        tpm_map[name] = cfg.tpm
+        if cfg.tpm is None:
+            logger.warning(
+                "llm provider %s: no tpm configured -- token pacing "
+                "disabled for it (treated as unconstrained)", name,
+            )
         if cfg.read_timeout_seconds is not None:
             # Connect timeout is shared; only the read leg is overridable
             # (2026-08-30 decision: primary reads time out at 20s).
@@ -147,6 +159,7 @@ def build_router(
         breaker_threshold=settings.backoff.circuit_breaker_failures,
         provider_limits=limits,
         rpm_by_provider=rpm_map,
+        tpm_by_provider=tpm_map,
         timeout_by_provider=timeout_map,
         clock=clock,
         sleep=sleep,

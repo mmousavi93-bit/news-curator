@@ -32,7 +32,9 @@ class Provider:
     `spend` is None for free providers (no guard rails configured).
     `timeout` is the (connect, read) pair used for this provider's HTTP
     calls -- per-provider override from settings, DEFAULT_TIMEOUT otherwise
-    (2026-08-30 decision: the primary runs a tighter read timeout)."""
+    (2026-08-30 decision: the primary runs a tighter read timeout).
+    `tpm` (session 9s) feeds the TokenPacer; None = unconstrained, which
+    the pacer treats as no pacing."""
 
     name: str
     adapter: ProviderAdapter
@@ -40,6 +42,7 @@ class Provider:
     spend: ProviderBudget | None = None
     timeout: tuple[float, float] = DEFAULT_TIMEOUT
     schema_retried: bool = False
+    tpm: int | None = None
 
 
 def attempt(

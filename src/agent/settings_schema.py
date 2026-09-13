@@ -42,6 +42,8 @@ class PipelineSettings:
     vision_min_image_bytes: int
     embed_model: str
     item_body_chars: int
+    # Session 9s: pairs_csv row-count floor, NOT a threshold (settings.yaml).
+    samerun_pair_log_floor: float
 
 
 @dataclass(frozen=True, slots=True)
@@ -99,6 +101,9 @@ class MarketsSettings:
 @dataclass(frozen=True, slots=True)
 class LlmSettings:
     max_calls_per_run: int
+    # Session 9s: clusters per LLM call; 1 = pre-batching behaviour exactly
+    # (the rollback path). Guarded vs smallest tpm: settings_guard.py.
+    batch_size: int
     order: Sequence[str]
     stages: Mapping[str, Any]
     providers: Mapping[str, ProviderSettings]
@@ -122,7 +127,6 @@ class DigestRankSettings:
     min_score: float
     max_messages: int
     repeat_window_hours: int
-    fallback_max_items: int
     # Round-2 review, 2026-09-06, fix 1 -- TWO-BAND repeat gate. A matched
     # "repeat" ships as a follow-up line instead of a hard drop when its OWN
     # importance score clears repeat_bypass_score AND (only in the HIGH,
@@ -168,7 +172,7 @@ SECTIONS: tuple[tuple[str, type, tuple[str, ...]], ...] = (
     ("pipeline", PipelineSettings,
      ("max_clusters_per_run", "max_vision_calls_per_run", "cluster_similarity_threshold",
       "event_match_threshold", "vision_min_image_bytes", "embed_model",
-      "item_body_chars")),
+      "item_body_chars", "samerun_pair_log_floor")),
     ("retention", RetentionSettings,
      ("url_hashes_days", "events_days", "embeddings_days", "signal_events_days",
       "speaker_statements_days", "score_history_days", "scheduled_events_days")),
@@ -186,12 +190,12 @@ SECTIONS: tuple[tuple[str, type, tuple[str, ...]], ...] = (
     ("markets", MarketsSettings,
      ("fred_api_key_env", "daily_series", "intraday_series", "daily_stale_after_hours",
       "triggers")),
-    ("llm", LlmSettings, ("max_calls_per_run", "order", "stages", "providers", "backoff")),
+    ("llm", LlmSettings, ("max_calls_per_run", "batch_size", "order", "stages", "providers", "backoff")),
     ("digest_rank", DigestRankSettings,
      ("category_weights", "corroboration_weight", "tier_bonus",
       "recency_max_bonus", "recency_window_hours", "size_boost_per_member",
       "size_boost_cap", "min_score", "max_messages", "repeat_window_hours",
-      "fallback_max_items", "event_repeat_threshold", "repeat_bypass_score")),
+      "event_repeat_threshold", "repeat_bypass_score")),
     ("delivery", DeliverySettings,
      ("telegram_max_chars", "char_budget", "truncate_priority", "output_language",
       "source_languages", "flash_watchdog_enabled",

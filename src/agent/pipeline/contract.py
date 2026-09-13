@@ -44,11 +44,9 @@ def within_bounds(payload: dict, raw_len: int = 0) -> tuple[bool, str]:
     return True, ""
 
 
-def extract_json(text: str) -> dict:
-    """The model may wrap JSON in markdown fences. Strip them, then parse.
-    Raises ValueError on anything unparseable -- the caller skips the
-    cluster, because feeding a half-parse downstream invents content.
-    None arrives when a provider answers 200 with `content: null` (an
+def _strip_fences(text) -> str:
+    """The model may wrap JSON in markdown fences. Strip them. None
+    arrives when a provider answers 200 with `content: null` (an
     empty/refusal answer); it is unparseable by definition, never a crash
     (2026-08-30: exactly this None crashed a whole run mid-pipeline)."""
     if not isinstance(text, str):
@@ -59,7 +57,25 @@ def extract_json(text: str) -> dict:
         stripped = stripped[first_newline + 1:] if first_newline != -1 else stripped[3:]
     if stripped.endswith(_FENCE_RE_OPEN):
         stripped = stripped[: stripped.rfind(_FENCE_RE_OPEN)].strip()
-    parsed = json.loads(stripped)
+    return stripped
+
+
+def extract_json(text: str) -> dict:
+    """Parse one response into a JSON OBJECT. Raises ValueError on
+    anything unparseable -- the caller skips the cluster, because feeding
+    a half-parse downstream invents content."""
+    parsed = json.loads(_strip_fences(text))
     if not isinstance(parsed, dict):
         raise ValueError("response is not a JSON object")
+    return parsed
+
+
+def extract_json_array(text: str) -> list:
+    """The batch contract (session 9s): the response is a JSON ARRAY, one
+    object per cluster. A single-object answer against the array contract
+    is unparseable by definition -- guessing "the first cluster" invents
+    content (constraint 11)."""
+    parsed = json.loads(_strip_fences(text))
+    if not isinstance(parsed, list):
+        raise ValueError("response is not a JSON array")
     return parsed

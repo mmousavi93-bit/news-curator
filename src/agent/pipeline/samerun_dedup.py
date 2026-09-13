@@ -39,15 +39,51 @@ beats B, B beats C left only A's winner standing even when B and C were
 unrelated -- a corpse deleting survivors. 9q's cluster-cap fix roughly
 doubled the exposure by letting more same-family clusters reach understand.
 The loop now breaks the moment `event` is the loser.
+
+SESSION 9s -- PAIR LOGGING. The drop decision is UNCHANGED; this pass now
+also records every pairwise comparison at or above
+settings.pipeline.samerun_pair_log_floor into pairs_<ts>.csv, dropped or
+not. It exists to settle the open measurement gap (CLAUDE.md pending
+item): the tanker cluster fragmented into n=48/12/9/3 and Azraq into
+n=59/18/23/4, but within-run pairwise cosines were never recorded, so
+"pairs sit at 0.60-0.79 and need a same-story test that is not a single
+cosine" vs "MiniLM fails on Persian paraphrase below 0.55" are both live
+and need OPPOSITE fixes. log_floor is NOT a tuning variable -- it filters
+row count only, and a test pins the surviving set invariant to it.
 """
 
 from __future__ import annotations
 
 import logging
+from dataclasses import dataclass
 from typing import Mapping
 
 from agent.memory.event_models import Event
 from agent.pipeline.repeats import _cosine
+
+
+@dataclass(frozen=True, slots=True)
+class PairRecord:
+    """One pairwise same-run comparison worth keeping. Fields carry the
+    pair's TEXT (Masafer Yatta lesson, 9p item 5: a new fate must carry
+    its text) so the 9t clusterer decision can be made from the CSV alone.
+    The brief sketched score_a/score_b -- deviation, documented: events
+    carry NO rank score at validate time (rank_events runs in compose),
+    so independent_count (the corroboration this pass actually ranks on)
+    stands in."""
+
+    run_at_utc: str
+    key_a: str
+    key_b: str
+    similarity: float
+    decision: str  # dropped_b | dropped_a | kept_below_threshold
+    threshold: float
+    n_members_a: int
+    n_members_b: int
+    independent_count_a: int
+    independent_count_b: int
+    headline_a: str
+    headline_b: str
 
 
 def _rank_key(event: Event, clusters_by_key: Mapping[str, object]) -> tuple[int, int]:
@@ -61,24 +97,50 @@ def _rank_key(event: Event, clusters_by_key: Mapping[str, object]) -> tuple[int,
 
 
 def drop_same_run_dups(
-    ctx, events: list[Event], logger: logging.Logger
-) -> tuple[list[Event], list[Event], dict[str, str]]:
+    ctx, events: list[Event], logger: logging.Logger, *, log_floor: float | None = None
+) -> tuple[list[Event], list[Event], dict[str, str], list[PairRecord]]:
     """Survivor is the one with the higher (independent_count, member
-    count), ties keep the first. Returns (kept, dropped, reasons) --
-    reasons is machine-greppable (`same_run_dup sim=<f>`) for report_csv.py.
-    """
+    count), ties keep the first. Returns (kept, dropped, reasons, pairs)
+    -- reasons is machine-greppable (`same_run_dup sim=<f>`) for
+    report_csv.py; pairs feeds pairs_<ts>.csv (session 9s). The DROP
+    LOGIC is the 9r logic untouched: logging observes, never reorders,
+    re-embeds or re-compares."""
     if getattr(ctx, "embedder", None) is None or len(events) < 2:
-        return events, [], {}
+        return events, [], {}, []
     # HIGH band only (9r fix 1) -- see the module docstring. settings.py's
     # cross-section check already refuses a config where this is below
     # pipeline.event_match_threshold, so it can never widen past the
     # cross-run gate's floor.
     threshold = ctx.config.settings.digest_rank.event_repeat_threshold
+    floor = (
+        ctx.config.settings.pipeline.samerun_pair_log_floor
+        if log_floor is None else log_floor
+    )
     vectors = ctx.embedder.embed([e.summary for e in events])
     clusters_by_key = {c.key: c for c in getattr(ctx, "clusters", None) or []}
+    run_at = ctx.now.isoformat()
+
+    def _size(key: str) -> int:
+        cluster = clusters_by_key.get(key)
+        return len(cluster.members) if cluster is not None else 0
+
+    def _record(a: Event, b: Event, similarity: float, decision: str) -> PairRecord:
+        return PairRecord(
+            run_at_utc=run_at,
+            key_a=a.event_key, key_b=b.event_key,
+            similarity=round(similarity, 4),
+            decision=decision,
+            threshold=threshold,
+            n_members_a=_size(a.event_key), n_members_b=_size(b.event_key),
+            independent_count_a=a.independent_count,
+            independent_count_b=b.independent_count,
+            headline_a=a.headline or a.summary,
+            headline_b=b.headline or b.summary,
+        )
 
     dropped_keys: set[str] = set()
     reasons: dict[str, str] = {}
+    pairs: list[PairRecord] = []
     for i, event in enumerate(events):
         if event.event_key in dropped_keys:
             continue
@@ -88,6 +150,9 @@ def drop_same_run_dups(
                 continue
             similarity = _cosine(vectors[i], vectors[j])
             if similarity < threshold:
+                if similarity >= floor:
+                    pairs.append(_record(event, other, similarity,
+                                         "kept_below_threshold"))
                 continue
             loser = (
                 event
@@ -96,6 +161,11 @@ def drop_same_run_dups(
             )
             dropped_keys.add(loser.event_key)
             reasons[loser.event_key] = f"same_run_dup sim={similarity:.2f}"
+            # Observed, not acted on: the drop itself is the 9r decision.
+            pairs.append(_record(
+                event, other, similarity,
+                "dropped_a" if loser is event else "dropped_b",
+            ))
             logger.info(
                 "validate: %s dropped as same-run duplicate of a more "
                 "corroborated/larger cluster (sim %.2f)",
@@ -110,4 +180,5 @@ def drop_same_run_dups(
         [e for e in events if e.event_key not in dropped_keys],
         [e for e in events if e.event_key in dropped_keys],
         reasons,
+        pairs,
     )

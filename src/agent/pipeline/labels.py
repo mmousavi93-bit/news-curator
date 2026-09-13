@@ -47,7 +47,11 @@ LABELS: Mapping[str, Mapping[str, str]] = {
             "خبرها ذخیره شدند و در اجراهای بعدی پوشش داده می‌شوند."
         ),
         "nothing_new": "چیز تازهای نسبت به اجرای قبلی نیامده.",
-        "raw_fallback": "⚠️ خلاصه خودکار در دسترس نیست — عناوین خام منابع:",
+        # Session 9s: the raw-title section is gone -- raw untranslated
+        # source titles violate the Persian-only tone contract. A count is
+        # a fact (constraint 11); {count} arrives pre-formatted in Persian
+        # digits from render.py.
+        "raw_fallback": "⚠️ {count} خبر بدون خلاصه ماند",
         "ai_unavailable": (
             "هوش مصنوعی در این اجرا در دسترس نبود؛ خبرها جمعآوری و "
             "ذخیره شدند اما خلاصهای ساخته نشد."
@@ -73,7 +77,7 @@ LABELS: Mapping[str, Mapping[str, str]] = {
         "digest_marker": "daily digest",
         "tehran": "Tehran",
         "nothing_new": "Nothing new since the last run.",
-        "raw_fallback": "⚠️ Automated summaries unavailable — raw source titles:",
+        "raw_fallback": "⚠️ {count} stories shipped without a summary",
         "ai_unavailable": (
             "AI unavailable this run -- items were collected and stored, "
             "but nothing could be summarised."

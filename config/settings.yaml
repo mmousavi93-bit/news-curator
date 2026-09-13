@@ -150,6 +150,14 @@ pipeline:
   # per-cluster prompt so token costs stay predictable on busy days.
   item_body_chars: 600
 
+  # SESSION 9s. Same-run pairs with cosine similarity BELOW this are not
+  # written to pairs_<ts>.csv. NOT a tuning threshold -- it controls row
+  # count only; the same-run drop decision (digest_rank.event_repeat_
+  # threshold, 0.80) is completely independent of it. ~40 events is ~780
+  # pairs; expect 50-150 rows at 0.40. Above ~400 rows, raise this floor,
+  # never the file size.
+  samerun_pair_log_floor: 0.40
+
 # ---------------------------------------------------------------------------
 # RETENTION
 # ---------------------------------------------------------------------------
@@ -295,7 +303,26 @@ llm:
   # wall-clock, not this cap. Enforcement is real, not advisory:
   # llm/router.py refuses call N+1 before a request is built (constraint #2).
   max_calls_per_run: 70
-  # gemini stays FIRST despite its 20/day cap: it serves the highest-
+  # SESSION 9s. Clusters per LLM call (batched extraction, pipeline/batch.py
+  # + understand_batch.txt). 1 = the pre-batching behaviour exactly, one
+  # call per cluster -- the rollback path. Why batching exists: one call
+  # pays the ~2,300-token prompt template; 40 clusters = 40 template
+  # payments, ~138K tokens/run. Batching pays it ~8 times. The binder is
+  # groq's TPM 8,000 (per-provider `tpm` below), so the batch must FIT one
+  # minute's allowance -- a request above it 429s permanently regardless of
+  # pacing. Nominal arithmetic (settings_guard.py refuses configs whose
+  # nominal batch exceeds the smallest tpm in `order`):
+  #
+  #   batch 1: ~3,000 tokens/call, ~120K/run -> 15 min at 8K TPM  (old)
+  #   batch 5: ~5,800 tokens/call, ~46K/run  -> 6 min   -> fits, headroom
+  #   batch 7: ~7,200 tokens/call, ~41K/run  -> 6 min   -> fits, NO headroom
+  #   batch 10: ~9,300 tokens/call          -> IMPOSSIBLE on groq (8K TPM)
+  #
+  # Runtime pacing is the TokenPacer (llm/token_pacer.py), which books the
+  # ACTUAL rendered prompt size on every attempt including failures; the
+  # run is expected to get SLOWER (~8 -> ~12 min) -- that is the fix
+  # working, not a regression.
+  batch_size: 5
   # priority clusters (understand runs clusters in priority order) until its
   # quota-day allowance is spent, then llm/limits.py skips it and groq
   # carries the tail. Quota resets at Pacific midnight (~10:30 Tehran), so
@@ -351,13 +378,15 @@ llm:
       # is a premium HEAD-START, not a workhorse: it serves the day's ~20
       # highest-priority clusters, then the daily cap in llm/limits.py
       # refuses call 21+ (enforced, not advisory -- constraint 15) and groq
-      # carries the rest. TPM is NOT a schema field: at 5 RPM and ~3.4K
-      # tokens/call, 250K TPM is ~72 calls/min, so RPM binds ~14x earlier.
+      # carries the rest. At 5 RPM and ~3.4K tokens/call, 250K TPM is
+      # ~72 calls/min, so RPM binds ~14x earlier than TPM; the token pacer
+      # (session 9s) never binds on gemini.
       # 5 RPM = 12s pacing per call (RpmPacer): 20 calls cost ~4 min of
       # whichever run spends them -- the price of "gold".
       model: "gemini-flash-latest"
       rpm: 5
       rpd: 20
+      tpm: 250000
       supports_vision: true
       # DECISION 2026-08-30 (first automated run, POSTMORTEMS.md): read
       # timeout 20s, not the 60s default. Evidence: Gemini hung until the
@@ -369,16 +398,22 @@ llm:
     groq:
       # 2026-08-29, run-log evidence: llama-3.3-70b-versatile is gone from
       # Groq's roster (404). qwen3.8-27b from the live list (probe step).
+      #
+      # LIMITS verified 2026-09-09 from the Groq console limits page
+      # (outputs/groqlimits.txt): RPM 30 / RPD 1,000 / TPM 8,000 /
+      # TPD 200,000. The old "rpd: 14400" was WRONG -- 14.4K belongs to the
+      # llama-prompt-guard models. TPM 8,000 is the binder: one extraction
+      # call is ~3,450 tokens, so ~2.3 calls/min is sustainable, not 30.
+      # The 2026-09-08 22:56Z run fired 8-9 req/min (~30K tokens/min into
+      # an 8K window): 35 of 60 calls 429'd, minutes 9-19 at 100% failure,
+      # zero recovery -- rejected requests consume the token window. The
+      # TokenPacer (llm/token_pacer.py, session 9s) books every attempt's
+      # estimate into a 60s window, failures included.
       model: "qwen/qwen3.8-27b"
       rpm: 30
-      rpd: 14400
+      rpd: 1000
+      tpm: 8000
       supports_vision: false
-      # 2026-08-30 cascade evidence: Groq free-tier TPM caps capacity at
-      # ~13-14 calls per run regardless of correct 30-RPM pacing (429s at
-      # call ~14). ACCEPTED (owner decision, POSTMORTEMS.md): on
-      # Gemini-outage days each run covers its priority-ordered top ~14 of
-      # 40 clusters. A 429 here is NOT a pacing bug -- do not "fix" the
-      # pacer, there is nothing to fix.
     openrouter:
       # VERDICT 2026-08-30 (run at 18:24 UTC): OpenRouter is DEAD for this
       # project under the zero-cost constraint. The sequence settled it:
@@ -487,7 +522,6 @@ digest_rank:
   size_boost_cap: 1.0
   min_score: 8                   # importance floor: below this, no show
   max_messages: 6                # safety valve; count is dynamic by design
-  fallback_max_items: 5          # LLM-outage raw-title section (move 1)
   repeat_window_hours: 72        # events matching a recent stored event are repeats
   # TWO-BAND REPEAT GATE (round-2 review, 2026-09-06, fix 1 -- REPLACES the
   # 2026-09-06 fix-1 single conjunction, whose comment here previously

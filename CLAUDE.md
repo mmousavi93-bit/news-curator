@@ -60,7 +60,20 @@ silently work around them.
   Enforced in code as a daily cap keyed to Pacific midnight (health.py `_quota_day`).
   Gemini 3.5 Flash Lite reports **500 RPD** (owner, UNVERIFIED: exact model id, RPM, TPM
   unknown — do not wire until all three are confirmed).
-- Groq free: 30 RPM, 14,400 RPD, no card. Second-tier fallback. No vision.
+- Groq free, **`qwen/qwen3.8-27b`, verified 2026-09-09 from the console limits page**
+  (`outputs/groqlimits.txt`): RPM 30, **RPD 1K**, **TPM 8K**, TPD 200K. No card. No vision.
+  The old "30 RPM, 14,400 RPD" line was WRONG — 14.4K RPD belongs to the
+  `llama-prompt-guard-2-*` models, not to any model this project calls.
+  **TPM 8,000 is the binding limit on everything.** One extraction call is ~3,450
+  tokens (~3,050 in + ~400 out) → **2.3 calls/minute sustainable, not 30.** The
+  `RpmPacer` paces REQUESTS and is therefore blind to the limit that actually
+  binds; on 2026-09-08 it fired 8–9 req/min ≈ 30K tokens/min into an 8K window and
+  groq returned 429 on 35 of 60 calls, with minutes 9–19 at 100% failure and zero
+  recovery — rejected requests still consume the token window, so aggressive retry
+  is self-sustaining lockout. Evidence: `outputs/output-log.txt` + the two run.csvs
+  (18:03Z run 9 ok/62; the LATER 22:56Z run 25 ok/60 — later-is-better disproves any
+  daily ceiling). Corollary for batching: a single request must stay under 8K tokens,
+  so batches above ~7 clusters are guaranteed-permanent 429 on groq.
 - OpenRouter free: 20 RPM but only **50 requests/day**, model roster rotates weekly.
   Emergency parachute only, not a real fallback.
 - GitHub Actions: unlimited minutes on **public** repos; 2,000/mo private. Cache 10 GB.
@@ -167,7 +180,8 @@ Prompts live in `config/prompts/*.txt` — edit those, never hardcode prompt tex
 | `config/settings.yaml` | Thresholds, schedules, feature flags. |
 | `config/credibility.yaml` | Source → credibility tier. Drives confidence scoring. |
 | `config/risk_weights.yaml` | Signal → indicator weight matrix. Drives risk scoring. |
-| `config/prompts/` | All prompt text, editable without touching code. **Created 2026-08-29 (Phase 6):** `understand.txt` (cluster summarisation, JSON contract), `vision.txt` (inert until collectors extract images). |
+| `config/prompts/` | All prompt text, editable without touching code. **Created 2026-08-29 (Phase 6):** `understand.txt` (cluster summarisation, JSON contract), `vision.txt` (inert until collectors extract images). **9s (2026-09-09):** `understand_batch.txt` — the array contract; understand.txt stays the batch_size=1 rollback path, byte-identical. |
+| Session-9s files | `pipeline/batch.py` (chunk/build_payload/map_results + shared build_event), `pipeline/batch_run.py` (batch loop), `pipeline/single_run.py` (pre-9s loop, verbatim), `llm/token_pacer.py`, `settings_guard.py`, `report_csv_pairs.py`, `tests/unit/test_pipeline_batch.py`, `test_llm_token_pacer.py`, `test_pipeline_samerun_pairs.py`, `test_llm_wiring.py` |
 | `config/topics.yaml` | **Created 2026-08-29 (Phase 6):** per-language keyword lists gating the six `topic_gate: true` sources. Owner-editable; `pipeline/filter.py` validates shape. |
 | `config/relevance.yaml` | **Created 2026-08-30 (session 9c):** Iran-relevance keyword tiers for digest ranking — `iran_direct` 8 / `strategic` 4 / `economy` 3, highest match wins. Owner-editable; `pipeline/relevance.py` validates shape and scores. |
 | `config/risk_weights.yaml` | **Created 2026-08-29 (Phase 8):** 36-signal catalog + [BACKTESTED] weights + stateful list + markets-fetcher exemptions, copied from `analysis/backtest_weights.py`. Consumed by the Phase 11 scorer and the startup coverage check. |
@@ -212,6 +226,15 @@ Prompts live in `config/prompts/*.txt` — edit those, never hardcode prompt tex
 - **Routing: follow the `claude-agent-routing` skill** (canonical since 2026-08-29).
   Mechanical work (bulk file ops, wide greps, repetitive extraction, source-list research) →
   Haiku scout with a scoped brief; note the routing in one line.
+- **Never run plain `git status` from the sandbox — use `git --no-optional-locks status`.**
+  `git status` refreshes the index stat cache, which takes `.git/index.lock`; the
+  sandbox can create files in the mounted folder but **cannot delete them**
+  (`Operation not permitted`), so the lock is orphaned and the owner's next
+  `git add`/`commit` dies with "Another git process seems to be running."
+  Happened twice — 2026-09-08 18:58 (blocked the 9r push for ~40 min) and again
+  at 19:36 diagnosing the first. Verified fix: `--no-optional-locks` leaves 0
+  locks. `git log`/`rev-parse`/`show` are safe; anything that writes the index
+  is not. Owner recovery: confirm no git process, then `Remove-Item .git\index.lock -Force`.
 - **Data goes to CSV or files, not into chat.**
 - **Update this file** whenever a fact is verified, an ambiguity resolved, or a phase
   completed. Keep it lean — facts, numbers, blockers, locations. No frameworks, no prose
@@ -407,6 +430,44 @@ Forensic: POSTMORTEMS.md top entry. Four rounds of adversarial review, 27 → 33
 5. **Suite 769, predicted 769** (753 + 2 validate + 11 watchdog + 3 compose)
    — stated before running, reconciled exactly.
 
+## Session 9s (2026-09-09) — batched extraction + TokenPacer. Suite 813 → 815, review 38/40 SHIP (UNPUSHED)
+
+Brief: `agents/briefs/SESSION_9S_BRIEF.md`. Fixes the measured binder — Groq TPM 8K
+(see Decided facts): ~40 calls/run → ~8 by sending N clusters per call (prompt
+template paid once per batch, not per cluster). Ships with a token-aware pacer
+because batching alone fires ~46K tokens/min into an 8K window and fails identically.
+
+- `llm.batch_size: 5` (settings.yaml, arithmetic table in the comment);
+  **1 = the rollback path, byte-identical** (`single_run.py` is the pre-9s loop
+  verbatim — log strings, fates, retry prompt; pinned by tests).
+- `providers.*.tpm` (groq 8000, gemini 250000, bai unrecorded → logged once,
+  unconstrained). `settings_guard.py` refuses configs whose nominal batch
+  (2,300 + 800×N, deliberately conservative — round-1 review MINOR-1) exceeds
+  the smallest tpm in `llm.order`.
+- `TokenPacer` (`llm/token_pacer.py`): 60s sliding window, estimate booked on
+  EVERY attempt incl. failures (rejected requests consume the window — the
+  2026-09-08 lockout), estimate > tpm logs once and sends anyway. RpmPacer,
+  CooldownRegister 30s, 429-off-breaker all untouched.
+- Key-echo mapping, never position (`batch.py` — constraint 11 fence): response
+  elements echo per-batch ids c1..cN; unknown/duplicate keys dropped+logged;
+  missing/malformed element fates its cluster `unavailable`, batch-mates ship.
+- `pipeline.samerun_pair_log_floor: 0.40` (row count only, NOT a threshold) +
+  `pairs_<ts>.csv` (5th report CSV) with headlines — the measurement 9t's
+  clusterer fix is blocked on.
+- Raw-title fallback replaced by count-only line «⚠️ ۲ خبر بدون خلاصه ماند»
+  (raw untranslated titles never reach output). `fallback_max_items` removed.
+- Deviations from the brief, all documented in code: two prompt files (req 3's
+  exact-rollback forces it), TokenPacer in its own module (limits.py at cap),
+  pair key `pipeline.*` not `observability.*` (no such section), pair CSV
+  `independent_count_*` not `score_*` (no score exists at validate time).
+- Owner verifies after push (three reads): run.csv (`calls_groq` single digits,
+  `fails_groq` ~0; if 429s persist the token estimate is too low, not the batch
+  size), Actions log (`outcome=ok` dominates, run ~8→~12 min = the fix working),
+  `pairs_csv` (tanker/Azraq pairs: 0.60–0.79 → 9t same-story test; <0.55 → MiniLM
+  fails on Persian paraphrase).
+- Deferred to 9t: per-element raw-length cap (batch mode caps only whole-batch —
+  review MINOR-3, DB-bloat class, not output).
+
 ## Phases 6–10 (2026-08-29) — v1 CODE COMPLETE. Suite 522, 0 failed, shim-verified
 
 - Owner's mandate this session: push to done. Built per briefs: Phase 6 Understand
@@ -441,33 +502,59 @@ Forensic: POSTMORTEMS.md top entry. Four rounds of adversarial review, 27 → 33
 
 ## Pending / unresolved
 
-- [ ] **UNPUSHED: session 9r (suite 769).** Owner pushes; agents run no git here.
-      Suite re-verified independently 2026-09-08 19:33 in a clean sandbox
-      (`PYTHONPATH=src python3 tools/pytest_shim.py tests`): **769 passed, 0
-      failed, 0 skipped**. The count is measured, not predicted — do not re-run
-      it to "check". `RUN_ME_9r.ps1` sits in the repo root, unrun; 17 paths
-      still dirty.
-      9q IS pushed — `cb74744` is on `origin/main`, verified 2026-09-08. The old
-      "9q unpushed" item was stale for two days and inverted the plan.
-- [ ] **THE BLOCKER: no run artifacts exist in the working folder.** Zero
-      `chosen.csv` / `run.csv` / `summaries.csv` / `read.csv` / `flash_*.csv`.
-      Every remaining item of value is evidence work and none of it can start
-      until the owner downloads the pipeline + flash-reports artifacts from
-      GitHub Actions into the folder. This is the highest-value 2 minutes on
-      the project. Once they exist:
-      **(1) Verify 9q + 9r on 2–3 live runs.** The one number that matters is
-      delivered-event count: expect ~2–4 on a quiet run, ~14–20 across 2
-      messages on an escalation run. Then tune, ONE variable at a time, from
-      `chosen.csv`: `event_repeat_threshold` 0.80 (a guess, and now shared by
-      TWO consumers — measure the sim distribution of `repeat_dropped` AND
-      `same_run_dup` rows), then `digest_rank.min_score` 8, then source pruning
-      from read.csv.
-      **(2) Flash tuning loop** — 2–3 days of flash-reports CSVs → tune
-      `config/flash_alert.yaml`. Open flash defects: class-level burst
-      discipline still over-fires, untranslated English on CENTCOM-style
-      confirmations, ~42 `stale` rows concentrated in tg_wfwitness/tg_tabzlive.
-      **(3) Standing gates:** 3-run, 1-week, 60-day cron reset (RUNBOOK §6–8).
-      **(4) `tg_tsepress`** — probed USE_GATED, still HELD until (1) passes.
+- [x] CLOSED 2026-09-09: **9r IS pushed** — `843f517` on `origin/main`, verified
+      by `git log`, and it was live for the 22:56Z run reviewed below. The
+      "UNPUSHED 9r" item was stale, exactly as the "9q unpushed" item had been
+      for two days. **Standing rule: verify push state with `git log` before
+      planning around it. Never trust this list's own push claims.**
+- [x] CLOSED 2026-09-09: **the artifact blocker.** `outputs/` now holds the
+      22:56Z pipeline set + 4 flash CSVs.
+- [ ] **9q + 9r VERIFIED on the 2026-09-08 22:56Z escalation run. Review:
+      `analysis/RUN_REVIEW_20260908_2256Z.md`** — read that file, do not
+      re-derive. 474 items → 128 clusters → 40 kept → 20 events → **19
+      delivered / 2 messages** (9q blackout run was 2 of 905). Inside the
+      predicted 14–20 band. `event_repeat_threshold` 0.80 and
+      `digest_rank.min_score` 8 both HELD — do NOT tune either on this run.
+      The failure mode inverted from silence to **redundancy**. Five defects,
+      fix order in the review. Highest: **the LLM cascade failed 42 of 70 calls
+      and exhausted the cap** (gemini 4c/3f — 20 RPD makes it structurally
+      dead; groq 60c/35f; bai 6c/4f), leaving 13 of 40 kept clusters with no
+      summary and dumping raw untranslated headlines into both Persian
+      messages. Groq's failure CAUSE is in the Actions log, not the CSVs.
+      **The "~288 calls/day, 5x margin" line under Decided facts is STALE** —
+      written against the old 1,500 RPD figure. 40 clusters x 6 runs needs
+      ~240/day; gemini supplies 20.
+- [ ] **MEASUREMENT GAP — do not act on inference here.** The `band=mid sim=`
+      values in chosen.csv are the CROSS-run gate. Within-run pairwise cosines
+      are logged ONLY for pairs that get dropped (one row, 0.83). So the
+      fragmented tanker clusters (n=48/12/9/3, four entries for one event) and
+      Azraq (n=59/18/23/4) have no measured similarity, and two opposite
+      diagnoses remain live: (a) pairs at 0.60–0.79 → within-run needs a
+      same-story test that is not a single cosine, or (b) pairs below 0.55 →
+      MiniLM is failing on Persian paraphrase and no threshold anywhere fixes
+      it. Next build step is INSTRUMENTATION ONLY: log every within-run pair
+      above a low floor, and classify provider failures into run.csv. Ship
+      nothing else that run. Cannot be measured in the sandbox — no PyPI, no
+      sentence-transformers.
+- [ ] **Flash tuning loop** — 2–3 days of flash-reports CSVs → tune
+      `config/flash_alert.yaml`. Measured 2026-09-09 across 317 rows:
+      `پاسداران` → ring `city`, extracted from «سپاه پاسداران» (needs a
+      negative-context rule; Pasdaran is a real Tehran district so this fires
+      on nearly every military message); a person's name rendered as
+      `📍 خامنه ای`; 3 of 4 delivered alerts from `tg_tweet_mardomi` ALONE, two
+      of them opinion posts, one truncated mid-word; 186 of 317 rows
+      term-matched with NO location; 38 `stale` in tg_wfwitness/tg_tabzlive.
+- [ ] **9s UNPUSHED — owner push + live-run verification** (suite 815, review
+      38/40 SHIP, 0 blocking/major). Verify push with `git log`, then read
+      run.csv / Actions log / pairs_csv per the Session 9s block above.
+      9t is designed only from those measurements. Deferred from the review:
+      per-element raw-length cap (MINOR-3) joins the 9t queue.
+- [ ] **Standing gates:** 3-run, 1-week, 60-day cron reset (RUNBOOK §6–8).
+      Also: the 21:33 Tehran run's digest was delivered but its
+      chosen/run/summaries CSVs are missing from `outputs/` — check whether the
+      run uploaded an artifact at all.
+- [ ] **`tg_tsepress`** — probed USE_GATED, still HELD until the redundancy
+      defects close. One variable at a time.
 - [ ] **Filed 9q, still open — two items.** (Item (a), samerun non-transitivity,
       was FIXED in 9r.)
       (b) Two 9q fixes shipped with NO regression test — flash `location_display`

@@ -109,6 +109,13 @@ def build_stages(
         embedder = MiniLmEmbedder(config.settings.pipeline.embed_model)
 
     understand_prompt = _load_prompt("understand.txt", base)
+    # The batch template is loaded only when batching is on (session 9s):
+    # batch_size=1 -- the rollback path -- must not even READ the array
+    # contract, let alone send it. A missing batch file with batching
+    # enabled is a loud ConfigError, exactly like the single prompt.
+    batch_template = None
+    if config.settings.llm.batch_size > 1:
+        batch_template = _load_prompt("understand_batch.txt", base)
 
     stages = (
         CollectStage(sources, config.settings, logger),
@@ -117,7 +124,9 @@ def build_stages(
         EmbedStage(),
         ClusterStage(config, logger),
         UnderstandStage(
-            understand_prompt, config.settings.pipeline.item_body_chars, logger
+            understand_prompt, config.settings.pipeline.item_body_chars, logger,
+            batch_template=batch_template,
+            batch_size=config.settings.llm.batch_size,
         ),
         ValidateStage(config.credibility, logger),
         NoopStage("score"),     # v1.5 (Phase 11)
