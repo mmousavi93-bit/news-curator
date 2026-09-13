@@ -86,6 +86,17 @@ def open_flash_db(path: Path, *, create_if_absent: bool = False) -> sqlite3.Conn
         conn.execute(
             "ALTER TABLE bursts ADD COLUMN location_display TEXT NOT NULL DEFAULT ''")
         conn.commit()
+    # 9y (2026-09-13): the escalation class was removed — flash is
+    # tehran-only now. A persisted DB still holds open escalation bursts,
+    # and frames.* indexes config.classes[name] for every burst it sees,
+    # so an open escalation row crashes the monitor (KeyError) before it
+    # can ever reach the close-burst step — every run, forever. Close
+    # them here, at open, so the tehran-only monitor never touches them;
+    # they prune out under normal retention. Additive-only, no delete.
+    conn.execute(
+        "UPDATE bursts SET closed_at = last_seen_at "
+        "WHERE class_name = 'escalation' AND closed_at IS NULL")
+    conn.commit()
     row = conn.execute("SELECT value FROM meta WHERE key = ?",
                        (_VERSION_KEY,)).fetchone()
     if row is None:

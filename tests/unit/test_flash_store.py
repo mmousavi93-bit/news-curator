@@ -132,3 +132,35 @@ def test_log_flash_persists_rows(tmp_path):
         assert row["n"] == 1
     finally:
         conn.close()
+
+
+def test_open_closes_legacy_escalation_bursts(tmp_path):
+    # 9y regression (2026-09-13): the escalation class was removed from
+    # config, but a persisted flash DB still holds OPEN escalation rows.
+    # frames.* indexes config.classes[name] for every burst it sees, so an
+    # open escalation row would KeyError and crash the monitor on every
+    # run before it ever reaches the close-burst step. open_flash_db must
+    # close them at open so the tehran-only monitor never touches them.
+    path = tmp_path / "flash.db"
+    conn = store.open_flash_db(path, create_if_absent=True)
+    try:
+        conn.execute(
+            "INSERT INTO bursts (class_name, signature, term_bucket, "
+            "location_ring, location_token, headline, first_source, "
+            "first_seen_at, last_seen_at, source_ids) "
+            "VALUES ('escalation', 'escalation', 'strike', 'iran_geo', "
+            "'خلیج', 'legacy', 'tg_a', ?, ?, '[]')",
+            (store._iso(NOW - timedelta(hours=2)), store._iso(NOW)))
+        conn.commit()
+        assert store.open_bursts(conn)  # still open before re-open
+    finally:
+        conn.close()
+    conn2 = store.open_flash_db(path)
+    try:
+        row = conn2.execute(
+            "SELECT closed_at FROM bursts WHERE class_name = 'escalation'"
+        ).fetchone()
+        assert row["closed_at"] is not None  # migration closed it
+        assert store.open_bursts(conn2) == []  # no open escalation survives
+    finally:
+        conn2.close()
