@@ -424,6 +424,30 @@ def test_category_icons_render():
     assert "🏛️" in ctx.messages[0]
 
 
+def test_multi_source_event_renders_corroboration_count():
+    # 9v: an event corroborated by >=2 independent sources shows a factual
+    # «تأیید از N منبع» count. The reader weighing rumour-vs-fact needs the
+    # strength signal, not just the binary claim marker (constraint 11).
+    from agent.pipeline.labels import labels_for
+    ctx = _Ctx(config=_config())
+    event = _event("خلاصه نظامی اسرائیل تأییدشده.", category="military",
+                   independent=3, claim_status="likely")
+    ctx.events = [_with_cluster(ctx, event)]
+    ComposeStage(_Log()).run(ctx)
+    assert labels_for("fa")["sources_count"].format(count="۳") in ctx.messages[0]
+
+
+def test_single_source_event_omits_corroboration_count():
+    # 9v: independent_count == 1 means the event is already marked «تک‌منبع»;
+    # a "confirmed by 1 source" count would contradict that. No count line.
+    ctx = _Ctx(config=_config())
+    event = _event("خلاصه نظامی اسرائیل.", category="military",
+                   independent=1, claim_status="unconfirmed")
+    ctx.events = [_with_cluster(ctx, event)]
+    ComposeStage(_Log()).run(ctx)
+    assert "تأیید از" not in ctx.messages[0]
+
+
 def test_below_threshold_events_never_reach_the_message():
     ctx = _Ctx(config=_config())
     event = _event("مطلب غیرمرتبط.", category="other", independent=0)
