@@ -118,9 +118,28 @@ def test_openai_chat_request_shape(adapter, host):
         "messages": [{"role": "user", "content": "prompt"}],
         "temperature": 0.0,
         # 2026-08-30: the ramble cap (nemotron generated ~16.5K tokens on a
-        # ~400-token task and held a call open for 8 minutes).
-        "max_tokens": 700,
+        # ~400-token task and held a call open for 8 minutes). 9v raised it
+        # 700 -> 2000: since 9s the stage is batched and a 5-cluster array
+        # with 2-3-sentence summaries truncated mid-JSON at 700 (live run
+        # 34752049889 -> every cluster "unparseable").
+        "max_tokens": 2000,
     }
+
+
+def test_max_tokens_covers_worst_case_batch_output():
+    # 9v regression guard: the understand stage is batched, so the API
+    # max_tokens cap must cover the largest allowed batch's worst-case
+    # field-bounded output. A single-cluster 700 truncated a 5-cluster
+    # array mid-JSON -> every cluster "unparseable" (live run 34752049889).
+    # Conservative Persian ratio ~2.2 tok/word + JSON overhead per cluster;
+    # batch ceiling 7 is enforced by settings_guard (groq 8K TPM).
+    from agent.pipeline.contract import HEADLINE_WORD_BOUNDS, SUMMARY_WORD_BOUNDS
+
+    words_per_cluster = HEADLINE_WORD_BOUNDS[1] + SUMMARY_WORD_BOUNDS[1] + 8
+    worst_batch = (words_per_cluster * 2.2 + 15) * 7
+    adapter = GroqAdapter("qwen/qwen3.8-27b", "k" * 16)
+    _, _, payload = adapter.build_request("prompt", [])
+    assert payload["max_tokens"] >= worst_batch
 
 
 @pytest.mark.parametrize(

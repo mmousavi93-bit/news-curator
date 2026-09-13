@@ -131,10 +131,17 @@ class _OpenAiChatAdapter:
             # nemotron-3.5-lightning generated ~16.5K tokens on a task that
             # needs ~400 -- an 8-minute ramble whose continuous bytes kept
             # the read timeout fed, so it never tripped. The chat adapters'
-            # only consumer today is the understand stage (~400-token strict
-            # JSON); 700 is headroom, and a truncated JSON fails loudly
-            # (schema error -> retry) rather than silently.
-            "max_tokens": 700,
+            # only consumer today is the understand stage, which since 9s is
+            # BATCHED (llm.batch_size clusters per call, practical ceiling 7
+            # under groq's 8K TPM). The old 700 was a single-cluster budget;
+            # 9v's 2-3-sentence summaries pushed a 5-cluster array past it
+            # and every response truncated mid-JSON -> "unparseable" (live
+            # run 34752049889, 0 events). Worst case at the field bounds
+            # (headline 25w + summary 60w + entities, ~220 tokens/cluster in
+            # Persian) x batch 7 ~= 1540, so 2000 leaves headroom and stays
+            # ~8x under the ramble it guards against. The real content gates
+            # are contract.within_bounds and MAX_RESPONSE_CHARS (x batch).
+            "max_tokens": 2000,
         }
         return self._url, headers, payload
 
