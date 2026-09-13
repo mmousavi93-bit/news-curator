@@ -221,3 +221,18 @@ keywords:
     - "gold"
     - "inflation"
     - "sanctions"
+    # SESSION 9v (2026-09-13): consumer-economy terms. The tier was
+    # macro/oil-centric and missed what an Iranian household actually
+    # worries about (fuel, subsidies, housing, staples). Specific terms
+    # only -- no bare "قیمت" (price), which would over-fire on any
+    # priced object.
+    - "بنزین"
+    - "سوخت"
+    - "یارانه"
+    - "ارزاق"
+    - "مسکن"
+    - "gasoline"
+    - "fuel"
+    - "subsidy"
+    - "subsidies"
+    - "housing"

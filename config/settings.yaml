@@ -501,9 +501,10 @@ llm:
 # knows. Deterministic (constraint 3): identical input -> identical order.
 # score = category_weight + corroboration_weight*min(groups,3) + tier_bonus
 #         + recency bonus (decays to 0 at recency_window_hours) + size boost
-# Arithmetic for min_score (defaults): economy rumour from a tier-3 channel
-# = 2+0+0+3 = 5 -> dropped. "other" from a tier-2 = 0+2+2+3 = 7 -> dropped.
-# military rumour = 5+0+0+3 = 8 -> kept. politics tier-2 fresh = 3+2+2+3 = 10.
+# Arithmetic for min_score (defaults): military rumour from a tier-3 channel
+# = 6+0+0+3 = 9 -> kept. economy from a single tier-3 source = 5+0+0+3 = 8
+# -> kept at the floor. "other" from a tier-2 = 0+2+2+3 = 7 -> dropped.
+# politics tier-2 fresh = 3+2+2+3 = 10.
 # ---------------------------------------------------------------------------
 digest_rank:
   # DECISION 2026-08-30 (session 9c): relevance is the FILTER (config/
@@ -513,7 +514,14 @@ digest_rank:
   # product rule. Restored: military 6 (not 5) -- a fresh military RUMOUR
   # from the owner's own channels is exactly the early warning this system
   # exists for; 6 keeps it visible for ~4h of recency decay, then it drops.
-  category_weights: {military: 6, security: 4, politics: 3, economy: 2, other: 0}
+  # SESSION 9v (2026-09-13): economy 2 -> 5. The owner's audience is "an
+  # Iranian with war/economy worries" -- economy was the lowest non-zero
+  # weight and was structurally buried (measured: the one economy item in
+  # the 2026-09-08 run ranked 17/18). Corroboration still gives military a
+  # structural edge (Telegram channels corroborate war, not markets), so 5
+  # (one below military) is a first nudge, not a parity claim. Re-tune from
+  # the next clean-run CSV, one variable at a time.
+  category_weights: {military: 6, security: 4, politics: 3, economy: 5, other: 0}
   corroboration_weight: 2        # per independent corroborating group
   tier_bonus: {1: 3, 2: 2, 3: 0} # best source tier among cluster members
   recency_max_bonus: 3

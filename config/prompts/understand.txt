@@ -14,10 +14,15 @@ Rules:
   to decide from this line alone whether to read on or skip. No
   adjectives, no exclamation, no question bait, no news-anchor drama.
   A plain report of the fact, e.g. "حمله به یک کشتی تجاری در تنگه هرمز".
-- `summary`: 1-2 short sentences with the essential detail BEYOND the
-  headline -- do NOT repeat the headline's content. State what is
-  confirmed and what is merely claimed; if the articles disagree, say
-  they disagree. Drop details the reader does not need.
+- `summary`: 2-3 short sentences -- a mini-brief, NOT a restatement of
+  the headline. Sentence 1: what actually happened, with the essential
+  detail. Sentence 2: what is confirmed vs merely claimed; if the
+  articles disagree, say so. Sentence 3 (ONLY when the articles
+  themselves state it): the consequence that matters to an Iranian
+  reader -- escalation or security risk to Iran and its region, or an
+  economic effect (oil, prices, sanctions, supply, the rial). Never
+  infer or invent a consequence the articles do not state; when none is
+  given, omit sentence 3. Drop details the reader does not need.
 - `entities`: people, places, organisations involved, max 4.
 - `category`: one English word from exactly: "military", "security",
   "politics", "economy", "other".

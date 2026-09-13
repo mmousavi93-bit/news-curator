@@ -156,11 +156,22 @@ def build_digest_items(kept: list, clusters: dict, settings, labels: dict) -> tu
         elif event.claim_status == "unconfirmed":
             headline = f"{labels['unconfirmed']} · {headline}"
         headline = f"{category_icon(event.category)} {headline}"
-        detail_bits = [name, when, event.summary] if when else [name, event.summary]
+        meta_bits = [name]
+        if getattr(event, "independent_count", 0) >= 2:
+            meta_bits.append(labels["sources_count"].format(
+                count=to_persian_digits(str(event.independent_count))
+            ))
+        if when:
+            meta_bits.append(when)
+        meta = " · ".join(meta_bits)
+        # Elaborated form (9v): the meta line (category · corroboration ·
+        # time) and the summary are separated so the summary reads as a
+        # digest paragraph, not a suffix on the timestamp.
+        detail = f"{meta}\n{event.summary}" if event.summary else meta
         items.append(Item(
             headline=headline,
             priority=normal_index,
-            detail=" · ".join(detail_bits),
+            detail=detail,
         ))
     for event in high_events:
         headline = event.headline.strip() if event.headline else _headline(event.summary)
