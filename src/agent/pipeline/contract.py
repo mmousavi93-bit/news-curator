@@ -17,8 +17,8 @@ import json
 
 _FENCE_RE_OPEN = "```"
 
-# Output-contract bounds (the prompt asks for a ~15-word headline and 1-2
-# sentence summary). Enforced HERE, not at the API boundary.
+# Output-contract bounds (the prompt asks for a ~15-word headline and 2-3
+# sentence mini-brief summary). Enforced HERE, not at the API boundary.
 HEADLINE_WORD_BOUNDS = (2, 25)
 SUMMARY_WORD_BOUNDS = (2, 60)
 # A compliant digest answer is ~120 words ≈ well under 1,000 chars of JSON.
