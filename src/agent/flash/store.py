@@ -27,7 +27,7 @@ FLASH_SCHEMA_VERSION = 1
 _VERSION_KEY = "flash_schema_version"
 _SCHEMA_PATH = Path(__file__).with_name("schema.sql")
 
-_BURST_RETENTION_DAYS = 30  # the momentum layer's lookback horizon
+_BURST_RETENTION_DAYS = 30  # historical retention; tehran quiet window needs only 24h
 _URL_RETENTION_DAYS = 7
 _LOG_RETENTION_DAYS = 30
 
@@ -221,10 +221,8 @@ def log_flash(conn: sqlite3.Connection, rows: list[tuple], now: datetime) -> Non
 
 
 def prune(conn: sqlite3.Connection, now: datetime) -> tuple[int, int]:
-    """(bursts_pruned, urls_pruned). Bursts keep 30 days — the momentum
-    layer's lookback horizon; pruning them at 7 days made the
-    de-escalation notice unreachable after a week of quiet (reviewer
-    finding 2026-08-31). URLs keep 7, the log 30."""
+    """(bursts_pruned, urls_pruned). Bursts keep 30 days of history; URLs
+    keep 7, the log 30."""
     cutoff_burst = _iso(now - timedelta(days=_BURST_RETENTION_DAYS))
     cutoff_log = _iso(now - timedelta(days=_LOG_RETENTION_DAYS))
     cursor = conn.execute(

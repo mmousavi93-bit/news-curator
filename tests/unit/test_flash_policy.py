@@ -138,12 +138,12 @@ def test_hourly_cap_defers_new_alert(tmp_path):
     ]
     evaluate(seeds, conn, _CONFIG, NOW, _Sender(), _Log())
     assert store.alerts_sent_since(conn, store._iso(NOW - timedelta(hours=1))) == 3
-    # A fourth NEW event (escalation class) hits the cap -> deferred.
-    match = _match("https://x/9", "حمله آمریکا به لارک", "tg_9")
+    # A fourth NEW event (tehran class) hits the cap -> deferred.
+    match = _match("https://x/9", "موشک‌باران در کرج", "tg_9")
     sender = _Sender()
     evaluate([match], conn, _CONFIG, NOW + timedelta(minutes=1), sender, _Log())
     assert sender.sent == []  # deferred, burst stays open
-    assert any(b.signature == "escalation"
+    assert any(b.signature == "tehran|attack_air|region"
                for b in store.open_bursts(conn))
 
 
@@ -165,20 +165,6 @@ def test_quiet_window_holds_refire_below_threshold(tmp_path):
                for i in range(3, 6)]
     evaluate(matches, conn, _CONFIG, t2, sender, _Log())
     assert len(sender.sent) == 1
-
-
-def test_escalation_quiet_window_is_shorter(tmp_path):
-    conn = _db(tmp_path)
-    match = _match("https://x/1", "حمله آمریکا به لارک", "tg_a")
-    evaluate([match], conn, _CONFIG, NOW, _Sender(), _Log())
-    for burst in store.open_bursts(conn):
-        store.close_burst(conn, burst.id, NOW)
-    # 13 hours later: within tehran's 24h quiet, OUTSIDE escalation's 12h.
-    later = NOW + timedelta(hours=13)
-    match2 = _match("https://x/2", "حمله آمریکا به ایران", "tg_b", later)
-    sender = _Sender()
-    evaluate([match2], conn, _CONFIG, later, sender, _Log())
-    assert len(sender.sent) == 1  # fires immediately at one source
 
 
 def test_window_expiry_stops_all_sends(tmp_path):
@@ -207,31 +193,19 @@ def test_cap_deferral_survives_and_fires_when_cap_frees(tmp_path):
         _match("https://x/3", "انفجار در کرج", "tg_3"),
     ]
     evaluate(seeds, conn, _CONFIG, NOW, _Sender(), _Log())
-    match = _match("https://x/9", "حمله آمریکا به لارک", "tg_9")
+    match = _match("https://x/9", "موشک‌باران در کرج", "tg_9")
     sender = _Sender()
     evaluate([match], conn, _CONFIG, NOW + timedelta(minutes=1), sender, _Log())
     assert sender.sent == []  # deferred at the cap
     # +30 min: within the 90-min deadline -> NOT stale-closed.
     evaluate([], conn, _CONFIG, NOW + timedelta(minutes=30), sender, _Log())
-    assert any(b.signature == "escalation"
+    assert any(b.signature == "tehran|attack_air|region"
                for b in store.open_bursts(conn))
     # +62 min: the seeds aged out of the hourly window -> cap free, the
     # pending first alert finally fires.
     evaluate([], conn, _CONFIG, NOW + timedelta(minutes=62), sender, _Log())
     assert len(sender.sent) == 1
-    assert "افزایش تنش" in sender.sent[0]
-
-
-def test_never_sent_bursts_do_not_count_for_deescalation(tmp_path):
-    # Reviewer finding 2026-08-31: quiet-held/stale-closed rumour hits
-    # that never alerted must not produce a false "calm" notice.
-    conn = _db(tmp_path)
-    for d in (6, 7, 8):
-        match = _match(f"https://x/h{d}", "حمله آمریکا به لارک", f"tg_h{d}")
-        _backdate_burst(conn, match, d, sent=False)
-    sender = _Sender()
-    evaluate([], conn, _CONFIG, NOW, sender, _Log())
-    assert sender.sent == []
+    assert "هشدار انفجار" in sender.sent[0]
 
 
 def test_headline_html_is_escaped_before_send(tmp_path):
@@ -246,161 +220,18 @@ def test_headline_html_is_escaped_before_send(tmp_path):
     assert "<جزئیات>" not in sender.sent[0]
 
 
-def test_escalation_wave_merges_into_one_alert(tmp_path):
-    # Owner live feedback 2026-08-31: three escalation posts in the same
-    # wave (different buckets, different locations) = ONE alert, sources
-    # accumulate — not three first alerts.
-    conn = _db(tmp_path)
-    matches = [
-        _match("https://x/1", "حمله به کشتی تجاری در تنگه هرمز", "tg_1"),
-        _match("https://x/2", "حمله آمریکا به لارک", "tg_2"),
-    ]
-    sender = _Sender()
-    evaluate(matches, conn, _CONFIG, NOW, sender, _Log())
-    assert len(sender.sent) == 1
-    assert store.open_bursts(conn)[0].source_count == 2
-
-
-def test_novel_bucket_after_gap_realerts(tmp_path):
-    # "Once per momentum change is enough": a novel bucket INSIDE the
-    # gap merges silently; past the gap it is a new momentum change and
-    # re-alerts.
-    conn = _db(tmp_path)
-    evaluate([_match("https://x/1", "حمله به کشتی تجاری در تنگه هرمز", "tg_1")],
-             conn, _CONFIG, NOW, _Sender(), _Log())
-    t1 = NOW + timedelta(minutes=60)
-    sender = _Sender()
-    evaluate([_match("https://x/2", "حمله دریایی در بندرعباس", "tg_2", t1)],
-             conn, _CONFIG, t1, sender, _Log())
-    assert sender.sent == []  # inside the 120-min gap: merged, no re-alert
-    t2 = t1 + timedelta(minutes=130)
-    evaluate([_match("https://x/3", "ناوهواپیمابر وارد خلیج فارس شد", "tg_3", t2)],
-             conn, _CONFIG, t2, sender, _Log())
-    assert len(sender.sent) == 1  # past the gap: momentum change -> alert
-    assert "افزایش تنش" in sender.sent[0]
-
-
-def test_convergence_note_when_three_buckets_fire_within_72h(tmp_path):
-    # WAR_SIGNALS_PAPER: one category screaming is a rumor cycle; three
-    # ALERTED categories moving within 72h is a war. The note is
-    # deterministic, never a claim upgrade, and counts only buckets the
-    # owner actually saw (live feedback 2026-08-31).
-    conn = _db(tmp_path)
-    seeds = [
-        _match("https://x/1", "حمله به کشتی تجاری در تنگه هرمز", "tg_1"),
-        _match("https://x/2", "حمله آمریکا به لارک", "tg_2"),
-    ]
-    evaluate(seeds, conn, _CONFIG, NOW, _Sender(), _Log())
-    for burst in store.open_bursts(conn):
-        store.close_burst(conn, burst.id, NOW)
-    t = NOW + timedelta(minutes=130)  # past the novelty gap
-    match = _match("https://x/9", "ناوهواپیمابر لینکلن وارد خلیج فارس شد",
-                   "tg_9", t)
-    sender = _Sender()
-    evaluate([match], conn, _CONFIG, t, sender, _Log())
-    assert len(sender.sent) == 1
-    assert "همگرایی سیگنال" in sender.sent[0]
-    assert "3 دسته" in sender.sent[0]
-
-
 def test_arabic_headline_gets_lang_prefix(tmp_path):
     # Owner live feedback 2026-08-31: raw Arabic headlines read as a
     # broken Persian contract. The quote stays raw; the prefix makes it
     # explicit.
     conn = _db(tmp_path)
     match = _match("https://x/1",
-                   "بحرية الحرس الثوري الإيراني: تحذير لشركات الملاحة",
+                   "انفجار في تهران؛ سماع دوي الانفجار",
                    "al_manar", lang="ar")
     sender = _Sender()
     evaluate([match], conn, _CONFIG, NOW, sender, _Log())
     assert len(sender.sent) == 1
     assert "«عربی»" in sender.sent[0]
-
-
-def _backdate_burst(conn, match, days_ago, now=NOW, sent: bool = True):
-    """Insert a burst then backdate its first/last-seen and close it —
-    the momentum layer reads ALERTED history rows, so seeds are marked
-    sent by default (a pattern the owner never saw cannot count)."""
-    burst_id = store.insert_burst(conn, match, now, requires_sources=0)
-    stamp = store._iso(now - timedelta(days=days_ago))
-    conn.execute(
-        "UPDATE bursts SET first_seen_at = ?, last_seen_at = ?, closed_at = ?, "
-        "alert_sent = ?, alert_sent_at = ? WHERE id = ?",
-        (stamp, stamp, stamp, int(sent), stamp if sent else None, burst_id))
-    conn.commit()
-
-
-def test_background_bucket_needs_volume_on_day_three(tmp_path):
-    # Day 1-2 of the same attack-and-response pattern is escalation; by
-    # day 3 at the same intensity it is the new normal — re-alert only
-    # with volume (owner 2026-08-31 momentum rule).
-    conn = _db(tmp_path)
-    for d in (1, 2, 3):
-        match = _match(f"https://x/h{d}", "حمله آمریکا به لارک", f"tg_h{d}")
-        _backdate_burst(conn, match, d)
-    match = _match("https://x/n1", "حمله آمریکا به لارک", "tg_n1")
-    sender = _Sender()
-    evaluate([match], conn, _CONFIG, NOW, sender, _Log())
-    assert sender.sent == []  # background: 1 source is not enough
-    t = NOW + timedelta(minutes=5)
-    matches = [_match(f"https://x/n{i}", "حمله آمریکا به لارک", f"tg_n{i}", t)
-               for i in range(2, 4)]
-    evaluate(matches, conn, _CONFIG, t, sender, _Log())
-    assert len(sender.sent) == 1  # 3 sources break the background hold
-
-
-def test_novel_target_restores_instant_escalation(tmp_path):
-    conn = _db(tmp_path)
-    for d in (1, 2, 3):
-        match = _match(f"https://x/h{d}", "حمله آمریکا به لارک", f"tg_h{d}")
-        _backdate_burst(conn, match, d)
-    # Same bucket, NEW target domain (تهران) — full escalation again,
-    # fires at ONE source even mid-streak.
-    match = _match("https://x/n1", "حمله آمریکا به تهران", "tg_n1")
-    sender = _Sender()
-    evaluate([match], conn, _CONFIG, NOW, sender, _Log())
-    assert len(sender.sent) == 1
-
-
-def test_deescalation_notice_after_three_quiet_days(tmp_path):
-    conn = _db(tmp_path)
-    for d in (6, 7, 8):
-        match = _match(f"https://x/h{d}", "حمله آمریکا به لارک", f"tg_h{d}")
-        _backdate_burst(conn, match, d)
-    sender = _Sender()
-    evaluate([], conn, _CONFIG, NOW, sender, _Log())
-    assert len(sender.sent) == 1
-    assert "کاهش تنش" in sender.sent[0]
-    # Cooldown: no second notice on the next tick.
-    sender2 = _Sender()
-    evaluate([], conn, _CONFIG, NOW + timedelta(minutes=15), sender2, _Log())
-    assert sender2.sent == []
-
-
-def test_no_deescalation_without_prior_pattern(tmp_path):
-    conn = _db(tmp_path)
-    sender = _Sender()
-    evaluate([], conn, _CONFIG, NOW, sender, _Log())
-    assert sender.sent == []
-
-
-def test_no_deescalation_when_recently_active(tmp_path):
-    conn = _db(tmp_path)
-    match = _match("https://x/1", "حمله آمریکا به لارک", "tg_1")
-    _backdate_burst(conn, match, 1)
-    sender = _Sender()
-    evaluate([], conn, _CONFIG, NOW, sender, _Log())
-    assert sender.sent == []
-
-
-def test_requires_override_none_on_short_streak_seen_token(tmp_path):
-    from agent.flash import momentum as momentum_mod
-
-    conn = _db(tmp_path)
-    match = _match("https://x/h1", "حمله آمریکا به لارک", "tg_h1")
-    _backdate_burst(conn, match, 1)
-    assert momentum_mod.requires_override(
-        conn, "escalation", "strike", "لارک", NOW, _CONFIG) is None
 
 
 def test_stale_burst_closes(tmp_path):

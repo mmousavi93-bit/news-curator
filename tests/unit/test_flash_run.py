@@ -41,11 +41,11 @@ class _FakeClient:
         return type("R", (), {"ok": True})()
 
 
-def _larak_item(url="https://t.me/tabzlive/999"):
+def _tehran_item(url="https://t.me/tabzlive/999"):
     now = datetime.now(timezone.utc)
     return Item(source_id="tg_tabzlive", url=url,
-                title="حمله آمریکا به جزیره لارک؛ سپاه وعده پاسخ قاطع داد",
-                body="منابع از حمله نظامی آمریکا به مواضع ایران خبر می‌دهند.",
+                title="انفجار مهیب در تهران؛ صدای انفجار شنیده شد",
+                body="شاهدان از شنیده شدن صدای انفجار در تهران خبر می‌دهند.",
                 published_at=now, lang="fa", raw_hash="f" * 8)
 
 
@@ -65,21 +65,21 @@ def _patch(monkeypatch, items, client):
 def test_end_to_end_alert_sent_once_then_deduped(tmp_path, monkeypatch):
     db = tmp_path / "flash.db"
     client = _FakeClient()
-    _patch(monkeypatch, [_larak_item()], client)
+    _patch(monkeypatch, [_tehran_item()], client)
     assert run_flash._run(_args(db=db)) == 0
     assert len(client.sent) == 1
-    assert "افزایش تنش" in client.sent[0]
+    assert "هشدار انفجار" in client.sent[0]
     assert "تأیید نشده" in client.sent[0]
     # Second run: same URL already seen -> no duplicate alert.
     client2 = _FakeClient()
-    _patch(monkeypatch, [_larak_item()], client2)
+    _patch(monkeypatch, [_tehran_item()], client2)
     assert run_flash._run(_args(db=db)) == 0
     assert client2.sent == []
 
 
 def test_dry_run_writes_csv_and_sends_nothing(tmp_path, monkeypatch):
     client = _FakeClient()
-    _patch(monkeypatch, [_larak_item()], client)
+    _patch(monkeypatch, [_tehran_item()], client)
     monkeypatch.setenv("NEWS_CURATOR_REPORT_DIR", str(tmp_path))
     assert run_flash._run(_args(dry_run=True)) == 0
     assert client.sent == []
