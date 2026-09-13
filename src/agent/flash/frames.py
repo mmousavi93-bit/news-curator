@@ -1,6 +1,5 @@
 """Message rendering + window math for the flash monitor. Split out of
-policy.py 2026-08-31 (constraint 12: the state machine gained the
-novelty-gap merge and policy.py crossed the ~200-line cap).
+policy.py 2026-08-31 (constraint 12: policy.py crossed the ~200-line cap).
 
 Rendering rules (owner output contract):
 - every interpolated source string is HTML-escaped (Telegram parse_mode
@@ -42,8 +41,7 @@ def headline(burst: store.BurstRow) -> str:
     return _lang_prefix(raw) + escape_html(raw)
 
 
-def render_first(burst: store.BurstRow, config: FlashConfig, now: datetime,
-                 convergence: str = "") -> str:
+def render_first(burst: store.BurstRow, config: FlashConfig, now: datetime) -> str:
     extra = burst.source_count - 1
     return config.templates["first"].format(
         label=config.classes[burst.class_name].label,
@@ -55,7 +53,6 @@ def render_first(burst: store.BurstRow, config: FlashConfig, now: datetime,
         location_token=escape_html(burst.location_display or burst.location_token),
         first_source=burst.first_source,
         more_sources=f" (+{extra} منبع دیگر)" if extra else "",
-        convergence=convergence,
         jalali=format_jalali(now),
         tehran_time=to_tehran(now).strftime("%H:%M"),
     )
@@ -75,9 +72,7 @@ def deadline(burst: store.BurstRow, config: FlashConfig) -> datetime:
 
 
 def collapse_window(burst: store.BurstRow, config: FlashConfig) -> int:
-    """Per-class collapse window: escalation's class-level burst stays
-    open 180 min so one wave = one alert (owner live feedback
-    2026-08-31); tehran uses the global 30-min default."""
+    """Per-class collapse window (tehran uses the global default)."""
     alert_class = config.classes[burst.class_name]
     return (alert_class.collapse_window_minutes
             or config.collapse_window_minutes)

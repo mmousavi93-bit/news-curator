@@ -38,7 +38,7 @@ def _term_bucket(text: str, alert_class: AlertClass) -> str | None:
 def _location(text: str, alert_class: AlertClass,
               allowed_rings: tuple[str, ...]) -> tuple[str, str, str] | None:
     """(ring, token, display) or None. `token` is the NORMALIZED form (used
-    for matching, history and novelty comparison); `display` is the
+    for matching and history); `display` is the
     spelling the owner configured (round-4 review, fix 2 — the alert must
     show what he typed, not the folded form). Single-word terms are
     whole-token matches; multi-word phrases are substring matches. RING
@@ -46,9 +46,8 @@ def _location(text: str, alert_class: AlertClass,
     (iran_geo before actors), so «حمله آمریکا به لارک» displays لارک (the
     target), never آمریکا (the attacker). WITHIN a ring the most specific
     token wins: longest, ties broken by earliest occurrence. `allowed_rings`
-    is the bucket's ring_requirements — action buckets must hit Iran
-    territory, statement buckets may match actors (owner live feedback
-    2026-08-31: routine Gaza-front coverage is not escalation)."""
+    is the bucket's ring_requirements (a class may restrict a bucket to
+    specific rings; tehran uses none, so all rings are allowed)."""
     tokens = _tokens(text)
     for ring, locations in alert_class.locations.items():
         if ring not in allowed_rings:
@@ -127,10 +126,7 @@ def match_items(items, config: FlashConfig, now: datetime):
             if location is None:
                 # A term hit without an allowed location must not block
                 # later classes: «حمله موشکی» in a non-Tehran item is a
-                # tehran no_location but may be a live escalation
-                # (the Larak FA item carries موشک). A Gaza artillery
-                # story is a strike whose ring requirement (iran_geo)
-                # is unmet — killed here, exactly as designed.
+                # tehran no_location — killed here, exactly as designed.
                 kills.append((item.source_id, f"{class_name}:no_location"))
                 continue
             ring, token, display = location

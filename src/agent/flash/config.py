@@ -12,12 +12,11 @@ from agent.flash.textnorm import normalize
 
 _LANGS = ("fa", "en", "ar")
 _RINGS = ("city", "region", "iran_geo", "actors")
-_TEMPLATE_KEYS = ("first", "followup", "system_down", "deescalation")
+_TEMPLATE_KEYS = ("first", "followup", "system_down")
 _REQUIRED_PLACEHOLDERS = {
     "first": ("{label}", "{headline}", "{location_token}", "{first_source}",
-              "{more_sources}", "{convergence}", "{jalali}", "{tehran_time}"),
+              "{more_sources}", "{jalali}", "{tehran_time}"),
     "followup": ("{n}", "{label}", "{headline}"),
-    "deescalation": ("{n}",),
 }
 
 
@@ -49,12 +48,6 @@ class FlashConfig:
     followup_window_minutes: int
     followups: tuple[int, ...]
     max_alerts_per_hour: int
-    novelty_min_gap_minutes: int
-    momentum_streak_window_days: int
-    momentum_streak_repeat_threshold_days: int
-    momentum_repeat_requires_sources: int
-    deescalation_quiet_days: int
-    deescalation_cooldown_days: int
     classes: Mapping[str, AlertClass]
     templates: Mapping[str, str]
 

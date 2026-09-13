@@ -1,11 +1,11 @@
-# flash_alert.yaml — Tehran explosion + escalation flash monitor.
+# flash_alert.yaml — Tehran explosion flash monitor.
 # Deterministic, ZERO LLM calls, owner-editable (2026-08-30, owner-approved
 # design: 15-min scans, 24/7, unverified-OK alerts with burst cleaning).
 #
 # Loader (agent/flash/config.py) validates shape strictly: a typo fails the
 # run loudly, never silently widens or narrows the alert.
 #
-# SEMANTICS: an alert fires when one of a CLASS's term buckets AND one of
+# SEMANTICS: an alert fires when one of the CLASS's term buckets AND one of
 # its location rings both match an item published in the last
 # `freshness_minutes`. Term = substring; single-word location = whole-token
 # (so «ری» never matches «خبری»); multi-word locations match as phrases.
@@ -15,10 +15,12 @@
 # AMPLIFICATION, never corroboration — every message carries the
 # «تأیید نشده» label (standing rumour policy).
 #
-# CLASS PRECEDENCE: classes are checked in file order; the first matching
-# class wins (a Tehran explosion alerts as tehran, not escalation).
+# The escalation class was REMOVED 2026-09-13 (session 9Y): regional
+# tension escalation is a trend, not an event — it belongs to the 3-hourly
+# digest, not a 15-min channel. This monitor is now the single life-safety
+# signal: an explosion / air attack reported in or near Tehran.
 
-version: 2
+version: 3
 
 enabled: true
 
@@ -42,32 +44,14 @@ matching:
   window_chars: 300           # buckets must appear in title + first 300 chars
 
 burst:
-  collapse_window_minutes: 30 # tehran default; escalation overrides per-class
+  collapse_window_minutes: 30 # tehran collapse window
   followup_window_minutes: 90 # after first sighting, alerts stop; digest owns it
   followups: [3, 8]           # at most 2 per event; count = distinct source ids
-  # Escalation re-alert guard (owner 2026-08-31, live-feedback): a novel
-  # bucket/ring only re-alerts after this much quiet on the open burst —
-  # "once per momentum change is enough", not once per micro-post.
-  novelty_min_gap_minutes: 120
 
 caps:
   max_alerts_per_hour: 3      # NEW-event first alerts, ALL classes; FUs exempt
   # Cap hit -> defer, never drop: the burst stays open, the next scan
   # re-evaluates. Window expiry -> items flow to the 3-hourly digest.
-
-# MOMENTUM (owner 2026-08-31): the same attack-and-response pattern is
-# escalation on day 1-2 and background noise by day 3 at the same
-# intensity. A NEW target domain (novel location token) or a NEW bucket
-# restores full escalation. Escalation guesses FAST; de-escalation is
-# certified SLOWLY (asymmetric by design).
-momentum:
-  streak_window_days: 7
-  streak_repeat_threshold_days: 3   # 3rd distinct day of the same bucket = background
-  repeat_requires_sources: 3        # background buckets need 3 sources to re-alert
-
-deescalation:
-  quiet_days: 3                     # sustained quiet before the 📉 notice
-  cooldown_days: 7                  # one notice per week at most
 
 exclusions:
   # substring over FULL title+body; ANY hit kills the fire. «شایعه» is
@@ -110,94 +94,13 @@ classes:
              بهارستان, رباط‌کریم, رباط کریم, دماوند, فیروزکوه, پیشوا, قدس, گلستان]
         en: [karaj, pardis, varamin, pakdasht, rey, lavasan]
 
-  escalation:
-    label: "افزایش تنش"
-    # ONE open escalation state, not one burst per story (owner live
-    # feedback 2026-08-31: the same IRGC-navy story fired twice because
-    # two sources matched different location tokens). All matches of a
-    # wave merge; a novel bucket/ring re-alerts only past the novelty gap.
-    burst_scope: class
-    collapse_window_minutes: 180
-    # Escalation rhetoric (IRGC response threats) is a constant background
-    # hum — a SHORTER quiet window than tehran, not a longer one, because a
-    # genuine response follows fast and must not be suppressed.
-    quiet_hours: 12
-    quiet_requires_sources: 3
-    # ACTION buckets must hit IRAN TERRITORY: routine Gaza/Lebanon front
-    # coverage («الاحتلال يجرف المنصوري بالقصف المدفعي») is not escalation.
-    # Statement buckets may match the actors ring (IRGC threats, Trump
-    # ultimatums).
-    ring_requirements:
-      strike: [iran_geo]
-      maritime: [iran_geo]
-      posture: [iran_geo]
-      response_threat: [iran_geo, actors]
-      ultimatum: [iran_geo, actors]
-      apparatus: [iran_geo, actors]
-    # Bucket order = evidential value (WAR_SIGNALS_PAPER.md taxonomy,
-    # 2025-26 Iran wars): E kinetic (maritime first — a vessel attack
-    # preceded EVERY US strike wave by 24-72h in July 2026) → A posture
-    # (expensive, hard to fake) → B apparatus protection (0-3d lead, the
-    # shortest) → C/D calendar+rhetoric → D rhetoric (cheapest, decays).
-    terms:
-      maritime:
-        fa: [حمله به کشتی, حمله دریایی, کشتی تجاری, نفتکش, مین‌گذاری,
-             مین گذاری, تلغیم]
-        en: [vessel attack, tanker, ship attacked, ship attack, maritime incident,
-             mining, naval attack, blockade]
-        ar: [ناقلة, سفينة, تلغيم, بحرية]
-      strike:
-        fa: [حمله, حمله نظامی, حمله هوایی, موشک‌باران, هدف قرار گرفت, بمباران,
-             تهاجم, ضربه, غاره, انهدام]
-        en: [strike, attack, hit, targeted, bombed, raid, destroyed]
-        ar: [هاجم, قصف, ضربة, استهدف, غارة, دمر]
-      posture:
-        fa: [ناوهواپیمابر, ناو هواپیمابر, بمب‌افکن, بمب افکن, تاد, پاتریوت,
-             استقرار نظامی, انتقال مهمات, ناو جنگی, جنگنده]
-        en: [carrier, aircraft carrier, bomber, b-52, b-2, thaad, patriot,
-             deployment, repositioning, munitions, fighter jets]
-        ar: [حاملة طائرات, قاذفة, صواريخ دفاعية]
-      apparatus:
-        fa: [تخلیه سفارت, تخلیه شهروندان, تخلیه پرسنل, هشدار سفر, بستن سفارت,
-             تعطیلی سفارت, تعطیل شدن سفارت]
-        en: [evacuation, evacuate, travel advisory, embassy closure,
-             closing embassy, embassy closed, personnel depart]
-        ar: [إجلاء, إغلاق السفارة, تخلي]
-      ultimatum:
-        fa: [اولتیماتوم, ضرب‌الاجل, مهلت داد, هشدار نهایی, مهلت پایان]
-        en: [ultimatum, deadline, final warning]
-        ar: [مهلة, إنذار نهائي]
-      response_threat:
-        fa: [پاسخ, تلافی, انتقام, پاسخ قاطع, پاسخ خواهیم داد, واکنش سخت,
-             پاسخی کوبنده, پاسخ سهمگین, تهدید کرد]
-        en: [retaliate, retaliation, revenge, will respond, response, threatens, vowed]
-        ar: [رد, انتقام, سيرد, سنرد, توعد]
-    locations:
-      iran_geo:  # Iran territory incl. strategic islands/sites (Larak-class)
-        fa: [ایران, ایرانی, تهران, لارک, تنگه هرمز, خلیج فارس, هرمز, بوشهر,
-             بندرعباس, بندر لنگه, خارک, اصفهان, نطنز, فوردو, کیش, قشم,
-             ابوموسی, تنب بزرگ, تنب کوچک, میناب]
-        en: [iran, iranian, tehran, larak, strait of hormuz, persian gulf,
-             hormuz, bushehr, bandar abbas, isfahan, natanz, fordo, kish,
-             qeshm, abu musa, kharg]
-        ar: [إيران, إيراني, لارك, مضيق هرمز, الخليج, هرمز, بوشهر, بندر عباس,
-             نطنز, جزيرة]
-      actors:  # whose actions/statements make it escalation-relevant
-        fa: [آمریکا, آمریکایی, ترامپ, اسرائیل, اسرائیلی, پنتاگون, سپاه,
-             پاسداران, خامنه‌ای, خامنه ای, عراقچی, فرمانده کل]
-        # "us" is ABSENT on purpose: normalization lowercases text, so
-        # the English pronoun "us" would match and re-alert forever.
-        en: [usa, united states, american, trump, pentagon, israel,
-             israeli, irgc, khamenei, araqchi]
-        ar: [أمريكا, امريكا, ترامب, إسرائيل, البنتاغون, الحرس الثوري, خامنئي, عراقجي]
-
 templates:
   first: |
     🚨 {label}
     {headline}
     📍 {location_token}
     📡 منابع: {first_source}{more_sources}
-    {convergence}⏱ {jalali} — {tehran_time}
+    ⏱ {jalali} — {tehran_time}
     «تأیید نشده»
   followup: |
     🚨 به‌روزرسانی — {n} منبع گزارش می‌دهند
@@ -207,6 +110,3 @@ templates:
   system_down: |
     ⚠️ سیستم هشدار از کار افتاده است (رمزگشایی state ناموفق یا خطای بحرانی).
     تا رفع مشکل، به مرور اخبار عادی تکیه کنید.
-  deescalation: |
-    📉 کاهش تنش — {n} روز بدون سیگنال تشدید
-    الگوی درگیری‌ها در حال فروکش است. این ارزیابی محتاطانه است و تنها پس از چند روز آرامش پایدار صادر می‌شود.

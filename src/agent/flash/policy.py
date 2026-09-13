@@ -1,25 +1,20 @@
 """The burst state machine: collapse, follow-ups, caps, quiet windows,
-momentum, ack-gating. Deterministic — identical state + input yields
+ack-gating. Deterministic — identical state + input yields
 identical sends (constraint 3). Rendering + window math live in
 frames.py (split 2026-08-31, constraint 12).
 
 Cleaning policy (owner-approved 2026-08-30, refined by live feedback
 2026-08-31):
 
-- CLASS-LEVEL bursts for escalation: ONE open escalation state, not one
-  burst per story. The same event reported by N sources in minutes =
-  one first alert + at most 2 source-count follow-ups. The count is
+- per-signature bursts: one open burst per (bucket, location-ring)
+  signature. The same event reported by N sources in minutes = one
+  first alert + at most 2 source-count follow-ups. The count is
   reported, never upgraded — repetition is amplification, not
   corroboration (standing rumour policy).
 - first alert fires at source-count 1 immediately, UNLESS the signature
   is in its quiet window — then it waits for >= quiet_requires_sources.
 - follow-ups fire when the distinct-source count crosses config
   thresholds (3, 8).
-- NOVELTY RE-ALERT (the momentum-change alert): a match whose
-  (bucket, location-ring) has not alerted in the streak window
-  re-alerts as a new first alert — but only after the open burst has
-  been quiet for novelty_min_gap_minutes. "Once for each momentum
-  change is enough" (owner, on the 6-alerts-in-2-hours live run).
 - cap (max_alerts_per_hour) counts NEW first alerts actually SENT in
   the last hour; a cap hit DEFERS (burst stays open, next scan
   retries) — never drops.
@@ -35,7 +30,7 @@ import logging
 import sqlite3
 from datetime import datetime, timedelta
 
-from agent.flash import frames, history, momentum, store
+from agent.flash import frames, store
 from agent.flash.config import FlashConfig
 from agent.flash.matcher import Match
 
@@ -51,40 +46,18 @@ def evaluate(matches: list[Match], conn: sqlite3.Connection,
             store.close_burst(conn, burst.id, now)
             logger.info("flash: burst %s closed (stale)", burst.signature)
 
-    # 2. Merge matches into open bursts; create new ones (quiet- and
-    #    momentum-checked; novelty-gap re-alerts).
+    # 2. Merge matches into open bursts; create new ones (quiet-window checked).
     max_quiet = max(c.quiet_hours for c in config.classes.values())
     closed_recent = store.closed_signatures(
         conn, store._iso(now - timedelta(hours=max_quiet)))
     for match in matches:
         open_burst = next((b for b in store.open_bursts(conn)
                            if b.signature == match.signature), None)
-        override = momentum.requires_override(
-            conn, match.class_name, match.term_bucket,
-            match.location_token, now, config,
-        )
-        novel = override == 0
 
         if open_burst is not None:
-            if (novel and open_burst.alert_sent
-                    and now - datetime.fromisoformat(open_burst.last_seen_at)
-                    >= timedelta(minutes=config.novelty_min_gap_minutes)):
-                # A momentum change on a quieted wave: new first alert.
-                store.insert_burst(conn, match, now, requires_sources=0)
-                log_rows.append(("novel_target", match.class_name,
-                                 match.signature, match.item.source_id,
-                                 f"new bucket/ring {match.term_bucket}/{match.location_ring}"))
-                continue
             if match.item.source_id not in open_burst.source_ids:
                 store.add_source(conn, open_burst.id, match.item.source_id,
                                  match.term_bucket, now)
-            if novel and not open_burst.alert_sent and open_burst.requires_sources > 0:
-                # The held burst's wave gained a novel domain: the hold
-                # must not suppress it (novelty restores instantly).
-                store.set_requires(conn, open_burst.id, 0)
-                log_rows.append(("novel_target", match.class_name,
-                                 match.signature, match.item.source_id,
-                                 "held burst restored by novel domain"))
             continue
 
         requires = 0
@@ -96,19 +69,6 @@ def evaluate(matches: list[Match], conn: sqlite3.Connection,
             log_rows.append(("quiet_held", match.class_name, match.signature,
                              match.item.source_id,
                              f"requires {requires} sources after recent closure"))
-        # Momentum (owner 2026-08-31): a background bucket needs volume
-        # to re-alert; a NOVEL target domain restores instant escalation
-        # even inside the quiet window.
-        if override is not None:
-            if override == 0:
-                log_rows.append(("novel_target", match.class_name,
-                                 match.signature, match.item.source_id,
-                                 f"new domain {match.location_token}"))
-            else:
-                log_rows.append(("background", match.class_name,
-                                 match.signature, match.item.source_id,
-                                 f"repeat pattern needs {override} sources"))
-            requires = override
         store.insert_burst(conn, match, now, requires_sources=requires)
 
     # 3. Send decisions.
@@ -128,23 +88,7 @@ def evaluate(matches: list[Match], conn: sqlite3.Connection,
                 logger.warning("flash: alert deferred (hourly cap %d)",
                                config.max_alerts_per_hour)
                 continue
-            # Convergence (WAR_SIGNALS_PAPER 2025-26): one category
-            # screaming is a rumor cycle; three ALERTED categories
-            # moving within 72h is a war. Deterministic note, never a
-            # claim upgrade.
-            convergence = ""
-            if burst.class_name == "escalation":
-                others = history.recent_distinct_buckets(
-                    conn, "escalation",
-                    store._iso(now - timedelta(hours=72)),
-                    exclude_bucket=burst.term_bucket, sent_only=True,
-                )
-                if len(others) >= 2:
-                    convergence = (
-                        f"⚠️ همگرایی سیگنال‌ها: {len(others) + 1} دسته "
-                        "در ۷۲ ساعت گذشته\n"
-                    )
-            result = send(frames.render_first(burst, config, now, convergence))
+            result = send(frames.render_first(burst, config, now))
             if result.ok:
                 store.mark_alert_sent(conn, burst.id, now)
                 alerts_this_hour += 1
@@ -169,7 +113,6 @@ def evaluate(matches: list[Match], conn: sqlite3.Connection,
                              "", f"{burst.source_count} source(s)"))
     if log_rows:
         store.log_flash(conn, log_rows, now)
-    deescalated = momentum.maybe_deescalation(conn, config, now, send, logger)
     open_count = len(store.open_bursts(conn))
-    return {"sent": sent + deescalated, "alerts_this_hour": alerts_this_hour,
+    return {"sent": sent, "alerts_this_hour": alerts_this_hour,
             "open_bursts": open_count}

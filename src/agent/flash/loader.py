@@ -20,7 +20,7 @@ from agent.flash.config import (
     check_str_list,
 )
 
-_CONFIG_VERSION = 2
+_CONFIG_VERSION = 3
 
 
 def validate_flash(raw: object) -> FlashConfig:
@@ -63,8 +63,6 @@ def validate_flash(raw: object) -> FlashConfig:
                          "burst.collapse_window_minutes", 1, errors)
     followup_window = check_int(burst_raw.get("followup_window_minutes"),
                                 "burst.followup_window_minutes", 1, errors)
-    novelty_gap = check_int(burst_raw.get("novelty_min_gap_minutes"),
-                            "burst.novelty_min_gap_minutes", 1, errors)
     followups_raw = burst_raw.get("followups")
     followups: tuple[int, ...] = ()
     if (isinstance(followups_raw, list)
@@ -82,26 +80,6 @@ def validate_flash(raw: object) -> FlashConfig:
         caps_raw = {}
     max_alerts = check_int(caps_raw.get("max_alerts_per_hour"),
                            "caps.max_alerts_per_hour", 1, errors)
-
-    momentum_raw = raw.get("momentum")
-    if not isinstance(momentum_raw, dict):
-        errors.append("flash_alert.yaml: 'momentum' must be a mapping")
-        momentum_raw = {}
-    streak_window = check_int(momentum_raw.get("streak_window_days"),
-                              "momentum.streak_window_days", 1, errors)
-    repeat_threshold = check_int(momentum_raw.get("streak_repeat_threshold_days"),
-                                 "momentum.streak_repeat_threshold_days", 1, errors)
-    repeat_requires = check_int(momentum_raw.get("repeat_requires_sources"),
-                                "momentum.repeat_requires_sources", 1, errors)
-
-    deescalation_raw = raw.get("deescalation")
-    if not isinstance(deescalation_raw, dict):
-        errors.append("flash_alert.yaml: 'deescalation' must be a mapping")
-        deescalation_raw = {}
-    quiet_days = check_int(deescalation_raw.get("quiet_days"),
-                           "deescalation.quiet_days", 1, errors)
-    cooldown_days = check_int(deescalation_raw.get("cooldown_days"),
-                              "deescalation.cooldown_days", 1, errors)
 
     classes_raw = raw.get("classes")
     classes: dict[str, AlertClass] = {}
@@ -146,12 +124,6 @@ def validate_flash(raw: object) -> FlashConfig:
         followup_window_minutes=followup_window,
         followups=followups,
         max_alerts_per_hour=max_alerts,
-        novelty_min_gap_minutes=novelty_gap,
-        momentum_streak_window_days=streak_window,
-        momentum_streak_repeat_threshold_days=repeat_threshold,
-        momentum_repeat_requires_sources=repeat_requires,
-        deescalation_quiet_days=quiet_days,
-        deescalation_cooldown_days=cooldown_days,
         classes=classes,
         templates=templates,
     )
