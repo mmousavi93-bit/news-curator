@@ -20,6 +20,7 @@ from agent.llm.breaker import backoff_delay
 from agent.llm.call import _OK, _SAME, Provider, attempt
 from agent.llm.errors import FATAL, REFUSED_CAP, UNAVAILABLE, LlmResult
 from agent.llm.providers import ImageInput
+from agent.llm.token_pacer import estimate_tokens
 
 if TYPE_CHECKING:
     from agent.llm.router import Router
@@ -82,6 +83,14 @@ def failover(
             return LlmResult(ok=False, status=REFUSED_CAP)
 
         router._pacer.wait(name, provider.rpm)
+        # Token-aware pacing (session 9s): the estimate is BOOKED before
+        # the request leaves, on EVERY attempt including the ones that
+        # will fail -- rejected requests consume the provider's 60s token
+        # window (measured 2026-09-08: 35/35 groq failures were 429s and
+        # the lockout never recovered), so a pacer that books only
+        # successes reproduces the lockout exactly.
+        tokens_est = estimate_tokens(prompt)
+        router._token_pacer.wait(name, provider.tpm, tokens_est)
         router._call_index += 1
         outcome, result = attempt(
             provider=provider,
@@ -100,6 +109,13 @@ def failover(
 
         if outcome == _OK:
             router._breaker.success(name)
+            usage = result.usage or {}
+            actual = int(usage.get("in", 0) or 0) + int(usage.get("out", 0) or 0)
+            # Post-attempt correction: the provider reported real usage.
+            # Overestimates are never refunded (token_pacer.charge is a
+            # no-op for non-positive deltas) -- the window errs
+            # conservative on purpose.
+            router._token_pacer.charge(name, actual - tokens_est)
             if provider.spend is not None:
                 provider.spend.record_usage(
                     result.usage.get("in", 0), result.usage.get("out", 0)

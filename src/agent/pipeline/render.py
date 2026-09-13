@@ -17,7 +17,7 @@ from __future__ import annotations
 from agent.collectors.tz import to_tehran
 from agent.delivery.message import Item
 from agent.pipeline.labels import category_icon, category_name
-from agent.util.jalali import format_jalali
+from agent.util.jalali import format_jalali, to_persian_digits
 
 
 def _headline(summary: str) -> str:
@@ -30,7 +30,6 @@ def _headline(summary: str) -> str:
     return cut + "…"
 
 
-_RAW_TITLE_CAP = 110
 # Understand-stage PROVIDER failures only -- an inclusion list on purpose:
 # a repeat-drop is a validate judgment, not a provider failure, so it stays
 # out. These are the fates understand.py actually writes for clusters the
@@ -44,35 +43,29 @@ _UNCOVERED_FATES = {
 }
 
 
-def _raw_fallback(clusters: list, event_keys: set, fates: dict, labels: dict,
-                  max_items: int) -> str:
-    """Raw-title section for clusters the LLM could not cover (move 1,
-    2026-08-31: the product survives total LLM loss). Content-filtered
-    clusters (clickbait/irrelevant) are judgments, not failures — they
-    stay out. Source titles are quoted text, displayed as-is; the
-    formatter (or the plain-text path) escapes them."""
-    lines: list[str] = []
+def _raw_fallback(clusters: list, event_keys: set, fates: dict, labels: dict) -> str:
+    """Count-only line for clusters the LLM could not cover (session 9s
+    replaces the raw-title section -- the 22:56Z escalation run dumped
+    untranslated English and Arabic headlines into both Persian messages,
+    which is exactly the raw-source-titles class the tone contract
+    forbids). Inclusion logic is the 2026-08-31 one UNCHANGED (provider
+    failures and fate-less clusters only; content-filtered clusters are
+    judgments, not failures); the render is now a count, which is a fact
+    (constraint 11). Batching makes this line more prominent, not less --
+    one lost batch voids several clusters at once."""
+    uncovered = 0
     for cluster in clusters:
         fate = fates.get(cluster.key)
         if cluster.key in event_keys:
             continue
         if fate not in _UNCOVERED_FATES and fate is not None:
             continue  # judged (clickbait/irrelevant) or another stage's drop
-        title = cluster.members[0].title.strip()
-        if not title:
-            # Telegram posts carry no title: the body lead stands in —
-            # an empty bullet is worse than nothing (owner 2026-08-31).
-            title = (cluster.members[0].body or "").strip()[:_RAW_TITLE_CAP]
-        if not title:
-            continue
-        if len(title) > _RAW_TITLE_CAP:
-            title = title[:_RAW_TITLE_CAP] + "…"
-        lines.append(f"• {title}")
-        if len(lines) >= max_items:
-            break
-    if not lines:
+        uncovered += 1
+    if not uncovered:
         return ""
-    return labels["raw_fallback"] + "\n" + "\n".join(lines)
+    return labels["raw_fallback"].format(
+        count=to_persian_digits(str(uncovered))
+    )
 
 
 def _when_text(cluster, labels) -> str:

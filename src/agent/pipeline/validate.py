@@ -157,7 +157,14 @@ class ValidateStage:
         kept, repeat_dropped, repeat_reasons = drop_repeats(
             ctx, self._credibility, classified, self._logger
         )
-        kept, same_run_dropped, same_run_reasons = drop_same_run_dups(ctx, kept, self._logger)
+        kept, same_run_dropped, same_run_reasons, samerun_pairs = drop_same_run_dups(
+            ctx, kept, self._logger
+        )
+        # Session 9s: pairwise observation for pairs_<ts>.csv -- the
+        # measurement that settles the cluster-fragmentation question
+        # (CLAUDE.md pending item). Recording only; nothing here changes
+        # what survives.
+        ctx.samerun_pairs = samerun_pairs
         ctx.repeat_dropped = repeat_dropped + same_run_dropped
         # Fix E, 2026-09-06 review: per-event drop reasons for chosen.csv's
         # `reason` column (report_csv.py's repeat_dropped fate). Merge

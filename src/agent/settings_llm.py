@@ -28,11 +28,13 @@ from agent.leaf_types import _type_matches, _type_name
 @dataclass(frozen=True, slots=True)
 class ProviderSettings:
     """One `providers:` entry. Optional fields are None when unset;
-    `supports_vision` is required by build_llm (below)."""
+    `supports_vision` is required by build_llm (below). `tpm` (session 9s)
+    feeds the TokenPacer; None = unconstrained (no pacing, no booking)."""
 
     model: str | None = None
     rpm: int | None = None
     rpd: int | None = None
+    tpm: int | None = None
     read_timeout_seconds: int | None = None
     supports_vision: bool = False
     enabled: bool | None = None
@@ -55,6 +57,7 @@ _PROVIDER_FIELDS: dict[str, type] = {
     "model": str,
     "rpm": int,
     "rpd": int,
+    "tpm": int,
     "read_timeout_seconds": int,
     "supports_vision": bool,
     "enabled": bool,
@@ -184,7 +187,7 @@ def build_llm(raw: Any, errors: list[str]) -> dict[str, Any]:
     backoff_obj = BackoffSettings(**backoff) if len(backoff) == len(_BACKOFF_FIELDS) else None
 
     result: dict[str, Any] = {"providers": providers, "backoff": backoff_obj}
-    for key in ("max_calls_per_run", "order", "stages"):
+    for key in ("max_calls_per_run", "batch_size", "order", "stages"):
         if key in raw:
             result[key] = raw[key]
     return result

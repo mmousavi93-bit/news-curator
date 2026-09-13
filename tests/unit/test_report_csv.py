@@ -334,11 +334,13 @@ def test_run_csv_records_counters_and_digest_flag(tmp_path):
     assert row["repeat_dropped"] == "1"
 
 
-def test_write_run_reports_returns_four_paths(tmp_path):
+def test_write_run_reports_returns_five_paths(tmp_path):
+    # Five since session 9s: pairs_<ts>.csv joined the four.
     ctx = _Ctx(tmp_path)
     written = write_run_reports(ctx, tmp_path)
-    assert len(written) == 4
+    assert len(written) == 5
     assert all(p.exists() for p in written)
+    assert any(p.name.startswith("pairs_") for p in written)
 
 
 def test_run_pipeline_writes_reports_when_dir_set(tmp_path):
@@ -349,4 +351,4 @@ def test_run_pipeline_writes_reports_when_dir_set(tmp_path):
     ctx = RunContext(config=_config(), dry_run=True, now=NOW,
                      report_dir=tmp_path)
     run_pipeline(ctx, [], logging.getLogger("t"))
-    assert len(list(tmp_path.glob("*.csv"))) == 4
+    assert len(list(tmp_path.glob("*.csv"))) == 5
