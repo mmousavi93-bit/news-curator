@@ -132,6 +132,22 @@ jobs:
           BAI_API_KEY: ${{ secrets.BAI_API_KEY }}
         run: python -m agent.run --db state.db
 
+      # Feedback loop (9u, 2026-09-13): harvest the owner's reactions to the
+      # digest messages and DMs to the bot via getUpdates. Read-only -- it
+      # writes feedback_<ts>.csv into reports/ and the getUpdates offset into
+      # state.db; it changes no scoring/clustering/pipeline threshold. Runs
+      # even when the pipeline crashed (reactions accrue regardless) and
+      # never fails the job: a feedback collector that can break the digest
+      # is worse than none. POST to getUpdates (Bot API accepts POST for
+      # every method); no Telethon/MTProto (constraint 6).
+      - name: Harvest feedback
+        if: always()
+        continue-on-error: true
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          NEWS_CURATOR_REPORT_DIR: reports
+        run: python -m agent.feedback --db state.db
+
       # A failed encrypt fails the job: losing state is the worst outcome.
       # The recipient is a PUBLIC key; safe in argv.
       # `if: always()` + self-guard: a crashed PIPELINE (2026-08-30:
