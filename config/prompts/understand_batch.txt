@@ -60,9 +60,12 @@ Rules (identical for every cluster):
   `security`.
 - Commemorative or ceremonial announcements report no operational fact:
   national-day celebrations, memorials, anniversaries, award ceremonies,
-  public-relations events. Mark them `irrelevant` UNLESS the item unveils
-  new weapons or equipment or reports concrete military action during
-  the event.
+  public-relations events. Mark them `irrelevant` UNLESS the item reports
+  a concrete operational or capability fact: a named weapon system that
+  entered service, was deployed, or was used in combat, with at least one
+  verifiable detail (range, numbers, location). A bare product launch or
+  prototype unveiling with no technical or operational detail is a press
+  release, not a development -- keep it `irrelevant`.
 - When genuinely unsure between keeping and dropping, drop. A digest earns
   trust by omission.
 - Never invent facts or numbers. Never dramatise. Never praise or attack
