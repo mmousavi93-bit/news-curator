@@ -1312,6 +1312,17 @@ than the behaviour: a red run here means "could not fetch", never "the feed is w
   aliases rot too -- the "List available models" probe step is the ONLY
   backstop. Prefer a pinned CURRENT model taken from the probe list, and treat
   any alias as a rot risk; re-read the probe list after every LLM outage.**
+- **Newest-flash saturation (2026-09-14, Session 10B, probe run 34872571838):
+  the pin above was wrong the other way.** `gemini-3.8-flash` -- pinned as
+  "the live GA flash" -- is LISTED but generateContent 503s on free tier
+  ("high demand ... usually temporary"; 4/4 in run 34869394223, 3.7-flash the
+  same). The probe showed 3.6-flash / 3.5-flash / 3.5-flash-lite all serve
+  200, while 2.5-flash-lite is 404 (discontinued). So "LISTED" is not the
+  whole story either: the two NEWEST flashes are saturated on the free tier.
+  Fixed by pinning `gemini-3.6-flash` (newest stable, one below the saturated
+  pair). **Standing rule (refined): after any gemini re-pin, probe
+  `:generateContent` (not the models list) before trusting it -- the models
+  endpoint lists saturated and retired ids alike.**
 - **Output rework (owner decisions, 2026-08-29) -- Persian, ranked, anti-repetitive.**
   Built and shim-green (suite 488) in one local iteration per the owner's
   explicit "make things local, iterate, then update" instruction. Shipments:
