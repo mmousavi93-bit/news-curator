@@ -380,6 +380,14 @@ llm:
       # list shows it retire; the pipeline log's "List available Gemini
       # models" step is the ground truth on every run.
       #
+      # 2026-09-14, Session 10B probe (workflow gemini-probe, run
+      # 34872571838): the NEWEST flashes are saturated on free tier --
+      # 3.8-flash and 3.7-flash both 503 "high demand ... usually
+      # temporary" (3.8 also 4/4 in run 34869394223). 3.6-flash, 3.5-flash
+      # and 3.5-flash-lite all serve 200; 2.5-flash-lite is 404
+      # (discontinued). => pin 3.6-flash: newest stable, one below the
+      # saturated pair. Re-pin upward only after a probe shows it green.
+      #
       # FREE-TIER LIMITS 2026-09-05 (owner, from the AI Studio per-project
       # page): 3.8 Flash = 5 RPM / 250,000 TPM / 20 RPD. The old 10 RPM /
       # 1,500 RPD was the pre-2026 free tier and is GONE. At 20 RPD gemini
@@ -391,7 +399,7 @@ llm:
       # (session 9s) never binds on gemini.
       # 5 RPM = 12s pacing per call (RpmPacer): 20 calls cost ~4 min of
       # whichever run spends them -- the price of "gold".
-      model: "gemini-3.8-flash"
+      model: "gemini-3.6-flash"
       rpm: 5
       rpd: 20
       tpm: 250000
