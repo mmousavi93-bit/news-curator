@@ -390,6 +390,20 @@ sources:
     note: "osint613.com/feed -- 70 items, CI-OK 2026-08-17. Replaces the uncollectable
            @Osint613 Twitter account. Same group for the same reason as defenderdome."
 
+  tg_entekhab:
+    tier: 3
+    group: null
+    note: "Official channel of Entekhab (reformist Persian news site, not state
+           media). Tier 3 per Telegram-mirror convention -- the newsroom's own
+           domain is canonical, this channel is a mirror. Owner may upgrade to
+           tier 2 if the channel is treated as the org's primary feed."
+  tg_tsepress:
+    tier: 3
+    group: null
+    note: "Tehran bourse/market press. r7 probe: unknown editorial provenance, so
+           never tier 2. Market colour (شاخص/ارز/دلار/طلا); nominates the H3
+           currency-collapse signal. Owner may upgrade later."
+
 # --- lead class (weight 0.0). See DECISION 7. ---
   tg_padeshah_fxn:
     tier: lead

@@ -1,0 +1,3 @@
+probe,id,name,type,url,http,items,newest,verdict,detail
+r8,tg_entekhab,Entekhab (انتخاب),telegram,https://t.me/s/entekhab_ir,200,20,,OK,text/html
+r8,tg_tsepress,TSE Press (بورس تهران),telegram,https://t.me/s/tsepress,200,20,,OK,text/html
