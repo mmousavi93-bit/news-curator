@@ -235,6 +235,22 @@ def test_fallback_counts_uncovered_not_judged_clusters():
     assert "مو قرمز" not in message
 
 
+def test_fallback_excludes_repeat_dropped_clusters():
+    # A repeat-dropped event received a summary (it was a duplicate, not an
+    # LLM failure), carries no fate, and is stripped from ctx.events before
+    # compose builds the exclusion set -- so it must NOT inflate the
+    # "بدون خلاصه ماند" count. Run 34846355119 showed 18 when only 5
+    # clusters truly went uncovered (13 repeat_dropped leaked in).
+    ctx = _Ctx(config=_config())
+    ctx.llm_failed = True
+    key_repeat = _raw_cluster(ctx, "تکرار خبر قبلی")
+    key_uncovered = _raw_cluster(ctx, "حمله آمریکا به لارک")
+    ctx.cluster_fates = [(key_uncovered, "unavailable")]
+    ctx.repeat_drop_reasons = {key_repeat: "band=mid/sim=0.9/score=8/prior=k"}
+    ComposeStage(_Log()).run(ctx)
+    assert "۱ خبر بدون خلاصه ماند" in ctx.messages[0]
+
+
 def test_fallback_counts_cap_refused_and_fatal_fates():
     # 2026-09-05 review: _UNCOVERED_FATES listed "refused_cap"/"lang_dropped"
     # but understand.py writes "cap_refused"/"fatal" -- cap-exhausted and

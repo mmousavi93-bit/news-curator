@@ -89,9 +89,18 @@ class ComposeStage:
         # 2026-09-05 run lost its best item -- Israel/Lebanon, 17.794 --
         # this way).
         fates = dict(getattr(ctx, "cluster_fates", None) or [])
+        # Repeat-drops carry no fate (a summarized event is never a provider
+        # failure) and validate.py strips them from ctx.events before this
+        # point, so they used to slip past the exclusion set below and inflate
+        # the "بدون خلاصه ماند" count (18 vs 5 in run 34846355119). Exclude
+        # their keys explicitly: a duplicate DID get a summary, it was just
+        # not re-sent. lang-dropped events stay OUT of this set on purpose --
+        # their prose failed the Persian gate, so they still count as uncovered.
+        excluded = {e.event_key for e in events}
+        excluded.update(getattr(ctx, "repeat_drop_reasons", None) or {})
         raw_fallback = _raw_fallback(
             list(getattr(ctx, "clusters", None) or []),
-            {e.event_key for e in events},
+            excluded,
             fates, labels,
         )
 
