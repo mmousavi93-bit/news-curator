@@ -17,6 +17,7 @@ from typing import Mapping
 from agent.delivery.credentials import TelegramConfigError
 from agent.delivery.telegram import TelegramClient
 from agent.memory.event_models import mark_delivered
+from agent.pipeline.deescalation import mark_notice_sent, record_escalation_day
 
 
 class DeliverStage:
@@ -67,6 +68,13 @@ class DeliverStage:
         keys = getattr(ctx, "compose_kept_keys", None)
         if keys and getattr(ctx, "db", None) is not None:
             mark_delivered(ctx.db, keys, ctx.now)
+        # De-escalation state (9z), same all-real gate as the markers above:
+        # record today as an escalation-delivered day and stamp the notice's
+        # cooldown clock only after every real send succeeded.
+        if getattr(ctx, "escalation_delivered", False) and getattr(ctx, "db", None) is not None:
+            record_escalation_day(ctx.db, ctx.now, ctx.config.deescalation)
+        if getattr(ctx, "deescalation_notice", None) and getattr(ctx, "db", None) is not None:
+            mark_notice_sent(ctx.db, ctx.now)
 
     def _client(self):
         try:

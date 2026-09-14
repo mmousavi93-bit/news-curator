@@ -122,6 +122,17 @@ keywords:
 """,
         encoding="utf-8",
     )
+    # Also valid on purpose: load_all now requires deescalation.yaml too.
+    (tmp_path / "deescalation.yaml").write_text(
+        """
+enabled: true
+streak_days: 3
+window_days: 30
+quiet_days: 3
+cooldown_days: 7
+""",
+        encoding="utf-8",
+    )
 
     with pytest.raises(ConfigError) as exc_info:
         load_all(base=tmp_path)

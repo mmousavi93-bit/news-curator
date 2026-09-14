@@ -142,6 +142,9 @@ class Config:
     # Digest-ranking relevance tiers (config/relevance.yaml). None only when
     # a Config is built directly (tests); load_all always sets it.
     relevance: object | None = None
+    # De-escalation notice (config/deescalation.yaml). None only when a
+    # Config is built directly (tests); load_all always sets it.
+    deescalation: object | None = None
 
 
 def load_all(*, base: Path | None = None) -> Config:
@@ -151,6 +154,7 @@ def load_all(*, base: Path | None = None) -> Config:
     first. Risk weights and sources are added to this loader in Phases 7/8 --
     they do not exist yet, so they are not loaded here.
     """
+    from agent.pipeline.deescalation import validate_deescalation
     from agent.pipeline.relevance import validate_relevance
 
     directory = base if base is not None else config_dir()
@@ -174,6 +178,14 @@ def load_all(*, base: Path | None = None) -> Config:
     except ConfigError as exc:
         errors.append(str(exc))
 
+    deescalation_obj = None
+    try:
+        deescalation_obj = validate_deescalation(
+            load_yaml("deescalation.yaml", base=directory)
+        )
+    except ConfigError as exc:
+        errors.append(str(exc))
+
     settings_obj: Settings | None = None
     if settings_raw is not None:
         try:
@@ -190,4 +202,4 @@ def load_all(*, base: Path | None = None) -> Config:
 
     assert settings_obj is not None  # guaranteed: no errors means it loaded and validated
     return Config(settings=settings_obj, credibility=credibility_obj,
-                  relevance=relevance_obj)
+                  relevance=relevance_obj, deescalation=deescalation_obj)
