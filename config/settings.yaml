@@ -372,11 +372,13 @@ llm:
     gemini:
       # 2026-08-29, run-log evidence: gemini-2.5-flash is LISTED by the API
       # but generateContent 404s (discontinued June 2026 -- listed-but-dead).
-      # gemini-3-flash does not exist (only -preview). The ALIAS is the
-      # self-healing choice: it always points at the current GA flash and
-      # cannot be retired. Pin a specific model only when v1.5 scoring
-      # arrives and output stability starts to matter; the pipeline log's
-      # "List available Gemini models" step is the ground truth on every run.
+      # 2026-09-14, run 34857770910: the gemini-flash-latest ALIAS went the
+      # same way -- still LISTED by the models endpoint but generateContent
+      # 503s on every call (2/2, 432ms + 2022ms). The "self-healing alias"
+      # assumption is falsified: Google's alias did NOT re-point off the
+      # retired flash. PIN the current GA flash and re-pin when the models
+      # list shows it retire; the pipeline log's "List available Gemini
+      # models" step is the ground truth on every run.
       #
       # FREE-TIER LIMITS 2026-09-05 (owner, from the AI Studio per-project
       # page): 3.8 Flash = 5 RPM / 250,000 TPM / 20 RPD. The old 10 RPM /
@@ -389,7 +391,7 @@ llm:
       # (session 9s) never binds on gemini.
       # 5 RPM = 12s pacing per call (RpmPacer): 20 calls cost ~4 min of
       # whichever run spends them -- the price of "gold".
-      model: "gemini-flash-latest"
+      model: "gemini-3.8-flash"
       rpm: 5
       rpd: 20
       tpm: 250000
