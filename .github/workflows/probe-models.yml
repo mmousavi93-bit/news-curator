@@ -1,17 +1,21 @@
 name: probe-models
 
-# Manual only. Probes every OpenRouter :free model against the REAL
-# understand prompt + a fixed sample set (owner request 2026-08-30: the
-# free roster rotates weekly, and the current pick must be measured, not
-# guessed). Deterministic checks only -- zero LLM-judge (constraint 3).
+# Manual only. Probes every free model on a gateway (openrouter | bai)
+# against the REAL understand prompt + a fixed sample set (owner request
+# 2026-08-30: the free roster rotates weekly, and the current pick must
+# be measured, not guessed). Deterministic checks only -- zero LLM-judge
+# (constraint 3).
 #
 # Budget: each dispatch spends ~4 calls per model (28 for the default
 # list) of the OpenRouter free tier's ~50 requests/day -- the pipeline's
 # parachute quota. Do NOT dispatch while Gemini is down for the day.
 #
-# Stdlib only (urllib) -- deliberately no pip install, same contract as
-# check_feeds.py. The key comes from GitHub Secrets; results land in a
-# CSV artifact; nothing is committed.
+# The probe script uses urllib for the actual HTTP calls, but imports
+# agent.pipeline.contract / langgate to score the responses, which pulls
+# in agent.config -> yaml. So the package (core deps: PyYAML + requests)
+# must be installed first -- deliberately NOT [embeddings] (torch), this
+# stays fast. Keys come from GitHub Secrets; results land in a CSV
+# artifact; nothing is committed.
 
 on:
   workflow_dispatch:
@@ -39,6 +43,9 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
+
+      - name: Install package (core deps only, no torch)
+        run: pip install -e .
 
       - name: Probe every free model from a US runner
         env:
