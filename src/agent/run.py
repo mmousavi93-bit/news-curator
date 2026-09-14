@@ -220,7 +220,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     finally:
         if db_conn is not None:
             try:
-                llm_health.save_health(db_conn, router.stats.as_dict(), ctx.now)
+                llm_health.save_health(
+                    db_conn, router.stats.as_dict(), ctx.now,
+                    {n: c.model for n, c in config.settings.llm.providers.items()},
+                )
                 llm_health.save_daily(db_conn, router.stats.as_dict(), ctx.now)
             except Exception as exc:  # noqa: BLE001 -- health never breaks a run
                 logger.error("health: saving failed: %s", exc)
