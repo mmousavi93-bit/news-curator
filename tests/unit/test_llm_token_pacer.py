@@ -73,8 +73,20 @@ def test_second_wait_sleeps_when_window_full():
     pacer, clock = _pacer()
     pacer.wait("groq", 8000, 5800)  # t=0, window=5800
     clock.t = 5.0
-    pacer.wait("groq", 8000, 5800)  # 5800+5800 > 8000 -> sleep 55s
+    pacer.wait("groq", 8000, 5800)  # 5800+5800 > 65% of 8000 -> sleep 55s
     assert clock.sleeps == [55.0]
+
+
+def test_safety_factor_blocks_back_to_back_small_batches():
+    # Run 34846355119: groq 429'd every request fired back-to-back, even when
+    # the combined estimate fit under the nominal 8,000. Booking against 65%
+    # of nominal makes two small batches (3,000 + 3,000 = 6,000 < 8,000, but
+    # > 5,200) wait out the window instead of firing together.
+    pacer, clock = _pacer()
+    pacer.wait("groq", 8000, 3000)   # small batch, t=0
+    clock.t = 0.1                    # a back-to-back attempt 100ms later
+    pacer.wait("groq", 8000, 3000)   # 6000 > 5200 budget -> wait out window
+    assert clock.sleeps == [59.9]
 
 
 def test_window_expires_after_sixty_seconds():
@@ -101,7 +113,7 @@ def test_charge_correction_counts_toward_the_window():
     pacer.wait("groq", 8000, 6000)   # booked estimate
     clock.t = 3.0
     pacer.charge("groq", 2500)       # actual usage was higher (correction)
-    pacer.wait("groq", 8000, 100)    # 6000+2500+100 > 8000 -> sleeps
+    pacer.wait("groq", 8000, 100)    # 6000+2500+100 > 65% budget -> sleeps
     assert clock.sleeps == [57.0]    # until the first booking expires
 
 

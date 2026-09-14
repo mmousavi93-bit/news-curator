@@ -48,6 +48,19 @@ _CHARS_PER_TOKEN = 3.0
 # max_tokens). Added to the booked estimate because the window counts input
 # AND output; 1,000 covers the observed range with a small margin.
 _OUTPUT_TOKENS_EST = 1000
+# Safety factor on the booked window budget. Run 34846355119 (2026-09-14)
+# still 429'd 4 of 11 groq calls: every 429 was a request fired <320 ms after
+# the previous one (back-to-back), which the estimate allowed because two
+# small batches (combined estimate ~5,600) fit under the nominal 8,000. groq
+# rejected at 5.4-6.1K ACTUAL tokens -- well under 8K -- so the nominal TPM
+# overstates the effective limit (rejected requests consume the window, and
+# the coarse chars/3.0 estimate under-measures token-dense Persian). Booking
+# against 65% of nominal (~5,200) leaves headroom and makes back-to-back
+# requests impossible: even the two smallest batch estimates sum to ~5,600 >
+# 5,200, so the second always waits out the 60s window. The overfit check
+# (estimated_tokens > tpm) stays against the FULL nominal tpm, so a single
+# batch never re-triggers the old "sending anyway" 429 thrash.
+_SAFETY_FACTOR = 0.65
 
 
 def estimate_tokens(text: str) -> int:
@@ -112,7 +125,8 @@ class TokenPacer:
         window = self._windows.setdefault(name, deque())
         now = self._clock()
         self._purge(name, now)
-        while window and self._window_sum(name) + estimated_tokens > tpm:
+        budget = int(tpm * _SAFETY_FACTOR)
+        while window and self._window_sum(name) + estimated_tokens > budget:
             # Sleep until the oldest booking ages out, then re-check --
             # a fresh clock read each round, because sleep moves the clock.
             oldest_at, _ = window[0]
