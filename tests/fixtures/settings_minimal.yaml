@@ -125,7 +125,7 @@ delivery:
   output_language: "fa"
   source_languages: ["en", "fa", "ar", "he"]
   flash_watchdog_enabled: true
-  flash_watchdog_max_age_minutes: 180
+  flash_watchdog_max_age_minutes: 720
 
 ops:
   mock_mode: true

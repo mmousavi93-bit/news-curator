@@ -132,7 +132,7 @@ def test_flash_watchdog_warning_rides_above_the_digest_header():
     # 9r: the flash monitor's liveness line must reach the delivered message,
     # inside the character budget (constraint 8), above the header -- it is a
     # statement about the system, not the news.
-    restore = _with_flash_age("400")
+    restore = _with_flash_age("780")
     try:
         ctx = _Ctx(config=_config())
         ctx.events = [_with_cluster(ctx, _event("خلاصه نظامی اسرائیل."))]
@@ -147,7 +147,7 @@ def test_flash_watchdog_warning_rides_above_the_digest_header():
 def test_flash_watchdog_warning_rides_the_honest_one_liner_too():
     # The case that matters most: a quiet run says "nothing new", which is
     # indistinguishable from a dead system unless the warning is on it.
-    restore = _with_flash_age("400")
+    restore = _with_flash_age("780")
     try:
         ctx = _Ctx(config=_config())
         ComposeStage(_Log()).run(ctx)

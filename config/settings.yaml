@@ -622,12 +622,15 @@ delivery:
   # digest carries one warning line while it is stale. Set enabled: false to
   # silence the line (it does NOT stop the monitor).
   #
-  # 180 minutes = 12 missed */15 scans. Chosen to be unambiguous rather than
-  # twitchy: GitHub's cron is 10-20 min late at the median and skips runs
-  # under load, so 30-60 min would cry wolf on a healthy monitor. A dead
-  # monitor is detected within 3 hours, i.e. inside one pipeline interval.
+  # 720 minutes = 12 hours (Session 11, 2026-09-14). The "10-20 min median
+  # lateness" assumption behind the old 180 was falsified: GitHub throttles
+  # */15 crons on public repos to gaps of 2-7+ hours (observed 1.8h/1.9h/
+  # 5.2h/6.8h on 2026-09-13/14), so 180 min cried wolf on a HEALTHY monitor
+  # every digest. 12h sits above the worst observed throttle gap while still
+  # flagging a genuinely dead monitor (60-day disable, broken edit, crash)
+  # within half a day. The 15-min cadence itself is a separate infra gap.
   flash_watchdog_enabled: true
-  flash_watchdog_max_age_minutes: 180
+  flash_watchdog_max_age_minutes: 720
 
 # ---------------------------------------------------------------------------
 # OPERATIONS
