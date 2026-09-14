@@ -5,6 +5,43 @@ session; this file does not. Nothing here is deleted or condensed — it is the 
 record of what broke, why, and what rule came out of it. Read it when working on the
 phase or subsystem it covers. CLAUDE.md keeps the operational core and points here.
 
+## 2026-09-14 (Session 12) — langgate dropped the run's only corroborated item on one stray ي
+
+Quality round on run `34872885506` (42 clusters → 40 LLM'd → 6 delivered). The six
+delivered were correctly ranked (war/oil surfaced, rumour demoted) and relevant (zero
+trivia) — the defects were all on the DROP side.
+
+**Defect (fixed):** `lang_dropped` killed the only corroborated, high-confidence item —
+Portugal FM on Israel settlements (score 12.04, independent_count=2, claim=likely,
+al_monitor|sky_news_arabia). Byte inspection showed a single Arabic yeh U+064A in the
+transliteration "بتسيلم" (B'Tselem) tripped `is_persian_output`, which dropped on ANY
+Arabic-only codepoint. Persian LLM output (groq) routinely carries one stray ي/ك in
+foreign names, so the gate had a silent bias *against* exactly the international,
+multi-source stories the digest exists for.
+
+Fix: split the marker set in `langgate.py`. STRONG = ة ى إ + Hebrew (any occurrence →
+drop, unambiguous). SOFT = ي ك (drop only at count ≥ 2 — a lone one is a
+transliteration, two or more is genuine Arabic drift). Monotonic: recovers single-ي
+items, never adds a drop. `langretry.py` (the other `is_persian_output` consumer) keeps
+the same contract for full drift (strong markers / 2+ soft). Tests added in
+`test_pipeline_langgate.py` + `test_pipeline_langretry.py`; suite 849 → 851.
+
+**Known limitation (not changed):** the repeat gate dropped the top-scored item
+(Israeli strikes continuing, 13.50, 6 members) as high-band `no_development`. This is
+BY DESIGN (settings.yaml digest_rank comment: same-story ships only with development =
+independent_count↑ or claim↑). Content-novelty detection would need an LLM call — not
+affordable on the free tier — so "strikes continue" with no new specific fact stays a
+pure re-tell. Flagged, not fixed.
+
+**Config:** `max_clusters_per_run` 40 → 55. The 40 cap dropped a directly-relevant
+Reuters Hormuz-shipping item (cap_dropped) even on a quiet 42-cluster day; busier days
+dropped ~62%. +LLM calls only on high-volume days; health-aware wiring degrades
+gracefully. Dial back to 40 if a busy-day run trips the circuit breaker.
+
+**Standing rule:** the lang gate must never drop on a single ambiguous codepoint.
+Strong markers (ة ى إ, Hebrew) are the only single-occurrence proof of non-Persian;
+soft markers (ي ك) need a count threshold.
+
 ## 2026-09-14 (Session 11) — flash-watchdog threshold 180 → 720 min
 
 The 22:40 digest carried the flash liveness line on a **healthy** monitor:
