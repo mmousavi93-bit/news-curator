@@ -444,13 +444,19 @@ llm:
       # Rate limits unknown (reseller) -- conservative until measured.
       # 2026-08-31 (corrected same day): bai's MEDIAN answer is ~19-20s
       # and 4 of 6 measured calls were >=19s -- a 20s cap timed out both
-      # calls of the 09:36 run and killed the fallback. The 46.5s meme
-      # outlier stays acceptable against that. 45s: slow answers survive,
-      # only truly hung ones rotate.
+      # calls of the 09:36 run and killed the fallback.
+      # 2026-09-14 (probe-models run 34844454075): the gateway has SLOWED --
+      # qwen3.8-flash now needs ~58s/call (4 samples, 234s total), so the
+      # 45s cap timed out EVERY production call (the 100% fail seen in run
+      # 34834335214). Raised to 90s so the fallback can actually complete;
+      # a truly hung call still rotates. The same probe confirmed 10 of the
+      # 12 listed models are dead (0/4) -- including deepseek-v4-flash and
+      # glm-5.3-flash -- with only qwen3.8-flash (~58s) and mimo-v2.5
+      # (~30s) alive. qwen3.8-flash stays the pick (multilingual lineage).
       model: "qwen3.8-flash"
       rpm: 20
       rpd: 1000
-      read_timeout_seconds: 45
+      read_timeout_seconds: 90
       supports_vision: false
     bai_deepseek:
       # OWNER 2026-08-31: deepseek is available THROUGH the bai gateway --
