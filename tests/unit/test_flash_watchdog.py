@@ -38,14 +38,14 @@ def test_fresh_heartbeat_is_silent():
 
 def test_exactly_at_the_threshold_is_silent():
     # Boundary is inclusive-silent: the warning fires only PAST the limit.
-    assert flash_warning(_settings(), FA, {ENV_AGE: "180"}) == ""
+    assert flash_warning(_settings(), FA, {ENV_AGE: "720"}) == ""
 
 
 def test_stale_heartbeat_warns_in_persian_with_hours():
-    out = flash_warning(_settings(), FA, {ENV_AGE: "260"})
+    out = flash_warning(_settings(), FA, {ENV_AGE: "780"})
     assert out
     assert "پایش هشدار فوری" in out
-    assert "4" in out           # 260 // 60 == 4 hours
+    assert "13" in out          # 780 // 60 == 13 hours
     assert "{hours}" not in out  # the template was actually formatted
 
 
@@ -54,7 +54,7 @@ def test_missing_branch_warns_distinctly():
     assert out == FA["flash_missing"]
     # Distinct from the stale message: "never reported" and "stopped
     # reporting" need different owner actions.
-    assert out != flash_warning(_settings(), FA, {ENV_AGE: "600"})
+    assert out != flash_warning(_settings(), FA, {ENV_AGE: "1440"})
 
 
 def test_unknown_age_is_silent():
@@ -90,8 +90,8 @@ def test_threshold_is_owner_configurable():
 
 
 def test_english_labels_render_too():
-    out = flash_warning(_settings(), EN, {ENV_AGE: "260"})
-    assert "Flash monitor" in out and "4h" in out
+    out = flash_warning(_settings(), EN, {ENV_AGE: "780"})
+    assert "Flash monitor" in out and "13h" in out
 
 
 def test_warning_fits_the_header_char_budget():

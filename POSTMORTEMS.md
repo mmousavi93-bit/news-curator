@@ -5,6 +5,30 @@ session; this file does not. Nothing here is deleted or condensed — it is the 
 record of what broke, why, and what rule came out of it. Read it when working on the
 phase or subsystem it covers. CLAUDE.md keeps the operational core and points here.
 
+## 2026-09-14 (Session 11) — flash-watchdog threshold 180 → 720 min
+
+The 22:40 digest carried the flash liveness line on a **healthy** monitor:
+"پایش هشدار فوری پاسخ نمی‌دهد — آخرین ثبت وضعیت حدود 3 ساعت پیش". The
+watchdog was not broken — the assumption under its 180-min threshold was.
+
+Evidence: `flash-alert.yml` is `active`, cron `*/15`, last run 13:19 UTC
+**successful**. GitHub's scheduler does NOT fire `*/15` crons on public
+repos anywhere near 15-min cadence — observed run gaps on 2026-09-13/14 were
+1.8h / 1.9h / 5.2h / 6.8h (flash-state commit ~4h stale at digest time).
+The old comment's "10-20 min median lateness" was falsified; "180 min = 12
+missed scans" was counting a cadence that never existed.
+
+Fix: `flash_watchdog_max_age_minutes` 180 → 720 (12h), comment rewritten to
+cite the measured throttle gaps. 12h sits above the worst observed gap while
+still catching a genuinely dead monitor (60-day cron disable, broken edit,
+crash) inside half a day. Tests re-baselined (`test_flash_watchdog.py`,
+`test_pipeline_compose.py`); suite still 849 green.
+
+**Standing rule:** the flash monitor rides GitHub's best-effort scheduler, so
+its liveness watchdog must tolerate multi-hour gaps. If true 15-min emergency
+alerting is required, move the monitor off GitHub cron (VPS cron / Cloudflare
+Workers) — deferred, not yet built.
+
 ## 2026-09-06/08 — the 22:12 run delivered 2 trivia items during a naval war. Four rounds of adversarial review. Suite 696 → 753
 
 Owner: "read / optimize / score, review and iterate till we get one step forward."
