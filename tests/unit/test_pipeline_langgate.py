@@ -38,6 +38,17 @@ def test_arabic_ya_and_kaf_fail():
     assert not is_persian_output(AR_YA + AR_KAF)
 
 
+def test_single_soft_marker_transliteration_passes():
+    # Session 12 (2026-09-14): a lone ي/ك in a transliterated foreign name
+    # is NOT Arabic drift -- dropping on it silently killed the run's only
+    # corroborated "likely" item (B'Tselem "بتسيلم", score 12.04, 2 sources).
+    assert is_persian_output(AR_YA)                 # one soft marker alone passes
+    btselem = "ب" + "ت" + "س" + AR_YA + "ل" + "م"   # بتسيلم with the Arabic yeh
+    assert is_persian_output(btselem)
+    assert is_persian_output("حمله به " + btselem + " در تنگه هرمز")
+    assert not is_persian_output(AR_YA + AR_KAF)    # two soft markers still drop
+
+
 def test_arabic_ta_marbuta_and_maqsura_fail():
     assert not is_persian_output(AR_TA + AR_MAQSURA)
 

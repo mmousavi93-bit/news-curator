@@ -98,9 +98,20 @@ def test_persian_text_is_not_drift():
     assert drifts_from_persian("حمله به یک کشتی در تنگه هرمز", "جزئیات حادثه") is False
 
 
-@pytest.mark.parametrize("marker", ["ة", "ى", "ي", "ك", "إ"])
+@pytest.mark.parametrize("marker", ["ة", "ى", "إ"])
 def test_arabic_only_markers_are_drift(marker):
     assert drifts_from_persian(f"خبر مهم با {marker}", "خلاصه") is True
+
+
+@pytest.mark.parametrize("marker", ["\u064a", "\u0643"])
+def test_soft_marker_alone_is_not_drift(marker):
+    # Session 12 (2026-09-14): a lone ي/ك is a transliterated foreign name,
+    # not Arabic drift -- compose no longer drops on one soft marker.
+    assert drifts_from_persian(f"خبر مهم با {marker}", "خلاصه") is False
+
+
+def test_two_soft_markers_are_drift():
+    assert drifts_from_persian("خبر مهم با \u064a \u0643", "خلاصه") is True
 
 
 def test_hebrew_block_is_drift():
