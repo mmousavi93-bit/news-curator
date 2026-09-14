@@ -639,3 +639,30 @@ sources:
     topic: regional
     enabled: true
     signals_covered: [A8, A9, B3, B4, B6, D2, E1, E2, E3, E5, D4]
+
+
+  # ADDED 2026-09-14 (r8): Persian domestic + economy coverage for a Tehran user.
+  # tg_entekhab = official channel of Entekhab (reformist Persian news site, not
+  #               state media). iran_domestic.
+  # tg_tsepress = Tehran bourse/market press (economy). topic_gate trims the
+  #               high-volume feed to ارز/دلار/طلا/تورم/بورس/سکه/ریال keywords.
+
+  - id: tg_entekhab
+    name: Entekhab (انتخاب)
+    url: https://t.me/s/entekhab_ir
+    type: telegram
+    lang: fa
+    topic: iran_domestic
+    enabled: true
+    signals_covered: [C2, C4, D2, D3, H1, H2, H3]
+
+
+  - id: tg_tsepress
+    name: TSE Press (بورس تهران)
+    url: https://t.me/s/tsepress
+    type: telegram
+    lang: fa
+    topic: macro
+    enabled: true
+    topic_gate: true   # high-volume bourse feed; gate to economy keywords
+    signals_covered: [H3]
