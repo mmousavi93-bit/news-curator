@@ -48,8 +48,8 @@ def _pacer():
 
 
 def test_estimate_tokens_is_never_zero_and_counts_output():
-    assert estimate_tokens("") == 400  # 0 chars -> 0/1.6 + 400 output
-    assert estimate_tokens("x" * 1600) == 1400  # 1600/1.6 + 400
+    assert estimate_tokens("") == 1000  # 0 chars -> 0/3.0 + 1000 output
+    assert estimate_tokens("x" * 1500) == 1500  # 1500/3.0 + 1000
 
 
 def test_estimate_tokens_scales_with_prompt_length():

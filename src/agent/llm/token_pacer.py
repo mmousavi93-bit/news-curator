@@ -32,22 +32,26 @@ from typing import Callable
 _WINDOW_SECONDS = 60.0
 
 # Character-based token estimate, deliberately coarse and documented as an
-# ESTIMATE (the brief's own words). One measured extraction call is ~3,450
-# tokens for a prompt of ~3,000-4,500 chars of mixed English template +
-# Persian/Arabic/Hebrew items -- ~1.3-1.5 chars/token in the wild. 1.6
-# errs slightly conservative for most batches: an overestimate costs a few
-# seconds of sleep, an underestimate costs the eleven-minute 429 lockout.
-# The owner-verification rule from the brief applies: if 429s persist at
-# 8 calls/run, raise this estimate (or lower batch_size) -- the measured
-# numbers land in run.csv's calls_/fails_ columns.
-_CHARS_PER_TOKEN = 1.6
-# Expected output tokens per extraction call (~400 measured). Added to the
-# booked estimate because the window counts input AND output.
-_OUTPUT_TOKENS_EST = 400
+# ESTIMATE (the brief's own words). Calibrated 2026-09-14 from run
+# 34834335214's live log: a batch-5 prompt of ~17,000 chars tokenized to
+# ~5,100 input tokens (~3.3 chars/token -- the English prompt template is
+# token-light, the Persian/Arabic/Hebrew items token-dense), and output ran
+# ~800-960 tokens. At 1.6/400 the pacer estimated 11,033 tokens for a
+# 6,103-token call, so every batch-5 request tripped the overfit path
+# ("sending anyway") and fired back-to-back into groq's 8,000-token wall,
+# producing the 429 thrash seen in run.csv's calls_/fails_ columns.
+# 3.0 keeps a batch-5 estimate ~6,700 (< 8,000) so normal pacing applies,
+# while still over-booking ~10% as a safety margin. An overestimate costs a
+# few seconds of sleep; an underestimate costs the eleven-minute 429 lockout.
+_CHARS_PER_TOKEN = 3.0
+# Expected output tokens per extraction call (~800-960 measured, capped by
+# max_tokens). Added to the booked estimate because the window counts input
+# AND output; 1,000 covers the observed range with a small margin.
+_OUTPUT_TOKENS_EST = 1000
 
 
 def estimate_tokens(text: str) -> int:
-    """Cheap pre-send token estimate for one request. Chars/1.6 plus the
+    """Cheap pre-send token estimate for one request. Chars/3.0 plus the
     expected output; never zero. No tokenizer here -- the sandbox has no
     PyPI, the pipeline must not import sentence-transformers-adjacent
     packages into its hot path, and a per-provider tokenizer table would
