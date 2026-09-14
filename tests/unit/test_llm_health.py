@@ -79,6 +79,90 @@ def test_load_corrupt_health_returns_empty(tmp_path):
 
 
 # ---------------------------------------------------------------------------
+# Model-aware health (Session 10A): a model id change resets the stale sample
+# ---------------------------------------------------------------------------
+
+
+def test_cascade_order_model_change_resets_demotion():
+    # Sick under the OLD model, but the currently-configured model differs.
+    h = {"gemini": {"calls": 30, "failed": 30, "model": "gemini-flash-latest"}}
+    models = {"gemini": "gemini-3.8-flash", "groq": "qwen/qwen3.8-27b"}
+    assert health.cascade_order(ORDER, h, models) == list(ORDER)
+
+
+def test_cascade_order_legacy_record_without_model_is_not_sick():
+    # Pre-model record (no "model" key) is no evidence against the new model.
+    h = {"gemini": {"calls": 30, "failed": 30}}
+    assert health.cascade_order(ORDER, h, {"gemini": "gemini-3.8-flash"}) == list(ORDER)
+
+
+def test_cascade_order_same_model_stays_sick():
+    h = {"gemini": {"calls": 30, "failed": 30, "model": "gemini-3.8-flash"}}
+    assert (health.cascade_order(ORDER, h, {"gemini": "gemini-3.8-flash"})
+            == ["groq", "bai", "openrouter", "gemini"])
+
+
+def test_cascade_order_no_models_keeps_old_behavior():
+    # Omitting models preserves the fail-rate-only rule (backward compat).
+    h = {"gemini": {"calls": 30, "failed": 30, "model": "gemini-3.8-flash"}}
+    assert health.cascade_order(ORDER, h) == ["groq", "bai", "openrouter", "gemini"]
+
+
+def test_save_health_stores_model(tmp_path):
+    conn = _db(tmp_path)
+    try:
+        health.save_health(conn, {"gemini": {"calls": 5, "failed": 2}}, NOW,
+                           {"gemini": "gemini-3.8-flash"})
+        stored = health.load_health(conn)
+        assert stored["gemini"] == {"calls": 5, "failed": 2, "model": "gemini-3.8-flash"}
+    finally:
+        conn.close()
+
+
+def test_save_health_model_change_resets_sample(tmp_path):
+    conn = _db(tmp_path)
+    try:
+        # Old model failed 30/30.
+        health.save_health(conn, {"gemini": {"calls": 30, "failed": 30}}, NOW,
+                           {"gemini": "gemini-flash-latest"})
+        # New model: only this run's 1 ok call counts, not the 30 stale failures.
+        health.save_health(conn, {"gemini": {"calls": 1, "failed": 0}},
+                           NOW + timedelta(hours=3),
+                           {"gemini": "gemini-3.8-flash"})
+        stored = health.load_health(conn)
+        assert stored["gemini"] == {"calls": 1, "failed": 0, "model": "gemini-3.8-flash"}
+    finally:
+        conn.close()
+
+
+def test_save_health_legacy_record_resets_on_first_model_aware_run(tmp_path):
+    conn = _db(tmp_path)
+    try:
+        # Pre-model record (no model key): 30/30 stale failures.
+        health.save_health(conn, {"gemini": {"calls": 30, "failed": 30}}, NOW)
+        # First model-aware run with the new model: stale sample is dropped.
+        health.save_health(conn, {"gemini": {"calls": 2, "failed": 0}},
+                           NOW + timedelta(hours=3),
+                           {"gemini": "gemini-3.8-flash"})
+        stored = health.load_health(conn)
+        assert stored["gemini"] == {"calls": 2, "failed": 0, "model": "gemini-3.8-flash"}
+    finally:
+        conn.close()
+
+
+def test_save_health_no_models_keeps_legacy_shape(tmp_path):
+    # Omitting models stores no model key (existing roundtrip contract).
+    conn = _db(tmp_path)
+    try:
+        health.save_health(conn, {"gemini": {"calls": 5, "failed": 2}}, NOW)
+        stored = health.load_health(conn)
+        assert "model" not in stored["gemini"]
+        assert stored["gemini"] == {"calls": 5, "failed": 2}
+    finally:
+        conn.close()
+
+
+# ---------------------------------------------------------------------------
 # Daily quota persistence (llm/limits.py seeds ProviderBudget from this)
 # ---------------------------------------------------------------------------
 

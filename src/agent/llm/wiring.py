@@ -111,7 +111,10 @@ def build_router(
     (e.g. gemini's 20) is enforced ACROSS runs, not re-armed per run.
     """
     logger = logger or get_logger("agent.llm.router")
-    order = cascade_order(settings.order, health or {})
+    order = cascade_order(
+        settings.order, health or {},
+        {name: cfg.model for name, cfg in settings.providers.items()},
+    )
     adapters = build_adapters(order, settings.providers, env, logger)
     limits: dict[str, ProviderBudget] = {}
     rpm_map: dict[str, int | None] = {}

@@ -63,7 +63,7 @@ def load_health(conn: sqlite3.Connection) -> dict[str, dict]:
 
 
 def save_health(conn: sqlite3.Connection, stats: Mapping[str, Mapping[str, int]],
-                now: datetime) -> None:
+                now: datetime, models: Mapping[str, str] | None = None) -> None:
     stored = load_health(conn)
     last = stored.get("_last_run")
     fresh = stored
@@ -76,11 +76,20 @@ def save_health(conn: sqlite3.Connection, stats: Mapping[str, Mapping[str, int]]
             fresh = {}
     merged: dict[str, dict] = {"_last_run": now.isoformat()}
     for name, entry in stats.items():
-        calls = int(entry.get("calls", 0)) + int(fresh.get(name, {}).get("calls", 0))
-        failed = int(entry.get("failed", 0)) + int(fresh.get(name, {}).get("failed", 0))
+        prev = fresh.get(name, {}) if isinstance(fresh.get(name), Mapping) else {}
+        # A model id change means the stored sample was recorded against a
+        # DIFFERENT model (or predates model tracking) -- start fresh instead
+        # of letting a dead alias poison a newly-pinned one.
+        stale_model = (models is not None and prev.get("model") != models.get(name))
+        base_calls = 0 if stale_model else int(prev.get("calls", 0))
+        base_failed = 0 if stale_model else int(prev.get("failed", 0))
+        calls = int(entry.get("calls", 0)) + base_calls
+        failed = int(entry.get("failed", 0)) + base_failed
         if calls > _MAX_CALLS:
             calls, failed = 0, 0  # bounded window: restart the sample
         merged[name] = {"calls": calls, "failed": failed}
+        if models is not None:
+            merged[name]["model"] = models.get(name)
     conn.execute(
         "INSERT INTO meta (key, value) VALUES (?, ?) "
         "ON CONFLICT(key) DO UPDATE SET value = excluded.value",
@@ -140,15 +149,21 @@ def save_daily(conn: sqlite3.Connection, stats: Mapping[str, Mapping[str, int]],
 
 
 def cascade_order(configured: Sequence[str],
-                  health: Mapping[str, Mapping]) -> list[str]:
+                  health: Mapping[str, Mapping],
+                  models: Mapping[str, str] | None = None) -> list[str]:
     """Configured order with measurably-sick providers demoted to the end.
-    Unknown providers (in health but not configured) are ignored."""
+    Unknown providers (in health but not configured) are ignored. When
+    `models` is provided, a provider is only demoted if its stored sample was
+    recorded against the CURRENTLY configured model -- failures logged against
+    an older model id (or a legacy record with no model) do not indict the
+    freshly-pinned one."""
     sick = {
         name for name, entry in health.items()
         if name != "_last_run"
         and isinstance(entry, Mapping)
         and entry.get("calls", 0) >= _MIN_SAMPLES
         and entry.get("failed", 0) / max(entry.get("calls", 1), 1) >= _FAIL_RATE
+        and (models is None or entry.get("model") == models.get(name))
     }
     return ([p for p in configured if p not in sick]
             + [p for p in configured if p in sick])
