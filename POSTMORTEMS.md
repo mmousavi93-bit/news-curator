@@ -1300,6 +1300,18 @@ than the behaviour: a red run here means "could not fetch", never "the feed is w
   message delivered (the honest "AI unavailable" notice, 92 chars).
   Also: HF Hub warns about unauthenticated requests -- it worked, but an
   HF_TOKEN secret is optional hardening if rate limits ever bite.
+- **Alias rot (2026-09-14, run 34857770910): the "self-healing" gemini alias
+  died too.** `gemini-flash-latest` stayed LISTED by the models endpoint but
+  generateContent 503'd on 2/2 calls (432ms + 2022ms), so the router's health
+  demotion (7-day fail_rate >= 0.5) pushed gemini to the end of the cascade
+  and groq carried every understand call. This falsifies the 2026-08-29
+  standing rule "aliases for unattended systems": the alias had bound to the
+  retired 2.5-flash and did NOT re-point. Fixed by pinning `gemini-3.8-flash`
+  (the live GA flash from the probe list; its 5 RPM / 250K TPM / 20 RPD limits
+  were already documented). **Standing rule (revised): model ids rot, and
+  aliases rot too -- the "List available models" probe step is the ONLY
+  backstop. Prefer a pinned CURRENT model taken from the probe list, and treat
+  any alias as a rot risk; re-read the probe list after every LLM outage.**
 - **Output rework (owner decisions, 2026-08-29) -- Persian, ranked, anti-repetitive.**
   Built and shim-green (suite 488) in one local iteration per the owner's
   explicit "make things local, iterate, then update" instruction. Shipments:
