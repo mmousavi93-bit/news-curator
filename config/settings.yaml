@@ -345,10 +345,16 @@ llm:
   #   openrouter    403 on 1/1 call -- the zero-balance policy verdict
   #                 already recorded 2026-08-30 ("DEAD under constraint 1").
   #                 It should not have still been in this list.
+  # bai REMOVED 2026-09-14: a dead-gift fallback -- batched understand calls
+  # (~5 clusters) exceeded even the 90s read timeout (run 34846355119 timed
+  # out 2/2 calls and tripped the breaker), contributing ~3 min of latency
+  # and zero coverage per run. Probe latency (~58s single call) does NOT
+  # bound batched-call latency. Re-add only after a batched end-to-end call
+  # is measured under 90s.
   # Re-add bai_deepseek only after confirming the exact model id in the bai
   # console; re-add openrouter only if the balance policy changes.
   # Their provider blocks below are kept, unused, so re-enabling is one edit.
-  order: ["gemini", "groq", "bai"]
+  order: ["gemini", "groq"]
 
   stages:
     vision:    { provider: "gemini" }
@@ -453,6 +459,8 @@ llm:
       # 12 listed models are dead (0/4) -- including deepseek-v4-flash and
       # glm-5.3-flash -- with only qwen3.8-flash (~58s) and mimo-v2.5
       # (~30s) alive. qwen3.8-flash stays the pick (multilingual lineage).
+      # REMOVED from the cascade 2026-09-14 (run 34846355119): batched calls
+      # still exceeded 90s, so the block sits unused -- see the order comment.
       model: "qwen3.8-flash"
       rpm: 20
       rpd: 1000
