@@ -23,6 +23,7 @@ import logging
 from agent.collectors.tz import to_tehran
 from agent.delivery.formatter import escape_html, format_split_tracked
 from agent.delivery.message import Message
+from agent.pipeline.deescalation import is_escalation, maybe_deescalation_notice
 from agent.pipeline.flash_watchdog import flash_warning
 from agent.pipeline.labels import labels_for
 from agent.pipeline.langgate import split_persian
@@ -53,6 +54,17 @@ class ComposeStage:
         # the honest one-liner too -- a "nothing new" run is exactly when a
         # dead alerter is most dangerous and least visible.
         warning = flash_warning(settings, labels)
+        # De-escalation notice (9z): computed once, prepended above the
+        # header on every path -- it fires precisely when the military/
+        # security stream has been QUIET, which is often a "nothing new"
+        # run. Missing db / disabled / no history -> None, never a crash.
+        notice = maybe_deescalation_notice(
+            getattr(ctx, "db", None), ctx.now, ctx.config.deescalation, labels
+        )
+        ctx.deescalation_notice = notice
+        ctx.escalation_delivered = False
+        preamble_parts = [p for p in (warning, notice) if p]
+        preamble = "\n\n".join(preamble_parts) if preamble_parts else ""
         # Built FIRST: a lead-only run (main events empty -- nothing
         # corroborated) must still deliver leads, which is exactly the
         # scenario the leads channel exists for (fix 2026-08-30).
@@ -95,7 +107,7 @@ class ComposeStage:
                 text = labels["nothing_new"]
             if raw_fallback:
                 text += "\n\n" + escape_html(raw_fallback)
-            ctx.messages = [f"{warning}\n\n{text}" if warning else text]
+            ctx.messages = [f"{preamble}\n\n{text}" if preamble else text]
             ctx.counters["compose"] = 0
             self._logger.info("compose: no events -- honest one-liner")
             return
@@ -116,7 +128,7 @@ class ComposeStage:
             )
             if raw_fallback:
                 text += "\n\n" + escape_html(raw_fallback)
-            ctx.messages = [f"{warning}\n\n{text}" if warning else text]
+            ctx.messages = [f"{preamble}\n\n{text}" if preamble else text]
             ctx.counters["compose"] = 0
             self._logger.info(
                 "compose: all %d event(s) below min_score -- honest one-liner", len(events)
@@ -132,10 +144,11 @@ class ComposeStage:
             f"{labels['header']} — {format_jalali(now_tehran, with_time=True)}"
             f" {labels['tehran']}{marker}"
         )
-        if warning:
-            # Above the digest header on purpose: it is a statement about the
-            # system, not about the news, and it must be the first thing read.
-            header = f"{warning}\n{header}"
+        if preamble:
+            # Above the digest header on purpose: the watchdog warning is a
+            # statement about the system, the de-escalation notice about the
+            # news -- both must be the first thing read.
+            header = f"{preamble}\n{header}"
 
         # Follow-up priority + item construction: pipeline/render.py's
         # build_digest_items (moved out 2026-09-06 when this file crossed
@@ -169,6 +182,9 @@ class ComposeStage:
         )
         ctx.counters["compose"] = len(kept)
         delivered = [e for i, e in enumerate(ordered_events) if i not in truncated_orders]
+        ctx.escalation_delivered = any(
+            is_escalation(e, ctx.config.relevance) for e in delivered
+        )
         ctx.compose_truncated = [
             e for i, e in enumerate(ordered_events) if i in truncated_orders
         ]

@@ -64,6 +64,7 @@ LABELS: Mapping[str, Mapping[str, str]] = {
             "آخرین ثبت وضعیت حدود {hours} ساعت پیش."
         ),
         "flash_missing": "⚠️ پایش هشدار فوری هیچ وضعیتی ثبت نکرده است.",
+        "deescalation": "📉 کاهش تنش — {days} روز از آخرین خبر نظامی/امنیتی گذشته است.",
         "time_not_stated": "زمان اعلام نشده",
         "date_unknown": "تاریخ نامعلوم",
         "rumour": "شایعه",
@@ -92,6 +93,7 @@ LABELS: Mapping[str, Mapping[str, str]] = {
             "{hours}h ago."
         ),
         "flash_missing": "⚠️ Flash monitor has never reported state.",
+        "deescalation": "📉 De-escalation — {days} days since the last military/security item.",
         "time_not_stated": "time not stated",
         "date_unknown": "date unknown",
         "rumour": "RUMOUR",

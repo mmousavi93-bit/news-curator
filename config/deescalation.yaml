@@ -1,0 +1,15 @@
+# De-escalation notice for the 3-hourly digest (session 9z).
+#
+# Restores the 📉 notice the flash used to send, dropped in 9y when the
+# flash became tehran-only. On the digest side, "escalation" is a
+# military/security event that cleared the strategic relevance tier (a
+# regional anchor or Iran is named). The digest records, once per Tehran
+# day, that an escalation event was DELIVERED; the notice fires when
+# escalation had been delivered on >= streak_days distinct days in the last
+# window_days and has been quiet for >= quiet_days days, at most once per
+# cooldown_days. All deterministic -- no LLM.
+enabled: true
+streak_days: 3      # escalation must have been delivered on >= this many distinct days
+window_days: 30     # lookback for the streak
+quiet_days: 3       # sustained quiet before the notice fires
+cooldown_days: 7    # at most one notice per N days
