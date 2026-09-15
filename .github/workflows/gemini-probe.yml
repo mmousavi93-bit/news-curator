@@ -1,0 +1,46 @@
+name: gemini-probe
+
+# TEMPORARY (Session 10B pattern, re-created 2026-09-15). Verifies which
+# gemini free-tier flash/lite ids are actually SERVING (generateContent 200
+# with tokens) vs merely LISTED, ahead of a possible pin to
+# gemini-3.5-flash-lite (owner-reported 500 RPD, limits still unverified).
+# Deleted after use. Invariants (SESSION_10B_BRIEF): permissions contents
+# read only; keys in -H headers never the URL (logs are public); touches
+# nothing -- no state, no pipeline, no push.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: List and ping every flash/lite model
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          set -u
+          base="https://generativelanguage.googleapis.com/v1beta"
+          raw=$(curl -s --max-time 30 -H "x-goog-api-key: $GEMINI_API_KEY" "$base/models")
+          ids=$(printf '%s' "$raw" | python3 -c 'import sys,json; d=json.load(sys.stdin); ms=[m["name"].split("/")[-1] for m in d.get("models",[])]; print(" ".join(sorted({m for m in ms if "flash" in m.lower()})))')
+          if [ -z "$ids" ]; then
+            echo "MODELS LIST EMPTY OR UNPARSEABLE. Raw head:"
+            printf '%s' "$raw" | head -c 500
+            echo
+            exit 1
+          fi
+          echo "FLASH/LITE IDS: $ids"
+          echo "----------------------------------------"
+          for m in $ids; do
+            code=$(curl -s -o /tmp/body -w "%{http_code}" --max-time 30 \
+              -H "x-goog-api-key: $GEMINI_API_KEY" \
+              -H "Content-Type: application/json" \
+              -X POST \
+              -d '{"contents":[{"parts":[{"text":"ping"}]}]}' \
+              "$base/models/$m:generateContent")
+            snip=$(head -c 300 /tmp/body | tr '\n' ' ')
+            echo "MODEL=$m HTTP=$code BODY=$snip"
+          done
