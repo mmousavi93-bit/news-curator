@@ -58,8 +58,11 @@ silently work around them.
   AI Studio per-project page; the old 10 RPM / 1,500 RPD was the pre-2026 tier. No card,
   vision included, may train on prompts → public news content only, never personal data.
   Enforced in code as a daily cap keyed to Pacific midnight (health.py `_quota_day`).
-  Gemini 3.5 Flash Lite reports **500 RPD** (owner, UNVERIFIED: exact model id, RPM, TPM
-  unknown — do not wire until all three are confirmed).
+  Gemini 3.5 Flash Lite reports **500 RPD** (owner). FALSIFIED 2026-09-15 (gemini-probe
+  run 34979425272): `gemini-3.5-flash-lite` generateContent HANGS (20s timeout, 2/2 runs)
+  — it does not serve at all. The lite model that actually SERVES 200 is
+  `gemini-3.1-flash-lite` (~1.3s); its RPM/TPM/RPD are still console-only, unverified —
+  do not wire until confirmed.
 - Groq free, **`qwen/qwen3.8-27b`, verified 2026-09-09 from the console limits page**
   (`outputs/groqlimits.txt`): RPM 30, **RPD 1K**, **TPM 8K**, TPD 200K. No card. No vision.
   The old "30 RPM, 14,400 RPD" line was WRONG — 14.4K RPD belongs to the
