@@ -383,3 +383,39 @@ def test_reason_records_the_best_matching_priors_event_key(tmp_path):
     reason = ctx.repeat_drop_reasons[cluster.key]
     assert "prior=wwwwwwww" in reason
     assert "prior=ssssssss" not in reason
+
+
+def test_bypass_via_content_novelty_new_number(tmp_path):
+    # Round-4 review, fix 6: development by CONTENT, not corroboration --
+    # the same story adds a new number (a death toll, a count) while
+    # independent_count and claim_status stay frozen. Under the old
+    # indep/claim ratchet this exact shape was the run's top false drop
+    # (no_development at score 17.97); it must now bypass.
+    credibility = _cred(t2=SourceCredibility(tier=2, group="g"))
+    cluster = _cluster([_item("t2", "https://x/1")])
+    event = Event(event_key=cluster.key, summary="old summary, 20 dead",
+                  category="military", source_count=1,
+                  first_seen_at=NOW, last_updated_at=NOW)
+    kept, ctx = _single_prior(tmp_path, credibility, cluster, event,
+                              prior_independent=1, prior_claim_status="unconfirmed")
+    assert len(kept) == 1
+    assert kept[0].follow_up is True
+    reason = ctx.repeat_drop_reasons[cluster.key]
+    assert "kept=development" in reason
+
+
+def test_bypass_via_content_novelty_new_entity(tmp_path):
+    # Round-4 review, fix 6: same story, new NAMED ENTITY (a new actor,
+    # place or org) with corroboration and claim frozen -- development by
+    # content. Mirrors the Aoun-security-deal block (score 12.20).
+    credibility = _cred(t2=SourceCredibility(tier=2, group="g"))
+    cluster = _cluster([_item("t2", "https://x/1")])
+    event = Event(event_key=cluster.key, summary="old summary",
+                  entities=("عون",), category="military", source_count=1,
+                  first_seen_at=NOW, last_updated_at=NOW)
+    kept, ctx = _single_prior(tmp_path, credibility, cluster, event,
+                              prior_independent=1, prior_claim_status="unconfirmed")
+    assert len(kept) == 1
+    assert kept[0].follow_up is True
+    reason = ctx.repeat_drop_reasons[cluster.key]
+    assert "kept=development" in reason
