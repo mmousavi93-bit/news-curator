@@ -117,13 +117,18 @@ pipeline:
   # clusters are logged once; they get no LLM call. The old "deferred to the
   # next run" comment predated that decision and was wrong -- a budget that
   # only fires on the busiest day must not rely on tomorrow being quieter.
-  max_clusters_per_run: 55
+  max_clusters_per_run: 90
   # SESSION 12 (2026-09-14): 40 -> 55. The 40 cap was dropping relevant
   # stories even on quiet days (measured: run 34872885506 had 42 clusters,
   # 2 cap_dropped, one a directly-relevant Reuters Hormuz-shipping item;
   # busier days dropped ~62%). +LLM calls only on high-volume days; the
   # health-aware wiring degrades gracefully if groq free tier strains. Dial
   # back to 40 if a busy-day run trips the circuit breaker.
+  # SESSION 13 (2026-09-16): 55 -> 90. Run 35103425928 (324 items, 165
+  # clusters) dropped 110 -- 34 of them on-mission (Mecca "red line",
+  # Araghchi US-casualties, Israeli double-tap, Malaysia shipments). Cost:
+  # 90 clusters = 18 batched calls/run x 6 = 108/day vs groq rpd 1000
+  # (~11%) and max_calls_per_run 70 (18 << 70). See SESSION_13_BRIEF.md.
   max_vision_calls_per_run: 10
 
   # Cosine similarity for agglomerative clustering. UNTUNED — placeholder until
