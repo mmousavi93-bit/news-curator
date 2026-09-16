@@ -10,8 +10,10 @@ against the review's measured run.
 
 from __future__ import annotations
 
+import re
 from typing import Mapping
 
+from agent.flash.textnorm import normalize
 from agent.memory.event_models import Event
 from agent.pipeline.rank import score_event
 
@@ -34,6 +36,33 @@ def _high_water(matched: list[Event]) -> tuple[int, int]:
         max(p.independent_count for p in matched),
         max(_claim_rank(p.claim_status) for p in matched),
     )
+
+
+_NUM_RE = re.compile(r"[0-9]+")
+
+
+def _numbers(text: str) -> set[str]:
+    """Every number in a summary after textnorm digit-folding, so Persian
+    (۲۰), Arabic-Indic (٢٠) and ASCII (20) collapse to the same token."""
+    return set(_NUM_RE.findall(normalize(text or "")))
+
+
+def _content_novelty(event: Event, matched: list[Event]) -> bool:
+    """Round-4 review, fix 6: `developed` has meant only corroboration
+    (independent_count grew) or confidence (claim upgraded) -- neither moves
+    when the SAME story picks up a new fact. Run 35103425928 blocked its two
+    highest-scored items this way (the Houthi Aramco/Khamis-Mushait strike
+    and the Gaza building collapse, both plainly new developments). Two
+    deterministic, zero-LLM signals declare development: a number no matched
+    prior summary contained (a new death toll, count, date), or a named
+    entity no prior carried (a new actor, place or org)."""
+    new_summary = event.summary or ""
+    prior_summaries = " ".join(p.summary or "" for p in matched)
+    if _numbers(new_summary) - _numbers(prior_summaries):
+        return True
+    new_entities = {normalize(e) for e in (event.entities or ())}
+    prior_entities = {normalize(e) for p in matched for e in (p.entities or ())}
+    return bool(new_entities - prior_entities)
 
 
 def _decide(
@@ -85,6 +114,7 @@ def _decide(
     developed = (
         event.independent_count > hw_independent
         or _claim_rank(event.claim_status) > hw_claim
+        or _content_novelty(event, matched)
     )
     bypass = meets_floor and developed
     if bypass:
