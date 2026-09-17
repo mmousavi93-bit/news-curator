@@ -53,3 +53,15 @@ calls/run × 6 runs = 108 calls/day vs groq `rpd: 1000` (~11%) and
 
 - Fix 1: revert the `or _content_novelty(...)` clause and the two helpers.
 - Fix 2: `max_clusters_per_run: 55` in both YAML files.
+
+## Follow-up (2026-09-17) — Fix 3, the missed timeout interaction
+
+The brief's cost note ("No run-duration watchdog is affected") was **wrong**: GitHub's
+job `timeout-minutes: 30` IS a run-duration cap, and the 55→90 raise pushed a busy run
+past it. Manual dispatch `35197529008` was cancelled at exactly 30 min mid-summarize
+(measured: cap-55 run `35161171996` = 20.0 min; cap-90 needs ~35 min with groq's
+8/18 429-and-retry). No digest was delivered that run.
+
+Fix 3: `.github/workflows/pipeline.yml` `timeout-minutes: 30` → `90`. Public repo =
+unlimited minutes; the LLM breaker — not this timer — is the real hung-call guard.
+Re-verify by re-dispatching and confirming clusters > 55 AND a delivered digest.
