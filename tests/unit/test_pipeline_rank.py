@@ -114,23 +114,43 @@ def test_relevance_gate_filters_before_importance_sort():
     assert any("relevance gate" in m for m in log.messages)
 
 
-def test_gated_in_events_sort_by_importance_not_relevance_tier():
-    # An iran_direct economy item (relevance 8) must NOT outrank a strategic
-    # military item (relevance 4): within the gate, IMPORTANCE sorts --
-    # military 6+2+2+3 = 13 beats economy 2+2+2+3 = 9.
+def test_relevance_tier_participates_in_sort():
+    # Owner change 2026-09-18 (owner lifted the "relevance is only a FILTER"
+    # rule -- "not a hard rule"): relevance is now a sort term too. An
+    # iran_direct politics item (relevance 8) outranks a strategic military
+    # item (relevance 4) even though the military importance (6+2+2+3=13)
+    # beats politics (3+2+2+3=10): relevance lifts it to 10+8=18 vs 13+4=17.
     settings = _settings()
     log = _Log()
-    iran_econ = _event("a" * 16, "economy", summary="قیمت نفت در ایران بالا رفت")
+    iran_pol = _event("a" * 16, "politics", summary="تحریم‌های جدید علیه ایران")
     strat_mil = _event("b" * 16, "military", summary="جنگ در منطقه آغاز شد")
     kept, _, _ = rank_events(
-        [iran_econ, strat_mil],
+        [iran_pol, strat_mil],
         {
             "a" * 16: _cluster("", [_item("t2")]),
             "b" * 16: _cluster("", [_item("t2")]),
         },
         CRED, settings, NOW, log, _relevance_cfg(),
     )
-    assert [e.event_key for e in kept] == ["b" * 16, "a" * 16]
+    assert [e.event_key for e in kept] == ["a" * 16, "b" * 16]
+
+
+def test_iran_direct_relevance_lifts_story_above_min_score():
+    # A weak "other" single-source story (importance ~5, below min_score 8)
+    # is rescued by iran_direct relevance (+8): relevance now counts in the
+    # score, so a single-source Iran story clears the floor where it used
+    # to be dropped.
+    settings = _settings()
+    log = _Log()
+    iran_other = _event("c" * 16, "other", summary="حادثه در ایران گزارش شد")
+    kept, dropped, gated = rank_events(
+        [iran_other],
+        {"c" * 16: _cluster("", [_item("t3")])},
+        CRED, settings, NOW, log, _relevance_cfg(),
+    )
+    assert [e.event_key for e in kept] == ["c" * 16]
+    assert dropped == []
+    assert gated == []
 
 
 def test_strong_corroboration_can_beat_weak_category():
