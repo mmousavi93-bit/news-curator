@@ -1,4 +1,4 @@
-"""Unit tests for llm/token_pacer.py (session 9s): the sliding 60-second
+"""Unit tests for llm/token_pacer.py (session 9s): the sliding 120-second
 token window that binds on groq's TPM 8,000. Everything clock-injected --
 no test sleeps and no test reads the wall clock (PHASE_5_BRIEF §5)."""
 
@@ -73,8 +73,8 @@ def test_second_wait_sleeps_when_window_full():
     pacer, clock = _pacer()
     pacer.wait("groq", 8000, 5800)  # t=0, window=5800
     clock.t = 5.0
-    pacer.wait("groq", 8000, 5800)  # 5800+5800 > 65% of 8000 -> sleep 55s
-    assert clock.sleeps == [55.0]
+    pacer.wait("groq", 8000, 5800)  # 5800+5800 > 65% of 8000 -> sleep 115s
+    assert clock.sleeps == [115.0]
 
 
 def test_safety_factor_blocks_back_to_back_small_batches():
@@ -86,13 +86,26 @@ def test_safety_factor_blocks_back_to_back_small_batches():
     pacer.wait("groq", 8000, 3000)   # small batch, t=0
     clock.t = 0.1                    # a back-to-back attempt 100ms later
     pacer.wait("groq", 8000, 3000)   # 6000 > 5200 budget -> wait out window
-    assert clock.sleeps == [59.9]
+    assert clock.sleeps == [119.9]
 
 
-def test_window_expires_after_sixty_seconds():
+def test_calls_one_window_apart_do_not_age_out_too_early():
+    # Run 35209729646: at 80 clusters the 60s window fired each batch one minute
+    # after the previous, but groq still counted the previous batch's tokens
+    # (effective window ~120s, first measured in run 34857770910), so every
+    # first attempt 429'd and the 30s-cooldown retries could never recover.
+    # A call 60s after the previous must still wait for the previous to drain.
+    pacer, clock = _pacer()
+    pacer.wait("groq", 8000, 4600)   # batch #1 at t=0
+    clock.t = 60.0
+    pacer.wait("groq", 8000, 2200)   # batch #2 at t=60: groq still counts #1
+    assert clock.sleeps == [60.0]    # waits until batch #1 drains at t=120
+
+
+def test_window_expires_after_window_duration():
     pacer, clock = _pacer()
     pacer.wait("groq", 8000, 5800)
-    clock.t = 61.0
+    clock.t = 121.0
     pacer.wait("groq", 8000, 5800)  # first booking aged out
     assert clock.sleeps == []
 
@@ -105,7 +118,7 @@ def test_failed_attempts_consume_the_window():
     pacer.wait("groq", 8000, 5800)   # attempt 1 (will fail)
     clock.t = 2.0
     pacer.wait("groq", 8000, 5800)   # attempt 2: window has both bookings
-    assert clock.sleeps == [58.0]    # must wait for attempt 1 to age out
+    assert clock.sleeps == [118.0]   # must wait for attempt 1 to age out
 
 
 def test_charge_correction_counts_toward_the_window():
@@ -114,7 +127,7 @@ def test_charge_correction_counts_toward_the_window():
     clock.t = 3.0
     pacer.charge("groq", 2500)       # actual usage was higher (correction)
     pacer.wait("groq", 8000, 100)    # 6000+2500+100 > 65% budget -> sleeps
-    assert clock.sleeps == [57.0]    # until the first booking expires
+    assert clock.sleeps == [117.0]   # until the first booking expires
 
 
 def test_charge_nonpositive_is_a_noop():
@@ -122,7 +135,7 @@ def test_charge_nonpositive_is_a_noop():
     pacer.wait("groq", 8000, 6000)
     pacer.charge("groq", 0)
     pacer.charge("groq", -500)
-    clock.t = 61.0
+    clock.t = 121.0
     pacer.wait("groq", 8000, 6000)   # nothing extra in the window
     assert clock.sleeps == []
 

@@ -1,4 +1,4 @@
-"""Token-aware pacing (session 9s): a sliding 60-second window of tokens
+"""Token-aware pacing (session 9s): a sliding 120-second window of tokens
 per provider, charged on EVERY attempt including failures.
 
 Why this exists -- the measured cause (agents/briefs/SESSION_9S_BRIEF.md,
@@ -29,7 +29,16 @@ import logging
 from collections import deque
 from typing import Callable
 
-_WINDOW_SECONDS = 60.0
+# groq's effective token window is ~120s, not the 60s the "tokens per minute"
+# label implies. Measured in run 34857770910: a call fired exactly 60s after the
+# previous still 429'd (4.6K + 1.5K + 2.2K ≈ 8.4K > 8K) because groq counts a
+# request's tokens past the nominal minute. Run 35209729646 (80 clusters) made it
+# the dominant failure: 22/34 groq calls 429'd (65%, all tokens_in=0 — rejected
+# at the door), and the fixed 30s failover cooldown (30s < 120s) retried into the
+# still-full window, so ~10 clusters fell to `unavailable` and 5 to `unparseable`
+# — the "بدون خلاصه" spike. Booking against the real 120s window means a batch
+# only fires once the previous batch's tokens have fully drained.
+_WINDOW_SECONDS = 120.0
 
 # Character-based token estimate, deliberately coarse and documented as an
 # ESTIMATE (the brief's own words). Calibrated 2026-09-14 from run
@@ -57,7 +66,7 @@ _OUTPUT_TOKENS_EST = 1000
 # the coarse chars/3.0 estimate under-measures token-dense Persian). Booking
 # against 65% of nominal (~5,200) leaves headroom and makes back-to-back
 # requests impossible: even the two smallest batch estimates sum to ~5,600 >
-# 5,200, so the second always waits out the 60s window. The overfit check
+# 5,200, so the second always waits out the 120s window. The overfit check
 # (estimated_tokens > tpm) stays against the FULL nominal tpm, so a single
 # batch never re-triggers the old "sending anyway" 429 thrash.
 _SAFETY_FACTOR = 0.65
@@ -73,7 +82,7 @@ def estimate_tokens(text: str) -> int:
 
 
 class TokenPacer:
-    """Sliding 60s token window per provider. wait() books a request's
+    """Sliding 120s token window per provider. wait() books a request's
     estimate BEFORE the request leaves and sleeps until it fits; charge()
     adds a correction after the attempt when real usage is known. The
     booking happens on every attempt -- including failures, including 429s
@@ -103,7 +112,7 @@ class TokenPacer:
 
     def wait(self, name: str, tpm: int | None, estimated_tokens: int) -> None:
         """Book `estimated_tokens` for this provider and sleep (through the
-        injected sleep callable) until the trailing 60s window has room.
+        injected sleep callable) until the trailing 120s window has room.
         Called on EVERY attempt, before the request is sent. `tpm` None
         (or 0) means unconstrained -- no pacing, no booking, matching the
         "treat a missing value as unconstrained" settings contract."""
