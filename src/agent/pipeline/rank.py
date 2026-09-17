@@ -1,22 +1,29 @@
-"""Digest ranking -- relevance gate + deterministic importance sorting.
+"""Digest ranking -- relevance gate + deterministic importance + relevance sort.
 
-Owner decision 2026-08-30 (refined mid-session, validated by two
-independent pro-agent evaluations of 9 delivered events): relevance is a
-FILTER, importance is the SORT, count is dynamic.
+Owner decision 2026-09-18 (the owner lifted the 2026-08-30 "relevance is only
+a FILTER" rule -- "not a hard rule, apply and measure"): relevance now
+participates in the SORT too, not just the gate. The earlier decisions were
+validated by independent pro-agent evaluations of 9 delivered events.
 
   filter: an event whose highest relevance tier (config/relevance.yaml)
           is below min_relevance never reaches the digest.
-  sort:   importance score, descending -- category, corroboration, tier,
-          recency, volume. Identical input -> identical order
-          (constraint 3 discipline: deterministic Python, no LLM).
+  sort:   relevance-weighted score, descending -- relevance tier weight,
+          category, corroboration, tier, recency, volume. Identical input
+          -> identical order (constraint 3 discipline: deterministic Python,
+          no LLM).
 
-score = category_weight
+score = relevance_weight            (highest matching tier: iran_direct/strategic/economy)
+      + category_weight
       + corroboration_weight * min(independent_groups, 3)
       + tier_bonus[best tier among members]
       + recency bonus (decays linearly to 0 at recency_window_hours)
       + size boost (0.1 per extra member, capped)
 
 The defaults' arithmetic is documented in settings.yaml next to min_score.
+The two floors (min_score, repeat_bypass_score) were recalibrated by exactly
++min_relevance (=3) when relevance entered the score, so non-Iran stories
+keep their exact importance floor and only Iran/strategic stories get a
+relative lift (economy +0, strategic +1, iran_direct +5 vs the gate baseline).
 """
 
 from __future__ import annotations
@@ -27,7 +34,7 @@ from typing import Mapping, Sequence
 
 from agent.memory.event_models import Event
 from agent.pipeline.cluster import Cluster
-from agent.pipeline.relevance import RelevanceConfig, passes_gate
+from agent.pipeline.relevance import RelevanceConfig, passes_gate, score_relevance
 from agent.settings import Settings
 
 _EPOCH = datetime(1970, 1, 1, tzinfo=timezone.utc)
@@ -66,11 +73,15 @@ def score_event(
     credibility: Mapping[str, object],
     settings: Settings,
     now: datetime,
+    relevance_score: float = 0.0,
 ) -> float:
-    """Deterministic IMPORTANCE score. Higher = more important.
+    """Deterministic importance + relevance score. Higher = more important.
 
-    Relevance is not part of this score -- it is the upstream FILTER
-    (rank_events drops below-min_relevance events before sorting)."""
+    `relevance_score` is the event's highest relevance-tier weight from
+    config/relevance.yaml (iran_direct / strategic / economy), added so
+    relevance-to-Iran participates in the sort (owner change 2026-09-18).
+    Callers that do not load relevance (tests constructing Config directly)
+    pass nothing and get the pure importance score."""
     cfg = settings.digest_rank
     category = event.category if event.category in _CATEGORIES else "other"
     score = float(cfg.category_weights.get(category, 0))
@@ -87,6 +98,7 @@ def score_event(
             cfg.size_boost_per_member * max(0, len(cluster.members) - 1),
             cfg.size_boost_cap,
         )
+    score += relevance_score
     return round(score, 3)
 
 
@@ -96,14 +108,15 @@ def event_order_key(
     credibility: Mapping[str, object],
     settings: Settings,
     now: datetime,
+    relevance_score: float = 0.0,
 ) -> tuple:
-    """The digest sort key: importance score desc, then recency desc, then
-    key. Shared by rank_events and the summaries.csv writer, so `rank` in
-    the CSV is the position the reader actually sees in the message."""
+    """The digest sort key: relevance-weighted score desc, then recency desc,
+    then key. Shared by rank_events and the summaries.csv writer, so `rank`
+    in the CSV is the position the reader actually sees in the message."""
     cluster = clusters_by_key.get(event.event_key)
     stamp = latest_stamp(cluster) if cluster else None
     return (
-        -score_event(event, cluster, credibility, settings, now),
+        -score_event(event, cluster, credibility, settings, now, relevance_score),
         -(stamp.timestamp() if stamp else 0.0),
         event.event_key,
     )
@@ -118,13 +131,15 @@ def rank_events(
     logger: logging.Logger,
     relevance: RelevanceConfig | None = None,
 ) -> tuple[list[Event], list[Event], list[Event]]:
-    """Relevance gate (filter), then importance sort, then min_score split.
+    """Relevance gate (filter), then relevance-weighted importance sort, then
+    min_score split.
 
     Returns (kept, below_min_score, below_relevance). The two drop reasons
     are separated so the observability CSVs record the real fate -- a
     relevance-gated event and a low-importance event are different
     diagnoses, and merging them hides which lever to tune."""
     if relevance is not None:
+        rel = {e.event_key: score_relevance(relevance, event_text(e)) for e in events}
         passing, gated = [], []
         for e in events:
             (passing if passes_gate(relevance, event_text(e)) else gated).append(e)
@@ -136,14 +151,19 @@ def rank_events(
                 ", ".join(e.event_key[:8] for e in gated),
             )
     else:
+        rel = {}
         passing, gated = list(events), []
 
     scored = sorted(
         passing,
-        key=lambda e: event_order_key(e, clusters_by_key, credibility, settings, now),
+        key=lambda e: event_order_key(
+            e, clusters_by_key, credibility, settings, now,
+            rel.get(e.event_key, 0.0),
+        ),
     )
     kept = [e for e in scored if score_event(
-        e, clusters_by_key.get(e.event_key), credibility, settings, now
+        e, clusters_by_key.get(e.event_key), credibility, settings, now,
+        rel.get(e.event_key, 0.0),
     ) >= settings.digest_rank.min_score]
     dropped = [e for e in scored if e not in kept]
     if dropped:

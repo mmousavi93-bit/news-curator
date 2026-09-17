@@ -2,10 +2,12 @@
 
 Deterministic, zero LLM calls: substring-matches config/relevance.yaml
 keyword tiers against the event's headline + summary + entities and returns
-the highest matching tier's weight. The owner's design (refined mid-session):
-relevance is a FILTER -- an event below `min_relevance` never reaches the
-digest -- and importance (category, corroboration, tier, recency) is the
-SORT within the surviving set. Detection is not relevance: a commentary
+the highest matching tier's weight. The owner's design: relevance is a
+FILTER -- an event below `min_relevance` never reaches the digest -- AND,
+since 2026-09-18 (owner lifted the "filter only" rule), a SORT term: the
+matching tier's weight is added to score_event, so iran_direct outranks
+strategic outranks economy within otherwise-comparable importance.
+Detection is not relevance: a commentary
 piece mentioning Iran still matches iran_direct; the understand prompt's
 commentary rule is the first defense, this gate is the second.
 
