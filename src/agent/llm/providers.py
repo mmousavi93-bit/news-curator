@@ -183,11 +183,14 @@ class GroqAdapter(_OpenAiChatAdapter):
 
 
 class CerebrasAdapter(_OpenAiChatAdapter):
-    """Cerebras Inference free tier (verified 2026-09-18): gpt-oss-120b and
-    gemma-4-31b, 5 RPM / 30K TPM / 1M tokens per hour / 1M tokens per day.
-    OpenAI-compatible. TPM 30,000 is 3.75x groq's 8,000: the third rung that
-    absorbs the batched-call wall when groq 429s and gemini 503s at once
-    (run 35343007845 lost 40/90 clusters to exactly that)."""
+    """Cerebras Inference third rung (owner Limits page, 2026-09-18):
+    qwen-3.8-27b, 450 RPM / 648K RPD / 150K UNCACHED TPM (450K total).
+    OpenAI-compatible. 150K uncached is ~18.75x groq's 8K: absorbs the
+    batched-call wall when groq 429s and gemini 503s at once (run
+    35343007845 lost 40/90 clusters to exactly that). tpm is the uncached
+    figure because the pipeline's prompts are cache-cold. 402
+    payment_required blocks live use until the owner adds a billing method
+    (probe 35380934632)."""
 
     _user_agent = (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "

@@ -1,19 +1,19 @@
-"""Probe Cerebras Inference's free roster for LIVENESS (chat.completions 200).
+"""Probe Cerebras Inference's org roster for LIVENESS (chat.completions 200).
 
 Owner problem 2026-09-18: free-LLM capacity is the binding constraint (run
 35343007845: 42 calls -> 10 ok, 40/90 clusters unavailable because groq 429
-and gemini 503 walled simultaneously). Cerebras free tier (5 RPM / 30K TPM /
-1M tokens per day) is the candidate third rung, but "listed" != "serves 200"
--- the gemini-alias trap (config/settings.yaml) applies here too. This tool
-answers, per candidate id, whether chat.completions returns 200 RIGHT NOW,
-plus latency and the error body for failures.
+and gemini 503 walled simultaneously). Cerebras qwen-3.8-27b (450 RPM / 150K
+uncached TPM, owner Limits page) is the candidate third rung, but "listed"
+!= "serves 200" -- the gemini-alias trap (config/settings.yaml) applies here
+too. This tool answers, per candidate id, whether chat.completions returns
+200 RIGHT NOW, plus latency and the error body for failures.
 
 Runs from a US GitHub runner (probe-cerebras.yml, workflow_dispatch) for the
 same reason every probe here is CI-only. Stdlib only. The key comes from
 CEREBRAS_API_KEY env; never logged. Results land in a text artifact.
 
-Budget note: each candidate id costs one call of the 5-RPM free tier -- probe
-only the two free models, never the whole roster.
+Budget note: each candidate id costs one call -- probe only the org's model
+(qwen-3.8-27b), never the whole roster.
 """
 
 from __future__ import annotations
@@ -36,7 +36,7 @@ _BROWSER_UA = (
     "(KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
 )
 
-DEFAULT_MODELS = ("gpt-oss-120b", "gemma-4-31b")
+DEFAULT_MODELS = ("qwen-3.8-27b",)
 
 # Mirrors the understand stage's ask (Persian strict JSON) so a 200 here is
 # evidence the model serves the real task, not just any prompt.
