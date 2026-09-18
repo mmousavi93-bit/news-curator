@@ -1,0 +1,51 @@
+name: probe-mistral
+
+# Manual only. Answers "which Mistral free-mode model id actually serves 200
+# right now?" before the third-rung wiring (SESSION_19_BRIEF) counts on it.
+# "listed" != "serves 200" -- the gemini-alias trap applies here too, so the
+# models LIST endpoint is never taken as a liveness verdict. Re-pin/confirm
+# the mistral block in config/settings.yaml only after this probe shows a
+# target id green.
+#
+# Mistral "Free mode" (no card, ~$10/mo included credits) is the no-card
+# third rung: Cerebras is billing-gated (402 on every live model, owner has
+# no card). Unlike Cerebras, api.mistral.ai is NOT geo-blocked or
+# Cloudflare-fronted -- the runner location is just where the secret lives.
+#
+# Budget: each probed id costs one call of the free-mode monthly credit
+# pool. Default probes 1 candidate (mistral-small-latest), padded to 15s.
+# Do NOT grow the roster here without checking the free-mode limits.
+
+on:
+  workflow_dispatch:
+    inputs:
+      models:
+        description: "Comma-separated model ids (empty = mistral-small-latest)"
+        required: false
+        default: ""
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Identify the commit under test
+        run: echo "running ${{ github.sha }}"
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Probe Mistral free-mode roster
+        env:
+          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+        run: |
+          python tools/probe_mistral.py --models "${{ inputs.models }}"
+
+      - uses: actions/upload-artifact@v5
+        with:
+          name: mistral-probe
+          path: config/mistral_probe.txt
+          if-no-files-found: error
