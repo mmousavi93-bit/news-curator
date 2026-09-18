@@ -49,9 +49,15 @@ weights:
   economy: 3
 
 # FILTER threshold (owner decision 2026-08-30, session 9c-v2): an event whose
-# highest matched tier is BELOW this never reaches the digest -- relevance is a
-# gate, importance is the sort. Default 3 = economy tier passes (macro moves
-# matter). Set 4 for strategic-only, 8 for Iran-direct-only.
+# highest matched tier is BELOW this never reaches the digest. Default 3 =
+# economy tier passes (macro moves matter). Set 4 for strategic-only, 8 for
+# Iran-direct-only.
+# 2026-09-18: relevance is no longer gate-ONLY -- the matched tier weight is
+# now ALSO added to the digest sort score in rank.py (owner lifted the
+# "relevance is a FILTER" rule; see rank.py docstring). This threshold still
+# gates, but above it the weight lifts iran_direct (+8) and strategic (+4)
+# stories up the order; min_score and repeat_bypass_score were shifted +3
+# (= min_relevance) so the non-Iran importance floor is unchanged.
 min_relevance: 3
 
 keywords:
@@ -64,10 +70,22 @@ keywords:
     - "پاسدار"
     - "باسدار"
     - "خامنه"
-    - "رهبری"
+    # 2026-09-18 fix: bare رهبری ("leadership") false-fired iran_direct on
+    # «شورای رهبری یمن» (Yemen's Presidential Leadership Council), wrongly
+    # crediting a Yemen-vs-Houthi story as Iran-direct (and ranking it #1 of
+    # the digest). Replaced with the two specific Khamenei-title forms;
+    # «خامنه» above already covers named references.
+    - "رهبر معظم"
+    - "مقام معظم رهبری"
     - "جمهوری اسلامی"
     - "پزشکیان"
     - "بزشکیان"
+    # 2026-09-18 fix: فاطمیون (the IRGC's Afghan Fatemiyoun militia) and
+    # زاهدان (Sistan-and-Baluchestan's provincial capital) are Iran-direct
+    # but were absent, so a real Iran story (militia members killed in
+    # Zahedan) scored 0 relevance and stayed rank_dropped.
+    - "فاطمیون"
+    - "زاهدان"
     - "برجام"
     - "خلیج فارس"
     - "تنگه هرمز"
