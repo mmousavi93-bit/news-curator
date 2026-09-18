@@ -20,6 +20,7 @@ from agent.llm.providers import (
     DEFAULT_TIMEOUT,
     BaiAdapter,
     BaiDeepSeekAdapter,
+    CerebrasAdapter,
     DeepSeekAdapter,
     GeminiAdapter,
     GroqAdapter,
@@ -35,6 +36,7 @@ from agent.util.logging import get_logger
 _ADAPTERS: dict[str, type] = {
     "gemini": GeminiAdapter,
     "groq": GroqAdapter,
+    "cerebras": CerebrasAdapter,
     "bai": BaiAdapter,
     "bai_deepseek": BaiDeepSeekAdapter,
     "openrouter": OpenRouterAdapter,

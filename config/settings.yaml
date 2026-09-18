@@ -365,7 +365,7 @@ llm:
   # Re-add bai_deepseek only after confirming the exact model id in the bai
   # console; re-add openrouter only if the balance policy changes.
   # Their provider blocks below are kept, unused, so re-enabling is one edit.
-  order: ["gemini", "groq"]
+  order: ["gemini", "groq", "cerebras"]
 
   stages:
     vision:    { provider: "gemini" }
@@ -440,6 +440,34 @@ llm:
       rpm: 30
       rpd: 1000
       tpm: 8000
+      supports_vision: false
+    cerebras:
+      # 2026-09-18 (SESSION_18_BRIEF): third rung, the capacity-wall fix.
+      # Run 35343007845 proved free-LLM capacity is the binding constraint:
+      # 42 calls -> 10 ok (76% fail), 40/90 clusters unavailable because
+      # groq 429 (TPM/daily) and gemini 503 (saturation) walled SIMULTANEOUSLY.
+      # Cerebras Inference free tier (verified from Cerebras docs 2026-09-18):
+      # 5 RPM / 30K TPM / 1M tokens per hour / 1M tokens per day, models
+      # gpt-oss-120b (OpenAI open-weight 120B) and gemma-4-31b (Google).
+      # OpenAI-compatible endpoint -> reuses the chat adapter (3-line class).
+      # TPM 30,000 is 3.75x groq's 8,000: a batch-5 call (~5.8K tokens) no
+      # longer sits at the wall. 5 RPM = 12s pacing, same as gemini's 5 RPM.
+      # rpd is a token/day approximation: 1M TPD / ~5.8K per call ~= 172
+      # calls/day, set to 150 for headroom. There is no TPH field in the
+      # schema; the 1M tokens/hour limit is approximated by the rpd/tpm
+      # guards and won't bind (Cerebras only fires as overflow when gemini
+      # AND groq both wall).
+      #
+      # Liveness NOT yet probed (no key at wiring time): the "listed !=
+      # serves 200" trap that killed the gemini aliases applies here too.
+      # tools/probe_cerebras.py (workflow: probe-cerebras) must confirm
+      # gpt-oss-120b returns 200 before the first run counts on it. Inert
+      # until CEREBRAS_API_KEY exists in GitHub secrets (build_adapters
+      # skips keyless providers, so pushing this changes nothing yet).
+      model: "gpt-oss-120b"
+      rpm: 5
+      rpd: 150
+      tpm: 30000
       supports_vision: false
     openrouter:
       # VERDICT 2026-08-30 (run at 18:24 UTC): OpenRouter is DEAD for this

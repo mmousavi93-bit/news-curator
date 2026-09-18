@@ -23,6 +23,7 @@ API_KEY_ENV: dict[str, str] = {
     "bai": "BAI_API_KEY",
     "bai_deepseek": "BAI_API_KEY",
     "deepseek": "DEEPSEEK_API_KEY",
+    "cerebras": "CEREBRAS_API_KEY",
 }
 
 # (connect, read) timeout in seconds. Read is generous: a free-tier
@@ -170,6 +171,19 @@ class GroqAdapter(_OpenAiChatAdapter):
     def __init__(self, model: str, api_key: str) -> None:
         super().__init__(
             "groq", "https://api.groq.com/openai/v1/chat/completions", model, api_key
+        )
+
+
+class CerebrasAdapter(_OpenAiChatAdapter):
+    """Cerebras Inference free tier (verified 2026-09-18): gpt-oss-120b and
+    gemma-4-31b, 5 RPM / 30K TPM / 1M tokens per hour / 1M tokens per day.
+    OpenAI-compatible. TPM 30,000 is 3.75x groq's 8,000: the third rung that
+    absorbs the batched-call wall when groq 429s and gemini 503s at once
+    (run 35343007845 lost 40/90 clusters to exactly that)."""
+
+    def __init__(self, model: str, api_key: str) -> None:
+        super().__init__(
+            "cerebras", "https://api.cerebras.ai/v1/chat/completions", model, api_key
         )
 
 
