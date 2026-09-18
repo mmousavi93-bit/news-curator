@@ -10,7 +10,7 @@ Evidence from the Session 17 live run log: `calls_gemini=2 fails_gemini=2`, `cal
 - Net: `understand` stage went "unavailable after 4 attempts" → **one batch of 5 clusters skipped with no LLM answer** (`unavailable=5`; 5/34 = 15% of clusters lost, unrecoverable).
 - groq recovered on the next batch (`call #8 ok`), so the loss is burst-dependent — but gemini is the only fallback and it is dead.
 
-Fix options (probe first, do not wire unconfirmed — CLAUDE.md): (a) repair gemini 503 (key/quota/region), (b) add a third free provider with confirmed model id + RPM + TPM, (c) lengthen 429 backoff so a groq token wall alone no longer exhausts the stage. This is the "llm free enough in the system" risk the owner flagged — it caused real signal loss this run, not just ranking noise.
+Fix options (probe first, do not wire unconfirmed — CLAUDE.md): (a) repair gemini 503 — **DONE 2026-09-18** (`72dfdbc`: 503 now transient like 429, never trips the breaker; probe `35338974460` confirmed gemini-3.6-flash green http=200). (b) add a third free provider — **gated, no viable candidate today**: bai removed 09-14 (batched calls >90s, ~58s single-call latency), openrouter dead 09-05 (zero-balance, monthly recheck due ~10-05), bai_deepseek wrong model id. (c) lengthen 429 backoff so a groq token wall alone no longer exhausts the stage. This is the "llm free enough in the system" risk the owner flagged — it caused real signal loss this run, not just ranking noise.
 
 ## 2. Cap is dropping signal before the LLM sees it (highest-impact next lever)
 
@@ -19,7 +19,7 @@ Evidence (baseline run 2026-09-18T100118Z, old keyword code): 188 clusters → *
 - "U.S. military has begun its withdrawal from Iraqi Kurdistan"
 - "Lockheed Martin received the first mission critical PAC-3 MSE components" (🇺🇸 ❌ 🇮🇷)
 
-The significance gate (Session 17) only reorders the ~40 clusters that survive the cap. It cannot rescue signal that `max_clusters_per_run=40` drops before `understand` runs. Lever: raise cap / improve the pre-understand `on_mission` triage so real signal is not silently discarded. **Constraint: more clusters = more LLM calls (owner flagged caps as pipe-endangering).** Needs a cost-vs-coverage decision, not a silent raise.
+The significance gate (Session 17) only reorders the ~90 clusters that survive the cap. It cannot rescue signal that `max_clusters_per_run=90` drops before `understand` runs. Lever: raise cap / improve the pre-understand `on_mission` triage so real signal is not silently discarded. **Constraint: more clusters = more LLM calls (owner flagged caps as pipe-endangering).** Needs a cost-vs-coverage decision, not a silent raise.
 
 ## 2. Event-sequence pattern recognition (war-period signal mining)
 
