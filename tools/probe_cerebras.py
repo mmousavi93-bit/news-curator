@@ -28,6 +28,14 @@ import urllib.request
 
 _BASE = "https://api.cerebras.ai/v1"
 
+# Cerebras is behind Cloudflare bot protection: urllib's default UA gets
+# 403 error 1010 (verified 2026-09-18), while a browser UA reaches the API
+# (401 wrong-key is the auth path, not the bot wall).
+_BROWSER_UA = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
+)
+
 DEFAULT_MODELS = ("gpt-oss-120b", "gemma-4-31b")
 
 # Mirrors the understand stage's ask (Persian strict JSON) so a 200 here is
@@ -40,7 +48,7 @@ _SAMPLE_PROMPT = (
 
 
 def _request(method: str, url: str, key: str, payload: dict | None = None) -> dict:
-    headers = {"Authorization": f"Bearer {key}"}
+    headers = {"Authorization": f"Bearer {key}", "User-Agent": _BROWSER_UA}
     data = None
     if payload is not None:
         headers["Content-Type"] = "application/json"

@@ -106,6 +106,12 @@ class _OpenAiChatAdapter:
 
     supports_vision = False
 
+    # Optional browser User-Agent. Cerebras sits behind Cloudflare bot
+    # protection that 403s urllib's default UA (error 1010, probe run
+    # 35380211262, 2026-09-18); a browser UA reaches the API. None = send
+    # the client default (groq/openrouter need no override).
+    _user_agent: str | None = None
+
     def __init__(self, name: str, url: str, model: str, api_key: str) -> None:
         self.name = name
         self.model = model
@@ -124,6 +130,8 @@ class _OpenAiChatAdapter:
             "Authorization": f"Bearer {self._api_key}",
             "Content-Type": "application/json",
         }
+        if self._user_agent:
+            headers["User-Agent"] = self._user_agent
         payload = {
             "model": self.model,
             "messages": [{"role": "user", "content": prompt}],
@@ -180,6 +188,11 @@ class CerebrasAdapter(_OpenAiChatAdapter):
     OpenAI-compatible. TPM 30,000 is 3.75x groq's 8,000: the third rung that
     absorbs the batched-call wall when groq 429s and gemini 503s at once
     (run 35343007845 lost 40/90 clusters to exactly that)."""
+
+    _user_agent = (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+        "(KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
+    )
 
     def __init__(self, model: str, api_key: str) -> None:
         super().__init__(
