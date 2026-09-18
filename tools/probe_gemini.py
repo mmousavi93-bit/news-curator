@@ -92,7 +92,16 @@ def main(argv=None) -> int:
         print("error: GEMINI_API_KEY is not set", file=sys.stderr)
         return 1
 
-    models = [m.strip() for m in args.models.split(",") if m.strip()]
+    # Empty --models (the workflow's default input) means "use the default
+    # roster" -- otherwise an empty string yields an empty probe.
+    models = [m.strip() for m in (args.models or ",".join(DEFAULT_MODELS)).split(",")
+              if m.strip()]
+
+    lines = [
+        "# gemini flash liveness probe\n",
+        f"# at {time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}\n",
+        "# verdict http lat_ms listed model\n",
+    ]
 
     # 1. Ground-truth roster: what the models endpoint lists right now.
     roster = _request("GET", f"{_API}/models?pageSize=200", key)
@@ -104,14 +113,11 @@ def main(argv=None) -> int:
                       for m in json.loads(roster["snippet"]).get("models", [])}
         except Exception:
             pass
-    print(f"   flash-family listed: {sorted(m for m in listed if 'flash' in m)}")
+    roster_line = f"   flash-family listed: {sorted(m for m in listed if 'flash' in m)}"
+    print(roster_line)
+    lines.append(roster_line + "\n")
 
     # 2. Liveness: does generateContent return 200 for each candidate?
-    lines = [
-        "# gemini flash liveness probe\n",
-        f"# at {time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}\n",
-        "# verdict http lat_ms listed model\n",
-    ]
     for model in models:
         url = f"{_API}/models/{model}:generateContent"
         payload = {
