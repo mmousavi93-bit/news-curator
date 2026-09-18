@@ -209,6 +209,32 @@ def test_provider_provenance_columns_record_who_answered(tmp_path):
     assert summaries[0]["provider"] == "deepseek"
 
 
+def test_significance_column_exported_in_chosen_and_summaries(tmp_path):
+    # Session 17: significance is the digest's gate + sort axis, so it must be
+    # in the observability CSVs -- otherwise a run's drops/sends are
+    # unjudgeable (the same reason the text columns exist). Event is frozen,
+    # so rebuild the two events with dataclasses.replace.
+    import dataclasses
+
+    ctx = _Ctx(tmp_path)
+    sent_key = ctx.clusters[0].key
+    rank_key = ctx.clusters[1].key
+    ctx.events = [
+        dataclasses.replace(e, significance=(
+            "escalation" if e.event_key == sent_key
+            else "none" if e.event_key == rank_key
+            else e.significance
+        ))
+        for e in ctx.events
+    ]
+    written = {p.name.split("_")[0]: p for p in write_run_reports(ctx, tmp_path)}
+    chosen = {r["cluster_key"]: r for r in _rows(written["chosen"])}
+    assert chosen[sent_key]["significance"] == "escalation"
+    assert chosen[rank_key]["significance"] == "none"  # a gated drop is visible
+    summaries = _rows(written["summaries"])
+    assert summaries[0]["significance"] == "escalation"
+
+
 def test_repeat_dropped_reason_carries_calibration_fields(tmp_path):
     # Fix E, 2026-09-06 review: every OTHER fate still writes "" in the
     # reason column, but repeat_dropped must carry similarity, the new

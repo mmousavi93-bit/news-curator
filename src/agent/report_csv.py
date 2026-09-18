@@ -85,9 +85,9 @@ def _write_summaries(ctx, path: Path) -> Path:
         e, clusters_by_key, credibility, ctx.config.settings, ctx.now))
     with path.open("w", encoding="utf-8-sig", newline="") as fh:
         writer = csv.writer(fh)
-        writer.writerow(["rank", "event_key", "score", "category", "claim_status",
-                         "independent_count", "best_tier", "n_members", "sources",
-                         "provider", "latest_utc", "headline", "summary"])
+        writer.writerow(["rank", "event_key", "score", "category", "significance",
+                         "claim_status", "independent_count", "best_tier", "n_members",
+                         "sources", "provider", "latest_utc", "headline", "summary"])
         providers = getattr(ctx, "event_provider", None) or {}
         for rank, event in enumerate(events):
             cluster = clusters_by_key.get(event.event_key)
@@ -95,7 +95,8 @@ def _write_summaries(ctx, path: Path) -> Path:
                 rank, event.event_key,
                 f"{score_event(event, cluster, credibility, ctx.config.settings, ctx.now):.3f}"
                 if cluster else "",
-                event.category, event.claim_status, event.independent_count,
+                event.category, event.significance, event.claim_status,
+                event.independent_count,
                 _best_tier(cluster, credibility) if cluster else "",
                 len(cluster.members) if cluster else "",
                 _sources(cluster) if cluster else "",
