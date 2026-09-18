@@ -337,6 +337,22 @@ def test_consecutive_429s_do_not_open_the_breaker():
     assert result.provider == "gemini"
 
 
+def test_consecutive_503s_do_not_open_the_breaker():
+    # 2026-09-18 run 35335314225: gemini 3.6-flash's free tier returned two
+    # transient "high demand" 503s and the breaker (threshold 2) opened,
+    # locking a provider that recovered within ~27 min out for the whole
+    # run. A 503 is the same transient class as a 429 -- "slow down", not
+    # "broken" -- so the breaker must not judge on it. With one provider:
+    # two 503s in a row would open a breaker that counts them, and the
+    # third attempt would return UNAVAILABLE.
+    transport = MockHttpTransport(
+        responses=[HttpResponse(503, {}), HttpResponse(503, {}), _GEMINI_OK]
+    )
+    result = _router([_gemini()], transport, breaker_threshold=2).complete("hello")
+    assert result.ok is True
+    assert result.provider == "gemini"
+
+
 def test_429_retries_same_provider_after_cooldown():
     # 2026-09-05: a 429 means "slow down, I'll be back", not "hand the
     # cluster to the next provider". The 2026-09-05 run wasted its cascade

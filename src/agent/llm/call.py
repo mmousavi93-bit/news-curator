@@ -126,6 +126,21 @@ def attempt(
         return _ROTATE, LlmResult(
             ok=False, status=UNAVAILABLE, provider=name, http_status=status)
 
+    if status == 503:
+        # 503 rotates WITHOUT counting toward the breaker -- same class as
+        # 429 (2026-09-18 run 35335314225): gemini 3.6-flash's free tier
+        # returned "high demand ... usually temporary" 503s on a saturation
+        # burst, and two of them opened the breaker (threshold 2), locking
+        # a provider that recovered within ~27 min out for the whole run.
+        # Transient saturation is "slow down", not "broken" -- the router
+        # cools it (failover.py). A retired model id that 503s on EVERY
+        # call is caught by the "List available Gemini models" step plus
+        # tools/probe_gemini.py, not by the breaker.
+        log_call(logger, call_index, stage, provider, prompt_hash,
+                 f"status_{status}", latency_ms, None)
+        return _ROTATE, LlmResult(
+            ok=False, status=UNAVAILABLE, provider=name, http_status=status)
+
     if status == 404 or status >= 500:
         # 404 rotates too: "this provider does not have this model" is
         # provider-SPECIFIC -- each provider has its own model id, so the
