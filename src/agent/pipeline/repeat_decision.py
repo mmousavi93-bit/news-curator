@@ -15,8 +15,7 @@ from typing import Mapping
 
 from agent.flash.textnorm import normalize
 from agent.memory.event_models import Event
-from agent.pipeline.rank import event_text, score_event
-from agent.pipeline.relevance import score_relevance
+from agent.pipeline.rank import score_event
 
 # rulebook Step 1 claim-status ordering, low to high.
 _CLAIM_RANK = {"rumour": 0, "unconfirmed": 1, "likely": 2}
@@ -86,9 +85,8 @@ def _decide(
     prior=<key>` or `blocked=<term> prior=<key>`."""
     settings = ctx.config.settings
     cfg = settings.digest_rank
-    rel = score_relevance(getattr(ctx.config, "relevance", None), event_text(event))
     score = (
-        score_event(event, cluster, credibility, settings, ctx.now, rel)
+        score_event(event, cluster, credibility, settings, ctx.now)
         if cluster is not None else None
     )
     floor = cfg.repeat_bypass_score

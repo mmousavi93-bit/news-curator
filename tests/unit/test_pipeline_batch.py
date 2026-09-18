@@ -17,7 +17,7 @@ from pathlib import Path
 
 from agent.collectors.base import Item
 from agent.llm.errors import LlmResult, REFUSED_CAP, UNAVAILABLE
-from agent.pipeline.batch import build_payload, chunk, map_results, render_prompt
+from agent.pipeline.batch import build_event, build_payload, chunk, map_results, render_prompt
 from agent.pipeline.cluster import cluster_items
 from agent.pipeline.contract import MAX_RESPONSE_CHARS
 from agent.pipeline.understand import UnderstandStage
@@ -163,6 +163,19 @@ def test_map_results_non_dict_element_dropped():
     mapped = map_results([a, b], ["garbage", _element("c2")], log)
     assert mapped[a.key] is None  # malformed element -> its cluster fated unavailable
     assert mapped[b.key] is not None
+
+
+def test_build_event_significance_parsed_and_validated():
+    # Session 17: `significance` is model-judged war-picture impact. Valid
+    # tiers pass through; anything the model invents or omits falls back to
+    # "economy" -- keep-and-rank-low, never a silent drop.
+    cluster = _cluster("https://x/sig")
+    assert build_event(cluster, _element("c1", significance="escalation"), T0).significance == "escalation"
+    assert build_event(cluster, _element("c1", significance="balance"), T0).significance == "balance"
+    assert build_event(cluster, _element("c1", significance="economy"), T0).significance == "economy"
+    assert build_event(cluster, _element("c1", significance="none"), T0).significance == "none"
+    assert build_event(cluster, _element("c1", significance="nuclear"), T0).significance == "economy"
+    assert build_event(cluster, _element("c1"), T0).significance == "economy"
 
 
 def test_render_prompt_single_path_still_works():

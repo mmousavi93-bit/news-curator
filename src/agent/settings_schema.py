@@ -118,6 +118,11 @@ class DigestRankSettings:
     deterministic (constraint 3)."""
 
     category_weights: Mapping[str, int]
+    # War-picture impact tiers (owner 2026-09-18, Session 17): escalation |
+    # balance | economy | none, judged by the understand model as the
+    # `significance` field. Sort weight only -- `none` is gated out of the
+    # digest in rank.py, never silently weighted.
+    significance_weights: Mapping[str, int]
     corroboration_weight: float
     tier_bonus: Mapping[int, float]
     recency_max_bonus: float
@@ -192,7 +197,7 @@ SECTIONS: tuple[tuple[str, type, tuple[str, ...]], ...] = (
       "triggers")),
     ("llm", LlmSettings, ("max_calls_per_run", "batch_size", "order", "stages", "providers", "backoff")),
     ("digest_rank", DigestRankSettings,
-     ("category_weights", "corroboration_weight", "tier_bonus",
+     ("category_weights", "significance_weights", "corroboration_weight", "tier_bonus",
       "recency_max_bonus", "recency_window_hours", "size_boost_per_member",
       "size_boost_cap", "min_score", "max_messages", "repeat_window_hours",
       "event_repeat_threshold", "repeat_bypass_score")),
