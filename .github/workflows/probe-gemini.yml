@@ -1,0 +1,50 @@
+name: probe-gemini
+
+# Manual only. Answers "which gemini flash id actually serves 200 right
+# now?" because the free-tier saturation marches DOWN the version list:
+# 3.7/3.8 saturated first, then 3.6 (503 x2 in run 35335314225). The models
+# LIST endpoint still lists all of them, so a list is not a liveness
+# verdict (the gemini-flash-latest alias died the same way). Re-pin the
+# gemini block in config/settings.yaml only after this probe shows a target
+# id green.
+#
+# CI-only (US runner) for the same reason as probe-feeds/dump-body: an
+# Iran-side fetch measures Iran's network, not the provider.
+#
+# Budget: each probed id costs one generateContent call of the 20-RPD free
+# tier. Default probes 3 candidates (3.6, 3.5, 3.5-lite) = 15% of the day.
+# Do NOT add 3.7/3.8 -- they are already known-saturated.
+
+on:
+  workflow_dispatch:
+    inputs:
+      models:
+        description: "Comma-separated flash ids (empty = 3.6, 3.5, 3.5-lite)"
+        required: false
+        default: ""
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Identify the commit under test
+        run: echo "running ${{ github.sha }}"
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Probe Gemini flash roster
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          python tools/probe_gemini.py --models "${{ inputs.models }}"
+
+      - uses: actions/upload-artifact@v5
+        with:
+          name: gemini-probe
+          path: config/gemini_probe.txt
+          if-no-files-found: error
