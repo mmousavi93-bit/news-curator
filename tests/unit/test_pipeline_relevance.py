@@ -195,3 +195,33 @@ def test_arabic_irgc_and_hormuz_spellings_score_iran_direct():
 def test_arabic_opec_spelling_scores_economy():
     cfg = _real_cfg()
     assert score_relevance(cfg, "اجتماع اوبک يبحث خفض الإنتاج") == cfg.weights["economy"]
+
+
+# --- 2026-09-18 fix: رهبری false positive + فاطمیون/زاهدان gap ------------
+# Re-scoring run 20260917T162536Z after the Session 15 sort change surfaced
+# two keyword defects: bare رهبری credited a Yemen-vs-Houthi story as
+# Iran-direct (ranked it #1), and a real Iran story (Fatemiyoun members
+# killed in Zahedan) scored 0 because neither term was a keyword.
+
+
+def test_yemen_leadership_council_not_iran_direct():
+    # «شورای رهبری یمن» (Yemen's Presidential Leadership Council) must NOT
+    # fire iran_direct -- it is a Yemen strategic story, not an Iran one.
+    cfg = _real_cfg()
+    text = "شورای رهبری یمن و دولت به حوثی در تعز حمله کردند"
+    assert score_relevance(cfg, text) == cfg.weights["strategic"]
+
+
+def test_khamenei_title_forms_score_iran_direct():
+    # The specific Khamenei titles that replaced bare رهبری must still fire.
+    cfg = _real_cfg()
+    assert score_relevance(cfg, "مقام معظم رهبری دستور برگزاری رزمایش را صادر کرد") == cfg.weights["iran_direct"]
+    assert score_relevance(cfg, "فرمان رهبر معظم انقلاب ابلاغ شد") == cfg.weights["iran_direct"]
+
+
+def test_fatemiyoun_zahedan_scores_iran_direct():
+    # فاطمیون (IRGC Afghan militia) and زاهدان (provincial capital) are
+    # Iran-direct; before this fix a real Iran story scored 0 and stayed
+    # rank_dropped.
+    cfg = _real_cfg()
+    assert score_relevance(cfg, "تیراندازی به اعضای فاطمیون در زاهدان") == cfg.weights["iran_direct"]
