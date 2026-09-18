@@ -186,6 +186,17 @@ def test_capability_flags_are_correct():
     assert CerebrasAdapter("m", "k" * 16).supports_vision is False
 
 
+def test_cerebras_request_carries_browser_user_agent():
+    _, headers, _ = CerebrasAdapter("gpt-oss-120b", "k" * 16).build_request("hi", [])
+    assert "User-Agent" in headers
+    assert "Mozilla" in headers["User-Agent"]
+
+
+def test_non_cerebras_adapters_send_no_user_agent_override():
+    _, groq_headers, _ = GroqAdapter("m", "k" * 16).build_request("hi", [])
+    assert "User-Agent" not in groq_headers
+
+
 # ---------------------------------------------------------------------------
 # build_adapters
 # ---------------------------------------------------------------------------
