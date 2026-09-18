@@ -8,12 +8,18 @@ returns 402 payment_required, and the owner has no card. Mistral "Free mode"
 is the no-card fallback: create API keys and use included monthly usage
 (~$10/mo in API credits), no payment method required.
 
-Candidate model: mistral-small-latest (cost-sensitive, Apache-2.0). The
-quality fallback is mistral-medium-latest (frontier). "listed" != "serves
-200" -- the gemini-alias trap (config/settings.yaml) applies here too, so
-this tool answers, per candidate id, whether chat.completions returns 200
-RIGHT NOW, plus the exact alias the /models list reports and the error body
-on failure.
+Candidate models: mistral-small-latest (cost-sensitive, Apache-2.0) and
+mistral-medium-latest (frontier). "listed" != "serves 200" -- the
+gemini-alias trap (config/settings.yaml) applies here too, so this tool
+answers, per candidate id, whether chat.completions returns 200 RIGHT NOW,
+plus the exact alias the /models list reports and the error body on failure.
+
+A 429 here is NOT a hard failure -- it is the signal we are trying to
+measure: Mistral's free tier rate limit (the exact RPM/TPM the wiring gate
+needs). So on 429 this tool captures the Retry-After / ratelimitbysize-*
+headers and retries with backoff, printing the numeric limit the server
+reports. That converts "rate limit exceeded" into the RPM/TPM data the
+CLAUDE.md gate requires before wiring.
 
 Unlike Cerebras, api.mistral.ai is NOT Cloudflare-fronted: default python
 client UAs reach the API (401 auth path, verified 2026-09-18). The browser
@@ -24,8 +30,8 @@ Runs from a GitHub runner (probe-mistral.yml, workflow_dispatch) so the key
 lives only in MISTRAL_API_KEY (the same secret the pipeline uses). Stdlib
 only. Never logs the key. Results land in a text artifact.
 
-Budget note: each candidate id costs one call; probe only the two candidate
-ids, never the whole roster.
+Budget note: each candidate id costs one call (plus 429 retries); probe only
+the two candidate ids, never the whole roster.
 """
 
 from __future__ import annotations
@@ -48,7 +54,7 @@ _BROWSER_UA = (
     "(KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
 )
 
-DEFAULT_MODELS = ("mistral-small-latest",)
+DEFAULT_MODELS = ("mistral-small-latest", "mistral-medium-latest")
 
 # Mirrors the understand stage's ask (Persian strict JSON) so a 200 here is
 # evidence the model serves the real task, not just any prompt.
@@ -57,6 +63,36 @@ _SAMPLE_PROMPT = (
     "these news items. Items: UKMTO reports a tanker struck by a projectile "
     "in the Strait of Hormuz; no casualties. Respond in Persian, JSON only."
 )
+
+# Header names Mistral reports for size-based rate limits (docs: "Rate
+# limits" page). Captured on every response so a 429 prints the number.
+_RATE_HEADERS = (
+    "retry-after",
+    "ratelimitbysize-limit",
+    "ratelimitbysize-remaining",
+    "ratelimitbysize-reset",
+    "ratelimitbysize-quota",
+    "ratelimitbysize-query-cost",
+    "x-ratelimitbysize-limit",
+    "x-ratelimitbysize-remaining",
+    "x-ratelimitbysize-reset",
+    "x-ratelimit-limit",
+    "x-ratelimit-remaining",
+    "x-ratelimit-reset",
+    "ratelimit-limit",
+    "ratelimit-remaining",
+    "ratelimit-reset",
+)
+
+_MAX_RETRIES = 4  # enough to ride out a 60s Retry-After window once or twice
+
+
+def _headers_dict(msg) -> dict:
+    """urllib HTTPMessage -> dict of lowercased header names."""
+    out: dict = {}
+    for k, v in msg.items():
+        out[str(k).lower()] = v
+    return out
 
 
 def _request(method: str, url: str, key: str, payload: dict | None = None) -> dict:
@@ -67,26 +103,44 @@ def _request(method: str, url: str, key: str, payload: dict | None = None) -> di
         data = json.dumps(payload).encode("utf-8")
     req = urllib.request.Request(url, data=data, headers=headers, method=method)
     started = time.monotonic()
+    resp_headers: dict = {}
     try:
         with urllib.request.urlopen(req, timeout=60) as resp:
             status = resp.status
             body = resp.read().decode("utf-8", "replace")
+            resp_headers = _headers_dict(resp.headers)
     except urllib.error.HTTPError as exc:
         status = exc.code
         body = exc.read().decode("utf-8", "replace")
+        resp_headers = _headers_dict(exc.headers)
     except Exception as exc:  # noqa: BLE001 -- network failure is a verdict here
         return {
             "status": None,
             "latency_ms": int((time.monotonic() - started) * 1000),
             "error": f"{type(exc).__name__}: {exc}",
             "snippet": "",
+            "headers": {},
         }
     return {
         "status": status,
         "latency_ms": int((time.monotonic() - started) * 1000),
         "error": "",
         "snippet": body,
+        "headers": resp_headers,
     }
+
+
+def _rate_summary(headers: dict) -> str:
+    parts = [f"{n}={headers[n]}" for n in _RATE_HEADERS if n in headers]
+    return " ".join(parts) if parts else "(no rate headers)"
+
+
+def _retry_after(headers: dict) -> int | None:
+    for name in ("retry-after", "x-ratelimit-reset", "ratelimitbysize-reset"):
+        v = headers.get(name)
+        if v is not None and str(v).strip().isdigit():
+            return int(str(v).strip())
+    return None
 
 
 def main(argv=None) -> int:
@@ -106,11 +160,12 @@ def main(argv=None) -> int:
     lines = [
         "# mistral free-mode liveness probe\n",
         f"# at {time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}\n",
-        "# verdict http lat_ms listed model\n",
+        "# verdict http lat_ms try listed model\n",
     ]
 
     roster = _request("GET", f"{_BASE}/models", key)
-    print(f"== models list: http {roster['status']} ({roster['latency_ms']}ms)")
+    print(f"== models list: http {roster['status']} ({roster['latency_ms']}ms) "
+          f"{_rate_summary(roster['headers'])}")
     listed: set[str] = set()
     if roster["status"] == 200:
         try:
@@ -127,17 +182,31 @@ def main(argv=None) -> int:
             "temperature": 0.0,
             "max_tokens": 100,
         }
-        r = _request("POST", f"{_BASE}/chat/completions", key, payload)
         listed_mark = "listed" if model in listed else "NOT-listed"
-        verdict = "OK" if r["status"] == 200 else "FAIL"
-        line = (f"{verdict:4} http={r['status']} lat={r['latency_ms']:>6}ms "
-                f"{listed_mark:10} {model}")
-        print(line)
-        lines.append(line + "\n")
-        if r["status"] != 200:
+        r: dict = {}
+        for attempt in range(1, _MAX_RETRIES + 1):
+            r = _request("POST", f"{_BASE}/chat/completions", key, payload)
+            verdict = "OK" if r["status"] == 200 else "FAIL"
+            line = (f"{verdict:4} http={r['status']} lat={r['latency_ms']:>6}ms "
+                    f"try={attempt} {listed_mark:10} {model}")
+            print(line)
+            lines.append(line + "\n")
+            if r["status"] == 200:
+                break
+            if r["status"] == 429:
+                rate = _rate_summary(r["headers"])
+                print(f"        rate: {rate}")
+                lines.append(f"        rate: {rate}\n")
+                if attempt < _MAX_RETRIES:
+                    wait = _retry_after(r["headers"])
+                    if wait is None:
+                        wait = 15 * attempt  # exponential-ish fallback
+                    print(f"        retrying in {wait}s ...")
+                    time.sleep(wait)
+                    continue
             snippet = (r.get("error") or r["snippet"])[:200].replace("\n", " ")
             lines.append(f"        err: {snippet}\n")
-        time.sleep(15.0)  # free-mode RPM unknown; pad to be safe
+            break
 
     with open(args.out, "w", encoding="utf-8") as fh:
         fh.writelines(lines)
