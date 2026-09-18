@@ -100,6 +100,12 @@ def build_event(cluster: Cluster, parsed: dict, now) -> Event:
     category = str(parsed.get("category") or "other")
     if category not in ("military", "security", "politics", "economy", "other"):
         category = "other"
+    # War-picture impact (owner 2026-09-18, Session 17): validated to the
+    # known set; anything the model invents or omits falls back to
+    # "economy" -- keep-and-rank-low, never a silent drop.
+    significance = str(parsed.get("significance") or "economy")
+    if significance not in ("escalation", "balance", "economy", "none"):
+        significance = "economy"
     # When no member carries a date, the run's now is the observation
     # time -- a fact, not an invention (events.first_seen_at is NOT NULL;
     # writing NULL here would make INSERT OR IGNORE drop the row).
@@ -110,6 +116,7 @@ def build_event(cluster: Cluster, parsed: dict, now) -> Event:
         headline=headline,
         entities=entities,
         category=category,
+        significance=significance,
         source_count=len(cluster.members),
         first_seen_at=observed,
         last_updated_at=max(published) if published else observed,

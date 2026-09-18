@@ -123,7 +123,7 @@ class ComposeStage:
 
         kept, dropped, gated = rank_events(
             events, clusters, ctx.config.credibility, settings, ctx.now,
-            self._logger, ctx.config.relevance,
+            self._logger,
         )
         ctx.rank_dropped = dropped
         ctx.relevance_dropped = gated

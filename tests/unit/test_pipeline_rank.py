@@ -56,10 +56,12 @@ def _item(source_id: str, hours_ago: float = 1.0) -> Item:
 
 
 def _event(key: str, category: str, independent: int = 1,
-           claim_status: str = "unconfirmed", summary: str | None = None) -> Event:
+           claim_status: str = "unconfirmed", summary: str | None = None,
+           significance: str = "economy") -> Event:
     return Event(event_key=key, summary=summary or f"s {key}", category=category,
                  independent_count=independent, claim_status=claim_status,
-                 source_count=1, first_seen_at=NOW, last_updated_at=NOW)
+                 source_count=1, first_seen_at=NOW, last_updated_at=NOW,
+                 significance=significance)
 
 
 CRED = {
@@ -82,71 +84,57 @@ def test_military_outranks_politics_at_equal_corroboration():
     assert s_m > s_p
 
 
-def _relevance_cfg() -> object:
-    from agent.pipeline.relevance import validate_relevance
-
-    return validate_relevance({
-        "weights": {"iran_direct": 8, "strategic": 4, "economy": 3},
-        "min_relevance": 3,
-        "keywords": {
-            "iran_direct": ["ایران"],
-            "strategic": ["جنگ"],
-            "economy": ["نفت"],
-        },
-    })
-
-
-def test_relevance_gate_filters_before_importance_sort():
-    # Owner decision 2026-08-30 (v2): relevance is a FILTER. A corroborated
-    # tier-1 military event with no relevance match is dropped by the gate
-    # even though its importance score (6+4+3+3 = 16) clears min_score.
+def test_significance_none_gated_from_digest():
+    # Owner decision 2026-09-18 (Session 17): the model's `significance`
+    # field replaces keyword relevance as the gate. A corroborated tier-1
+    # military event judged `none` (routine combat / war-picture noise) is
+    # dropped even though its importance score clears min_score.
     settings = _settings()
     log = _Log()
-    noise = _event("n" * 16, "military", independent=2)
+    noise = _event("n" * 16, "military", independent=2, significance="none")
     kept, dropped_score, gated = rank_events(
         [noise],
         {"n" * 16: _cluster("", [_item("t1"), _item("t2")])},
-        CRED, settings, NOW, log, _relevance_cfg(),
+        CRED, settings, NOW, log,
     )
     assert kept == []
     assert dropped_score == []
     assert [e.event_key for e in gated] == ["n" * 16]
-    assert any("relevance gate" in m for m in log.messages)
+    assert any("significance=none" in m for m in log.messages)
 
 
-def test_relevance_tier_participates_in_sort():
-    # Owner change 2026-09-18 (owner lifted the "relevance is only a FILTER"
-    # rule -- "not a hard rule"): relevance is now a sort term too. An
-    # iran_direct politics item (relevance 8) outranks a strategic military
-    # item (relevance 4) even though the military importance (6+2+2+3=13)
-    # beats politics (3+2+2+3=10): relevance lifts it to 10+8=18 vs 13+4=17.
+def test_significance_tier_participates_in_sort():
+    # Owner change 2026-09-18 (Session 17): significance is a sort term. An
+    # escalation politics item (sig 8) outranks an economy military item
+    # (sig 3) even though the military importance (6+2+2+3=13) beats
+    # politics (3+2+2+3=10): escalation lifts it to 10+8=18 vs 13+3=16.
     settings = _settings()
     log = _Log()
-    iran_pol = _event("a" * 16, "politics", summary="تحریم‌های جدید علیه ایران")
-    strat_mil = _event("b" * 16, "military", summary="جنگ در منطقه آغاز شد")
+    escalation_pol = _event("a" * 16, "politics", significance="escalation")
+    economy_mil = _event("b" * 16, "military", significance="economy")
     kept, _, _ = rank_events(
-        [iran_pol, strat_mil],
+        [escalation_pol, economy_mil],
         {
             "a" * 16: _cluster("", [_item("t2")]),
             "b" * 16: _cluster("", [_item("t2")]),
         },
-        CRED, settings, NOW, log, _relevance_cfg(),
+        CRED, settings, NOW, log,
     )
     assert [e.event_key for e in kept] == ["a" * 16, "b" * 16]
 
 
-def test_iran_direct_relevance_lifts_story_above_min_score():
-    # A weak "other" single-source story (importance ~5, below min_score 8)
-    # is rescued by iran_direct relevance (+8): relevance now counts in the
-    # score, so a single-source Iran story clears the floor where it used
-    # to be dropped.
+def test_escalation_lifts_story_above_min_score():
+    # A weak "other" single-source story (importance 0+2+0+3 = 5, below
+    # min_score 11) is rescued by escalation (+8): significance counts in the
+    # score, so a single-source escalation story clears the floor where the
+    # same story at `economy` (+3) would be dropped.
     settings = _settings()
     log = _Log()
-    iran_other = _event("c" * 16, "other", summary="حادثه در ایران گزارش شد")
+    escalation_other = _event("c" * 16, "other", significance="escalation")
     kept, dropped, gated = rank_events(
-        [iran_other],
+        [escalation_other],
         {"c" * 16: _cluster("", [_item("t3")])},
-        CRED, settings, NOW, log, _relevance_cfg(),
+        CRED, settings, NOW, log,
     )
     assert [e.event_key for e in kept] == ["c" * 16]
     assert dropped == []
@@ -187,8 +175,8 @@ def test_recency_bonus_prefers_newer():
 def test_min_score_splits_kept_from_dropped():
     settings = _settings()
     log = _Log()
-    military = _event("m" * 16, "military", independent=1)   # 5+2+2+3 = 12
-    other = _event("o" * 16, "other", independent=1)         # 0+2+2+3 = 7
+    military = _event("m" * 16, "military", independent=1)   # 6+2+2+3+3 = 16
+    other = _event("o" * 16, "other", independent=1)         # 0+2+2+3+3 = 10
     kept, dropped, gated = rank_events(
         [other, military],
         {"m" * 16: _cluster("", [_item("t2")]), "o" * 16: _cluster("", [_item("t2")])},
@@ -196,7 +184,7 @@ def test_min_score_splits_kept_from_dropped():
     )
     assert [e.event_key for e in kept] == ["m" * 16]
     assert [e.event_key for e in dropped] == ["o" * 16]
-    assert gated == []  # no relevance config: gate is open
+    assert gated == []  # neither is significance=none: gate is open
     assert any("below min_score" in m for m in log.messages)
 
 

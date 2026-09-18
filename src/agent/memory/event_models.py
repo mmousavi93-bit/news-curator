@@ -60,6 +60,8 @@ class Event:
     # are frozen at CREATE IF NOT EXISTS. Persist when Phase 11's scorer
     # arrives, if it still matters then.
     category: str = "other"
+    # War-picture impact (Session 17): escalation|balance|economy|none; in-memory; missing → "economy".
+    significance: str = "economy"
     claim_status: str = "unconfirmed"
     source_count: int = 0
     independent_count: int = 0

@@ -1,18 +1,30 @@
-"""Digest ranking -- relevance gate + deterministic importance + relevance sort.
+"""Digest ranking -- significance gate + deterministic importance + significance sort.
 
-Owner decision 2026-09-18 (the owner lifted the 2026-08-30 "relevance is only
-a FILTER" rule -- "not a hard rule, apply and measure"): relevance now
-participates in the SORT too, not just the gate. The earlier decisions were
-validated by independent pro-agent evaluations of 9 delivered events.
+Owner decision 2026-09-18 (Session 17): relevance is no longer "which country
+does the story mention" (the keyword tiers in config/relevance.yaml). The
+understand model's own judgment -- a structured `significance` field -- is the
+relevance signal now:
 
-  filter: an event whose highest relevance tier (config/relevance.yaml)
-          is below min_relevance never reaches the digest.
-  sort:   relevance-weighted score, descending -- relevance tier weight,
-          category, corroboration, tier, recency, volume. Identical input
-          -> identical order (constraint 3 discipline: deterministic Python,
-          no LLM).
+  escalation = Iran directly in play (strikes on Iran, Iranian offensive
+               action, nuclear/enrichment/IAEA/JCPOA, decapitation of a
+               senior figure).
+  balance    = the war's balance shifts WITHOUT Iran hit directly: a
+               strategic asset destroyed/captured (fortification, tunnel,
+               checkpoint, base, radar), force posture, realignment.
+  economy    = oil, sanctions, the rial, fuel, markets.
+  none       = routine combat with no strategic consequence ("war
+               continues"), or anything that does not move the war picture.
+               Israel/Gaza and Lebanon bombardment default here.
 
-score = relevance_weight            (highest matching tier: iran_direct/strategic/economy)
+  gate: an event the model judged `significance: none` never reaches the
+        digest. Missing/invalid significance falls back to `economy`
+        (keep-and-rank-low) -- dropping is irreversible, under-ranking is
+        recoverable.
+  sort: significance weight + category + corroboration + tier + recency +
+        volume, descending. Identical input -> identical order (deterministic
+        Python, no LLM in the ranker).
+
+score = significance_weight      (escalation / balance / economy / none)
       + category_weight
       + corroboration_weight * min(independent_groups, 3)
       + tier_bonus[best tier among members]
@@ -20,10 +32,9 @@ score = relevance_weight            (highest matching tier: iran_direct/strategi
       + size boost (0.1 per extra member, capped)
 
 The defaults' arithmetic is documented in settings.yaml next to min_score.
-The two floors (min_score, repeat_bypass_score) were recalibrated by exactly
-+min_relevance (=3) when relevance entered the score, so non-Iran stories
-keep their exact importance floor and only Iran/strategic stories get a
-relative lift (economy +0, strategic +1, iran_direct +5 vs the gate baseline).
+The keyword relevance scorer (config/relevance.yaml) is no longer used here:
+it survives ONLY for priority.py's pre-understand on_mission triage and
+deescalation.py's is_escalation -- neither is digest ranking.
 """
 
 from __future__ import annotations
@@ -34,16 +45,17 @@ from typing import Mapping, Sequence
 
 from agent.memory.event_models import Event
 from agent.pipeline.cluster import Cluster
-from agent.pipeline.relevance import RelevanceConfig, passes_gate, score_relevance
 from agent.settings import Settings
 
 _EPOCH = datetime(1970, 1, 1, tzinfo=timezone.utc)
 
 _CATEGORIES = frozenset({"military", "security", "politics", "economy", "other"})
+_SIGNIFICANCE = frozenset({"escalation", "balance", "economy", "none"})
 
 
 def event_text(event: Event) -> str:
-    """The text the relevance gate matches over: headline, summary, entities."""
+    """The text the (keyword) relevance gate matches over: headline, summary,
+    entities. Kept for deescalation.py, which still uses keyword relevance."""
     return " ".join(filter(None, [
         event.headline or "",
         event.summary or "",
@@ -67,21 +79,27 @@ def latest_stamp(cluster: Cluster) -> datetime | None:
     return max(stamps) if stamps else None
 
 
+def significance_weight(event: Event, settings: Settings) -> float:
+    """The event's war-picture impact weight (owner 2026-09-18, Session 17).
+    Missing or unknown significance falls back to `economy` -- keep and rank
+    low, never a silent drop: dropping is irreversible, under-ranking is
+    recoverable."""
+    sig = event.significance if event.significance in _SIGNIFICANCE else "economy"
+    return float(settings.digest_rank.significance_weights.get(sig, 0.0))
+
+
 def score_event(
     event: Event,
     cluster: Cluster | None,
     credibility: Mapping[str, object],
     settings: Settings,
     now: datetime,
-    relevance_score: float = 0.0,
 ) -> float:
-    """Deterministic importance + relevance score. Higher = more important.
+    """Deterministic importance + significance score. Higher = more important.
 
-    `relevance_score` is the event's highest relevance-tier weight from
-    config/relevance.yaml (iran_direct / strategic / economy), added so
-    relevance-to-Iran participates in the sort (owner change 2026-09-18).
-    Callers that do not load relevance (tests constructing Config directly)
-    pass nothing and get the pure importance score."""
+    Significance is read from `event.significance` (the understand model's
+    war-picture judgment), not passed in -- so the digest sort and the
+    summaries.csv writer compute the SAME score from the SAME signal."""
     cfg = settings.digest_rank
     category = event.category if event.category in _CATEGORIES else "other"
     score = float(cfg.category_weights.get(category, 0))
@@ -98,7 +116,7 @@ def score_event(
             cfg.size_boost_per_member * max(0, len(cluster.members) - 1),
             cfg.size_boost_cap,
         )
-    score += relevance_score
+    score += significance_weight(event, settings)
     return round(score, 3)
 
 
@@ -108,15 +126,14 @@ def event_order_key(
     credibility: Mapping[str, object],
     settings: Settings,
     now: datetime,
-    relevance_score: float = 0.0,
 ) -> tuple:
-    """The digest sort key: relevance-weighted score desc, then recency desc,
-    then key. Shared by rank_events and the summaries.csv writer, so `rank`
-    in the CSV is the position the reader actually sees in the message."""
+    """The digest sort key: significance-weighted score desc, then recency
+    desc, then key. Shared by rank_events and the summaries.csv writer, so
+    `rank` in the CSV is the position the reader actually sees."""
     cluster = clusters_by_key.get(event.event_key)
     stamp = latest_stamp(cluster) if cluster else None
     return (
-        -score_event(event, cluster, credibility, settings, now, relevance_score),
+        -score_event(event, cluster, credibility, settings, now),
         -(stamp.timestamp() if stamp else 0.0),
         event.event_key,
     )
@@ -129,41 +146,30 @@ def rank_events(
     settings: Settings,
     now: datetime,
     logger: logging.Logger,
-    relevance: RelevanceConfig | None = None,
 ) -> tuple[list[Event], list[Event], list[Event]]:
-    """Relevance gate (filter), then relevance-weighted importance sort, then
-    min_score split.
+    """Significance gate (drop `none`), then significance-weighted importance
+    sort, then min_score split.
 
-    Returns (kept, below_min_score, below_relevance). The two drop reasons
+    Returns (kept, below_min_score, significance_none). The two drop reasons
     are separated so the observability CSVs record the real fate -- a
-    relevance-gated event and a low-importance event are different
-    diagnoses, and merging them hides which lever to tune."""
-    if relevance is not None:
-        rel = {e.event_key: score_relevance(relevance, event_text(e)) for e in events}
-        passing, gated = [], []
-        for e in events:
-            (passing if passes_gate(relevance, event_text(e)) else gated).append(e)
-        if gated:
-            logger.info(
-                "rank: %d event(s) below relevance gate (min_relevance %.1f) -- "
-                "not in the digest: %s",
-                len(gated), relevance.min_relevance,
-                ", ".join(e.event_key[:8] for e in gated),
-            )
-    else:
-        rel = {}
-        passing, gated = list(events), []
+    significance-gated event (war-picture noise) and a low-importance event
+    are different diagnoses, and merging them hides which lever to tune."""
+    passing, gated = [], []
+    for e in events:
+        sig = e.significance if e.significance in _SIGNIFICANCE else "economy"
+        (gated if sig == "none" else passing).append(e)
+    if gated:
+        logger.info(
+            "rank: %d event(s) significance=none -- not in the digest: %s",
+            len(gated), ", ".join(e.event_key[:8] for e in gated),
+        )
 
     scored = sorted(
         passing,
-        key=lambda e: event_order_key(
-            e, clusters_by_key, credibility, settings, now,
-            rel.get(e.event_key, 0.0),
-        ),
+        key=lambda e: event_order_key(e, clusters_by_key, credibility, settings, now),
     )
     kept = [e for e in scored if score_event(
         e, clusters_by_key.get(e.event_key), credibility, settings, now,
-        rel.get(e.event_key, 0.0),
     ) >= settings.digest_rank.min_score]
     dropped = [e for e in scored if e not in kept]
     if dropped:

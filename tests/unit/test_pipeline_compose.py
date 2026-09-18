@@ -80,7 +80,8 @@ def _with_cluster(ctx: _Ctx, event: Event, source_id: str = "t2",
     ctx.clusters.append(cluster)
     return Event(event_key=cluster.key, summary=event.summary,
                  headline=event.headline, entities=event.entities,
-                 category=event.category, claim_status=event.claim_status,
+                 category=event.category, significance=event.significance,
+                 claim_status=event.claim_status,
                  independent_count=event.independent_count,
                  source_count=event.source_count,
                  first_seen_at=event.first_seen_at,
@@ -88,14 +89,16 @@ def _with_cluster(ctx: _Ctx, event: Event, source_id: str = "t2",
 
 
 def _event(summary: str, category: str = "military", independent: int = 1,
-           claim_status: str = "unconfirmed") -> Event:
-    # "Acme" deliberately: entities now feed the relevance scorer
-    # (2026-08-30), and the old default ("Iran") would silently give every
-    # test event the iran_direct +8 bonus.
+           claim_status: str = "unconfirmed",
+           significance: str = "economy") -> Event:
+    # "Acme" deliberately: entities once fed the keyword relevance scorer;
+    # significance is now explicit, defaulting to "economy" so no test event
+    # accidentally gets an escalation/balance lift or a `none` drop.
     return Event(event_key="k" * 16, summary=summary, entities=("Acme",),
                  category=category, independent_count=independent,
                  claim_status=claim_status, source_count=2,
-                 first_seen_at=NOW, last_updated_at=NOW)
+                 first_seen_at=NOW, last_updated_at=NOW,
+                 significance=significance)
 
 
 def test_no_events_produces_honest_persian_one_liner():
@@ -284,36 +287,40 @@ def test_kept_path_appends_fallback_count_as_footer():
 
 
 def test_pezeshkian_sco_trip_passes_relevance_gate():
-    # Regression for the 2026-08-31 over-cut: the Iranian president's
-    # summit trip gated out because neither «ایران» nor his name was in
-    # the relevance keywords (the Masafer Yatta disease). His name now
-    # sits in iran_direct.
+    # Session 17: relevance is the model's `significance` field, not keyword
+    # country-match. A summit trip is war-picture "balance" (regional
+    # realignment) and must NOT be gated.
     ctx = _Ctx(config=_config())
     event = _with_cluster(ctx, _event(
         "بزشکیان برای شرکت در نشست‌های سازمان شانگهای به قرقیزستان سفر کرد",
-        category="politics"))
+        category="politics", significance="balance"))
     ctx.events = [event]
     ComposeStage(_Log()).run(ctx)
     assert event.event_key not in {e.event_key for e in ctx.relevance_dropped}
 
 
-def test_generic_military_noun_without_anchor_drops():
-    # 2026-09-05 regression: the Greek F-4 airshow crash ("جنگنده") and the
-    # Pentagon polygraph story ("تسلیحات") LED the digest on the generic
-    # military nouns alone. Strategic is anchor-only now: an unplaced
-    # "fighter jet"/"arms" is off-mission and must not pass the gate.
+def test_significance_none_drops_routine_combat():
+    # Session 17 (owner 2026-09-18): routine combat with no strategic
+    # consequence -- the Greek F-4 airshow crash -- is significance `none`
+    # and drops, even though it is military and on-mission. Replaces the
+    # 2026-09-05 keyword anchor gate.
     ctx = _Ctx(config=_config())
     event = _with_cluster(ctx, _event(
-        "سقوط یک جنگنده در نمایش هوایی.", category="military"))
+        "سقوط یک جنگنده در نمایش هوایی.", category="military",
+        significance="none"))
     ctx.events = [event]
     ComposeStage(_Log()).run(ctx)
     assert event.event_key in {e.event_key for e in ctx.relevance_dropped}
 
 
-def test_regional_anchor_military_event_passes_relevance_gate():
+def test_strategic_asset_balance_passes_relevance_gate():
+    # Session 17: Lebanon bombardment is NOT relevant UNLESS it destroys a
+    # strategic asset -- a heavily-invested checkpoint/fortification is
+    # `balance` and passes even though it names neither Iran nor a proxy.
     ctx = _Ctx(config=_config())
     event = _with_cluster(ctx, _event(
-        "حمله اسرائیل به مواضعی در لبنان.", category="military"))
+        "اسرائیل یک پایگاه مستحکم را در کوه‌های الطاهر منهدم کرد.",
+        category="military", significance="balance"))
     ctx.events = [event]
     ComposeStage(_Log()).run(ctx)
     assert event.event_key not in {e.event_key for e in ctx.relevance_dropped}
