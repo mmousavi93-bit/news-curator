@@ -92,8 +92,9 @@ def _write_chosen(ctx, path: Path) -> Path:
     with path.open("w", encoding="utf-8-sig", newline="") as fh:
         writer = csv.writer(fh)
         writer.writerow(["cluster_key", "fate", "reason", "n_members", "sources",
-                         "provider", "best_tier", "category", "claim_status",
-                         "independent_count", "score", "headline", "summary"])
+                         "provider", "best_tier", "category", "significance",
+                         "claim_status", "independent_count", "score", "headline",
+                         "summary"])
         providers = getattr(ctx, "cluster_provider", None) or {}
         for cluster in clusters:
             event = events_by_key.get(cluster.key)
@@ -106,6 +107,7 @@ def _write_chosen(ctx, path: Path) -> Path:
                 _sources(cluster), providers.get(cluster.key, ""),
                 _best_tier(cluster, credibility),
                 getattr(event, "category", "") if event else "",
+                getattr(event, "significance", "") if event else "",
                 getattr(event, "claim_status", "") if event else "",
                 getattr(event, "independent_count", "") if event else "",
                 score,
@@ -147,7 +149,7 @@ def _write_chosen(ctx, path: Path) -> Path:
                 cluster.key, "cap_dropped", reason,
                 len(cluster.members), _sources(cluster), "",
                 _best_tier(cluster, credibility),
-                "", "", cluster.independent_count(credibility), "",
+                "", "", "", cluster.independent_count(credibility), "",
                 title[:300], "",
             ])
     return path
