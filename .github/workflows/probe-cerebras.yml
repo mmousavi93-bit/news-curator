@@ -1,0 +1,49 @@
+name: probe-cerebras
+
+# Manual only. Answers "which Cerebras free model id actually serves 200
+# right now?" before the third-rung wiring (SESSION_18_BRIEF) counts on it.
+# "listed" != "serves 200" -- the gemini-alias trap applies here too, so the
+# models LIST endpoint is never taken as a liveness verdict. Re-pin/confirm
+# the cerebras block in config/settings.yaml only after this probe shows a
+# target id green.
+#
+# CI-only (US runner) for the same reason as probe-gemini: an Iran-side
+# fetch measures Iran's network, not the provider.
+#
+# Budget: each probed id costs one call of the 5-RPM free tier. Default
+# probes 2 candidates (gpt-oss-120b, gemma-4-31b) = 40% of a minute, padded
+# to 15s each. Do NOT grow the roster here without checking the free tier.
+
+on:
+  workflow_dispatch:
+    inputs:
+      models:
+        description: "Comma-separated model ids (empty = gpt-oss-120b,gemma-4-31b)"
+        required: false
+        default: ""
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Identify the commit under test
+        run: echo "running ${{ github.sha }}"
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Probe Cerebras free roster
+        env:
+          CEREBRAS_API_KEY: ${{ secrets.CEREBRAS_API_KEY }}
+        run: |
+          python tools/probe_cerebras.py --models "${{ inputs.models }}"
+
+      - uses: actions/upload-artifact@v5
+        with:
+          name: cerebras-probe
+          path: config/cerebras_probe.txt
+          if-no-files-found: error

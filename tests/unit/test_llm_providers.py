@@ -12,6 +12,7 @@ from agent.llm.providers import (
     API_KEY_ENV,
     BaiAdapter,
     BaiDeepSeekAdapter,
+    CerebrasAdapter,
     DeepSeekAdapter,
     GeminiAdapter,
     GroqAdapter,
@@ -107,6 +108,7 @@ def test_openai_chat_parse_null_content_raises_schema_error():
         (BaiAdapter("qwen3.8-flash", "k" * 16), "api.b.ai"),
         (BaiDeepSeekAdapter("deepseek-v4-flash", "k" * 16), "api.b.ai"),
         (DeepSeekAdapter("deepseek-v4-flash", "k" * 16), "api.deepseek.com"),
+        (CerebrasAdapter("gpt-oss-120b", "k" * 16), "api.cerebras.ai"),
     ],
 )
 def test_openai_chat_request_shape(adapter, host):
@@ -147,6 +149,7 @@ def test_max_tokens_covers_worst_case_batch_output():
     [
         GroqAdapter("llama-3.3-70b-versatile", "k" * 16),
         OpenRouterAdapter("m/f", "k" * 16),
+        CerebrasAdapter("gpt-oss-120b", "k" * 16),
     ],
 )
 def test_openai_chat_parse_ok(adapter):
@@ -180,6 +183,7 @@ def test_capability_flags_are_correct():
     assert GeminiAdapter("m", "k" * 16).supports_vision is True
     assert GroqAdapter("m", "k" * 16).supports_vision is False
     assert OpenRouterAdapter("m", "k" * 16).supports_vision is False
+    assert CerebrasAdapter("m", "k" * 16).supports_vision is False
 
 
 # ---------------------------------------------------------------------------
@@ -245,3 +249,4 @@ def test_api_key_env_names():
     assert API_KEY_ENV["groq"] == "GROQ_API_KEY"
     assert API_KEY_ENV["openrouter"] == "OPENROUTER_API_KEY"
     assert API_KEY_ENV["bai"] == "BAI_API_KEY"
+    assert API_KEY_ENV["cerebras"] == "CEREBRAS_API_KEY"
