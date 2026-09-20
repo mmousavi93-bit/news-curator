@@ -442,20 +442,14 @@ llm:
       tpm: 8000
       supports_vision: false
     groq2:
-      # Second Groq account (GROQ_API_KEY_2, owner 2026-09-20). Cascade
-      # overflow only — fires after groq1 is rate-limited (429), so its
-      # RPD pool is largely unused on normal days and available as a
-      # PEAK buffer when groq1 exhausts early (heavy digest in the first
-      # ~8 hours). Same RPM/TPM bounds assumed until the probe confirms
-      # from the second account's console limits page — adjust on
-      # evidence. Model: different from groq1 BY DESIGN (anti-ban — two
-      # keys from the same runner IP with different models look like
-      # genuinely different use cases). Initial pick mixtral-8x7b-32768
-      # (Mistral MoE, good multilingual, available on groq free as of
-      # mid-2026 per public docs). If the probe (tools/probe_groq2.py,
-      # workflow probe-groq2) says mixtral is gone, swap to whatever
-      # non-qwen model the second account lists.
-      model: "mixtral-8x7b-32768"
+      # Second Groq account (GROQ_API_KEY_2, owner 2026-09-20). Probe
+      # (run 35510359155, 2026-09-20): only qwen/qwen3.8-27b available —
+      # same model as groq1. All other free-tier models (llama-3.3-70b,
+      # llama-3.1-8b, gemma2-9b, qwen-2.5-32b, deepseek-r1-distill-qwen,
+      # mixtral-8x7b) are decommissioned. Anti-ban now relies on KEY
+      # SEPARATION alone (different account, different RPD pool); model
+      # fingerprint is identical. Cascade overflow after groq1 429s.
+      model: "qwen/qwen3.8-27b"
       rpm: 30
       rpd: 1000
       tpm: 8000

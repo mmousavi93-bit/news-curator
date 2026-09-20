@@ -185,11 +185,9 @@ class GroqAdapter(_OpenAiChatAdapter):
 
 class Groq2Adapter(_OpenAiChatAdapter):
     """Second Groq account (GROQ_API_KEY_2), wired as cascade overflow.
-    Different model from groq1 by policy — different model family = lower
-    fingerprint overlap — so both keys from the same runner IP do not look
-    like one user with two accounts. Model id is whatever the probe confirms
-    (tools/probe_groq2.py); the initial pick (mixtral-8x7b-32768) is the
-    default; if the probe says it's gone, swap to what IS listed."""
+    Same model as groq1 (qwen/qwen3.8-27b — probe 35510359155 confirmed
+    all other free models decommissioned). Anti-ban relies on key separation
+    (different account, different RPD pool, same IP)."""
 
     def __init__(self, model: str, api_key: str) -> None:
         super().__init__(
