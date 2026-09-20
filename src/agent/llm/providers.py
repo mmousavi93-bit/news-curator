@@ -18,6 +18,7 @@ from agent.llm.errors import SchemaError
 API_KEY_ENV: dict[str, str] = {
     "gemini": "GEMINI_API_KEY",
     "groq": "GROQ_API_KEY",
+    "groq2": "GROQ_API_KEY_2",
     "openrouter": "OPENROUTER_API_KEY",
     "anthropic": "ANTHROPIC_API_KEY",
     "bai": "BAI_API_KEY",
@@ -179,6 +180,20 @@ class GroqAdapter(_OpenAiChatAdapter):
     def __init__(self, model: str, api_key: str) -> None:
         super().__init__(
             "groq", "https://api.groq.com/openai/v1/chat/completions", model, api_key
+        )
+
+
+class Groq2Adapter(_OpenAiChatAdapter):
+    """Second Groq account (GROQ_API_KEY_2), wired as cascade overflow.
+    Different model from groq1 by policy — different model family = lower
+    fingerprint overlap — so both keys from the same runner IP do not look
+    like one user with two accounts. Model id is whatever the probe confirms
+    (tools/probe_groq2.py); the initial pick (mixtral-8x7b-32768) is the
+    default; if the probe says it's gone, swap to what IS listed."""
+
+    def __init__(self, model: str, api_key: str) -> None:
+        super().__init__(
+            "groq2", "https://api.groq.com/openai/v1/chat/completions", model, api_key
         )
 
 

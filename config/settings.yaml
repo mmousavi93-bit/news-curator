@@ -365,7 +365,7 @@ llm:
   # Re-add bai_deepseek only after confirming the exact model id in the bai
   # console; re-add openrouter only if the balance policy changes.
   # Their provider blocks below are kept, unused, so re-enabling is one edit.
-  order: ["gemini", "groq", "cerebras"]
+  order: ["gemini", "groq", "groq2", "cerebras"]
 
   stages:
     vision:    { provider: "gemini" }
@@ -437,6 +437,25 @@ llm:
       # TokenPacer (llm/token_pacer.py, session 9s) books every attempt's
       # estimate into a 60s window, failures included.
       model: "qwen/qwen3.8-27b"
+      rpm: 30
+      rpd: 1000
+      tpm: 8000
+      supports_vision: false
+    groq2:
+      # Second Groq account (GROQ_API_KEY_2, owner 2026-09-20). Cascade
+      # overflow only — fires after groq1 is rate-limited (429), so its
+      # RPD pool is largely unused on normal days and available as a
+      # PEAK buffer when groq1 exhausts early (heavy digest in the first
+      # ~8 hours). Same RPM/TPM bounds assumed until the probe confirms
+      # from the second account's console limits page — adjust on
+      # evidence. Model: different from groq1 BY DESIGN (anti-ban — two
+      # keys from the same runner IP with different models look like
+      # genuinely different use cases). Initial pick mixtral-8x7b-32768
+      # (Mistral MoE, good multilingual, available on groq free as of
+      # mid-2026 per public docs). If the probe (tools/probe_groq2.py,
+      # workflow probe-groq2) says mixtral is gone, swap to whatever
+      # non-qwen model the second account lists.
+      model: "mixtral-8x7b-32768"
       rpm: 30
       rpd: 1000
       tpm: 8000

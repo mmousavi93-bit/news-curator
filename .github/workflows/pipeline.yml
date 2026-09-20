@@ -67,6 +67,7 @@ jobs:
       - name: List available Groq models
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GROQ_API_KEY_2: ${{ secrets.GROQ_API_KEY }}
         run: |
           curl -s -H "Authorization: Bearer $GROQ_API_KEY" \
             "https://api.groq.com/openai/v1/models" \
@@ -134,6 +135,7 @@ jobs:
           TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GROQ_API_KEY_2: ${{ secrets.GROQ_API_KEY_2 }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           BAI_API_KEY: ${{ secrets.BAI_API_KEY }}
         run: python -m agent.run --db state.db

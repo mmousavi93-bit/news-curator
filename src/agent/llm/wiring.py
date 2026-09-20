@@ -24,6 +24,7 @@ from agent.llm.providers import (
     DeepSeekAdapter,
     GeminiAdapter,
     GroqAdapter,
+    Groq2Adapter,
     OpenRouterAdapter,
     ProviderAdapter,
 )
@@ -36,6 +37,7 @@ from agent.util.logging import get_logger
 _ADAPTERS: dict[str, type] = {
     "gemini": GeminiAdapter,
     "groq": GroqAdapter,
+    "groq2": Groq2Adapter,
     "cerebras": CerebrasAdapter,
     "bai": BaiAdapter,
     "bai_deepseek": BaiDeepSeekAdapter,
