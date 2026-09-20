@@ -15,7 +15,7 @@ PROMPT_TEMPLATE = "config/prompts/understand_batch.txt"
 MODELS = {
     "gemini-flash": {
         "key_env": "GEMINI_API_KEY",
-        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent",
         "adapter": "gemini",
     },
     "groq-qwen": {
@@ -32,6 +32,8 @@ MODELS = {
     },
 }
 
+UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+
 def build_prompt() -> str:
     with open(CLUSTER_FILE, encoding="utf-8") as f:
         items = f.read().strip()
@@ -46,6 +48,7 @@ def call_gemini(prompt: str, key: str) -> dict:
     }).encode()
     r = Request(MODELS["gemini-flash"]["url"] + f"?key={key}", data=payload)
     r.add_header("Content-Type", "application/json")
+    r.add_header("User-Agent", UA)
     return _do_request(r)
 
 def call_openai(prompt: str, key: str, model: str, base_url: str) -> dict:
@@ -58,6 +61,7 @@ def call_openai(prompt: str, key: str, model: str, base_url: str) -> dict:
     r = Request(base_url, data=payload)
     r.add_header("Authorization", f"Bearer {key}")
     r.add_header("Content-Type", "application/json")
+    r.add_header("User-Agent", UA)
     return _do_request(r)
 
 def _do_request(r: Request) -> dict:

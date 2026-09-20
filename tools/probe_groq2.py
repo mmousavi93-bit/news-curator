@@ -9,7 +9,7 @@ from urllib.request import Request, urlopen
 from urllib.error import HTTPError
 
 KEY = os.environ["GROQ_API_KEY_2"]
-BASE = "https://api.groq.com/openapi/v1"
+BASE = "https://api.groq.com/openai/v1"
 MODEL = "mixtral-8x7b-32768"
 
 def req(path: str, method: str = "GET", body: bytes | None = None) -> tuple[int, dict, str]:
