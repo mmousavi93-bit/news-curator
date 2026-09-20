@@ -28,12 +28,10 @@ jobs:
   run:
     runs-on: ubuntu-latest
     timeout-minutes: 90
-    # Session 13 (2026-09-17): 30 -> 90. The 55->90 cap raise (930c37b) made a
-    # busy run exceed the old 30-min budget -- the 90-cluster path needs ~35 min
-    # against groq's 8K-TPM 429s (measured: 55 clusters = 20 min, 8/18 groq calls
-    # fail and retry with backoff). Public repo = unlimited minutes; the LLM
-    # breaker, not this timeout, is what actually kills a hung call. Verified:
-    # manual dispatch 35197529008 was cancelled at exactly 30 min mid-summarize.
+    # Session 13 (2026-09-17): 30 -> 90. The 55->90 cap raise made a
+    # busy run exceed the old 30-min budget. Session 14: cap->150
+    # (30 batched calls) fits easily; cascade gemini-first.
+    # Verified: manual dispatch 35197529008 cancelled at 30 min mid-summarize.
     steps:
       - uses: actions/checkout@v5
 
