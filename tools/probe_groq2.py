@@ -16,6 +16,7 @@ def req(path: str, method: str = "GET", body: bytes | None = None) -> tuple[int,
     r = Request(f"{BASE}{path}", data=body, method=method)
     r.add_header("Authorization", f"Bearer {KEY}")
     r.add_header("Content-Type", "application/json")
+    r.add_header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
     try:
         resp = urlopen(r, timeout=30)
         return resp.status, dict(resp.headers), resp.read().decode()
