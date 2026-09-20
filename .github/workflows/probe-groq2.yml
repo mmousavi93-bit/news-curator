@@ -1,47 +1,15 @@
-name: probe-groq2
-
-# Manual only. Answers "does the SECOND groq account (GROQ_API_KEY_2) serve
-# the pinned qwen/qwen3.8-27b with a 200 right now?" before wiring a groq2
-# cascade rung. "listed" != "serves 200" -- the gemini-alias trap applies
-# (a fresh account may not serve the pipeline's pinned model), so the
-# /models list is never taken as a liveness verdict. Wire the groq2 block in
-# config/settings.yaml and the order in src/agent/llm/wiring.py only after
-# this probe shows the pinned id green.
-#
-# Budget: each probed id costs one call of the second account's free pool.
-# Default probes 1 candidate (qwen/qwen3.8-27b). Do NOT grow the roster here
-# without checking the new account's free-tier limits.
+name: Probe Groq2
 
 on:
   workflow_dispatch:
-    inputs:
-      models:
-        description: "Comma-separated model ids (empty = qwen/qwen3.8-27b)"
-        required: false
-        default: ""
 
 jobs:
   probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v5
-
-      - name: Identify the commit under test
-        run: echo "running ${{ github.sha }}"
-
-      - uses: actions/setup-python@v6
-        with:
-          python-version: "3.12"
-
-      - name: Probe the second Groq account
+      - name: Probe groq2 key + mixtral model
         env:
           GROQ_API_KEY_2: ${{ secrets.GROQ_API_KEY_2 }}
-        run: |
-          python tools/probe_groq2.py --models "${{ inputs.models }}"
-
-      - uses: actions/upload-artifact@v5
-        with:
-          name: groq2-probe
-          path: config/groq2_probe.txt
-          if-no-files-found: error
+        run: python3 tools/probe_groq2.py
