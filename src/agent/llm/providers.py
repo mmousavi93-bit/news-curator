@@ -24,7 +24,7 @@ API_KEY_ENV: dict[str, str] = {
     "bai": "BAI_API_KEY",
     "bai_deepseek": "BAI_API_KEY",
     "deepseek": "DEEPSEEK_API_KEY",
-    "cerebras": "CEREBRAS_API_KEY",
+    "mistral": "MISTRAL_API_KEY",
 }
 
 # (connect, read) timeout in seconds. Read is generous: a free-tier
@@ -107,10 +107,10 @@ class _OpenAiChatAdapter:
 
     supports_vision = False
 
-    # Optional browser User-Agent. Cerebras sits behind Cloudflare bot
-    # protection that 403s urllib's default UA (error 1010, probe run
-    # 35380211262, 2026-09-18); a browser UA reaches the API. None = send
-    # the client default (groq/openrouter need no override).
+    # Optional browser User-Agent. Reserved for any future provider that sits
+    # behind Cloudflare bot protection (the dropped Cerebras did; a browser UA
+    # reached it). None = send the client default (groq/groq2/openrouter/mistral
+    # need no override).
     _user_agent: str | None = None
 
     def __init__(self, name: str, url: str, model: str, api_key: str) -> None:
@@ -195,24 +195,21 @@ class Groq2Adapter(_OpenAiChatAdapter):
         )
 
 
-class CerebrasAdapter(_OpenAiChatAdapter):
-    """Cerebras Inference third rung (owner Limits page, 2026-09-18):
-    qwen-3.8-27b, 450 RPM / 648K RPD / 150K UNCACHED TPM (450K total).
-    OpenAI-compatible. 150K uncached is ~18.75x groq's 8K: absorbs the
-    batched-call wall when groq 429s and gemini 503s at once (run
-    35343007845 lost 40/90 clusters to exactly that). tpm is the uncached
-    figure because the pipeline's prompts are cache-cold. 402
-    payment_required blocks live use until the owner adds a billing method
-    (probe 35380934632)."""
-
-    _user_agent = (
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-        "(KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
-    )
+class MistralAdapter(_OpenAiChatAdapter):
+    """Mistral free "Free mode" third rung (owner Limits page, 2026-09-21).
+    The -latest ALIASES are the trap: mistral-small-latest and
+    mistral-medium-latest are listed by /models but 429 code 1300 on every
+    call -- same "listed != serves 200" as the gemini alias case. The DATED
+    id ministral-8b-2512 is the one that serves (probe 35589534761/35589811164):
+    200, ~2s, clean Persian strict JSON. Limits (owner Limits page): 625K TPM,
+    3.13 RPS (~188 RPM). That TPM is ~78x groq's 8K -- it absorbs the
+    batched-call wall when groq 429s and gemini 503s at once. OpenAI-compatible
+    endpoint. api.mistral.ai is NOT Cloudflare-fronted (default UA reaches it),
+    so no browser-UA override is needed (unlike the dropped Cerebras)."""
 
     def __init__(self, model: str, api_key: str) -> None:
         super().__init__(
-            "cerebras", "https://api.cerebras.ai/v1/chat/completions", model, api_key
+            "mistral", "https://api.mistral.ai/v1/chat/completions", model, api_key
         )
 
 

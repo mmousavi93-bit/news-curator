@@ -8,9 +8,12 @@ returns 402 payment_required, and the owner has no card. Mistral "Free mode"
 is the no-card fallback: create API keys and use included monthly usage
 (~$10/mo in API credits), no payment method required.
 
-Candidate models: mistral-small-latest (cost-sensitive, Apache-2.0) and
-mistral-medium-latest (frontier). "listed" != "serves 200" -- the
-gemini-alias trap (config/settings.yaml) applies here too, so this tool
+Candidate models: ministral-8b-2512 (the wired rung) and ministral-3b-2512
+(the higher-RPS alternative). The mistral-small-latest / mistral-medium-latest
+aliases are a trap: /models LISTS them but they 429 code 1300 on every call
+(probes 35585072996/35586658168, 2026-09-21) -- only the DATED ministral-*
+ids serve. "listed" != "serves 200" -- the gemini-alias trap
+(config/settings.yaml) applies here too, so this tool
 answers, per candidate id, whether chat.completions returns 200 RIGHT NOW,
 plus the exact alias the /models list reports and the error body on failure.
 
@@ -54,7 +57,7 @@ _BROWSER_UA = (
     "(KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
 )
 
-DEFAULT_MODELS = ("mistral-small-latest", "mistral-medium-latest")
+DEFAULT_MODELS = ("ministral-8b-2512", "ministral-3b-2512")
 
 # Mirrors the understand stage's ask (Persian strict JSON) so a 200 here is
 # evidence the model serves the real task, not just any prompt.

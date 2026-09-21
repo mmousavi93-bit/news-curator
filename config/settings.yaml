@@ -359,7 +359,7 @@ llm:
   # Re-add bai_deepseek only after confirming the exact model id in the bai
   # console; re-add openrouter only if the balance policy changes.
   # Their provider blocks below are kept, unused, so re-enabling is one edit.
-  order: ["gemini", "groq", "groq2", "cerebras"]
+  order: ["gemini", "groq", "groq2", "mistral"]
 
   stages:
     vision:    { provider: "gemini" }
@@ -448,33 +448,27 @@ llm:
       rpd: 1000
       tpm: 8000
       supports_vision: false
-    cerebras:
-      # 2026-09-18 (SESSION_18_BRIEF): third rung, the capacity-wall fix.
+    mistral:
+      # 2026-09-21 (SESSION_19): third rung, the capacity-wall fix (Cerebras
+      # dropped -- it 402'd, "payment method on file required").
       # Run 35343007845 proved free-LLM capacity is the binding constraint:
-      # 42 calls -> 10 ok (76% fail), 40/90 clusters unavailable because
       # groq 429 (TPM/daily) and gemini 503 (saturation) walled SIMULTANEOUSLY.
       #
-      # MODEL + LIMITS from the owner's Cerebras Limits page (2026-09-18),
-      # superseding the free-tier docs research (which was stale): the org's
-      # model is qwen-3.8-27b -- 450 RPM / 648K RPD / 450K TPM total / 150K
-      # TPM UNCACHED (216M uncached tokens/day). gpt-oss-120b is "Production"
-      # (5 RPM, paid) and gemma-4-31b is ARCHIVED (404) -- both dead ends.
-      # tpm is the UNCACHED figure (150K), not total (450K): the pipeline's
-      # prompts are cache-cold (fresh news every run), so the uncached wall
-      # is what binds. 150K is ~18.75x groq's 8K. OpenAI-compatible endpoint
-      # -> reuses the chat adapter (3-line class).
+      # ALIAS TRAP: /models lists mistral-small-latest and
+      # mistral-medium-latest, but BOTH 429 code 1300 on every call (probe
+      # 35585072996 / 35586658168) -- same "listed != serves 200" as the
+      # gemini alias case. The DATED id below is the one that serves.
       #
-      # Liveness probed 2026-09-18 (run 35380934632, real key): qwen-3.8-27b
-      # returns 402 payment_required ("Visit your billing tab"). The
-      # Cloudflare 403 bot-wall was fixed (browser UA), but 402 is a BILLING
-      # wall: Cerebras requires a payment method on file, same as Together
-      # AI. Stays INERT until the owner resolves billing; then re-probe with
-      # tools/probe_cerebras.py to confirm 200 before the first run counts
-      # on it.
-      model: "qwen-3.8-27b"
-      rpm: 450
-      rpd: 648000
-      tpm: 150000
+      # MODEL + LIMITS from the owner's Mistral Limits page (2026-09-21):
+      # ministral-8b-2512 -- 625K TPM / 3.13 RPS (~188 RPM). Liveness probed
+      # live (run 35589534761): 200, ~1.7s; quality re-probed (35589811164):
+      # clean Persian strict JSON (headline + summary). TPM is ~78x groq's
+      # 8K, so it absorbs the batched-call wall when groq+gq2+gemini all
+      # 429/503. OpenAI-compatible endpoint -> reuses the chat adapter.
+      model: "ministral-8b-2512"
+      rpm: 188
+      rpd: 270000
+      tpm: 625000
       supports_vision: false
     openrouter:
       # VERDICT 2026-08-30 (run at 18:24 UTC): OpenRouter is DEAD for this

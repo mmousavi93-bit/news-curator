@@ -12,11 +12,11 @@ from agent.llm.providers import (
     API_KEY_ENV,
     BaiAdapter,
     BaiDeepSeekAdapter,
-    CerebrasAdapter,
     DeepSeekAdapter,
     GeminiAdapter,
     GroqAdapter,
     ImageInput,
+    MistralAdapter,
     OpenRouterAdapter,
 )
 from agent.llm.wiring import build_adapters
@@ -108,7 +108,7 @@ def test_openai_chat_parse_null_content_raises_schema_error():
         (BaiAdapter("qwen3.8-flash", "k" * 16), "api.b.ai"),
         (BaiDeepSeekAdapter("deepseek-v4-flash", "k" * 16), "api.b.ai"),
         (DeepSeekAdapter("deepseek-v4-flash", "k" * 16), "api.deepseek.com"),
-        (CerebrasAdapter("gpt-oss-120b", "k" * 16), "api.cerebras.ai"),
+        (MistralAdapter("ministral-8b-2512", "k" * 16), "api.mistral.ai"),
     ],
 )
 def test_openai_chat_request_shape(adapter, host):
@@ -149,7 +149,7 @@ def test_max_tokens_covers_worst_case_batch_output():
     [
         GroqAdapter("llama-3.3-70b-versatile", "k" * 16),
         OpenRouterAdapter("m/f", "k" * 16),
-        CerebrasAdapter("gpt-oss-120b", "k" * 16),
+        MistralAdapter("ministral-8b-2512", "k" * 16),
     ],
 )
 def test_openai_chat_parse_ok(adapter):
@@ -183,18 +183,17 @@ def test_capability_flags_are_correct():
     assert GeminiAdapter("m", "k" * 16).supports_vision is True
     assert GroqAdapter("m", "k" * 16).supports_vision is False
     assert OpenRouterAdapter("m", "k" * 16).supports_vision is False
-    assert CerebrasAdapter("m", "k" * 16).supports_vision is False
+    assert MistralAdapter("m", "k" * 16).supports_vision is False
 
 
-def test_cerebras_request_carries_browser_user_agent():
-    _, headers, _ = CerebrasAdapter("gpt-oss-120b", "k" * 16).build_request("hi", [])
-    assert "User-Agent" in headers
-    assert "Mozilla" in headers["User-Agent"]
-
-
-def test_non_cerebras_adapters_send_no_user_agent_override():
+def test_non_mistral_adapters_send_no_user_agent_override():
+    # Mistral's endpoint is NOT Cloudflare-fronted (default UA reaches it),
+    # so no adapter may send a browser-UA override -- that hack was specific
+    # to the dropped Cerebras.
     _, groq_headers, _ = GroqAdapter("m", "k" * 16).build_request("hi", [])
     assert "User-Agent" not in groq_headers
+    _, mistral_headers, _ = MistralAdapter("m", "k" * 16).build_request("hi", [])
+    assert "User-Agent" not in mistral_headers
 
 
 # ---------------------------------------------------------------------------
@@ -260,4 +259,4 @@ def test_api_key_env_names():
     assert API_KEY_ENV["groq"] == "GROQ_API_KEY"
     assert API_KEY_ENV["openrouter"] == "OPENROUTER_API_KEY"
     assert API_KEY_ENV["bai"] == "BAI_API_KEY"
-    assert API_KEY_ENV["cerebras"] == "CEREBRAS_API_KEY"
+    assert API_KEY_ENV["mistral"] == "MISTRAL_API_KEY"
