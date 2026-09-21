@@ -24,7 +24,7 @@ Rules (identical for every cluster):
   adjectives, no exclamation, no question bait, no news-anchor drama.
   A plain report of the fact, e.g. "حمله به یک کشتی تجاری در تنگه هرمز".
 - `summary`: 2-3 short sentences -- a mini-brief, NOT a restatement of
-  the headline. Sentence 1: what actually happened, with the essential
+  the headline. 2 to 60 words (never empty). Sentence 1: what actually happened, with the essential
   detail. Sentence 2: what is confirmed vs merely claimed; if the
   articles disagree, say so. Sentence 3 (ONLY when the articles
   themselves state it): the consequence that matters to an Iranian
