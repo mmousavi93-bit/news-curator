@@ -580,11 +580,15 @@ def test_lead_only_run_delivers_lead_message():
     assert getattr(ctx, "lead_message", None) is not None
 
 
-def test_follow_up_event_renders_as_compact_line_not_full_entry():
-    # Fix 1, 2026-09-06: a repeat-gate bypass (validate.py's follow_up flag)
-    # ships as ONE compact "پیگیری · headline" line -- no category icon, no
-    # claim-status label, no detail/summary -- never a full entry ("a
-    # change that produces more output is probably wrong").
+def test_high_band_follow_up_carries_summary_but_no_full_entry_chrome():
+    # 2026-09-21 (owner): a HIGH-band repeat-gate bypass (validate.py's
+    # follow_up_high flag) now CARRIES its summary as the detail line --
+    # "پیگیری · headline" with the summary under it -- instead of the old
+    # headline-only compact line. It is still LIGHTER than a full entry:
+    # no category icon, no claim-status label, no meta line (category
+    # name · corroboration · time). And it is still worst priority, so a
+    # normal never-delivered story always survives the budget over it
+    # (see the tight-budget tests below).
     from dataclasses import replace
 
     from agent.pipeline.labels import labels_for
@@ -595,7 +599,7 @@ def test_follow_up_event_renders_as_compact_line_not_full_entry():
     # every other event in this file -- the point under test is compact
     # rendering, not relevance scoring.
     base = _event(
-        "این خلاصه کامل پیگیری اسرائیل است که نباید به عنوان جزئیات نمایش داده شود.",
+        "این خلاصه پیگیری به‌روزرسانی عملیات اسرائیل است.",
         category="military",
     )
     base = Event(event_key=base.event_key, summary=base.summary,
@@ -606,17 +610,20 @@ def test_follow_up_event_renders_as_compact_line_not_full_entry():
     # source_id="t1" (distinct from the normal event's default "t2") so the
     # two single-member clusters get distinct keys -- no url collision.
     followup_event = _with_cluster(ctx, base, source_id="t1")
-    # HIGH band (same story retold): compact line. round-4 review, fix 1 --
-    # follow_up alone no longer implies compact rendering, only
-    # follow_up_high does (see test_mid_band_follow_up_renders_as_full_entry
-    # for the MID-band contrast).
+    # HIGH band (same story retold). round-4 review, fix 1 -- follow_up
+    # alone no longer implies anything; only follow_up_high does (see
+    # test_mid_band_follow_up_renders_as_full_entry for the MID contrast).
     followup_event = replace(followup_event, follow_up=True, follow_up_high=True)
     ctx.events = [normal, followup_event]
     ComposeStage(_Log()).run(ctx)
     text = ctx.messages[0]
     assert labels_for("fa")["follow_up"] in text
     assert "تیتر پیگیری کوتاه اسرائیل" in text
-    assert "این خلاصه کامل پیگیری اسرائیل است که نباید" not in text
+    # NEW: the summary is now carried as the detail line.
+    assert "این خلاصه پیگیری به‌روزرسانی عملیات اسرائیل است" in text
+    # Still NOT a full entry: no category icon glued to the follow-up
+    # marker (the normal entry's own "⚔️ " prefix is the only icon line).
+    assert "⚔️ پیگیری" not in text
 
 
 def test_mid_band_follow_up_renders_as_full_entry_above_lower_scoring_normal():
@@ -661,14 +668,14 @@ def test_mid_band_follow_up_renders_as_full_entry_above_lower_scoring_normal():
 
 
 def test_high_band_follow_up_renders_below_every_normal_entry_regardless_of_score():
-    # Round-4 review, fix 1: the HIGH band is the compact one-liner, pinned
-    # below every normal entry (worst priority) even when its own
-    # importance score would otherwise sort it first -- the "DO NOT FIX"
-    # contract (repeat_decision.py: HIGH band is the SAME story retold,
-    # the reader is not owed a second full entry for it). Same score
-    # construction as the MID-band test above (18 vs 10) to prove the
-    # pin-to-bottom survives even when the HIGH-band item would otherwise
-    # rank first.
+    # Round-4 review, fix 1 (with 2026-09-21 owner change): the HIGH band
+    # is pinned below every normal entry (worst priority) even when its own
+    # importance score would otherwise sort it first -- the reader gets the
+    # development only after every never-before-delivered story. It now
+    # carries its summary as a detail line, but the pin-to-bottom must
+    # survive regardless. Same score construction as the MID-band test
+    # above (18 vs 10) to prove the pin survives even when the HIGH-band
+    # item would otherwise rank first.
     from dataclasses import replace
 
     ctx = _Ctx(config=_config())
@@ -678,7 +685,7 @@ def test_high_band_follow_up_renders_below_every_normal_entry_regardless_of_scor
         source_id="t2",
     )
     high_base = _event(
-        "این خلاصه هرگز نباید کامل نمایش داده شود اسرائیل.",
+        "این خلاصه به‌روزرسانی باند بالا است اسرائیل.",
         category="military", independent=3, claim_status="likely",
     )
     high_base = Event(
@@ -694,7 +701,7 @@ def test_high_band_follow_up_renders_below_every_normal_entry_regardless_of_scor
     ComposeStage(_Log()).run(ctx)
     text = ctx.messages[0]
     assert "تیتر باند بالا اسرائیل" in text
-    assert "این خلاصه هرگز نباید کامل نمایش داده شود" not in text  # detail dropped
+    assert "این خلاصه به‌روزرسانی باند بالا است اسرائیل" in text  # summary carried
     assert text.index("این خلاصه سیاسی عادی است") < text.index("تیتر باند بالا اسرائیل")
 
 

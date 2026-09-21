@@ -106,13 +106,16 @@ def build_digest_items(kept: list, clusters: dict, settings, labels: dict) -> tu
         which pinned the day's highest-scoring stories under a full entry
         that scored lower, with zero character pressure involved.
       HIGH band (`event.follow_up_high` True): genuinely the SAME story
-        retold with material development. Renders as the historical
-        compact "پیگیری · headline" line, no summary, no detail. It gets a
-        priority STRICTLY WORSE than every normal entry's (MID-band
-        survivors now count as normal for this purpose), so under
-        character pressure it is always the first thing cut -- never a
-        normal, never-before-delivered story or a MID-band different
-        story. The old value was `max(normal_count - 1, 0)`, i.e. the SAME
+        retold with material development. Renders with the
+        "پیگیری · headline" continuity marker and now CARRIES its summary
+        as the detail line (2026-09-21: the owner wants follow-ups to
+        carry a summary, not ship headline-only) -- but still no category
+        icon, no claim-status label, no meta line, so it stays visually
+        lighter than a full entry. It gets a priority STRICTLY WORSE than
+        every normal entry's (MID-band survivors now count as normal for
+        this purpose), so under character pressure it is always the first
+        thing cut -- never a normal, never-before-delivered story or a
+        MID-band different story. The old value was `max(normal_count - 1, 0)`, i.e. the SAME
         priority as the last normal entry; with equal priority budget.py's
         (priority, order) tie-break let a follow-up earlier in `kept`
         displace a lower-ranked normal entry that had never been delivered
@@ -178,5 +181,6 @@ def build_digest_items(kept: list, clusters: dict, settings, labels: dict) -> tu
         items.append(Item(
             headline=f"{labels['follow_up']} · {headline}",
             priority=worst_normal_priority,
+            detail=event.summary if event.summary else "",
         ))
     return items, ordered_events
