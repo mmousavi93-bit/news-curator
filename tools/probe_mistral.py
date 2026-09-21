@@ -192,6 +192,15 @@ def main(argv=None) -> int:
             print(line)
             lines.append(line + "\n")
             if r["status"] == 200:
+                # Capture the parsed assistant text so liveness != quality:
+                # a 200 can still return empty/garbage for strict Persian JSON.
+                try:
+                    body = json.loads(r["snippet"])
+                    content = body["choices"][0]["message"].get("content", "")
+                except (json.JSONDecodeError, KeyError, IndexError, AttributeError):
+                    content = r["snippet"][:2000]
+                lines.append(f"        body: {content[:800]!r}\n")
+                print(f"        body: {content[:800]!r}")
                 break
             if r["status"] == 429:
                 rate = _rate_summary(r["headers"])
