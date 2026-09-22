@@ -75,7 +75,9 @@ reviewer agent, optimize the whole project."
 - **D2** — significance-gate retention/revision, from a measurement that
   separates the significance drop from the `min_score` drop.
 - **D3** — category+significance redundancy in the score formula (M3).
-- **M1** — follow-up flood vs full-entry ratio.
+  **RESOLVED round 2:** terms uncorrelated (see Data result round 2) — no change.
+- **M1** — follow-up flood vs full-entry ratio. **RESOLVED round 2:** all
+  follow-ups are MID-band full entries, backlog artifact — no change.
 
 ## Next
 
@@ -111,6 +113,33 @@ Settled D1/M2 empirically — and it OVERTURNS the fragmentation premise.
   `development`), so `fragment==0` is not a reliable "no fragmentation" proof
   — but the cross-run `reason` field already settles it anyway.
 
+## Data result (round 2 — M1/M3 settled, also rejected)
+
+The reviewer's other two HIGH findings were tested on the same two runs:
+
+- **M1 (follow-up flood) — REJECTED.** All 16 `sent_followup` items in run 1
+  carry `reason band=mid sim=0.59–0.80 kept=above_floor` — MID band renders as
+  a FULL normal entry with only a "پیگیری ·" continuity marker, NOT a compact
+  line. Zero HIGH-band (`follow_up_high`) compact lines fired in either run
+  (run 2: 2 `sent_followup`, both `band=mid`). The "flood" is a backlog
+  artifact (a 12.5h gap means most big stories had SOME prior mention), and
+  even then it is full entries, not truncated lines.
+- **M3 (score triple-count) — REJECTED.** Reconstructed the three terms for
+  the 24 delivered items from `chosen_*.csv` + `digest_rank` weights:
+  `corr(significance_weight, category_weight) = +0.003`,
+  `corr(category_weight, tier_bonus) = −0.041`,
+  `corr(significance_weight, tier_bonus) = −0.585`. The terms are independent
+  (escalation spans military AND politics; economy is its own category) and
+  significance is *negatively* correlated with source tier (breaking escalation
+  arrives on lower-tier regional sources first). No double-counting.
+- **HIGH-band follow-up (new observation, not a defect).** The HIGH band *does*
+  fire — run 2 had three `band=high sim=0.84–0.85` matches, all
+  `blocked=no_development` (verbatim repeat, correctly dropped). The compact
+  summary-carrying follow-up line (`follow_up_high`, developed) is unit-tested
+  (`test_high_band_follow_up_renders_below_every_normal_entry_…`) but has no
+  production sample yet — "same story + material development" at sim ≥0.80 is
+  genuinely rare. Working as designed; nothing to fix.
+
 ## Implemented (round 2)
 
 - `if: always()` on the `Upload run reports` CI step (`.github/workflows/
@@ -123,8 +152,9 @@ Settled D1/M2 empirically — and it OVERTURNS the fragmentation premise.
 
 ## Real remaining levers (smaller than assumed)
 
-- groq fail rate ~30% (13/44 embedding calls; 9/30 + 4/14) — absorbed by the
-  cascade (llm_failed=0) but degrades embedding quality on ~1/3 of clusters.
+- groq fail rate ~30% in run 1 (13/44) is a BACKLOG rate-limit artifact, not a
+  steady-state defect: run 2 (clean, 3h) was groq 5/5 clean with llm_failed=0.
+  No action; re-observe on the next backlog run.
 - cap/timeout mismatch: a 150-cap backlog run reached 58 min against the
   90-min `timeout-minutes`; a busier day would cancel mid-run.
 - Both need a decision/measurement, not a unilateral change.
