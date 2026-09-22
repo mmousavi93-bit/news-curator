@@ -27,11 +27,15 @@ permissions:
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 150
     # Session 13 (2026-09-17): 30 -> 90. The 55->90 cap raise made a
     # busy run exceed the old 30-min budget. Session 14: cap->150
     # (30 batched calls) fits easily; cascade gemini-first.
     # Verified: manual dispatch 35197529008 cancelled at 30 min mid-summarize.
+    # Session 21 (2026-09-22): 90 -> 150. A 150-cap backlog run reached
+    # 58 min against the 90-min ceiling (run 35712130649); the ceiling was
+    # still sized for the old 40-cap era. Pure safety margin -- the job only
+    # runs as long as it needs.
     steps:
       - uses: actions/checkout@v5
 
