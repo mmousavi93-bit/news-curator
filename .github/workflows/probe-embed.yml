@@ -1,0 +1,32 @@
+name: probe-embed
+
+# One-off diagnostic: does the HIGH band (cosine >= 0.80) stay reachable for a
+# *developed* story, or does adding a new fact push similarity into the MID
+# band? Settles whether the `follow_up_high` compact-line path is live or dead.
+# No secrets needed -- embeddings are local MiniLM, not an API call.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      # Same cache key as pipeline.yml so the MiniLM model is already warm.
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-${{ runner.os }}-minilm-v1
+
+      - name: Install package (embeddings included)
+        run: pip install -e ".[embeddings]"
+
+      - name: Run reachability probe
+        run: python tools/probe_embed_reachability.py
