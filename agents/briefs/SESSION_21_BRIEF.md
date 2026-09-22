@@ -82,3 +82,49 @@ reviewer agent, optimize the whole project."
 Run the pipeline twice (CI has the keys; local does not), pull `pairs_<ts>.csv`,
 and settle D1/D2 from the novelty-filtered data. No threshold changes before then
 (one-variable rule).
+
+## Data result (runs 35712130649 + 35719159597, post-Session-17 150-cap)
+
+Settled D1/M2 empirically — and it OVERTURNS the fragmentation premise.
+
+- Run 35712130649 (manual dispatch, ~12.5h backlog, 58 min runtime):
+  - `pairs_*.csv`: 51 pairs (sim ≥0.40), **0 fragments, 51 development, 0
+    dropped, max cosine 0.63**. The 0.40–0.63 survivors are DISTINCT stories
+    sharing domain vocabulary (drug seizure vs cigarette smuggling; karate team
+    silver vs athlete silver; US/France Hormuz diplomacy vs Trump-Iran meeting)
+    — NOT "one event told N ways".
+  - `chosen_*.csv` fate: irrelevant 61, cap_dropped 37 (all `on_mission=0`,
+    i.e. off-mission noise dropped first — good design), repeat_dropped 25,
+    relevance_dropped 16, clickbait 14, oversized 8, sent 8, sent_followup 16,
+    rank_dropped 1, lang_dropped 1.
+  - **Cross-run repeat gate is the fragmentation catch**: 25 `repeat_dropped`
+    with `reason` `band=mid/high sim=… blocked=below_floor` (or
+    `kept=above_floor`) — including the "Gaza evacuation threat" duplicate (one
+    kept at score 23.7, the 13.1 paraphrase blocked). The two-band +
+    score-floor logic M2 claimed was "missing from same-run" ALREADY exists
+    cross-run and is where the paraphrase band is actually handled.
+  - Delivered 24 items (8 sent + 16 followup) are all distinct. No
+    fragmentation in the output.
+- **Conclusion**: D1 = leave `event_repeat_threshold` at 0.80. Do NOT add a
+  same-run two-band. The `novelty` field is a WEAK signal on live-war feeds
+  (every update adds a death toll/location/actor → ~all pairs classify
+  `development`), so `fragment==0` is not a reliable "no fragmentation" proof
+  — but the cross-run `reason` field already settles it anyway.
+
+## Implemented (round 2)
+
+- `if: always()` on the `Upload run reports` CI step (`.github/workflows/
+  pipeline.yml`, commit d0b7897): a failed/timed-out run still wrote its
+  `pairs_*.csv` dedup log but the upload step silently dropped it. Matches the
+  state-backup convention; protects the diagnostic exactly when it's most
+  needed (run 1 nearly timed out at 58 min).
+- `tools/analyze_pairs.py` (commit 3a7ed13): parses `pairs_*.csv` into
+  per-bucket fragment/development counts + a fragment list.
+
+## Real remaining levers (smaller than assumed)
+
+- groq fail rate ~30% (13/44 embedding calls; 9/30 + 4/14) — absorbed by the
+  cascade (llm_failed=0) but degrades embedding quality on ~1/3 of clusters.
+- cap/timeout mismatch: a 150-cap backlog run reached 58 min against the
+  90-min `timeout-minutes`; a busier day would cancel mid-run.
+- Both need a decision/measurement, not a unilateral change.
