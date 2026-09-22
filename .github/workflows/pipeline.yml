@@ -190,6 +190,12 @@ jobs:
       # the owner downloads for digest tuning. Same ordering rule as the
       # state backup: upload BEFORE the branch dance deletes untracked files.
       - name: Upload run reports (read / chosen / summaries / run CSVs)
+        # `if: always()`: a failed or timed-out run still wrote its CSVs --
+        # pairs_*.csv in particular is the dedup/fragmentation signal, and
+        # losing it on a near-timeout hides that signal exactly when the run
+        # is most worth diagnosing. `if-no-files-found: ignore` covers the
+        # empty case (same as the state backup below).
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: run-reports
