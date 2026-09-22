@@ -20,7 +20,7 @@ from agent.pipeline.samerun_dedup import PairRecord
 _FIELDS = (
     "run_at_utc", "key_a", "key_b", "similarity", "decision", "threshold",
     "n_members_a", "n_members_b", "independent_count_a",
-    "independent_count_b", "headline_a", "headline_b",
+    "independent_count_b", "headline_a", "headline_b", "novelty",
 )
 
 
@@ -38,5 +38,6 @@ def write_pairs(path: Path, rows: Sequence[PairRecord]) -> Path:
                 row.decision, row.threshold, row.n_members_a,
                 row.n_members_b, row.independent_count_a,
                 row.independent_count_b, row.headline_a, row.headline_b,
+                row.novelty,
             ))
     return path

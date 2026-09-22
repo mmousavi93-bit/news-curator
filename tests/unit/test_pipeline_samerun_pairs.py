@@ -79,10 +79,11 @@ def _cluster(n: int, base: str) -> Cluster:
     return cluster
 
 
-def _event(key: str, summary: str, headline: str, independent: int) -> Event:
+def _event(key: str, summary: str, headline: str, independent: int,
+           entities: tuple[str, ...] = ()) -> Event:
     return Event(event_key=key, summary=summary, headline=headline,
                  independent_count=independent, first_seen_at=NOW,
-                 last_updated_at=NOW)
+                 last_updated_at=NOW, entities=entities)
 
 
 def _run(vectors, clusters, events, **kwargs):
@@ -177,3 +178,51 @@ def test_log_floor_read_from_settings_when_not_passed():
     }
     kept, _, _, pairs = _run(vectors, clusters, events)  # no log_floor kwarg
     assert len(pairs) == 1  # recorded via pipeline.samerun_pair_log_floor
+
+
+# ---------------------------------------------------------------------------
+# session 21: novelty field distinguishes true fragmentation from development
+# ---------------------------------------------------------------------------
+
+
+def test_novelty_fragment_when_neither_side_brings_new_fact():
+    ca, cb = _cluster(1, "na"), _cluster(1, "nb")
+    clusters = [ca, cb]
+    events = [
+        _event(ca.key, "strike on the tanker", "h-a", 0),
+        _event(cb.key, "strike on the tanker", "h-b", 0),
+    ]
+    vectors = {"strike on the tanker": [1.0, 0.0, 0.0]}
+    kept, dropped, reasons, pairs = _run(vectors, clusters, events)
+    assert len(pairs) == 1
+    assert pairs[0].novelty == "fragment"
+
+
+def test_novelty_development_when_one_side_has_new_number():
+    ca, cb = _cluster(1, "na"), _cluster(1, "nb")
+    clusters = [ca, cb]
+    events = [
+        _event(ca.key, "strike on the tanker", "h-a", 0),
+        _event(cb.key, "strike on the tanker killed 5", "h-b", 0),
+    ]
+    vectors = {
+        "strike on the tanker": [1.0, 0.0, 0.0],
+        "strike on the tanker killed 5": [0.95, 0.312, 0.0],
+    }
+    kept, dropped, reasons, pairs = _run(vectors, clusters, events)
+    assert len(pairs) == 1
+    assert pairs[0].novelty == "development"
+
+
+def test_novelty_development_when_one_side_has_new_entity():
+    ca, cb = _cluster(1, "na"), _cluster(1, "nb")
+    clusters = [ca, cb]
+    events = [
+        _event(ca.key, "strike on the port", "h-a", 0, entities=("Hodeidah",)),
+        _event(cb.key, "strike on the port", "h-b", 0,
+               entities=("Hodeidah", "CENTCOM")),
+    ]
+    vectors = {"strike on the port": [1.0, 0.0, 0.0]}
+    kept, dropped, reasons, pairs = _run(vectors, clusters, events)
+    assert len(pairs) == 1
+    assert pairs[0].novelty == "development"

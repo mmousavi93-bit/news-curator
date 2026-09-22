@@ -59,6 +59,7 @@ from dataclasses import dataclass
 from typing import Mapping
 
 from agent.memory.event_models import Event
+from agent.pipeline.repeat_decision import _content_novelty
 from agent.pipeline.repeats import _cosine
 
 
@@ -84,6 +85,10 @@ class PairRecord:
     independent_count_b: int
     headline_a: str
     headline_b: str
+    # Session 21: does either side bring a NEW fact (number/entity) the
+    # other lacks? "development" = legitimate separate story; "fragment"
+    # = same story, should have merged (the fragmentation signal D1 needs).
+    novelty: str
 
 
 def _rank_key(event: Event, clusters_by_key: Mapping[str, object]) -> tuple[int, int]:
@@ -125,6 +130,7 @@ def drop_same_run_dups(
         return len(cluster.members) if cluster is not None else 0
 
     def _record(a: Event, b: Event, similarity: float, decision: str) -> PairRecord:
+        dev = _content_novelty(a, [b]) or _content_novelty(b, [a])
         return PairRecord(
             run_at_utc=run_at,
             key_a=a.event_key, key_b=b.event_key,
@@ -136,6 +142,7 @@ def drop_same_run_dups(
             independent_count_b=b.independent_count,
             headline_a=a.headline or a.summary,
             headline_b=b.headline or b.summary,
+            novelty="development" if dev else "fragment",
         )
 
     dropped_keys: set[str] = set()
