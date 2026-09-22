@@ -132,13 +132,18 @@ The reviewer's other two HIGH findings were tested on the same two runs:
   (escalation spans military AND politics; economy is its own category) and
   significance is *negatively* correlated with source tier (breaking escalation
   arrives on lower-tier regional sources first). No double-counting.
-- **HIGH-band follow-up (new observation, not a defect).** The HIGH band *does*
+- **HIGH-band follow-up — reachability settled by probe.** The HIGH band *does*
   fire — run 2 had three `band=high sim=0.84–0.85` matches, all
   `blocked=no_development` (verbatim repeat, correctly dropped). The compact
   summary-carrying follow-up line (`follow_up_high`, developed) is unit-tested
-  (`test_high_band_follow_up_renders_below_every_normal_entry_…`) but has no
-  production sample yet — "same story + material development" at sim ≥0.80 is
-  genuinely rare. Working as designed; nothing to fix.
+  but had no production sample. `tools/probe_embed_reachability.py` (workflow
+  `probe-embed`, run 35749144182) settled it with the real MiniLM embedder:
+  appending a new fact (number or entity) to a real summary drops cosine only
+  1.000 → 0.975/0.976, so a *developed* story stays well above the 0.80 band.
+  `follow_up_high` is live — it's rare because "same story + new fact" events
+  are rare, not because the band is unreachable. Side observation: a reworded
+  *same-fact* pair landed at 0.797, i.e. the 0.80 boundary sits exactly at
+  paraphrase similarity — the band is doing knife-edge work.
 
 ## Implemented (round 2)
 
@@ -155,6 +160,5 @@ The reviewer's other two HIGH findings were tested on the same two runs:
 - groq fail rate ~30% in run 1 (13/44) is a BACKLOG rate-limit artifact, not a
   steady-state defect: run 2 (clean, 3h) was groq 5/5 clean with llm_failed=0.
   No action; re-observe on the next backlog run.
-- cap/timeout mismatch: a 150-cap backlog run reached 58 min against the
-  90-min `timeout-minutes`; a busier day would cancel mid-run.
-- Both need a decision/measurement, not a unilateral change.
+- cap/timeout mismatch: RESOLVED — `timeout-minutes` raised 90→150 (commit
+  6a00bcd), a pure safety ceiling.
