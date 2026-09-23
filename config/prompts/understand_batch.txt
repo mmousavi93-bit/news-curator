@@ -61,10 +61,19 @@ Rules (identical for every cluster):
     bombardment is `none` UNLESS it destroys a named strategic asset or
     otherwise shifts the balance. `none` is NOT `irrelevant` -- the story
     is on-mission, it just does not move the war picture.
-- `why_matters`: OPTIONAL background, not a report. At most ONE short
+- `why_matters`: OPTIONAL background, not a report, and no extra LLM call
+  -- it is part of this same single JSON response. At most ONE short
   sentence explaining WHY this matters to an Iranian reader -- who a named
-  person is, or why a post or change carries weight. Write it ONLY when
-  the articles themselves give that background. NEVER invent a date,
+  person is, why a post or change carries weight, the pattern or precedent
+  the event fits, or the stake it puts on the table. EMIT IT whenever you
+  hold real background the reader does not get from the summary:
+  significance, pattern, stakes, context. That is the normal case, not
+  the exception -- default to writing it. Do NOT write a line that merely
+  restates the summary or its obvious implication; a sentence that adds
+  no background is worse than none. Template: «این تحول برای تصویر جنگ
+  آمریکا-اسرائیل-ایران از این جهت مهم است که ___» -- one sentence of
+  background, one step behind the news, grounded in the articles.
+  NEVER invent a date,
   number, quote, or any fact about a third party the articles do not
   state. When the source gives no such background, return an empty string
   -- omit rather than guess. The system renders it with a «چرا مهم است:»

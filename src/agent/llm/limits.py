@@ -23,9 +23,8 @@ from typing import Callable
 class CallBudget:
     """The one global per-run counter (CLAUDE.md constraint #2).
 
-    acquire() runs BEFORE a request is built. Call N+1 is refused, logged
-    once, and the run continues degraded -- it is never attempted and never
-    raises into run.py.
+    acquire() runs BEFORE a request is built. Call N+1 is refused, logged once,
+    and the run continues degraded -- never attempted, never raised into run.py.
     """
 
     def __init__(self, max_calls: int, logger: logging.Logger) -> None:
@@ -91,13 +90,12 @@ class CallBudget:
 class ProviderBudget:
     """Constraint #15 guard rails, per provider (PHASE_5_BRIEF §10).
 
-    Per-run accounting (calls, spend) stops the retry loop, which is the
-    within-run threat. The daily quota (`max_calls_per_day`, fed by the
-    provider's `rpd`) is the one cross-run guard: free tiers reset per day,
-    so a provider that is fine per-run but quota-bound per-day must be
-    refused once its day's allowance is spent. The count arrives seeded
-    (`daily_calls_used`) from the persisted record in health.py -- the
-    router is stateless between runs by construction.
+    Per-run accounting (calls, spend) stops the retry loop. The daily quota
+    (`max_calls_per_day`, fed by the provider's `rpd`) is the one cross-run
+    guard: a provider fine per-run but quota-bound per-day must be refused once
+    its day's allowance is spent. The count arrives seeded (`daily_calls_used`)
+    from the persisted record in health.py -- the router is stateless between
+    runs by construction.
     """
 
     def __init__(
@@ -138,16 +136,17 @@ class ProviderBudget:
             if not self._warned_day:
                 self._warned_day = True
                 self._logger.error(
-                    "llm provider %s: daily quota (%d) reached -- skipping "
-                    "for the rest of today", self.name, self._max_calls_day,
+                    "llm provider %s: daily quota (%d) reached -- skip_reason="
+                    "quota_exhausted, skipping for the rest of today",
+                    self.name, self._max_calls_day,
                 )
             return False
         if self._max_calls is not None and self.calls >= self._max_calls:
             if not self._warned:
                 self._warned = True
                 self._logger.error(
-                    "llm provider %s: per-run call cap (%d) reached",
-                    self.name, self._max_calls,
+                    "llm provider %s: per-run call cap (%d) reached -- "
+                    "skip_reason=per_run_cap", self.name, self._max_calls,
                 )
             return False
         self.calls += 1
@@ -165,7 +164,7 @@ class ProviderBudget:
                 self.halted = True
                 self._logger.error(
                     "llm provider %s: budget halt -- spend $%.4f exceeds $%.2f; "
-                    "all further calls to it are refused for the rest of this run",
+                    "skip_reason=spend_halt, further calls refused this run",
                     self.name, self.spend_usd, self._max_spend,
                 )
             elif not self._warned:
@@ -177,12 +176,10 @@ class ProviderBudget:
 
 
 class RpmPacer:
-    """Proactive pacing (PHASE_5_BRIEF §5). RPM binds long before RPD:
-    40 Gemini calls at 5 RPM is an eight-minute wall-clock floor. A pacer
-    that waits for 429s spends the run budget on retries and discovers the
-    limit the expensive way.
-
-    Calls are serial and stay serial: parallelism would break the pacer and
+    """Proactive pacing (PHASE_5_BRIEF §5). RPM binds long before RPD: 40 Gemini
+    calls at 5 RPM is an eight-minute wall-clock floor; a pacer that waits for
+    429s spends the run budget on retries and learns the limit expensively.
+    Calls are serial and stay serial -- parallelism would break the pacer and
     buys nothing against a 5 RPM ceiling.
     """
 

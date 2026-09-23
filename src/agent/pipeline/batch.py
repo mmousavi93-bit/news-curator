@@ -32,7 +32,7 @@ from typing import Sequence
 from agent.collectors.dates import to_tehran
 from agent.memory.event_models import Event
 from agent.pipeline.cluster import Cluster
-from agent.pipeline.contract import WHY_MATTERS_WORD_BOUNDS
+from agent.pipeline.contract import SUMMARY_WORD_BOUNDS, WHY_MATTERS_WORD_BOUNDS, trim_summary
 
 # Per-batch ids, e.g. "c1".."c5". Short on purpose: 64-char cluster keys
 # would cost ~16 tokens each twice (prompt + echo) for zero extra safety --
@@ -96,6 +96,18 @@ def build_event(cluster: Cluster, parsed: dict, now) -> Event:
     published = [m.published_at for m in cluster.members if m.published_at is not None]
     summary = str(parsed.get("summary") or parsed.get("headline") or "")
     headline = str(parsed.get("headline") or "").strip()
+    # Trim-not-drop (Session 22): within_bounds admits a 61-90-word summary
+    # as a trimmable over-run; the cut lands HERE so every path (single,
+    # batched, language retry) ships the trimmed text. A summary no trim can
+    # rescue (past the soft ceiling, no sentence boundary) must not ship
+    # over-bound: fall back to the already-bounded headline. within_bounds
+    # normally fates it first; this is the defensive backstop for any path
+    # that reaches build_event directly.
+    trimmed = trim_summary(summary)
+    if trimmed is not None:
+        summary = trimmed
+    elif len(summary.split()) > SUMMARY_WORD_BOUNDS[1]:
+        summary = headline
     # Digest-ranking category, validated to the known set; anything the
     # model invents falls back to "other" (weight 0 in the ranker).
     category = str(parsed.get("category") or "other")

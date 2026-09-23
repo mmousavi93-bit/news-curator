@@ -14,6 +14,7 @@ hide in ANY field -- so the raw response length is capped too.
 from __future__ import annotations
 
 import json
+import re
 
 _FENCE_RE_OPEN = "```"
 
@@ -21,6 +22,14 @@ _FENCE_RE_OPEN = "```"
 # sentence mini-brief summary). Enforced HERE, not at the API boundary.
 HEADLINE_WORD_BOUNDS = (2, 25)
 SUMMARY_WORD_BOUNDS = (2, 60)
+# Trim-not-drop band (Session 22): a summary over the 60-word bound but at
+# or under this ceiling is only SLIGHTLY over, not a ramble -- a 61-90-word
+# mini-brief is a formatting miss (the prompt asks for "2 to 60 words";
+# mistral/ministral overshoot anyway and 4-24 clusters/run were being
+# DROPPED for it). `within_bounds` admits the band and `trim_summary` cuts
+# it back to the bound in build_event. Past the ceiling, or past
+# MAX_RESPONSE_CHARS, the answer is the ramble class and still drops.
+SUMMARY_SOFT_CEILING_WORDS = 90
 # Optional "why it matters" context line (owner 2026-09-06). Used as a TRIM
 # in build_event, NOT a gate -- an over-long context line is dropped, never
 # sinks the event (headline/summary gate the event; context degrades
@@ -44,9 +53,71 @@ def within_bounds(payload: dict, raw_len: int = 0) -> tuple[bool, str]:
     if not (HEADLINE_WORD_BOUNDS[0] <= headline_words <= HEADLINE_WORD_BOUNDS[1]):
         return False, f"headline {headline_words} words (bounds {HEADLINE_WORD_BOUNDS})"
     summary_words = len(summary.split())
-    if not (SUMMARY_WORD_BOUNDS[0] <= summary_words <= SUMMARY_WORD_BOUNDS[1]):
+    if summary_words > SUMMARY_WORD_BOUNDS[1]:
+        # Over the bound. Inside the soft ceiling with a usable sentence
+        # boundary it is a trimmable over-run, not a ramble: ADMIT it and
+        # let build_event cut it to SUMMARY_WORD_BOUNDS[1] (trim-not-drop,
+        # Session 22). Everything else keeps the old fate.
+        if (summary_words <= SUMMARY_SOFT_CEILING_WORDS
+                and trim_summary(summary) is not None):
+            return True, ""
+        return False, f"summary {summary_words} words (bounds {SUMMARY_WORD_BOUNDS})"
+    if summary_words < SUMMARY_WORD_BOUNDS[0]:
         return False, f"summary {summary_words} words (bounds {SUMMARY_WORD_BOUNDS})"
     return True, ""
+
+
+# Sentence end + whatever legitimately trails it (closing quote, bracket,
+# space) so a cut lands AFTER the full stop, never inside it.
+_SENTENCE_END_RE = re.compile(r"[.!?؟…]+[\s»\"')\]]*")
+
+
+def _sentence_prefixes(text: str) -> list[str]:
+    """Whole-sentence prefixes: "a. b. c." -> ["a.", "a. b.", "a. b. c."].
+    A run-on with no terminator yields one prefix, the whole text -- it has
+    no sentence boundary to cut on, which is exactly what `trim_summary`
+    must not paper over by slicing mid-thought."""
+    prefixes: list[str] = []
+    start = 0
+    for match in _SENTENCE_END_RE.finditer(text):
+        if match.end() <= start:
+            continue
+        prefixes.append(text[:match.end()].strip())
+        start = match.end()
+    tail = text[start:].strip()
+    if tail:
+        prefixes.append(text.strip())
+    return [prefix for prefix in prefixes if prefix]
+
+
+def trim_summary(text: str, max_words: int = SUMMARY_WORD_BOUNDS[1]) -> str | None:
+    """The trim-not-drop cut (Session 22). Returns:
+
+      * `text` unchanged when it already fits `max_words`;
+      * else the LONGEST whole-sentence prefix that fits `max_words` and
+        keeps at least `max_words // 2` words -- the prompt asks for a 2-3
+        sentence mini-brief, so in practice this is "the first two
+        sentences", and a shorter cut is a truncation artifact;
+      * else None: no sentence boundary fits inside the bound (a single
+        unterminated 61+ word run-on) or the text is past
+        SUMMARY_SOFT_CEILING_WORDS -- the ramble class, which still drops.
+
+    Pure and deterministic, zero LLM calls: same input, same cut, and
+    `text` is never mutated -- callers apply the return value (build_event
+    does). Words are whitespace-split, the same count `within_bounds` uses.
+    """
+    if len(text.split()) <= max_words:
+        return text
+    if len(text.split()) > SUMMARY_SOFT_CEILING_WORDS:
+        return None
+    best: str | None = None
+    keep_min = max_words // 2  # a cut keeping less than half the budget is
+    # a truncation artifact (e.g. a 2-word first sentence), not a mini-brief.
+    for prefix in _sentence_prefixes(text):
+        count = len(prefix.split())
+        if keep_min <= count <= max_words:
+            best = prefix
+    return best
 
 
 def _strip_fences(text) -> str:
