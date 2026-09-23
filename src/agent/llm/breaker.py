@@ -27,12 +27,14 @@ class CircuitBreaker:
     the run degrades, it does not crash. No reset within a run: the next run
     starts with a fresh router.
 
-    Note (flagged for the Phase 6 wiring decision): with the drafted
-    backoff.max_retries=3 the rotation loop makes at most 4 attempts total,
-    so no single provider can reach 5 consecutive failures in one run --
-    the breaker never opens at the shipped defaults. The mechanism is
-    correct and gate-tested; the defaults interact badly and one of the two
-    numbers should move when the pipeline is wired.
+    Threshold = 2 (settings.yaml backoff.circuit_breaker_failures,
+    reconciled 2026-09-18): two consecutive provider-fatal failures (schema
+    garbage, 400/403/5xx) open the breaker and skip the provider for the
+    rest of the run. 429 and 503 deliberately never count (call.py) --
+    transient saturation is "slow down", not "broken", so it cannot retire
+    a healthy provider (2026-09-18 run 35335314225: gemini 503s had opened
+    the breaker under threshold 2, locking out a provider that recovered in
+    ~27 min). No reset within a run: the next run starts fresh.
     """
 
     def __init__(self, threshold: int, logger: logging.Logger) -> None:
