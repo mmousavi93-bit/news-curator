@@ -1,0 +1,934 @@
+aawsat                 | 2026-08-29T12:23:18+00:00 | لينارت كارل يستعد العودة لبايرن بعد غياب طويل
+aawsat                 | 2026-08-29T12:25:48+00:00 | إيران تضع سلاح «حماس» وحلفائها في لبنان في سلة عتاد «حزب الله»
+aawsat                 | 2026-08-29T12:29:59+00:00 | تونس: وفيات في المستشفيات والسجون بسبب الحر الشديد
+aawsat                 | 2026-08-29T12:30:42+00:00 | صلاح أبو سيف... 30 عاماً على سينما لا يغيب صاحبها
+aawsat                 | 2026-08-29T12:32:33+00:00 | الزيدي يدعو إلى وأد منظومة الفساد نهائياً في العراق
+aawsat                 | 2026-08-29T12:37:21+00:00 | موناكو ترسم خطة إزاحة إنفانتينو… 3 خطوات أوروبية ومعركة قد تمتد إلى مارس
+aawsat                 | 2026-08-29T12:46:15+00:00 | «قمة بشكيك» تجمع بوتين وشي وبزشكيان الاثنين
+aawsat                 | 2026-08-29T12:47:37+00:00 | نوريس باقِ مع ماكلارين حتى 2030
+aawsat                 | 2026-08-29T12:53:06+00:00 | الجزائر تلجأ لوضع أجهزة مراقبة للتأكد من عدم تجدد الحرائق
+aawsat                 | 2026-08-29T12:53:22+00:00 | اتهامات للحوثيين بالمقايضة... اللقاحات مقابل عودة المكاتب الأممية
+aawsat                 | 2026-08-29T12:58:30+00:00 | لياو يترك ميلان للانضمام إلى غلاطة سراي
+aawsat                 | 2026-08-29T12:59:46+00:00 | مصر والكويت تطالبان بـ«معالجة مختلف مصادر التوتر في المنطقة»
+aawsat                 | 2026-08-29T13:10:13+00:00 | بغداد تؤكد الالتزام بإنجاز الانسحاب الأميركي نهاية سبتمبر
+aawsat                 | 2026-08-29T13:10:28+00:00 | كيف نسج اليمن قواعد اشتباك تربك الحوثيين؟
+aawsat                 | 2026-08-29T13:10:51+00:00 | حلُّ لغز مكان ولادة الحيتان الحدباء في الحاجز المرجاني العظيم
+aawsat                 | 2026-08-29T13:14:56+00:00 | إسبانيا تطلب مساعدة الاتحاد الأوروبي في التعامل مع أزمة المهاجرين بسبتة
+aawsat                 | 2026-08-29T13:15:07+00:00 | «123 مليون جنيه إسترليني» تنقل باركولا من سان جيرمان إلى ليفربول
+aawsat                 | 2026-08-29T13:15:19+00:00 | فيتنام تؤكد استعدادها لمحادثات تجارية «بناءة» مع أميركا
+aawsat                 | 2026-08-29T13:19:02+00:00 | بري لـ«الشرق الأوسط»: البديل لـ«اليونيفيل» قوة تحت علم الأمم المتحدة
+aawsat                 | 2026-08-29T13:27:21+00:00 | آرسنال يربط مدافعه الشاب مارلي سالمون بأول عقد احترافي
+ajar                   | 2026-08-21T06:42:39+00:00 | غوطة دمشق الشرقية تحيي الذكرى الـ13 لمجزرة الكيماوي
+ajar                   | 2026-08-21T06:45:25+00:00 | "أخطر وظيفة عامة".. كيف تعمل شرطة غزة تحت الاستهداف؟
+ajar                   | 2026-08-21T06:59:00+00:00 | إسرائيل تسرق "بطيخ فلسطين".. فيديو لجنود الاحتلال يشعل معركة الرموز
+ajar                   | 2026-08-21T07:15:49+00:00 | "من بغي الغريب إلى بغي القريب".. تشبهنا كثيرا مأساة جساس
+ajar                   | 2026-08-21T07:23:47+00:00 | الزيدي: لا نية لصدام عسكري مع الفصائل والحوار مستمر لحصر السلاح
+ajar                   | 2026-08-21T07:24:04+00:00 | لبنان.. تصعيد إسرائيلي جنوبا وسلام يعد بجيش موحّد وتعزيز السيادة
+ajar                   | 2026-08-21T07:24:23+00:00 | بعد مناورات أغضبت تايوان.. الصين وإندونيسيا ترسمان شراكة أوسع
+ajar                   | 2026-08-21T07:26:23+00:00 | روسيا تبدي استعدادا لتقبل أفكار للسلام في أوكرانيا فما هو شرطها؟
+ajar                   | 2026-08-21T07:30:28+00:00 | سيدي كرير.. منفذ متوسطي بديل مع اضطراب الملاحة في باب المندب
+ajar                   | 2026-08-21T07:49:42+00:00 | خريطة تفاعلية توضح تطورات الأوضاع في مدينة الأبيض السودانية
+ajar                   | 2026-08-21T07:50:14+00:00 | بكين تجمع شركات العالم لتسريع التحول نحو عصر الروبوتات التجارية
+ajar                   | 2026-08-21T07:50:44+00:00 | الحكومة الإسرائيلية تفتح باب العطاءات لمشروع استيطاني
+ajar                   | 2026-08-21T08:03:09+00:00 | من المنشأة إلى محطة الوقود.. كيف طالت أزمة المحروقات الشارع الإيراني؟
+ajar                   | 2026-08-21T08:05:22+00:00 | خسارة ثقيلة لليكود.. استطلاعات رأي تظهر تراجعا حادا لنتنياهو
+ajar                   | 2026-08-21T08:23:03+00:00 | الأسهم العالمية نحو أكبر خسارة أسبوعية منذ منتصف يوليو
+ajar                   | 2026-08-21T08:24:54+00:00 | رئيسة الجنائية الدولية تحذر من "انهيار القانون الدولي"
+ajar                   | 2026-08-21T08:28:14+00:00 | من البنزين إلى "الأمبيرات".. فاتورة الوقود تثقل كاهل اللبنانيين
+ajar                   | 2026-08-21T08:39:57+00:00 | في ذكرى إحراقه.. حماس تدعو العرب والمسلمين لتحمل مسؤوليتهم تجاه الأقصى
+ajar                   | 2026-08-21T08:43:07+00:00 | بولندا وأستراليا تحتجان على إغلاق إسرائيل التحقيق في قتلها عمال إغاثة بغزة
+ajar                   | 2026-08-21T08:44:05+00:00 | 57 عاما على حريق روهان بالأقصى.. من يطفئ حرائق بن غفير؟
+ajar                   | 2026-08-29T07:11:27+00:00 | "الشوفار" عند باب الرحمة.. طقوس تلمودية ترسم واقعا جديدا حول الأقصى
+ajar                   | 2026-08-29T07:33:13+00:00 | "الحرس الوطني" يمنع طلاب السويداء من الوصول إلى المراكز الامتحانية في الريف الشمالي
+ajar                   | 2026-08-29T07:34:34+00:00 | "لامين جمال كيرالا".. كيف خطف طالب هندي الأضواء دون أن يسجل هدفا؟
+ajar                   | 2026-08-29T07:40:11+00:00 | سنغافورة تبيع أصولا بـ2.4 مليار دولار في أكبر قضية غسل أموال
+ajar                   | 2026-08-29T07:50:50+00:00 | بلايلي بين عقدين.. ماذا تقول لوائح "فيفا" عن ارتباطه بالترجي ومولودية الجزائر؟
+ajar                   | 2026-08-29T08:01:52+00:00 | ملف جديد بـ"العدل الدولية".. جنوب أفريقيا توثّق خرق إسرائيل قرارات المحكمة
+ajar                   | 2026-08-29T08:13:16+00:00 | الضفة على صفيح ساخن.. تصعيد إسرائيلي وإصابات بهجمات مستوطنين
+ajar                   | 2026-08-29T08:15:59+00:00 | أبرز حرائق المستوطنين في الضفة الغربية ونتائجها
+ajar                   | 2026-08-29T08:44:57+00:00 | كنز صغير داخل مشترياتك.. 9 استخدامات مذهلة لأكياس السيليكا
+ajar                   | 2026-08-29T08:50:37+00:00 | من فرنسا إلى الجزائر.. كيف قادت نجمة البريميرليغ "محاربات الصحراء" للمونديال؟
+ajar                   | 2026-08-29T09:00:04+00:00 | كيف أصبح ترمب أكبر عقبة أمام الجمهوريين في معركة نوفمبر؟
+ajar                   | 2026-08-29T09:08:05+00:00 | وكالة الفضاء الأوروبية: "غاليليو" كان ليساعد أوديسيوس لتخطي التيه
+ajar                   | 2026-08-29T09:10:48+00:00 | بطلان اعترافات غوانتانامو.. قاضٍ أمريكي يستبعد أهم أدلة محاكمة 11 سبتمبر
+ajar                   | 2026-08-29T09:23:45+00:00 | إسرائيل تتمسك بمرتفعات علي الطاهر وتعرقل الانسحاب من جنوب لبنان
+ajar                   | 2026-08-29T09:32:57+00:00 | "استيقظت لأجد خفاشا يحاول دخول فمي".. لحظات رعب عاشتها طبيبة أمريكية
+ajar                   | 2026-08-29T09:36:21+00:00 | مركز قلنديا المهني.. ذاكرة أجيال ومستقبل معلق
+ajar                   | 2026-08-29T09:38:00+00:00 | من كابوس نووي إلى مزار سياحي.. الوجه الآخر لتشرنوبل في "الدحيح"
+ajar                   | 2026-08-29T09:47:40+00:00 | الاتحاد الأفريقي يحذر من هشاشة الأمن ويدعو للحوكمة الشاملة
+ajar                   | 2026-08-29T09:52:01+00:00 | مرتفعات متفحمة وسحب دخانية.. كيف تبدو حرائق الغابات شرقي الجزائر من الفضاء؟
+ajar                   | 2026-08-29T09:52:16+00:00 | آيسلندا تعيد حساباتها.. استفتاء على العودة إلى مسار الاتحاد الأوروبي
+al_jazeera             | 2026-08-29T06:11:58+00:00 | Six months into the Iran war, a new Gulf security architecture is emerging
+al_jazeera             | 2026-08-29T07:08:23+00:00 | India and Pakistan are united in spending citizen lives like pocket change
+al_jazeera             | 2026-08-29T07:33:34+00:00 | Aston Villa sign Chelsea striker Nicolas Jackson for reported club record
+al_jazeera             | 2026-08-29T08:33:04+00:00 | LIVE: Liverpool vs Nottingham Forest – Premier League
+al_jazeera             | 2026-08-29T08:51:07+00:00 | Chelsea vs Brighton: Premier League – preview, team news, prediction
+al_jazeera             | 2026-08-29T09:05:30+00:00 | US revokes visa of former Iraqi minister after watchlist listing
+al_jazeera             | 2026-08-29T09:45:37+00:00 | Norway mourns King Harald as new era begins under Haakon VIII
+al_jazeera             | 2026-08-29T10:09:26+00:00 | Iran’s leaders acknowledge economic toll of war, pledge diplomacy, defence
+al_jazeera             | 2026-08-29T10:10:23+00:00 | Far-right commentator Milo Yiannopoulos detained by ICE
+al_jazeera             | 2026-08-29T10:36:11+00:00 | Russian attack on warehouse near Ukraine’s Kyiv kills at least 37
+al_jazeera             | 2026-08-29T10:49:31+00:00 | Liverpool strike deal to sign PSG’s Barcola for up to $166m: Reports
+al_jazeera             | 2026-08-29T11:30:00+00:00 | Can “super coral” and cooling the sea, save reefs from climate change?
+al_jazeera             | 2026-08-29T12:02:57+00:00 | Zimbabwe minibus carrying church members crashes, killing at least 27
+al_jazeera             | 2026-08-29T12:34:03+00:00 | Formula One champion Lando Norris extends McLaren contract until 2030
+al_jazeera             | 2026-08-29T12:45:48+00:00 | Indonesia sets up shelters for babies, children affected by wildfire smoke
+al_jazeera             | 2026-08-29T12:56:27+00:00 | Gaza farmer returns to the grapevines he couldn’t bear to abandon
+al_jazeera             | 2026-08-29T12:58:25+00:00 | UNRWA’s first and last vocational college in East Jerusalem is under threat
+al_jazeera             | 2026-08-29T13:10:04+00:00 | Israel raids, shutters UNRWA lifeline for Palestinian refugees
+al_jazeera             | 2026-08-29T13:10:47+00:00 | Chinese rescuers race to reach mudslide survivors in Nepal-China border
+al_jazeera             | 2026-08-29T13:11:41+00:00 | Israeli settlers surround Palestinian home in occupied West Bank’s Qusra
+al_manar               | 2026-08-29T12:47:58+00:00 | غارة من طيران العدو الاسرائيلي تستهدف وادي الحجير في جنوب لبنان
+al_manar               | 2026-08-29T12:53:32+00:00 | تقرير مصور | جامعة المعارف تحتفل بتخرج أكثر من 300 طالب لعام 2026
+al_manar               | 2026-08-29T12:58:31+00:00 | بلدية عيتا الجبل تدين بأشد العبارات استمرار الاعتداءات الإسرائيلية على البلدة وأرزاق أهلها
+al_manar               | 2026-08-29T13:00:02+00:00 | الناب الحاج حسن: العدو الحقيقي للعرب هو إسرائيل وليس إيران
+al_manar               | 2026-08-29T13:01:28+00:00 | مراسل المنار: مدفعية العدو الاسرائيلي استهدفت المنطقة الواقعة بين بلدتي حاريص وحداثا في جنوب لبنان
+al_manar               | 2026-08-29T13:02:48+00:00 | مراسل المنار: الطيران الحربي المعادي أغار مستهدفا وادي الحجير لجهة بلدة فرون كما أغار مستهدفا الوادي عند أطراف بلدة زوطر الغربية
+al_manar               | 2026-08-29T13:13:33+00:00 | عراقجي: معلوماتنا تفيد بأن جهودا واسعة النطاق تجري للتلاعب بأسواق الطاقة وتوجيهها
+al_manar               | 2026-08-29T13:19:26+00:00 | مراسل المنار: الطيران الحربي الاسرائيلي اعتدى على بلدة المنصوري في جنوب لبنان
+al_manar               | 2026-08-29T13:24:02+00:00 | بلدية برج البراجنة: للابتعاد عن الابنية المتضررة جراء العدوان الإسرائيلي
+al_manar               | 2026-08-29T13:26:52+00:00 | خاص | مواقف الإمام موسى الصدر من القضية الفلسطينية ومواجهة العدو الإسرائيلي (الجزء الأول)
+al_monitor             | 2026-08-28T13:21:25+00:00 | Israel, Hamas bide their time as Gaza peace plan stalls
+al_monitor             | 2026-08-28T14:30:27+00:00 | Netanyahu party in uproar as far-right refuses pleas to unite
+al_monitor             | 2026-08-28T14:46:31+00:00 | US hits Egyptian bank branches with Iran sanctions as war marks six months
+al_monitor             | 2026-08-28T15:03:32+00:00 | US Treasury targets Egyptian bank's UAE branches over Iran dealings
+al_monitor             | 2026-08-28T15:30:29+00:00 | Four plead guilty to London arson attack on Jewish ambulances
+al_monitor             | 2026-08-28T15:46:35+00:00 | Israel kills Hamas operative in rare West Bank air strike, military says
+al_monitor             | 2026-08-28T17:45:38+00:00 | Can Iran turn postwar vulnerability into a regional security pact?
+al_monitor             | 2026-08-28T17:53:19+00:00 | Iraq reinforces Saudi border security amid militia tensions: What to know
+al_monitor             | 2026-08-29T01:30:27+00:00 | Leaders of Russia, China, Iran to attend summit in Kyrgyzstan
+al_monitor             | 2026-08-29T02:46:36+00:00 | War weighs on Iran's economy as US intensifies sanctions
+al_monitor             | 2026-08-29T03:46:36+00:00 | Judge deals blow to Trump moves to deport pro-Palestinian activists
+al_monitor             | 2026-08-29T10:46:37+00:00 | US military families ride 'roller coaster of emotions' over six months of Iran war
+ap_gnews               | 2026-08-28T21:22:00+00:00 | Photos show aftermath of flash floods in Nepal - AP News
+ap_gnews               | 2026-08-28T22:04:00+00:00 | 2 LaGuardia air traffic controllers left work an hour early before deadly crash, AP source says - AP News
+ap_gnews               | 2026-08-28T22:05:00+00:00 | Federal government extends pause on Big Bend National Park border construction until mid-September - AP News
+ap_gnews               | 2026-08-28T22:15:00+00:00 | Israeli strikes kill 5 in Gaza and 3 in West Bank, and other news in the Middle East - AP News
+ap_gnews               | 2026-08-28T22:27:00+00:00 | Trump says he will observe the 25th anniversary of 9/11 at the Pentagon - AP News
+ap_gnews               | 2026-08-28T23:04:15+00:00 | Avs defenseman Cale Makar signs richest deal in NHL history at $163.2 million over 8 years - AP News
+ap_gnews               | 2026-08-29T01:53:00+00:00 | Former Ecuadorian President Lenín Moreno sentenced to 5 years for corruption - AP News
+ap_gnews               | 2026-08-29T02:25:00+00:00 | Tarik Skubal shed tears, pitching in Detroit for 1st time since Tigers traded him to Dodgers - AP News
+ap_gnews               | 2026-08-29T05:28:00+00:00 | US families with relatives missing in the Nepal-China floods plead for more rescue help - AP News
+ap_gnews               | 2026-08-29T05:33:00+00:00 | Europe’s summer drought threatens fish in rivers, lakes and farms - AP News
+ap_gnews               | 2026-08-29T05:46:00+00:00 | How international supermarkets can break up a dinner rut without costing a fortune - AP News
+ap_gnews               | 2026-08-29T06:54:00+00:00 | Jury in Lindsay Clancy trial ends second day of deliberations without a verdict - AP News
+ap_gnews               | 2026-08-29T07:25:00+00:00 | 6 months on, Iran’s leaders are defying the US and signaling no tolerance for dissent - AP News
+ap_gnews               | 2026-08-29T09:50:00+00:00 | Zimbabwe minibus taxi carrying church members crashes, killing 27 - AP News
+ap_gnews               | 2026-08-29T10:44:00+00:00 | Scientists investigate if a herpes virus is behind the mass deaths of sardines off South Africa - AP News
+ap_gnews               | 2026-08-29T11:44:00+00:00 | The Earth is sizzling, but climate isn’t a hot topic for Democrats in this year’s campaigns - AP News
+ap_gnews               | 2026-08-29T12:12:00+00:00 | Russian strike near Kyiv kills 37, in one of the year’s deadliest attacks - AP News
+ap_gnews               | 2026-08-29T12:22:00+00:00 | Noncitizen voting claims animate Trump's attacks on midterms and set up potential result challenges - AP News
+ap_gnews               | 2026-08-29T12:25:00+00:00 | FBI no longer treating an applicant's experience with prostitution as automatic bar against hiring - AP News
+ap_gnews               | 2026-08-29T12:27:00+00:00 | Niger’s defense minister says soldiers attempted predawn mutiny - AP News
+aviationist            | 2026-08-22T11:22:56+00:00 | China’s Y-15 Turboprop Tactical Cargo Aircraft Emerges in Clearest Images Yet
+aviationist            | 2026-08-22T13:26:53+00:00 | Saab Unveils A3-001 Collaborative Combat Aircraft Concept
+aviationist            | 2026-08-23T08:44:46+00:00 | U.S. Navy Reveals AIM-424 “Malice” Long-Range Air-to-Air Missile
+aviationist            | 2026-08-23T14:32:39+00:00 | Norway Approved for 21 UH-60M Black Hawks After Reversing Plans for HH-60W
+aviationist            | 2026-08-23T15:45:27+00:00 | Argentina Abandons Efforts to Return Super Étendard Fighters to Service
+aviationist            | 2026-08-23T15:58:17+00:00 | Cobra 600 Air Defense Drone Completes First Flight
+aviationist            | 2026-08-24T14:31:43+00:00 | Fifty Years of the MB-339, the Iconic Italian Jet Trainer
+aviationist            | 2026-08-24T19:48:09+00:00 | Photo-Recon in Pink: The Story of the Colorful PRU Spitfires
+aviationist            | 2026-08-24T20:08:03+00:00 | Ukraine Receives Storm Shadow Production License from UK in Exchange for Avenger AI Data
+aviationist            | 2026-08-25T20:05:44+00:00 | CIA Director Rides Unmarked USAF C-17 to Moscow
+aviationist            | 2026-08-25T23:48:52+00:00 | 160th SOAR MH-60 Black Hawk Crashes in Colorado, Crew Safe
+aviationist            | 2026-08-26T12:50:09+00:00 | Chinese J-16s Train Against Egyptian Rafales During Eagles of Civilization 2026
+aviationist            | 2026-08-27T13:51:52+00:00 | Sweden to Begin Phasing Out NH90 TTH Helicopters by 2027 – Reports
+aviationist            | 2026-08-28T13:29:56+00:00 | Gripen F Flies for the First Time
+aviationist            | 2026-08-29T12:54:04+00:00 | South Korea Launches Next Generation Fighter Program
+bbc_en                 | 2026-08-28T17:36:54+00:00 | Satellite images reveal scale of flood devastation in Nepal villages
+bbc_en                 | 2026-08-28T19:05:23+00:00 | Russia ramps up rhetoric but wants to avoid war with Nato, Western officials say
+bbc_en                 | 2026-08-28T19:40:45+00:00 | Norway mourns King Harald as Haakon VIII ascends throne
+bbc_en                 | 2026-08-28T19:57:50+00:00 | Greenland says findings on genocide allegation not final
+bbc_en                 | 2026-08-28T21:17:54+00:00 | 97-year-old woman rescued after Nepali floods looked like 'a warrior'
+bbc_en                 | 2026-08-28T21:29:01+00:00 | Berlin is being blackmailed by hackers, mayor says
+bbc_en                 | 2026-08-28T23:47:38+00:00 | Canada poaches dozens of top US researchers for its universities
+bbc_en                 | 2026-08-29T00:15:19+00:00 | What tariffs will really cost Canadians and Americans
+bbc_en                 | 2026-08-29T00:32:17+00:00 | Landlady to 9/11 hijackers reveals their links to alleged Saudi spy
+bbc_en                 | 2026-08-29T00:35:04+00:00 | How 'Book Queen' Dolly Parton inspired millions of children with gift of reading
+bbc_en                 | 2026-08-29T00:46:02+00:00 | Right-wing commentator Milo Yiannopoulos detained by ICE
+bbc_en                 | 2026-08-29T00:56:19+00:00 | Close race as Iceland votes on whether to restart talks on joining EU
+bbc_en                 | 2026-08-29T01:14:13+00:00 | Somali piracy surges as the impact of the US-Iran war ripples outwards
+bbc_en                 | 2026-08-29T03:54:11+00:00 | Footage of Tibet floods isn't being shown in China - and we know little about victims there
+bbc_en                 | 2026-08-29T04:30:27+00:00 | Forget Starbucks coffee - Gen Z like their drinks ice cold
+bbc_en                 | 2026-08-29T07:11:04+00:00 | Ex-White House teleprompter operator ordered to pay $172,000 for Trump speech bets
+bbc_en                 | 2026-08-29T08:48:34+00:00 | Dutch health institute issues 'red alert' over Trump-shaped ecstasy pills
+bbc_en                 | 2026-08-29T12:55:39+00:00 | At least 37 dead and hundreds evacuated after strike on Kyiv weapons depot
+bbc_en                 | 2026-08-29T13:16:43+00:00 | Trump hails 'historic' deal for US to control 65bn barrels of Venezuela's oil
+bbc_en_me              | 2026-07-31T16:00:56+00:00 | What's in the Gaza peace deal roadmap?
+bbc_en_me              | 2026-08-01T05:01:19+00:00 | What is Iran's Pickaxe Mountain and why does Trump say he wants to bomb it?
+bbc_en_me              | 2026-08-01T05:01:56+00:00 | Israeli West Bank settler tells BBC attacks on Palestinians are justified as revenge
+bbc_en_me              | 2026-08-03T23:13:03+00:00 | 'Digital lifeline' - Gaza tech workers give glimpse of possible future
+bbc_en_me              | 2026-08-07T23:23:12+00:00 | The phone book that led us to Assad's spy chief in hiding
+bbc_en_me              | 2026-08-10T14:43:08+00:00 | Netanyahu's rejection of Trump's 15-point Gaza plan unlikely to be final word
+bbc_en_me              | 2026-08-11T14:50:10+00:00 | Ousted Syrian dictator Bashar al-Assad sentenced to death in absentia
+bbc_en_me              | 2026-08-12T20:32:03+00:00 | How Israeli settlers are besieging Palestinian family homes in West Bank
+bbc_en_me              | 2026-08-14T17:03:17+00:00 | Activists try to deliver aid to Palestinians in homes besieged by Israeli settlers
+bbc_en_me              | 2026-08-15T20:21:14+00:00 | Eleven killed in Israeli strikes on southern Lebanon, authorities say
+bbc_en_me              | 2026-08-16T09:27:58+00:00 | Qatar denies capturing three Iranian pilots after downing fighter jets
+bbc_en_me              | 2026-08-17T16:02:58+00:00 | Kushner hails 'very good' meeting with Netanyahu after Hamas talks on Gaza peace plan
+bbc_en_me              | 2026-08-19T00:48:16+00:00 | US condemns 'unnecessary escalation' after Israeli airstrikes on Syrian airbase
+bbc_en_me              | 2026-08-19T05:04:00+00:00 | Families' agonising search for answers as thousands still missing in Gaza
+bbc_en_me              | 2026-08-19T17:46:01+00:00 | Multiple deadly Israeli strikes in Gaza in under 24 hours
+bbc_en_me              | 2026-08-20T04:17:53+00:00 | Israel confirms soldiers fired at car in which Hind Rajab was killed and opens criminal investigation
+bbc_en_me              | 2026-08-20T07:33:11+00:00 | Australia 'outraged' after Israel decides not to open criminal investigation into killing of aid worker in Gaza
+bbc_en_me              | 2026-08-20T10:30:52+00:00 | Israel opens up bids for highly sensitive West Bank settlement project
+bbc_en_me              | 2026-08-20T12:16:45+00:00 | What we know about Israel's criminal investigations
+bbc_en_me              | 2026-08-20T12:38:35+00:00 | Assad officer extradited to Syria on war crimes charges for first time
+bbc_en_me              | 2026-08-20T18:55:14+00:00 | UK, France, Germany, Italy and Canada condemn Israel's West Bank settlement project
+bbc_en_me              | 2026-08-20T19:52:48+00:00 | US says sanctions will 'squash' Iran's economy and 'collapse' its regime
+bbc_en_me              | 2026-08-21T05:00:57+00:00 | Israel re-establishes closed West Bank settlement, defying growing international protests
+bbc_en_me              | 2026-08-21T19:31:47+00:00 | How Israel is expanding settlements in drive to reshape West Bank
+bbc_en_me              | 2026-08-25T00:17:25+00:00 | US removes Syria from list of state sponsors of terrorism
+bbc_en_me              | 2026-08-25T08:08:26+00:00 | Iran says it is 'fully prepared' to counter widened US economic sanctions
+bbc_en_me              | 2026-08-25T11:53:36+00:00 | China hits out at 'illegal' new US sanctions on Iran and trading partners
+bbc_en_me              | 2026-08-25T12:37:53+00:00 | Trump hopes sanctions will topple Iran's regime - its leaders are betting otherwise
+bbc_en_me              | 2026-08-25T13:46:28+00:00 | Watch: What are the US sanctions on Iran and who else will be affected?
+bbc_en_me              | 2026-08-25T15:04:52+00:00 | Who does Iran trade with and what could Trump's 'economic D-Day' mean?
+bbc_en_me              | 2026-08-25T21:23:41+00:00 | Trump says all mines cleared from Strait of Hormuz
+bbc_en_me              | 2026-08-26T08:17:45+00:00 | Far-right Israeli lawmaker damages Palestinian memorial with sledgehammer
+bbc_en_me              | 2026-08-26T10:34:39+00:00 | Israel's seizure of Unrwa training college in East Jerusalem condemned
+bbc_en_me              | 2026-08-26T16:58:36+00:00 | Funeral held for renowned Palestinian artist Sliman Mansour
+bbc_en_me              | 2026-08-27T11:23:28+00:00 | Man who attacked nun on CCTV in Jerusalem acquitted on grounds of mental health
+bbc_en_me              | 2026-08-27T14:17:24+00:00 | Board of Peace's Gaza envoy criticises Israeli strikes and Hamas actions
+bbc_en_me              | 2026-08-28T01:43:23+00:00 | Former British-Israeli Hamas hostage married in Tel Aviv
+bbc_en_me              | 2026-08-28T14:06:13+00:00 | BBC tracks one week of Israeli settler violence in occupied West Bank
+bbc_en_me              | 2026-08-28T19:45:39+00:00 | US plans to cut off military aid to key Middle East ally, BBC told
+bbc_persian            | 2026-08-18T05:36:28+00:00 | پیمان مکه: آیا ترکیه، عربستان سعودی و پاکستان می‌توانند یک «ناتوی اسلامی» تشکیل دهند؟
+bbc_persian            | 2026-08-19T01:01:59+00:00 | شهری روی ماه؛ آیا رویای تازه ایلان ماسک عملی است؟
+bbc_persian            | 2026-08-19T04:39:51+00:00 | زنانی که حکومت طالبان شلاق زد؛ «به خاطر یک رابطه آشنایی، مرا ۳۹ ضربه شلاق زدند»
+bbc_persian            | 2026-08-19T07:50:36+00:00 | جنگ ایران وارد ماه ششم شد؛ چرا کسی از پایان آن حرف نمی‌زند؟
+bbc_persian            | 2026-08-19T13:54:16+00:00 | سفر قالیباف به عراق؛ ایران در تلاش برای حفظ آرامش در «بیت شیعه»
+bbc_persian            | 2026-08-19T23:34:14+00:00 | شغل‌های در معرض هوش مصنوعی؛ چه کسانی باید بیشتر نگران باشند؟
+bbc_persian            | 2026-08-20T02:23:44+00:00 | «زندان شناور»؛ ملوانان از زندگی در ناو جنگی مثل آبراهام لینکلن چه می‌گویند؟
+bbc_persian            | 2026-08-20T04:57:05+00:00 | «بی‌داد» در سینمای ایران؛ جدال بر سر فیلمی که قرار نیست در ایران اکران شود
+bbc_persian            | 2026-08-20T06:28:13+00:00 | چرا ایران ستاد کل نیروهای مسلح و قرارگاه خاتم‌الانبیا را ادغام می‌کند؟
+bbc_persian            | 2026-08-20T07:19:05+00:00 | آیا امارات می‌تواند معادله فشار بر ایران را تغییر دهد؟
+bbc_persian            | 2026-08-20T11:09:47+00:00 | بازگشت آقای خاص و «صندلی‌بازی» در ایتالیا؛ چه سوژه‌هایی را در لیگ‌های بزرگ اروپا دنبال کنیم؟
+bbc_persian            | 2026-08-20T18:16:06+00:00 | تقابل تصویری روسای مجلس ایران و عراق بر سر نام خلیج فارس
+bbc_persian            | 2026-08-20T23:55:51+00:00 | چرا روسیه ارمنستان را برای همه‌پرسی اتحادیه اروپا تحت فشار قرار می‌دهد؟
+bbc_persian            | 2026-08-21T01:58:30+00:00 | عایشه وهاب: نخستین نماینده افغان‌تبار کنگره آمریکا انتخاب شد
+bbc_persian            | 2026-08-21T02:17:35+00:00 | عملیات اقتصادی ترامپ چقدر می‌تواند به ایران آسیب برساند؟
+bbc_persian            | 2026-08-21T04:12:41+00:00 | چرا سوئیس بیشترین پناهگاه‌های هسته‌ای جهان را دارد؟
+bbc_persian            | 2026-08-21T05:13:35+00:00 | تنگه هرمز، تحریم و جنگ؛ چرا تهران برای توافق عجله ندارد؟
+bbc_persian            | 2026-08-21T06:22:25+00:00 | آیا اسرائیل و ترکیه به رویارویی نزدیک شده‌اند؟
+bbc_persian            | 2026-08-21T08:11:47+00:00 | جنگ اقتصادی ترامپ علیه ایران؛ تغییر رفتار یا تغییر حکومت؟
+bbc_persian            | 2026-08-21T12:02:17+00:00 | بریتانیا می‌گوید فرانسه در جلوگیری از عبور قایق‌های کوچک، کارآمدتر شده است
+bbc_persian            | 2026-08-26T23:28:15+00:00 | پیشتازان فضا: عمق فضای نهم؛ سریالی که بحران بی‌خانمانی آمریکا را پیش‌بینی کرد
+bbc_persian            | 2026-08-27T05:08:31+00:00 | چرا میامی آمریکا به محل زندگی میلیاردرها تبدیل شد؟
+bbc_persian            | 2026-08-27T06:20:51+00:00 | «از این بیماری خجالت نکشید»؛ آنچه باید درباره تبخال تناسلی بدانید
+bbc_persian            | 2026-08-27T07:30:38+00:00 | آیا فقیرتر کردن ایران آسان‌تر از وادار کردن آن به تسلیم است؟
+bbc_persian            | 2026-08-27T21:27:54+00:00 | جهانی که میلیاردرهای فناوری می‌خواهند بسازند؛ جایی که پول به رای تبدیل می‌شود
+bbc_persian            | 2026-08-28T00:05:34+00:00 | آیا باید گوشت مرغ خام را شست؟
+bbc_persian            | 2026-08-28T05:08:16+00:00 | توافق شبیه به پیروزی، انتخابات و قیمت بنزین؛ ترامپ در جنگ با ایران چه چیزهایی را محاسبه می‌کند؟
+bbc_persian            | 2026-08-28T06:16:36+00:00 | سفر محرمانه رئیس سیا به مسکو؛ هشدار به روسیه و پیامی درباره ایران؟
+bbc_persian            | 2026-08-28T07:13:46+00:00 | چرا جنگ ایران به دردسر انتخاباتی ترامپ تبدیل شد؟
+bbc_persian            | 2026-08-28T13:52:01+00:00 | درگذشت هارالد پنجم؛‌ هاکون هشتم، پادشاه جدید نروژ، کیست؟
+bbc_persian            | 2026-08-28T23:04:25+00:00 | سرقت گردنبند ۶۰۰ الماسی مادر فوزیه که در عروسی با محمدرضا پهلوی بر گردن داشت
+bbc_persian            | 2026-08-28T23:32:54+00:00 | «وقتی در شش‌سالگی پریود شدم، پزشکان پاسخی نداشتند»
+bbc_persian            | 2026-08-28T23:37:30+00:00 | چرا وزارت خارجه پاکستان ناچار شد درباره سفر عاصم منیر به تهران توضیح دهد؟
+bbc_persian            | 2026-08-29T02:42:42+00:00 | پزشکیان: واردات و صادرات تا ۳۵ درصد کاهش یافته؛ نرخ سوم بنزین ۱۰ هزار تومان می‌شود
+bbc_persian            | 2026-08-29T05:06:07+00:00 | شش‌ ماه گذشت:‌ جنگی که دیگر فقط جنگ ایران نیست
+bbc_persian            | 2026-08-29T06:22:13+00:00 | مریم مهدوی؛ طراحی که لباس‌های سنتی را وارد کمد زنان تهرانی کرد
+bbc_persian            | 2026-08-29T10:57:39+00:00 | ترامپ توافق با ونزوئلا برای کنترل ۶۵ میلیارد بشکه از نفت این کشور را «تاریخی» توصیف کرد
+bbc_persian            | 2026-08-29T11:12:30+00:00 | نبرد هرمز پس از شش ماه جنگ؛ آیا آمریکا دست بالا را پیدا کرده است؟
+bbc_persian            | 2026-08-29T11:38:48+00:00 | منابع آگاه به بی‌بی‌سی: آمریکا در حال برنامه‌ریزی برای قطع کمک نظامی به اقلیم کردستان عراق است
+bbc_persian            | 2026-08-29T12:38:56+00:00 | پزشکیان: تولید و تداوم فعالیت صنایع خط قرمز دولت است
+dw                     | 2026-08-28T14:02:00+00:00 | Africa's aging autocrats fight to stay in power
+dw                     | 2026-08-28T14:50:00+00:00 | Uganda: World's 'youngest monarch' dies aged 34
+dw                     | 2026-08-28T15:22:00+00:00 | Germany: Man gets life in jail for US tourist's rape, murder
+dw                     | 2026-08-28T16:47:00+00:00 | What next? Kurds say yes, Druze still say no to united Syria
+dw                     | 2026-08-28T19:30:00+00:00 | Germany news: Baltic summit plans hybrid-threat task force
+dw                     | 2026-08-28T20:32:00+00:00 | Austria museum heist: Thieves snatch diamond necklace
+dw                     | 2026-08-28T21:23:00+00:00 | Spain asks EU's Frontex for help in processing Ceuta migrants
+dw                     | 2026-08-28T21:45:00+00:00 | US arrests far-right provocateur Milo Yiannopoulos
+dw                     | 2026-08-28T23:23:00+00:00 | US, Venezuela announce 'historic' oil deal
+dw                     | 2026-08-29T04:49:00+00:00 | Nearly 200,000 forced deportees received by Haiti, UN says
+dw                     | 2026-08-29T06:32:00+00:00 | India news: PM Modi leaves for Central Asian tour
+dw                     | 2026-08-29T06:35:00+00:00 | Iceland holds knife-edge referendum on EU membership talks
+dw                     | 2026-08-29T07:19:00+00:00 | Serbia: Keeping EU, Russia in play ahead of key election
+dw                     | 2026-08-29T07:20:00+00:00 | This extremely successful author polarizes German readers
+dw                     | 2026-08-29T07:21:00+00:00 | South Korea leans toward military conscription for women
+dw                     | 2026-08-29T08:06:00+00:00 | Death toll from Nepal-Tibet floods rises to over 600
+dw                     | 2026-08-29T08:37:00+00:00 | US, Ecuador forces strike alleged drug smuggling boat
+dw                     | 2026-08-29T10:30:00+00:00 | Russian strike on warehouse near Kyiv kills dozens
+dw                     | 2026-08-29T12:12:00+00:00 | Germany news: Sick leave wage bill doubles in 15 years
+dw                     | 2026-08-29T12:23:00+00:00 | Niger's defense ministry says soldiers attempted mutiny
+france24               | 2026-08-24T16:26:34+00:00 | Mohammed bin Salman in the City of Light: Does West value economic interests over 'Western values'?
+france24               | 2026-08-24T21:38:31+00:00 | Israel's Netanyahu says Iran tried to assassinate one of his sons
+france24               | 2026-08-25T03:31:45+00:00 | Trump says Strait of Hormuz demined, warns of ‘zero tolerance’ for new mines
+france24               | 2026-08-25T09:36:13+00:00 | Iran threatens retaliation as new US sanctions hit already-struggling economy
+france24               | 2026-08-25T13:18:25+00:00 | US removes Syria off its list of state sponsors of terrorism
+france24               | 2026-08-25T13:25:54+00:00 | With sanctions and tariffs, US bets on its economic power to get what it wants
+france24               | 2026-08-25T13:44:24+00:00 | US economic D-Day sanctions: 'Repeated bombing attacks across Iran failed to change the calculus'
+france24               | 2026-08-25T15:44:13+00:00 | Iran offers $10 million to kill Trump's son
+france24               | 2026-08-25T18:49:09+00:00 | Syrian Kurdish leader announces SDF dissolution after its integration into army
+france24               | 2026-08-25T21:49:37+00:00 | US-led Gaza peace board warns Hamas over kites after Israeli threat
+france24               | 2026-08-26T06:04:05+00:00 | Trump says he believes Iran’s leader is still alive but 'seriously wounded'
+france24               | 2026-08-26T16:16:01+00:00 | Syria: Why is the dissolution of the Kurdish forces significant?
+france24               | 2026-08-26T20:29:00+00:00 | Navigation, jurisdiction, costs: Iran, Oman attempt to hammer out Hormuz deal
+france24               | 2026-08-27T09:41:20+00:00 | Driven by faith, Jewish activists stand up to settlers to protect West Bank Palestinians
+france24               | 2026-08-27T12:01:16+00:00 | Iran, Qatar hold Hormuz talks as US blockade squeezes Iran oil exports
+france24               | 2026-08-27T21:59:11+00:00 | Syria President appoints Kurdish leader Mazloum Abdi as presidential adviser
+france24               | 2026-08-28T08:58:15+00:00 | Israel's 'retrospective incrimination: First we shoot, we kill & then find a reason why it happened'
+france24               | 2026-08-28T15:31:19+00:00 | There is no proof that this video shows a plane crash in Tel Aviv
+france24               | 2026-08-28T17:14:47+00:00 | Israel army carries out rare West Bank air strike, killing 'three terrorists'
+france24               | 2026-08-29T10:34:58+00:00 | Several killed in Israeli strikes on Gaza and West Bank
+haaretz                | 2026-08-28T08:08:33+00:00 | Police accused of fueling East Jerusalem feud by withholding suspects' bodies
+haaretz                | 2026-08-28T08:25:59+00:00 | Disabled parking permits in Israel are out of control. Now comes the crackdown
+haaretz                | 2026-08-28T09:38:43+00:00 | Ben-Gvir rejects Netanyahu push for joint election run with Smotrich
+haaretz                | 2026-08-28T10:01:59+00:00 | One hundred Israelis living abroad petition High Court after being removed from voter roll
+haaretz                | 2026-08-28T10:16:13+00:00 | Two months out, Netanyahu's bloc is stuck in polls. But all the rest is a mystery
+haaretz                | 2026-08-28T12:11:06+00:00 | Is Turkey the new Iran?
+haaretz                | 2026-08-28T15:05:06+00:00 | Hadash rocked by misconduct allegations against candidate ahead of election
+haaretz                | 2026-08-28T17:45:44+00:00 | Israelis revel as freed hostage Emily Damari marries social media star Danielle Amit
+haaretz                | 2026-08-28T18:14:25+00:00 | Netanyahu said his son was target of Iranian assassination attempt. But the threat remains unclear
+haaretz                | 2026-08-28T19:09:38+00:00 | Is Israel really 'one step away' from total victory in Gaza?
+haaretz                | 2026-08-28T19:13:31+00:00 | Israeli judoka Gefen Primo wins Lausanne Grand Slam
+haaretz                | 2026-08-28T19:20:17+00:00 | IDF says three Palestinians killed in targeted strike near West Bank's Jenin
+haaretz                | 2026-08-28T23:06:59+00:00 | Secular Israelis besieged by ultra-Orthodox neighbors' Sabbath roadblocks
+haaretz                | 2026-08-29T01:49:52+00:00 | Israel election could swing shekel by up to 3 percent, JPMorgan estimates
+haaretz                | 2026-08-29T02:27:22+00:00 | IDF says it targeted a 'Hamas military wing commander' in Gaza Strip
+haaretz                | 2026-08-29T04:18:28+00:00 | Israel's leaders are fully embracing the role of the villain
+haaretz                | 2026-08-29T04:59:57+00:00 | These Israeli liberals are walking into hostile territory to change minds. Can they?
+haaretz                | 2026-08-29T05:27:14+00:00 | 'I've never seen such medical neglect': A Palestinian teen's ordeal in Israeli prison
+haaretz                | 2026-08-29T07:51:15+00:00 | Israel weather service downgrades rare heavy summer rain forecast
+haaretz                | 2026-08-29T08:35:18+00:00 | Pro-Israel senators among 30 urging it to halt E1 settlement plan
+iran_international     | 2026-08-27T11:55:15+00:00 | Iran's Bank Melli remains open in Germany despite sanctions
+iran_international     | 2026-08-27T13:30:49+00:00 | Man from Supreme Leader's empire takes the helm of Iran’s biggest online retailer
+iran_international     | 2026-08-27T15:19:14+00:00 | Iran sentences woman detained during January protests to death
+iran_international     | 2026-08-27T18:24:47+00:00 | ‘State-sponsored theft’: UN representative calls out rising seizures from Iran’s Bahá’ís
+iran_international     | 2026-08-27T21:01:57+00:00 | Three mediators in three days seek path back to Iran-US talks
+iran_international     | 2026-08-27T23:58:01+00:00 | Tehran debates austerity as US targets sanctions lifelines
+iran_international     | 2026-08-28T02:27:57+00:00 | Iran threatens US economic interests if maritime blockade continues
+iran_international     | 2026-08-28T09:15:47+00:00 | Persian Gulf states pour billions into routes bypassing Hormuz
+iran_international     | 2026-08-28T11:14:15+00:00 | Iranian banks and businesses remain open in Dubai despite Trump’s D-Day - WSJ
+iran_international     | 2026-08-28T12:04:56+00:00 | Iran sentences 27-year-old mechanic to death over alleged Mossad ties
+iran_international     | 2026-08-28T12:25:32+00:00 | British-Iranian man accused of seeking to aid IRGC Quds Force faces 2027 trial
+iran_international     | 2026-08-28T12:58:12+00:00 | Iranians are selling their own graves to pay for living
+iran_international     | 2026-08-28T16:35:59+00:00 | US targets Egyptian bank in first strike of economic war against Iran
+iran_international     | 2026-08-28T17:30:10+00:00 | War or deal? Rezaei begins to define Iran’s price
+iran_international     | 2026-08-28T19:50:14+00:00 | Iran or the dollar? US makes an example of Banque Misr
+iran_international     | 2026-08-28T21:09:00+00:00 | Iran’s oil exports near zero as Persian Gulf flows recover
+iran_international     | 2026-08-29T00:00:00+00:00 | Iran bets on China to blunt Trump’s economic offensive
+iran_international     | 2026-08-29T04:25:10+00:00 | Iran’s missing fuel: Can border smuggling explain it all?
+iran_international     | 2026-08-29T06:17:37+00:00 | Iranian banks remain open in UAE as US campaign squeezes Dubai trade - FT
+iran_international     | 2026-08-29T10:36:34+00:00 | Iran’s political prisoners are being executed. Why is supporting them controversial?
+irna                   | 2026-08-19T21:06:24+00:00 | Ghalibaf: Iran and Iraq have potential to create unique opportunities in regional countries
+irna                   | 2026-08-19T21:23:08+00:00 | Iranian, Mauritanian FMs discuss regional developments over phone
+irna                   | 2026-08-20T05:48:49+00:00 | Israeli regime continues attacks on southern Lebanon
+irna                   | 2026-08-20T07:44:57+00:00 | Ghalibaf meets Iraq’s judicial council chief in Baghdad
+irna                   | 2026-08-20T08:22:45+00:00 | Iran FM warns US: Doubling down on failed policies will lead to further defeat
+irna                   | 2026-08-20T09:40:19+00:00 | Iran’s deputy FM: US military aggression failed, next defeat is ‘economic war’
+irna                   | 2026-08-20T10:26:29+00:00 | Iran’s culture minister arrives in India for BRICS tourism summit
+irna                   | 2026-08-20T13:28:10+00:00 | VP Aref hails Iran’s scientific achievements, scientists’ role in defense
+irna                   | 2026-08-20T14:42:59+00:00 | Iraq remains committed to security agreement with Iran: Security adviser
+irna                   | 2026-08-20T15:41:32+00:00 | Iran to revamp defense industry based on recent war experience: Defense Ministry
+irna                   | 2026-08-20T15:45:39+00:00 | Iran warns US space ambitions risk fueling arms race
+irna                   | 2026-08-20T16:45:02+00:00 | Iran condemns new US sanctions as ‘economic terrorism’ and ‘crimes against humanity’
+irna                   | 2026-08-20T16:47:55+00:00 | Iran and Iraq did not let Western powers dictate their fate: Ghalibaf
+irna                   | 2026-08-20T20:24:21+00:00 | Yemen reports drone attack on Aramco refinery in Saudi Arabia
+irna                   | 2026-08-21T05:31:40+00:00 | Moscow hosts ceremony marking 40th day since burial of martyred Leader
+irna                   | 2026-08-21T07:39:09+00:00 | Mashhad hosts 40th-day memorial service for martyred Leader
+irna                   | 2026-08-21T09:02:35+00:00 | Iran–Iraq ties with clear roadmap can impact region: Ghalibaf
+irna                   | 2026-08-21T09:06:00+00:00 | Ghalibaf pays tribute to Iraqi resistance martyrs in Najaf
+irna                   | 2026-08-21T09:55:01+00:00 | Iran, Iraq to stand against global Arrogance: Ghalibaf
+irna                   | 2026-08-21T11:08:42+00:00 | Armed Forces chief warns of ‘devastating’ response to any enemy attack
+irna                   | 2026-08-28T13:07:51+00:00 | No regional oil sales unless Iran sells too: Parliament Speaker
+irna                   | 2026-08-28T16:16:29+00:00 | ‘Minab School’ exhibition shows true human rights: Iran FM
+irna                   | 2026-08-28T18:28:34+00:00 | Leader: Key to solving economic issues lies in domestic production, getting rid of dollar
+irna                   | 2026-08-28T19:41:19+00:00 | President appreciates Leader's message on occasion of Government Week
+irna                   | 2026-08-29T05:56:35+00:00 | Ghalibaf: Leader’s message is a guiding principle for all officials
+irna                   | 2026-08-29T05:59:06+00:00 | Iran will continue path of resistance, avenging martyred Leader: FM Araghchi
+irna                   | 2026-08-29T06:58:49+00:00 | Leader’s message is roadmap for all officials: Judiciary chief
+irna                   | 2026-08-29T07:08:11+00:00 | President Pezeshkian: Iran real winner of Islamabad MoU
+irna                   | 2026-08-29T07:18:37+00:00 | Regional Kung Fu competitions in Tabriz
+irna                   | 2026-08-29T07:51:10+00:00 | Pezeshkian administration strengthens cultural diplomacy, pursues cultural justice
+irna                   | 2026-08-29T08:07:39+00:00 | Iran’s security chief: Leader’s message is clear, beyond interpretation
+irna                   | 2026-08-29T08:43:20+00:00 | Exclusive | Hamas representative in Tehran calls Israel ‘enemy of humanity’
+irna                   | 2026-08-29T09:36:10+00:00 | Unity remains key to thwarting enemies’ conspiracies: Hezbollah chief
+irna                   | 2026-08-29T10:13:29+00:00 | Exclusive | Iran envoy: Europe must accept reality of a strong Iran
+irna                   | 2026-08-29T10:19:52+00:00 | Iranian referee Milad Ghalavand selected for World U23 Wrestling Championships
+irna                   | 2026-08-29T10:27:45+00:00 | Iran, Norway discuss expansion of literary and library cooperation
+irna                   | 2026-08-29T10:29:37+00:00 | Iran’s enemy failed to achieve its objectives: Army commander
+irna                   | 2026-08-29T12:49:53+00:00 | Culture minister urges Muslims to promote the Prophet’s message of humanity
+irna                   | 2026-08-29T13:00:26+00:00 | Araghchi says US officials using media to manipulate energy markets
+irna                   | 2026-08-29T13:03:38+00:00 | Pezeshkian inaugurates 18,910 municipal, rural projects worth over $640m
+mee                    | 2026-08-29T02:22:41+00:00 | 'Iran has many surprises in store for enemies', defence minister says
+mee                    | 2026-08-29T02:32:58+00:00 | ICE detains British far-right provocateur Milo Yiannopoulos
+mee                    | 2026-08-29T03:09:04+00:00 | Israeli strikes on Gaza killed four children in five days, Unicef says
+mee                    | 2026-08-29T03:45:41+00:00 | Congresswomen Rashida Tlaib, Yassamin Ansari denounce 'immoral' Iran war
+mee                    | 2026-08-29T04:26:13+00:00 | Iran will neither forgive nor forget Minab school massacre, Araghchi says
+mee                    | 2026-08-29T04:59:24+00:00 | Ghalibaf says 'no one will be able to sell oil in region where Iran can't'
+mee                    | 2026-08-29T05:25:09+00:00 | US judge rules alleged 9/11 mastermind's confessions inadmissible
+mee                    | 2026-08-29T05:54:05+00:00 | Morning recap
+mee                    | 2026-08-29T06:17:44+00:00 | West Bank attacks: Two Palestinians shot, entry to village closed
+mee                    | 2026-08-29T06:29:26+00:00 | Israeli forces carry out two explosions in southern Lebanon, set fire to homes
+mee                    | 2026-08-29T06:53:49+00:00 | Refugees International president trashes Israel's Gaza food claims
+mee                    | 2026-08-29T08:23:47+00:00 | France's nuclear tests in Algeria: A colonial legacy that still radiates 60 years later
+mee                    | 2026-08-29T10:07:00+00:00 | Iran's Pezeshkian admits US sanctions are hurting economy
+mee                    | 2026-08-29T10:15:30+00:00 | Israeli attacks increase Gaza death toll
+mee                    | 2026-08-29T10:59:53+00:00 | Iran reports $7.5bn in oil revenues amid US naval blockade
+mee                    | 2026-08-29T11:28:34+00:00 | Egypt's Banque Misr reviewing US Iran sanctions notice
+mee                    | 2026-08-29T12:01:45+00:00 | Tehran prepared to engage with talks as equal partners, says Iran envoy
+mee                    | 2026-08-29T12:26:10+00:00 | Israeli settlers continue Qusra siege for 21st day as forces prevent medical evacuations
+mee                    | 2026-08-29T12:39:44+00:00 | How the military-industrial complex is waging war on the planet
+mee                    | 2026-08-29T12:44:02+00:00 | Israeli settlers surround another Palestinian home in Qusra, attack journalists in Jalud
+naval_news             | 2026-08-25T19:01:32+00:00 | USMC Accepts First Australian-Designed Ancillary Surface Craft Prototype
+naval_news             | 2026-08-25T21:05:00+00:00 | Ocius Selects ThayerMahan and Thales Australia Thin-line Arrays for Bluebottle Fleets
+naval_news             | 2026-08-26T06:28:40+00:00 | FNSS Unveils U-MAV Unmanned Amphibious Vehicle
+naval_news             | 2026-08-26T07:02:06+00:00 | US Navy Awards Castelion $90M for Blackbeard Hypersonic Weapon EOC
+naval_news             | 2026-08-26T09:58:00+00:00 | Liberator: Understanding the U.S. Navy’s New Seabed Carrier Killer
+naval_news             | 2026-08-27T08:19:14+00:00 | Navantia Unveils F-110 Flight II / IAMD Frigate
+naval_news             | 2026-08-28T07:26:07+00:00 | HAVELSAN Unveils AVISTA, New Underwater Autonomy Project
+naval_news             | 2026-08-28T08:39:46+00:00 | Davie Wins $11.3 Billion Canadian Coast Guard Icebreaker Contract
+naval_news             | 2026-08-28T17:41:10+00:00 | Taiwan-Bound Harpoon Coastal Defense System Scores Direct Hit in US Navy Test
+naval_news             | 2026-08-29T08:54:20+00:00 | Roketsan Tests Ground-Launched ÇAKIR Cruise Missile Against Land, Sea Targets
+osint613_a             | 2026-08-28T16:26:55+00:00 | Zelensky Comments on Russia Economy
+osint613_a             | 2026-08-28T16:43:31+00:00 | Trump Criticizes Obama-Era Space Policy
+osint613_a             | 2026-08-28T16:48:37+00:00 | Iran FM Criticizes West on Human Rights
+osint613_a             | 2026-08-28T16:50:46+00:00 | Trump Hails U.S. Space Program Era
+osint613_a             | 2026-08-28T16:52:16+00:00 | Trump Emphasizes U.S. Space Dominance
+osint613_a             | 2026-08-28T16:55:18+00:00 | King Harald Casket Carried to Palace
+osint613_a             | 2026-08-28T17:02:38+00:00 | EU Sees No Russia Attack on NATO
+osint613_a             | 2026-08-28T17:05:15+00:00 | Trump to Sign Space Academy Order
+osint613_a             | 2026-08-28T17:06:41+00:00 | US Navy Plans Compact Air-to-Air Missile
+osint613_a             | 2026-08-28T17:20:39+00:00 | Ukrainian F-16AM Departs Belgium
+osint613_a             | 2026-08-28T17:32:42+00:00 | Khamenei Praises Iran Gov Amid Sanctions
+osint613_a             | 2026-08-28T17:39:36+00:00 | Trump Visits Johnson Space Center
+osint613_a             | 2026-08-28T17:48:49+00:00 | Iran Leader Warns Against Divisive Rhetoric
+osint613_a             | 2026-08-28T17:52:37+00:00 | Putin Comments on Electric Vehicles
+osint613_a             | 2026-08-28T18:06:35+00:00 | Hegseth Eyes Major Address at Quantico
+osint613_a             | 2026-08-28T20:15:18+00:00 | Heavy Russian Attacks Strike Kyiv
+osint613_a             | 2026-08-28T20:21:36+00:00 | ICE Arrests Milo Yiannopoulos in LA
+osint613_a             | 2026-08-28T21:54:09+00:00 | Hegseth Eyes 2028 Presidential Run
+osint613_a             | 2026-08-28T23:01:24+00:00 | US-Venezuela Oil Reserves Deal Announced
+reuters_gnews          | 2026-08-27T18:16:00+00:00 | Trump to meet refiners, fuel retailers as Iran war boosts gas prices ahead of midterms, sources say - Reuters
+reuters_gnews          | 2026-08-27T18:17:43+00:00 | Trump says the U.S. is not talking with Iran as economic war in focus - Reuters
+reuters_gnews          | 2026-08-27T18:35:00+00:00 | NEWSLETTER: Trump's brief Iran strike morphs into an open-ended conflict - Reuters
+reuters_gnews          | 2026-08-27T19:55:44+00:00 | Iran's security chief denies report about a potential plot against Trump's son - Reuters
+reuters_gnews          | 2026-08-27T20:50:57+00:00 | Iran sets conditions for reopening Strait of Hormuz, top security official Rezaei says - Reuters
+reuters_gnews          | 2026-08-27T20:55:00+00:00 | Photos of the week - Reuters
+reuters_gnews          | 2026-08-28T00:08:48+00:00 | Qatar steps in to mediate as Trump says US not talking to Iran - Reuters
+reuters_gnews          | 2026-08-28T00:37:43+00:00 | US-hosted G20 finance meeting to target growth, imbalances, Iran sanctions, Treasury official says - Reuters
+reuters_gnews          | 2026-08-28T01:16:00+00:00 | Oil settles lower on clues about Fed policy, rumors of Hormuz deal - Reuters
+reuters_gnews          | 2026-08-28T01:34:00+00:00 | Iran lashes out at US sanctions amid economic toll at home - Reuters
+reuters_gnews          | 2026-08-28T05:38:00+00:00 | September risks are stacking up hard and fast for world markets - Reuters
+reuters_gnews          | 2026-08-28T08:02:27+00:00 | Iran's disfigured supreme leader remains invisible six months into an existential war - Reuters
+reuters_gnews          | 2026-08-28T10:32:30+00:00 | Iran war drives US transport fuel surcharges, but also industry profits - Reuters
+reuters_gnews          | 2026-08-28T10:35:38+00:00 | Pipelines and ports: Iran war spurs Gulf infrastructure investment - Reuters
+reuters_gnews          | 2026-08-28T12:08:14+00:00 | UN refugee agency scales back posts and budget for 2027, documents show - Reuters
+reuters_gnews          | 2026-08-28T16:47:22+00:00 | QatarEnergy cancels gas deliveries to Italy's Edison until early November over Iran war - Reuters
+reuters_gnews          | 2026-08-28T17:37:19+00:00 | US hits Egyptian bank branches with Iran sanctions as war marks six months - Reuters
+reuters_gnews          | 2026-08-28T18:02:44+00:00 | Israel kills Hamas operative in rare West Bank air strike, military says - Reuters
+reuters_gnews          | 2026-08-28T20:45:01+00:00 | Iran's navy says it has 'full control' over Strait of Hormuz - Reuters
+reuters_gnews          | 2026-08-29T11:23:38+00:00 | War weighs on Iran's economy as US intensifies sanctions - Reuters
+sky_news_arabia        | 2026-08-29T04:33:07+00:00 | من المرشد والرئيس.. إقرار إيراني بـ"خسائر الاقتصاد"
+sky_news_arabia        | 2026-08-29T05:55:14+00:00 | ارتفاع حصيلة قتلى كارثة نيبال.. وتقدير مبدئي لحجم الخسائر
+sky_news_arabia        | 2026-08-29T07:03:45+00:00 | رصد إصابة جديدة بأميبا "آكلة للدماغ" في ولاية أميركية
+sky_news_arabia        | 2026-08-29T07:59:03+00:00 | فيديو لـ"مسيّرات اللهب".. تكتيك أوكراني لحرق المواقع الروسية
+sky_news_arabia        | 2026-08-29T08:18:34+00:00 | غابات متفحمة.. صور من الجو تكشف حجم "فاجعة الجزائر"
+sky_news_arabia        | 2026-08-29T08:40:02+00:00 | 3 دروس استثمارية ينبغي للآباء تعليمها لأبنائهم مبكراً
+sky_news_arabia        | 2026-08-29T08:46:51+00:00 | غسيل الكلى في السودان.. علاج محفوف بالموت
+sky_news_arabia        | 2026-08-29T09:15:26+00:00 | النيجر.. مواجهات بين الحرس الجمهوري ومتمردين قرب قصر الرئاسة
+sky_news_arabia        | 2026-08-29T09:22:40+00:00 | الحصار والعقوبات يخنقان إيران.. وبزشكيان يعلن قيودا حكومية
+sky_news_arabia        | 2026-08-29T10:19:46+00:00 | باركولا على أبواب ليفربول بـ123 مليون جنيه إسترليني
+sky_news_arabia        | 2026-08-29T10:29:48+00:00 | فيديو لمسيّرة روسية تضرب مخزن متفجرات.. 37 قتيلا في كييف
+sky_news_arabia        | 2026-08-29T11:02:55+00:00 | الرئاسة والمطار تحت النار.. ماذا يحدث في عاصمة النيجر؟
+sky_news_arabia        | 2026-08-29T11:12:52+00:00 | فيديو.. كلب يخطف الأنظار وسط جحيم حرائق الجزائر
+sky_news_arabia        | 2026-08-29T11:16:22+00:00 | بعد 3 عقود على العرش.. النرويج تودع الملك هارالد
+sky_news_arabia        | 2026-08-29T11:23:07+00:00 | بعد ليلة الرصاص.. النيجر تعلن فشل محاولة انقلاب
+sky_news_arabia        | 2026-08-29T11:51:47+00:00 | العراق يصعد حربه على الفساد.. الزيدي يدعو إلى "وأد المنظومة"
+sky_news_arabia        | 2026-08-29T12:17:16+00:00 | حكم ضد ترامب في قضية "ترحيل الطلاب"
+sky_news_arabia        | 2026-08-29T12:39:12+00:00 | بعد ساعة من إصلاحه.. "خلل مقلق" يظهر مجددا في مروحية ترامب
+sky_news_arabia        | 2026-08-29T12:55:14+00:00 | خشية تجدد الحرائق.. الجزائر تنشر أجهزة للرصد والمراقبة
+sky_news_arabia        | 2026-08-29T13:19:44+00:00 | مصر تزيح الستار عن مقبرة ومنظومة دفن أثرية في سقارة
+state_dept_travel      | 2026-07-07T00:00:00+00:00 | Federated States of Micronesia - Level 1: Exercise Normal Precautions
+state_dept_travel      | 2026-07-07T00:00:00+00:00 | Saint Kitts and Nevis - Level 1: Exercise Normal Precautions
+state_dept_travel      | 2026-07-07T00:00:00+00:00 | Saint Vincent and the Grenadines - Level 1: Exercise Normal Precautions
+state_dept_travel      | 2026-07-08T00:00:00+00:00 | French Guiana - Level 1: Exercise Normal Precautions
+state_dept_travel      | 2026-07-09T00:00:00+00:00 | Malta - Level 1: Exercise Normal Precautions
+state_dept_travel      | 2026-07-09T00:00:00+00:00 | Niger - Level 4: Do Not Travel
+state_dept_travel      | 2026-07-10T00:00:00+00:00 | Argentina - Level 1: Exercise Normal Precautions
+state_dept_travel      | 2026-07-10T00:00:00+00:00 | Saint Lucia - Level 2: Exercise Increased Caution
+state_dept_travel      | 2026-07-10T00:00:00+00:00 | Haiti - Level 4: Do Not Travel
+state_dept_travel      | 2026-07-10T00:00:00+00:00 | Eswatini - Level 2: Exercise Increased Caution
+state_dept_travel      | 2026-07-15T00:00:00+00:00 | Democratic Republic of the Congo - Level 4: Do Not Travel
+state_dept_travel      | 2026-07-23T00:00:00+00:00 | Belgium - Level 2: Exercise Increased Caution
+state_dept_travel      | 2026-07-28T00:00:00+00:00 | Kenya - Level 2: Exercise Increased Caution
+state_dept_travel      | 2026-07-28T00:00:00+00:00 | Uruguay - Level 2: Exercise Increased Caution
+state_dept_travel      | 2026-07-28T00:00:00+00:00 | The Bahamas - Level 2: Exercise Increased Caution
+state_dept_travel      | 2026-07-28T00:00:00+00:00 | Laos - Level 2: Exercise Increased Caution
+state_dept_travel      | 2026-07-29T00:00:00+00:00 | Mongolia - Level 1: Exercise Normal Precautions
+state_dept_travel      | 2026-08-18T00:00:00+00:00 | Liechtenstein - Level 1: Exercise Normal Precautions
+state_dept_travel      | 2026-08-18T00:00:00+00:00 | Kazakhstan - Level 1: Exercise Normal Precautions
+state_dept_travel      | 2026-08-18T00:00:00+00:00 | Mauritania - Level 3: Reconsider Travel
+state_dept_travel      | 2026-08-19T00:00:00+00:00 | Panama - Level 2: Exercise Increased Caution
+state_dept_travel      | 2026-08-19T00:00:00+00:00 | Paraguay - Level 1: Exercise Normal Precautions
+state_dept_travel      | 2026-08-20T00:00:00+00:00 | Guadeloupe - Level 1: Exercise Normal Precautions
+state_dept_travel      | 2026-08-20T00:00:00+00:00 | Martinique - Level 1: Exercise Normal Precautions
+state_dept_travel      | 2026-08-20T00:00:00+00:00 | Saint Barthelemy - Level 1: Exercise Normal Precautions
+state_dept_travel      | 2026-08-20T00:00:00+00:00 | Curaçao - Level 1: Exercise Normal Precautions
+state_dept_travel      | 2026-08-20T00:00:00+00:00 | Sint Eustatius - Level 1: Exercise Normal Precautions
+state_dept_travel      | 2026-08-20T00:00:00+00:00 | Bonaire - Level 1: Exercise Normal Precautions
+state_dept_travel      | 2026-08-20T00:00:00+00:00 | Saba - Level 1: Exercise Normal Precautions
+state_dept_travel      | 2026-08-21T00:00:00+00:00 | Austria - Level 1: Exercise Normal Precautions
+state_dept_travel      | 2026-08-21T00:00:00+00:00 | Turkmenistan - Level 1: Exercise Normal Precautions
+state_dept_travel      | 2026-08-25T00:00:00+00:00 | Algeria - Level 2: Exercise Increased Caution
+state_dept_travel      | 2026-08-25T00:00:00+00:00 | Kosovo - Level 2: Exercise Increased Caution
+state_dept_travel      | 2026-08-26T00:00:00+00:00 | Israel - Level 3: Reconsider Travel - Level 3: Reconsider Travel
+state_dept_travel      | 2026-08-26T00:00:00+00:00 | Albania - Level 2: Exercise Increased Caution
+state_dept_travel      | 2026-08-26T00:00:00+00:00 | West Bank - Level 3: Reconsider Travel
+state_dept_travel      | 2026-08-26T00:00:00+00:00 | Gaza - Level 4: Do Not Travel
+state_dept_travel      | 2026-08-27T00:00:00+00:00 | Montenegro - Level 1: Exercise Normal Precautions
+state_dept_travel      | 2026-08-27T00:00:00+00:00 | Bosnia and Herzegovina - Level 2: Exercise Increased Caution
+state_dept_travel      | 2026-08-27T00:00:00+00:00 | Serbia - Level 2: Exercise Increased Caution
+state_dept_travel      | 2026-08-27T00:00:00+00:00 | Ethiopia - Level 3: Reconsider Travel
+state_dept_travel      | 2026-08-28T00:00:00+00:00 | Qatar - Level 3: Reconsider Travel
+state_dept_travel      | 2026-08-28T00:00:00+00:00 | Ukraine - Level 4: Do Not Travel
+state_dept_travel      | 2026-08-28T00:00:00+00:00 | Kuwait - Level 3: Reconsider Travel
+state_dept_travel      | 2026-08-29T00:00:00+00:00 | Iraq - Level 4: Do Not Travel
+tg_behold_israel       | 2026-08-26T22:48:15+00:00 | 
+tg_behold_israel       | 2026-08-27T08:00:11+00:00 | 
+tg_behold_israel       | 2026-08-27T10:16:18+00:00 | 
+tg_behold_israel       | 2026-08-27T10:48:37+00:00 | 
+tg_behold_israel       | 2026-08-27T12:39:02+00:00 | 
+tg_behold_israel       | 2026-08-27T15:25:56+00:00 | 
+tg_behold_israel       | 2026-08-27T15:53:44+00:00 | 
+tg_behold_israel       | 2026-08-27T16:21:51+00:00 | 
+tg_behold_israel       | 2026-08-27T17:41:03+00:00 | 
+tg_behold_israel       | 2026-08-27T18:01:16+00:00 | 
+tg_behold_israel       | 2026-08-27T18:41:46+00:00 | 
+tg_behold_israel       | 2026-08-27T19:02:30+00:00 | 
+tg_behold_israel       | 2026-08-28T08:23:04+00:00 | 
+tg_behold_israel       | 2026-08-28T09:40:55+00:00 | 
+tg_behold_israel       | 2026-08-28T09:40:55+00:00 | 
+tg_behold_israel       | 2026-08-28T11:07:51+00:00 | 
+tg_behold_israel       | 2026-08-28T16:15:06+00:00 | 
+tg_behold_israel       | 2026-08-28T19:58:15+00:00 | 
+tg_behold_israel       | 2026-08-28T20:31:06+00:00 | 
+tg_behold_israel       | 2026-08-28T22:49:25+00:00 | 
+tg_defenderdome        | 2026-08-27T17:57:12+00:00 | 
+tg_defenderdome        | 2026-08-27T17:57:28+00:00 | 
+tg_defenderdome        | 2026-08-27T18:36:15+00:00 | 
+tg_defenderdome        | 2026-08-27T22:52:31+00:00 | 
+tg_defenderdome        | 2026-08-27T23:47:35+00:00 | 
+tg_defenderdome        | 2026-08-28T00:38:15+00:00 | 
+tg_defenderdome        | 2026-08-28T00:59:46+00:00 | 
+tg_defenderdome        | 2026-08-28T01:08:01+00:00 | 
+tg_defenderdome        | 2026-08-28T13:47:10+00:00 | 
+tg_defenderdome        | 2026-08-28T18:47:40+00:00 | 
+tg_defenderdome        | 2026-08-28T18:57:49+00:00 | 
+tg_defenderdome        | 2026-08-28T18:59:03+00:00 | 
+tg_defenderdome        | 2026-08-28T19:31:45+00:00 | 
+tg_defenderdome        | 2026-08-28T20:03:59+00:00 | 
+tg_defenderdome        | 2026-08-28T20:41:12+00:00 | 
+tg_defenderdome        | 2026-08-28T20:48:57+00:00 | 
+tg_defenderdome        | 2026-08-29T00:07:13+00:00 | 
+tg_defenderdome        | 2026-08-29T01:31:24+00:00 | 
+tg_defenderdome        | 2026-08-29T02:24:36+00:00 | 
+tg_defenderdome        | 2026-08-29T03:51:26+00:00 | 
+tg_esellco             | 2026-08-26T17:52:41+00:00 | 
+tg_esellco             | 2026-08-26T17:54:39+00:00 | 
+tg_esellco             | 2026-08-26T19:05:32+00:00 | 
+tg_esellco             | 2026-08-27T06:53:50+00:00 | 
+tg_esellco             | 2026-08-27T08:22:27+00:00 | 
+tg_esellco             | 2026-08-27T12:45:17+00:00 | 
+tg_esellco             | 2026-08-28T05:15:09+00:00 | 
+tg_esellco             | 2026-08-28T07:33:42+00:00 | 
+tg_esellco             | 2026-08-28T11:22:41+00:00 | 
+tg_esellco             | 2026-08-28T11:55:22+00:00 | 
+tg_esellco             | 2026-08-28T11:59:49+00:00 | 
+tg_esellco             | 2026-08-28T12:31:42+00:00 | 
+tg_esellco             | 2026-08-28T12:39:58+00:00 | 
+tg_esellco             | 2026-08-28T14:34:10+00:00 | 
+tg_esellco             | 2026-08-28T14:34:34+00:00 | 
+tg_esellco             | 2026-08-28T15:28:53+00:00 | 
+tg_esellco             | 2026-08-28T17:19:18+00:00 | 
+tg_esellco             | 2026-08-28T18:56:58+00:00 | 
+tg_esellco             | 2026-08-29T03:58:50+00:00 | 
+tg_esellco             | 2026-08-29T06:59:35+00:00 | 
+tg_exciton_missile     | 2026-08-22T11:26:21+00:00 | 
+tg_exciton_missile     | 2026-08-22T20:18:59+00:00 | 
+tg_exciton_missile     | 2026-08-22T20:23:16+00:00 | 
+tg_exciton_missile     | 2026-08-23T11:16:04+00:00 | 
+tg_exciton_missile     | 2026-08-23T13:08:58+00:00 | 
+tg_exciton_missile     | 2026-08-23T20:24:54+00:00 | 
+tg_exciton_missile     | 2026-08-25T10:51:52+00:00 | 
+tg_exciton_missile     | 2026-08-25T19:50:32+00:00 | 
+tg_exciton_missile     | 2026-08-25T19:51:36+00:00 | 
+tg_exciton_missile     | 2026-08-25T19:51:36+00:00 | 
+tg_exciton_missile     | 2026-08-29T10:12:03+00:00 | 
+tg_exciton_missile     | 2026-08-29T11:39:07+00:00 | 
+tg_exciton_missile     | 2026-08-29T13:05:23+00:00 | 
+tg_fighter_radar       | 2026-08-29T09:37:53+00:00 | 
+tg_fighter_radar       | 2026-08-29T09:45:51+00:00 | 
+tg_fighter_radar       | 2026-08-29T09:51:05+00:00 | 
+tg_fighter_radar       | 2026-08-29T09:56:55+00:00 | 
+tg_fighter_radar       | 2026-08-29T10:02:28+00:00 | 
+tg_fighter_radar       | 2026-08-29T10:14:23+00:00 | 
+tg_fighter_radar       | 2026-08-29T10:18:47+00:00 | 
+tg_fighter_radar       | 2026-08-29T11:19:02+00:00 | 
+tg_fighter_radar       | 2026-08-29T11:25:01+00:00 | 
+tg_fighter_radar       | 2026-08-29T11:33:58+00:00 | 
+tg_fighter_radar       | 2026-08-29T11:40:02+00:00 | 
+tg_fighter_radar       | 2026-08-29T11:55:35+00:00 | 
+tg_fighter_radar       | 2026-08-29T12:37:45+00:00 | 
+tg_fighter_radar       | 2026-08-29T12:41:33+00:00 | 
+tg_fighter_radar       | 2026-08-29T13:21:56+00:00 | 
+tg_fighter_radar       | 2026-08-29T13:24:16+00:00 | 
+tg_geopolitics_prime   | 2026-08-28T20:35:26+00:00 | 
+tg_geopolitics_prime   | 2026-08-28T22:12:01+00:00 | 
+tg_geopolitics_prime   | 2026-08-28T23:55:07+00:00 | 
+tg_geopolitics_prime   | 2026-08-29T01:52:57+00:00 | 
+tg_geopolitics_prime   | 2026-08-29T03:29:02+00:00 | 
+tg_geopolitics_prime   | 2026-08-29T05:03:02+00:00 | 
+tg_geopolitics_prime   | 2026-08-29T05:04:39+00:00 | 
+tg_geopolitics_prime   | 2026-08-29T06:34:30+00:00 | 
+tg_geopolitics_prime   | 2026-08-29T08:00:42+00:00 | 
+tg_geopolitics_prime   | 2026-08-29T08:03:01+00:00 | 
+tg_geopolitics_prime   | 2026-08-29T09:33:01+00:00 | 
+tg_geopolitics_prime   | 2026-08-29T09:50:45+00:00 | 
+tg_geopolitics_prime   | 2026-08-29T11:01:01+00:00 | 
+tg_geopolitics_prime   | 2026-08-29T11:41:44+00:00 | 
+tg_geopolitics_prime   | 2026-08-29T12:33:01+00:00 | 
+tg_geopwatch           | 2026-08-28T23:35:49+00:00 | 
+tg_geopwatch           | 2026-08-28T23:39:44+00:00 | 
+tg_geopwatch           | 2026-08-29T00:05:36+00:00 | 
+tg_geopwatch           | 2026-08-29T01:24:38+00:00 | 
+tg_geopwatch           | 2026-08-29T02:16:33+00:00 | 
+tg_geopwatch           | 2026-08-29T02:43:52+00:00 | 
+tg_geopwatch           | 2026-08-29T02:47:29+00:00 | 
+tg_geopwatch           | 2026-08-29T03:32:06+00:00 | 
+tg_geopwatch           | 2026-08-29T10:25:55+00:00 | 
+tg_geopwatch           | 2026-08-29T11:00:31+00:00 | 
+tg_geopwatch           | 2026-08-29T12:28:57+00:00 | 
+tg_geopwatch           | 2026-08-29T12:29:30+00:00 | 
+tg_geopwatch           | 2026-08-29T12:31:21+00:00 | 
+tg_geopwatch           | 2026-08-29T12:33:27+00:00 | 
+tg_geopwatch           | 2026-08-29T12:35:06+00:00 | 
+tg_geopwatch           | 2026-08-29T12:40:14+00:00 | 
+tg_geopwatch           | 2026-08-29T12:43:58+00:00 | 
+tg_geopwatch           | 2026-08-29T12:58:00+00:00 | 
+tg_geopwatch           | 2026-08-29T13:01:33+00:00 | 
+tg_irane_azad_news     | 2026-08-28T22:32:51+00:00 | 
+tg_irane_azad_news     | 2026-08-28T23:42:45+00:00 | 
+tg_irane_azad_news     | 2026-08-28T23:58:34+00:00 | 
+tg_irane_azad_news     | 2026-08-29T06:34:50+00:00 | 
+tg_irane_azad_news     | 2026-08-29T06:40:09+00:00 | 
+tg_irane_azad_news     | 2026-08-29T07:03:55+00:00 | 
+tg_irane_azad_news     | 2026-08-29T08:02:20+00:00 | 
+tg_irane_azad_news     | 2026-08-29T08:02:30+00:00 | 
+tg_irane_azad_news     | 2026-08-29T08:07:03+00:00 | 
+tg_irane_azad_news     | 2026-08-29T09:09:24+00:00 | 
+tg_irane_azad_news     | 2026-08-29T10:08:55+00:00 | 
+tg_irane_azad_news     | 2026-08-29T10:39:42+00:00 | 
+tg_irane_azad_news     | 2026-08-29T11:52:15+00:00 | 
+tg_irane_azad_news     | 2026-08-29T12:14:04+00:00 | 
+tg_irane_azad_news     | 2026-08-29T12:24:16+00:00 | 
+tg_irane_azad_news     | 2026-08-29T12:40:20+00:00 | 
+tg_iranian_militarism  | 2026-08-28T20:22:56+00:00 | 
+tg_iranian_militarism  | 2026-08-28T20:38:05+00:00 | 
+tg_iranian_militarism  | 2026-08-28T21:04:05+00:00 | 
+tg_iranian_militarism  | 2026-08-28T22:47:09+00:00 | 
+tg_iranian_militarism  | 2026-08-29T02:14:28+00:00 | 
+tg_iranian_militarism  | 2026-08-29T06:00:42+00:00 | 
+tg_iranian_militarism  | 2026-08-29T09:31:45+00:00 | 
+tg_iranian_militarism  | 2026-08-29T11:23:04+00:00 | 
+tg_iranian_militarism  | 2026-08-29T11:38:46+00:00 | 
+tg_iranian_militarism  | 2026-08-29T11:42:14+00:00 | 
+tg_iranian_militarism  | 2026-08-29T11:46:42+00:00 | 
+tg_iranian_militarism  | 2026-08-29T12:11:38+00:00 | 
+tg_iranian_militarism  | 2026-08-29T12:12:08+00:00 | 
+tg_iranian_militarism  | 2026-08-29T12:25:57+00:00 | 
+tg_iranian_militarism  | 2026-08-29T12:34:28+00:00 | 
+tg_mes                 | 2026-08-27T16:32:59+00:00 | 
+tg_mes                 | 2026-08-27T18:26:23+00:00 | 
+tg_mes                 | 2026-08-27T18:53:04+00:00 | 
+tg_mes                 | 2026-08-27T18:55:18+00:00 | 
+tg_mes                 | 2026-08-27T19:51:49+00:00 | 
+tg_mes                 | 2026-08-27T19:54:14+00:00 | 
+tg_mes                 | 2026-08-27T22:39:04+00:00 | 
+tg_mes                 | 2026-08-27T22:39:18+00:00 | 
+tg_mes                 | 2026-08-28T13:00:43+00:00 | 
+tg_mes                 | 2026-08-28T14:05:54+00:00 | 
+tg_mes                 | 2026-08-28T15:22:19+00:00 | 
+tg_mes                 | 2026-08-28T16:47:31+00:00 | 
+tg_mes                 | 2026-08-28T16:50:23+00:00 | 
+tg_mes                 | 2026-08-28T16:51:01+00:00 | 
+tg_mes                 | 2026-08-28T16:52:20+00:00 | 
+tg_mes                 | 2026-08-28T16:55:06+00:00 | 
+tg_mes                 | 2026-08-28T17:07:22+00:00 | 
+tg_mes                 | 2026-08-28T17:15:36+00:00 | 
+tg_mes                 | 2026-08-28T17:20:40+00:00 | 
+tg_mes                 | 2026-08-28T17:30:46+00:00 | 
+tg_militarywave        | 2026-08-19T08:52:38+00:00 | 
+tg_militarywave        | 2026-08-19T11:11:34+00:00 | 
+tg_militarywave        | 2026-08-19T15:13:15+00:00 | 
+tg_militarywave        | 2026-08-19T16:08:09+00:00 | 
+tg_militarywave        | 2026-08-20T10:04:07+00:00 | 
+tg_militarywave        | 2026-08-20T11:32:34+00:00 | 
+tg_militarywave        | 2026-08-20T12:12:33+00:00 | 
+tg_militarywave        | 2026-08-20T13:20:21+00:00 | 
+tg_militarywave        | 2026-08-20T15:03:58+00:00 | 
+tg_militarywave        | 2026-08-21T07:04:01+00:00 | 
+tg_militarywave        | 2026-08-21T08:01:12+00:00 | 
+tg_militarywave        | 2026-08-21T09:11:12+00:00 | 
+tg_militarywave        | 2026-08-21T10:01:24+00:00 | 
+tg_militarywave        | 2026-08-21T11:07:32+00:00 | 
+tg_militarywave        | 2026-08-28T08:02:20+00:00 | 
+tg_militarywave        | 2026-08-28T09:01:25+00:00 | 
+tg_militarywave        | 2026-08-28T10:14:08+00:00 | 
+tg_militarywave        | 2026-08-28T11:47:54+00:00 | 
+tg_militarywave        | 2026-08-28T12:19:13+00:00 | 
+tg_militarywave        | 2026-08-28T13:07:06+00:00 | 
+tg_militarywave        | 2026-08-28T14:04:52+00:00 | 
+tg_militarywave        | 2026-08-28T15:10:14+00:00 | 
+tg_militarywave        | 2026-08-28T16:11:48+00:00 | 
+tg_militarywave        | 2026-08-29T09:47:26+00:00 | 
+tg_militarywave        | 2026-08-29T10:20:53+00:00 | 
+tg_militarywave        | 2026-08-29T11:04:55+00:00 | 
+tg_militarywave        | 2026-08-29T11:05:17+00:00 | 
+tg_militarywave        | 2026-08-29T11:41:30+00:00 | 
+tg_militarywave        | 2026-08-29T12:17:45+00:00 | 
+tg_militarywave        | 2026-08-29T13:01:39+00:00 | 
+tg_minas_tirith        | 2026-08-28T07:50:50+00:00 | 
+tg_minas_tirith        | 2026-08-28T12:18:45+00:00 | 
+tg_minas_tirith        | 2026-08-28T12:18:50+00:00 | 
+tg_minas_tirith        | 2026-08-28T15:25:40+00:00 | 
+tg_minas_tirith        | 2026-08-28T19:50:56+00:00 | 
+tg_minas_tirith        | 2026-08-29T06:15:52+00:00 | 
+tg_minas_tirith        | 2026-08-29T06:20:41+00:00 | 
+tg_minas_tirith        | 2026-08-29T07:43:43+00:00 | 
+tg_minas_tirith        | 2026-08-29T08:48:26+00:00 | 
+tg_minas_tirith        | 2026-08-29T08:53:41+00:00 | 
+tg_minas_tirith        | 2026-08-29T09:23:30+00:00 | 
+tg_minas_tirith        | 2026-08-29T10:47:37+00:00 | 
+tg_mornovosti          | 2026-08-26T10:30:07+00:00 | 
+tg_mornovosti          | 2026-08-26T15:21:42+00:00 | 
+tg_mornovosti          | 2026-08-27T06:29:25+00:00 | 
+tg_mornovosti          | 2026-08-28T08:26:24+00:00 | 
+tg_mornovosti          | 2026-08-28T10:29:52+00:00 | 
+tg_mornovosti          | 2026-08-28T12:48:47+00:00 | 
+tg_mornovosti          | 2026-08-28T12:50:04+00:00 | 
+tg_mornovosti          | 2026-08-28T13:12:21+00:00 | 
+tg_mornovosti          | 2026-08-28T13:26:31+00:00 | 
+tg_mornovosti          | 2026-08-28T15:12:03+00:00 | 
+tg_mornovosti          | 2026-08-29T12:37:19+00:00 | 
+tg_padeshah_fxn        | 2026-08-21T10:13:34+00:00 | 
+tg_padeshah_fxn        | 2026-08-21T10:13:40+00:00 | 
+tg_padeshah_fxn        | 2026-08-21T10:14:39+00:00 | 
+tg_padeshah_fxn        | 2026-08-21T10:17:08+00:00 | 
+tg_padeshah_fxn        | 2026-08-21T10:17:34+00:00 | 
+tg_padeshah_fxn        | 2026-08-21T10:19:12+00:00 | 
+tg_padeshah_fxn        | 2026-08-21T10:21:38+00:00 | 
+tg_padeshah_fxn        | 2026-08-21T10:27:36+00:00 | 
+tg_padeshah_fxn        | 2026-08-21T10:32:25+00:00 | 
+tg_padeshah_fxn        | 2026-08-21T10:50:21+00:00 | 
+tg_padeshah_fxn        | 2026-08-21T10:53:21+00:00 | 
+tg_padeshah_fxn        | 2026-08-21T10:55:51+00:00 | 
+tg_padeshah_fxn        | 2026-08-21T11:05:33+00:00 | 
+tg_padeshah_fxn        | 2026-08-21T11:06:55+00:00 | 
+tg_padeshah_fxn        | 2026-08-21T11:07:51+00:00 | 
+tg_padeshah_fxn        | 2026-08-21T11:11:47+00:00 | 
+tg_padeshah_fxn        | 2026-08-21T12:01:17+00:00 | 
+tg_padeshah_fxn        | 2026-08-21T12:02:36+00:00 | 
+tg_padeshah_fxn        | 2026-08-21T12:02:54+00:00 | 
+tg_padeshah_fxn        | 2026-08-21T12:06:09+00:00 | 
+tg_padeshah_fxn        | 2026-08-29T04:37:02+00:00 | 
+tg_padeshah_fxn        | 2026-08-29T05:46:44+00:00 | 
+tg_padeshah_fxn        | 2026-08-29T09:10:52+00:00 | 
+tg_padeshah_fxn        | 2026-08-29T09:14:01+00:00 | 
+tg_padeshah_fxn        | 2026-08-29T09:15:32+00:00 | 
+tg_padeshah_fxn        | 2026-08-29T09:18:08+00:00 | 
+tg_padeshah_fxn        | 2026-08-29T09:19:51+00:00 | 
+tg_padeshah_fxn        | 2026-08-29T09:44:15+00:00 | 
+tg_padeshah_fxn        | 2026-08-29T10:32:35+00:00 | 
+tg_padeshah_fxn        | 2026-08-29T10:35:00+00:00 | 
+tg_padeshah_fxn        | 2026-08-29T10:53:03+00:00 | 
+tg_padeshah_fxn        | 2026-08-29T12:50:34+00:00 | 
+tg_padeshah_fxn        | 2026-08-29T13:02:43+00:00 | 
+tg_padeshah_fxn        | 2026-08-29T13:05:08+00:00 | 
+tg_padeshah_fxn        | 2026-08-29T13:15:12+00:00 | 
+tg_padeshah_fxn        | 2026-08-29T13:22:25+00:00 | 
+tg_padeshah_fxn        | 2026-08-29T13:27:52+00:00 | 
+tg_rnintel             | 2026-08-28T23:43:22+00:00 | 
+tg_rnintel             | 2026-08-29T01:27:09+00:00 | 
+tg_rnintel             | 2026-08-29T08:46:05+00:00 | 
+tg_rnintel             | 2026-08-29T09:16:26+00:00 | 
+tg_rnintel             | 2026-08-29T09:42:16+00:00 | 
+tg_rnintel             | 2026-08-29T10:45:56+00:00 | 
+tg_rnintel             | 2026-08-29T10:55:47+00:00 | 
+tg_rnintel             | 2026-08-29T10:56:33+00:00 | 
+tg_rnintel             | 2026-08-29T10:58:12+00:00 | 
+tg_rnintel             | 2026-08-29T11:18:23+00:00 | 
+tg_rnintel             | 2026-08-29T11:50:41+00:00 | 
+tg_rnintel             | 2026-08-29T12:19:39+00:00 | 
+tg_rnintel             | 2026-08-29T12:29:05+00:00 | 
+tg_rnintel             | 2026-08-29T12:44:07+00:00 | 
+tg_rnintel             | 2026-08-29T12:46:18+00:00 | 
+tg_rnintel             | 2026-08-29T13:02:29+00:00 | 
+tg_tabzlive            | 2026-08-29T09:49:12+00:00 | 
+tg_tabzlive            | 2026-08-29T09:59:37+00:00 | 
+tg_tabzlive            | 2026-08-29T10:05:45+00:00 | 
+tg_tabzlive            | 2026-08-29T10:22:49+00:00 | 
+tg_tabzlive            | 2026-08-29T10:56:45+00:00 | 
+tg_tabzlive            | 2026-08-29T11:49:51+00:00 | 
+tg_tabzlive            | 2026-08-29T11:55:41+00:00 | 
+tg_tabzlive            | 2026-08-29T12:14:38+00:00 | 
+tg_tabzlive            | 2026-08-29T12:24:27+00:00 | 
+tg_tabzlive            | 2026-08-29T12:38:15+00:00 | 
+tg_tabzlive            | 2026-08-29T12:40:49+00:00 | 
+tg_tabzlive            | 2026-08-29T12:48:05+00:00 | 
+tg_tabzlive            | 2026-08-29T12:49:04+00:00 | 
+tg_tabzlive            | 2026-08-29T13:14:31+00:00 | 
+tg_tabzlive            | 2026-08-29T13:21:26+00:00 | 
+tg_tabzlive            | 2026-08-29T13:23:18+00:00 | 
+tg_tabzlive            | 2026-08-29T13:27:51+00:00 | 
+tg_tanker_trackers     | 2026-07-03T18:16:46+00:00 | 
+tg_tanker_trackers     | 2026-07-07T23:28:06+00:00 | 
+tg_tanker_trackers     | 2026-07-09T10:46:27+00:00 | 
+tg_tanker_trackers     | 2026-07-13T16:07:00+00:00 | 
+tg_tanker_trackers     | 2026-07-13T22:16:38+00:00 | 
+tg_tanker_trackers     | 2026-07-14T09:27:50+00:00 | 
+tg_tanker_trackers     | 2026-07-18T18:20:32+00:00 | 
+tg_tanker_trackers     | 2026-07-24T17:23:42+00:00 | 
+tg_tanker_trackers     | 2026-07-25T20:11:59+00:00 | 
+tg_tanker_trackers     | 2026-08-05T17:36:39+00:00 | 
+tg_tanker_trackers     | 2026-08-08T12:08:04+00:00 | 
+tg_tanker_trackers     | 2026-08-12T02:07:58+00:00 | 
+tg_tanker_trackers     | 2026-08-14T13:15:05+00:00 | 
+tg_tanker_trackers     | 2026-08-24T11:43:22+00:00 | 
+tg_tanker_trackers     | 2026-08-25T19:11:17+00:00 | 
+tg_tanker_trackers     | 2026-08-27T13:28:41+00:00 | 
+tg_tanker_trackers     | 2026-08-28T02:01:34+00:00 | 
+tg_tweet_mardomi       | 2026-08-28T19:02:29+00:00 | 
+tg_tweet_mardomi       | 2026-08-28T19:03:48+00:00 | 
+tg_tweet_mardomi       | 2026-08-28T19:06:50+00:00 | 
+tg_tweet_mardomi       | 2026-08-28T19:19:12+00:00 | 
+tg_tweet_mardomi       | 2026-08-28T19:31:18+00:00 | 
+tg_tweet_mardomi       | 2026-08-28T20:44:47+00:00 | 
+tg_tweet_mardomi       | 2026-08-28T22:51:46+00:00 | 
+tg_tweet_mardomi       | 2026-08-28T23:38:59+00:00 | 
+tg_tweet_mardomi       | 2026-08-29T05:52:01+00:00 | 
+tg_tweet_mardomi       | 2026-08-29T05:52:01+00:00 | 
+tg_tweet_mardomi       | 2026-08-29T05:52:17+00:00 | 
+tg_tweet_mardomi       | 2026-08-29T05:57:48+00:00 | 
+tg_tweet_mardomi       | 2026-08-29T07:29:03+00:00 | 
+tg_tweet_mardomi       | 2026-08-29T09:02:29+00:00 | 
+tg_tweet_mardomi       | 2026-08-29T09:33:00+00:00 | 
+tg_tweet_mardomi       | 2026-08-29T10:43:16+00:00 | 
+tg_tweet_mardomi       | 2026-08-29T10:51:37+00:00 | 
+tg_tweet_mardomi       | 2026-08-29T12:26:13+00:00 | 
+tg_tweet_mardomi       | 2026-08-29T12:32:59+00:00 | 
+tg_vahid_online        | 2026-08-27T15:32:28+00:00 | 
+tg_vahid_online        | 2026-08-27T15:33:46+00:00 | 
+tg_vahid_online        | 2026-08-27T19:30:10+00:00 | 
+tg_vahid_online        | 2026-08-27T19:33:25+00:00 | 
+tg_vahid_online        | 2026-08-27T19:37:52+00:00 | 
+tg_vahid_online        | 2026-08-28T12:48:12+00:00 | 
+tg_vahid_online        | 2026-08-28T12:57:35+00:00 | 
+tg_vahid_online        | 2026-08-28T12:59:14+00:00 | 
+tg_vahid_online        | 2026-08-28T13:04:33+00:00 | 
+tg_vahid_online        | 2026-08-28T13:06:26+00:00 | 
+tg_vahid_online        | 2026-08-28T13:08:45+00:00 | 
+tg_vahid_online        | 2026-08-28T13:13:32+00:00 | 
+tg_vahid_online        | 2026-08-28T13:15:37+00:00 | 
+tg_vahid_online        | 2026-08-28T14:46:57+00:00 | 
+tg_vahid_online        | 2026-08-28T17:53:18+00:00 | 
+tg_vahid_online        | 2026-08-28T19:15:43+00:00 | 
+tg_vahid_online        | 2026-08-29T01:16:52+00:00 | 
+tg_vira_university     | 2026-08-27T16:33:06+00:00 | 
+tg_vira_university     | 2026-08-27T18:15:13+00:00 | 
+tg_vira_university     | 2026-08-28T07:01:18+00:00 | 
+tg_vira_university     | 2026-08-28T11:53:31+00:00 | 
+tg_vira_university     | 2026-08-28T12:35:06+00:00 | 
+tg_vira_university     | 2026-08-28T12:35:08+00:00 | 
+tg_vira_university     | 2026-08-28T12:50:22+00:00 | 
+tg_vira_university     | 2026-08-28T16:33:53+00:00 | 
+tg_vira_university     | 2026-08-28T17:16:05+00:00 | 
+tg_vira_university     | 2026-08-28T18:15:13+00:00 | 
+tg_vira_university     | 2026-08-28T18:28:01+00:00 | 
+tg_vira_university     | 2026-08-29T07:03:17+00:00 | 
+tg_vira_university     | 2026-08-29T10:56:31+00:00 | 
+tg_vira_university     | 2026-08-29T12:32:12+00:00 | 
+tg_wfwitness           | 2026-08-29T04:20:54+00:00 | 
+tg_wfwitness           | 2026-08-29T04:31:04+00:00 | 
+tg_wfwitness           | 2026-08-29T04:41:37+00:00 | 
+tg_wfwitness           | 2026-08-29T04:45:10+00:00 | 
+tg_wfwitness           | 2026-08-29T04:46:11+00:00 | 
+tg_wfwitness           | 2026-08-29T05:59:57+00:00 | 
+tg_wfwitness           | 2026-08-29T09:05:46+00:00 | 
+tg_wfwitness           | 2026-08-29T09:13:20+00:00 | 
+tg_wfwitness           | 2026-08-29T10:05:23+00:00 | 
+tg_wfwitness           | 2026-08-29T10:41:07+00:00 | 
+tg_wfwitness           | 2026-08-29T10:43:24+00:00 | 
+tg_wfwitness           | 2026-08-29T10:56:31+00:00 | 
+tg_wfwitness           | 2026-08-29T11:28:53+00:00 | 
+tg_wfwitness           | 2026-08-29T11:31:34+00:00 | 
+tg_wfwitness           | 2026-08-29T12:45:11+00:00 | 
+tg_wfwitness           | 2026-08-29T12:46:03+00:00 | 
+tg_wfwitness           | 2026-08-29T12:53:11+00:00 | 
+tg_wfwitness           | 2026-08-29T13:03:12+00:00 | 
+tg_world_newsly        | 2026-08-25T05:19:10+00:00 | 
+tg_world_newsly        | 2026-08-25T05:19:16+00:00 | 
+the_war_zone           | 2026-08-14T21:03:13+00:00 | Army To Use Robinson R66 For Its New Helicopter Pilot Training Concept
+the_war_zone           | 2026-08-14T21:55:00+00:00 | Bunker Talk: Let’s Talk About All The Things We Did And Didn’t Cover This Week
+the_war_zone           | 2026-08-17T17:55:15+00:00 | New Patriot Battalion To Bolster Guam’s Defenses Within Months
+the_war_zone           | 2026-08-17T19:03:08+00:00 | Russia Is Expanding Its Long-Range Strike Drone Network
+the_war_zone           | 2026-08-17T23:13:20+00:00 | U.S. Military Training With South Korea Reduced Over Iran War Snub
+the_war_zone           | 2026-08-18T00:26:11+00:00 | Where Are The Aircraft Carriers?: August 17, 2026
+the_war_zone           | 2026-08-18T12:26:59+00:00 | Air Force Wants Family Of Expendable Target Drones That Can Mimic Everything From Stealth Fighters To UAV Swarms
+the_war_zone           | 2026-08-18T16:37:19+00:00 | Why The Ford Class Carrier’s Island Superstructure Is Located So Far Back
+the_war_zone           | 2026-08-18T19:19:49+00:00 | Israel Moves AH-64 Apaches Closer To Critical Northern Front
+the_war_zone           | 2026-08-18T23:00:18+00:00 | New Details Emerge About Ukraine’s Homegrown “Equalizer” Glide Bomb
+the_war_zone           | 2026-08-19T01:12:38+00:00 | South Korea’s Highly Mobile 155mm Artillery System Wins U.S. Army Howitzer Contract
+the_war_zone           | 2026-08-19T16:24:15+00:00 | Singapore’s Formidable Class Frigate Appears Armed With Blue Spear Anti-Ship Missiles
+the_war_zone           | 2026-08-19T19:15:29+00:00 | New USS John F. Kennedy Brings Back Key Feature From The Nimitz Class
+the_war_zone           | 2026-08-19T21:06:53+00:00 | EA-37B Flew Along Kaliningrad Border As Part Of “Specialized” Recon, EW Flight Package
+the_war_zone           | 2026-08-19T23:43:18+00:00 | China’s Reusable Space Launch Booster Recoveries Have Major Military Implications
+the_war_zone           | 2026-08-20T16:09:39+00:00 | This Is The New Blackbeard ‘Cheap’ Hypersonic Weapon
+the_war_zone           | 2026-08-20T18:11:01+00:00 | Wildfire Is General Atomics’ Successor To The MQ-9 Reaper
+the_war_zone           | 2026-08-20T18:13:10+00:00 | Our Best Look At China’s New Y-15 Turboprop Airlifter
+the_war_zone           | 2026-08-20T19:57:42+00:00 | F-117 Nighthawk Needs Fresh Explosives For Its Tailhook Nearly Two Decades After ‘Retirement’
+the_war_zone           | 2026-08-20T23:10:13+00:00 | USS George Washington’s Mideast Arrival Highlights Strain On Carrier Force
+the_war_zone           | 2026-08-25T13:06:11+00:00 | USAF C-17 Makes Extremely Rare Visit To Moscow (Updated)
+the_war_zone           | 2026-08-25T16:38:51+00:00 | Ukraine’s Newest USV Is A Super Sized Mothership Packed With Anti-Drone Interceptors
+the_war_zone           | 2026-08-25T17:53:10+00:00 | Poland’s Name Appears in U.S. F-15EX Deal, Warsaw Denies Procurement Plans
+the_war_zone           | 2026-08-25T19:42:25+00:00 | Ukraine Situation Report: Russia To Seize Commercial Infrastructure Left Unprotected From Drones
+the_war_zone           | 2026-08-25T21:19:01+00:00 | The Mystery Of J-20 Fighter-Like Shapes Spotted In China Has Been Solved
+the_war_zone           | 2026-08-26T16:15:31+00:00 | J-10 Deal With Bangladesh Takes Shape As China’s Fighter Export Push Grows
+the_war_zone           | 2026-08-26T17:16:14+00:00 | Bradley Fighting Vehicle Lugging Load Of Swarming Ground Drones Is A Sign Of What’s To Come
+the_war_zone           | 2026-08-26T21:01:15+00:00 | How Marine Rifle Squads Plan To Fight Future Wars Dominated By Drones
+the_war_zone           | 2026-08-26T22:42:15+00:00 | Blackbeard Low-Cost Hypersonic Missile Testing On The F/A-18 Super Hornet Has Begun
+the_war_zone           | 2026-08-27T02:04:22+00:00 | Claims Swirl Around CIA Director’s Reason For Secret Moscow Visit, Nearly All Of Them Are Terrifying
+the_war_zone           | 2026-08-27T17:09:22+00:00 | Army Widens Stinger Surface-To-Air Missile Replacement Search
+the_war_zone           | 2026-08-27T18:04:10+00:00 | What Europe Needs Next In Beyond-Visual-Range Air-To-Air Missiles
+the_war_zone           | 2026-08-27T21:52:57+00:00 | Russia Is Now Using Longer-Range Iskander Ballistic Missiles: Ukraine Intel
+the_war_zone           | 2026-08-28T00:43:01+00:00 | NASA’s Hunt To Replace Its Iconic T-38 Talon Jets Kicks Off
+the_war_zone           | 2026-08-28T16:29:01+00:00 | Saab’s Gripen F Two-Seater Takes To The Air For The First Time
+the_war_zone           | 2026-08-28T17:06:17+00:00 | Indonesia’s First Aircraft Carrier Is On Its Way From Italy
+the_war_zone           | 2026-08-28T17:14:20+00:00 | U.S. Expanding B-52 Bomber Capacity At Moron Air Base In Spain
+the_war_zone           | 2026-08-28T17:45:31+00:00 | Massive Expansion At China’s ‘Area 51’
+the_war_zone           | 2026-08-28T17:57:40+00:00 | USAF Stands Up Unit To Fly HH-60W Helicopters In Doomsday Evacuation Role In Nation’s Capital
+walla                  | 2026-08-28T16:02:00+00:00 | בפעם השנייה בתוך שבוע: גנץ וארדן נפגשו
+walla                  | 2026-08-28T16:13:00+00:00 | היעד: ראש התארגנות טרור - צה"ל תקף באופן ממוקד בג'נין
+walla                  | 2026-08-28T18:20:00+00:00 | בנט נגד איזנקוט: "מי שמתנגד למדינה פלסטינית - צריך לתמוך בהתיישבות"
+walla                  | 2026-08-28T18:23:00+00:00 | "את מרביצה לילדה שלי בכאפות ובכפכפים": האם שחשדה בגננת ואיימה עליה בווטסאפ
+walla                  | 2026-08-28T18:25:00+00:00 | השירות המטאורולוגי: כמויות הגשם הצפויות ירדו באופן משמעותי
+walla                  | 2026-08-28T19:26:00+00:00 | 3 נעצרו בחשד לרצח בן ה-29 ביפו: ג'יפ עצר לידו בזמן שרכב על אופניים - והיורה פתח באש
+walla                  | 2026-08-28T20:06:00+00:00 | ארה"ב מרחיבה את הנידוי הכלכלי - ומקדמת מהלך לניתוק בנק באמירויות מהמערכת הפיננסית
+walla                  | 2026-08-28T20:15:00+00:00 | "נגעה בכל אדם": החוקרת והאסטרולוגית מעין מדזיני מתה בטרם עת בחופשה ביוון
+walla                  | 2026-08-28T21:53:00+00:00 | מאות חולצו ממנהרה, ילד שרד על עץ: מרוץ נגד הזמן באזור האסון בנפאל
+walla                  | 2026-08-29T01:56:00+00:00 | טראמפ: ארה"ב חתמה עם ונצואלה על "עסקת הנפט הגדולה בהיסטוריה"
+walla                  | 2026-08-29T06:30:00+00:00 | אחרי העימות עם ממדאני: מושלת ניו יורק מתייצבת לצד היהודים - "אשלח את המשטרה"
+walla                  | 2026-08-29T08:00:00+00:00 | הצלקת הארוכה של צה"ל: הגדוד שנולד מהכישלון החמור ב-7 באוקטובר
+walla                  | 2026-08-29T08:30:00+00:00 | אשליה של ריבונות: כך הפכה ממשלת לבנון למנגנון ההסוואה של חיזבאללה
+walla                  | 2026-08-29T10:00:00+00:00 | פעם רק עצרנו כאן בדרך לנחל. עכשיו יש סיבה להישאר
+walla                  | 2026-08-29T10:55:00+00:00 | 135 חיות נדירות, כולל החתול ההיברידי הגדול בעולם - נמצאו בחווה של ארגון פשע
+walla                  | 2026-08-29T11:00:00+00:00 | עד 90 שקל לשעה מתחת לשולחן: "השוק השחור" של החינוך המיוחד
+walla                  | 2026-08-29T12:00:00+00:00 | הם יורים גם בסוסים: כיצד ממשל טראמפ איפשר שחיטה של אלפי סוסי בר - בניגוד לחוק
+walla                  | 2026-08-29T13:00:00+00:00 | "מי שמסכן חיי יהודים יישא בתוצאות": ארבעה צעירים הודו בהצתת אמבולנסים בלונדון
+walla                  | 2026-08-29T15:00:00+00:00 | ימי הזוהר והשפל: 75 שנות רכבת הרים ביחסי ישראל-טורקיה
+walla                  | 2026-08-29T15:44:00+00:00 | מתנחלים יידו אבנים והתבצרו בבית בקוסרה שבשומרון - פלסטינים נפצעו
+ynet                   | 2026-08-26T01:04:09+00:00 | After years of autonomy and battles: Kurdish force in Syria is disbanding, merging with army
+ynet_he                | 2026-08-21T11:28:49+00:00 | "פתח מלחמת עולם": הזעם על הליכודניק שהשבית את נתב"ג - והניסיון לאסור על כך

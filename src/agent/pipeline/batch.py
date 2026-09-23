@@ -32,6 +32,7 @@ from typing import Sequence
 from agent.collectors.dates import to_tehran
 from agent.memory.event_models import Event
 from agent.pipeline.cluster import Cluster
+from agent.pipeline.contract import WHY_MATTERS_WORD_BOUNDS
 
 # Per-batch ids, e.g. "c1".."c5". Short on purpose: 64-char cluster keys
 # would cost ~16 tokens each twice (prompt + echo) for zero extra safety --
@@ -106,6 +107,18 @@ def build_event(cluster: Cluster, parsed: dict, now) -> Event:
     significance = str(parsed.get("significance") or "economy")
     if significance not in ("escalation", "balance", "economy", "none"):
         significance = "economy"
+    # Optional "why it matters" context (owner 2026-09-06): trim, never
+    # gate. Strip a leaked «چرا مهم است» prefix (the prompt tells the model
+    # to omit it; strip defensively so it never doubles) and drop the line
+    # when it is empty or rambles past the one-sentence bound -- context is
+    # disposable, the event's facts are not.
+    why = str(parsed.get("why_matters") or "").strip().lstrip("«")
+    if why.startswith("چرا مهم است"):
+        why = why[len("چرا مهم است"):].lstrip(":»« ‌").strip()
+    why_words = len(why.split())
+    if not (WHY_MATTERS_WORD_BOUNDS[0] <= why_words <= WHY_MATTERS_WORD_BOUNDS[1]):
+        why = ""
+    why_matters = why
     # When no member carries a date, the run's now is the observation
     # time -- a fact, not an invention (events.first_seen_at is NOT NULL;
     # writing NULL here would make INSERT OR IGNORE drop the row).
@@ -117,6 +130,7 @@ def build_event(cluster: Cluster, parsed: dict, now) -> Event:
         entities=entities,
         category=category,
         significance=significance,
+        why_matters=why_matters,
         source_count=len(cluster.members),
         first_seen_at=observed,
         last_updated_at=max(published) if published else observed,

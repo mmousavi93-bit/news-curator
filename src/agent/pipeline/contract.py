@@ -21,6 +21,11 @@ _FENCE_RE_OPEN = "```"
 # sentence mini-brief summary). Enforced HERE, not at the API boundary.
 HEADLINE_WORD_BOUNDS = (2, 25)
 SUMMARY_WORD_BOUNDS = (2, 60)
+# Optional "why it matters" context line (owner 2026-09-06). Used as a TRIM
+# in build_event, NOT a gate -- an over-long context line is dropped, never
+# sinks the event (headline/summary gate the event; context degrades
+# gracefully). Lower bound 1: anything non-empty is acceptable.
+WHY_MATTERS_WORD_BOUNDS = (1, 30)
 # A compliant digest answer is ~120 words ≈ well under 1,000 chars of JSON.
 MAX_RESPONSE_CHARS = 2000
 

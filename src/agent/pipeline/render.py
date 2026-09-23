@@ -171,6 +171,10 @@ def build_digest_items(kept: list, clusters: dict, settings, labels: dict) -> tu
         # time) and the summary are separated so the summary reads as a
         # digest paragraph, not a suffix on the timestamp.
         detail = f"{meta}\n{event.summary}" if event.summary else meta
+        if event.why_matters:
+            # Optional context line (owner 2026-09-06): a footer marked as
+            # context, not reporting -- visually distinct from the summary.
+            detail = f"{detail}\n{labels['why_matters']} {event.why_matters}"
         items.append(Item(
             headline=headline,
             priority=normal_index,

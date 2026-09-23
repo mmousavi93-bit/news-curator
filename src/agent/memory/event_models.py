@@ -62,6 +62,7 @@ class Event:
     category: str = "other"
     # War-picture impact (Session 17): escalation|balance|economy|none; in-memory; missing → "economy".
     significance: str = "economy"
+    why_matters: str = ""  # optional «چرا مهم است:» context (owner 2026-09-06); in-memory, not persisted
     claim_status: str = "unconfirmed"
     source_count: int = 0
     independent_count: int = 0

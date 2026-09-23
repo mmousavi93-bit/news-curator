@@ -8,7 +8,7 @@ min_score -- which is itself correct behaviour, tested separately."""
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -81,6 +81,7 @@ def _with_cluster(ctx: _Ctx, event: Event, source_id: str = "t2",
     return Event(event_key=cluster.key, summary=event.summary,
                  headline=event.headline, entities=event.entities,
                  category=event.category, significance=event.significance,
+                 why_matters=event.why_matters,
                  claim_status=event.claim_status,
                  independent_count=event.independent_count,
                  source_count=event.source_count,
@@ -536,6 +537,23 @@ def test_kept_events_recorded_for_delivery():
     ctx.events = [_with_cluster(ctx, _event("خلاصه نظامی اسرائیل.", category="military"))]
     ComposeStage(_Log()).run(ctx)
     assert ctx.compose_kept_keys == [ctx.events[0].event_key]
+
+
+def test_why_matters_renders_as_context_footer() -> None:
+    # owner 2026-09-06 "why it matters": the optional context line renders
+    # as a footer marked «چرا مهم است:» -- visually distinct from the summary
+    # it annotates, never folded into the reported facts.
+    from agent.pipeline.labels import labels_for
+    ctx = _Ctx(config=_config())
+    event = replace(_event("خلاصه نظامی اسرائیل.", category="military"),
+                    why_matters="این وزیر نقش کلیدی در کابینه جنگ دارد.")
+    ctx.events = [_with_cluster(ctx, event)]
+    ComposeStage(_Log()).run(ctx)
+    text = ctx.messages[0]
+    assert labels_for("fa")["why_matters"] in text
+    assert "این وزیر نقش کلیدی" in text
+    # The context line follows its summary, not the headline.
+    assert text.index("این وزیر نقش کلیدی") > text.index("خلاصه نظامی اسرائیل")
 
 
 def test_below_threshold_events_are_never_recorded_for_delivery():

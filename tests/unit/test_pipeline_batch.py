@@ -178,6 +178,18 @@ def test_build_event_significance_parsed_and_validated():
     assert build_event(cluster, _element("c1"), T0).significance == "economy"
 
 
+def test_build_event_why_matters_parsed_and_trimmed():
+    # owner 2026-09-06 "why it matters": optional context line. Present and
+    # in-bounds passes through; absent -> empty; rambling -> dropped (a TRIM,
+    # never a gate -- the event survives without its context); a leaked
+    # «چرا مهم است» prefix is stripped so it never doubles on render.
+    cluster = _cluster("https://x/why")
+    assert build_event(cluster, _element("c1", why_matters="یک جمله زمینه."), T0).why_matters == "یک جمله زمینه."
+    assert build_event(cluster, _element("c1"), T0).why_matters == ""
+    assert build_event(cluster, _element("c1", why_matters="کلمه " * 31), T0).why_matters == ""
+    assert build_event(cluster, _element("c1", why_matters="چرا مهم است: یک جمله."), T0).why_matters == "یک جمله."
+
+
 def test_render_prompt_single_path_still_works():
     cluster = _cluster("https://x/1")
     prompt = render_prompt(_TEMPLATE, cluster, 100)

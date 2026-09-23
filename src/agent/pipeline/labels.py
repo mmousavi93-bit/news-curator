@@ -73,6 +73,7 @@ LABELS: Mapping[str, Mapping[str, str]] = {
         "lead_header": "کانال سرنخها (تأییدنشده، وزن صفر)",
         "lead_prefix": "سرنخ",
         "follow_up": "پیگیری",
+        "why_matters": "چرا مهم است:",
     },
     "en": {
         "header": "News Curator",
@@ -102,6 +103,7 @@ LABELS: Mapping[str, Mapping[str, str]] = {
         "lead_header": "News Curator - lead channel (unverified, weight 0)",
         "lead_prefix": "LEAD",
         "follow_up": "FOLLOW-UP",
+        "why_matters": "why it matters:",
     },
 }
 
