@@ -666,3 +666,41 @@ sources:
     enabled: true
     topic_gate: true   # high-volume bourse feed; gate to economy keywords
     signals_covered: [H3]
+
+
+  # ADDED 2026-09-24 (r9): owner-supplied handles, probed live via t.me/s/ preview.
+  # tg_kianmeli  = Persian geo/military aggregator. Yemen/Saudi strikes, Israel-Iran
+  #                nuclear, airspace closures, Hormuz rhetoric. Low noise, high signal.
+  # tg_eco_ehsan = Ehsan Moslemi (economist) market channel. Dollar/tether/gold/oil +
+  #                sanctions effects; nominates H3 currency collapse.
+  # tg_parvaz_capital_tel = Parvaz Capital market-education channel. DISTINCT from the
+  #                CUT `parvaz_capital` handle (dead preview); this `_tel` handle is live.
+
+  - id: tg_kianmeli
+    name: Kian Meli (کیان ملی)
+    url: https://t.me/s/kianmeli1
+    type: telegram
+    lang: fa
+    topic: military
+    enabled: true
+    signals_covered: [A3, A4, A5, A6, B3, B6, D3, E1, E2, E3, E4, E5]
+
+
+  - id: tg_eco_ehsan
+    name: Ecoehsan (اکواحسان)
+    url: https://t.me/s/eco_ehsan
+    type: telegram
+    lang: fa
+    topic: macro
+    enabled: true
+    signals_covered: [H3]
+
+
+  - id: tg_parvaz_capital_tel
+    name: Parvaz Capital (پرواز کپیتال)
+    url: https://t.me/s/parvazcapital_tel
+    type: telegram
+    lang: fa
+    topic: macro
+    enabled: true
+    signals_covered: [H3]

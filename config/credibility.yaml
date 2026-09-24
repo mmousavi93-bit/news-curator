@@ -403,6 +403,24 @@ sources:
     note: "Tehran bourse/market press. r7 probe: unknown editorial provenance, so
            never tier 2. Market colour (شاخص/ارز/دلار/طلا); nominates the H3
            currency-collapse signal. Owner may upgrade later."
+  tg_kianmeli:
+    tier: 3
+    group: null
+    note: "Persian geo/military aggregator (@kianmeli1). Curated, cites sources but is
+           not an original witness. Nominates E4 proxy strikes, B6 airspace closures,
+           D3 Hormuz rhetoric. Never corroborates on its own."
+  tg_eco_ehsan:
+    tier: 3
+    group: null
+    note: "Ehsan Moslemi (economist) personal channel. Market colour (دلار/طلا/تتر/نفت)
+           plus sanctions effects; nominates H3 currency collapse. Commentary, not a
+           newsroom."
+  tg_parvaz_capital_tel:
+    tier: 3
+    group: null
+    note: "Parvaz Capital market-education channel. Distinct from the CUT
+           `tg_parvaz_capital` (dead preview); this `_tel` handle is live via t.me/s/.
+           Market colour (طلا/دلار/بورس/نفت/کریپتو); nominates H3."
 
 # --- lead class (weight 0.0). See DECISION 7. ---
   tg_padeshah_fxn:
