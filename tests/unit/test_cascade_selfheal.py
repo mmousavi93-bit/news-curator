@@ -208,3 +208,31 @@ def test_window_cap_reset_does_not_bypass_cooldown(tmp_path):
         assert stored["gemini"]["demoted_runs"] == 2
     finally:
         conn.close()
+
+
+def test_absent_provider_keeps_demotion_across_missing_key(tmp_path):
+    """A demoted provider whose adapter is NOT built this run (key missing /
+    disabled) is absent from `stats`. save_health must carry its demotion +
+    cooldown forward rather than drop the record -- dropping it would
+    re-admit the still-sick provider to slot 0 the moment its key returns."""
+    conn = _db(tmp_path)
+    models = {"gemini": "m0", "groq": "m1", "groq2": "m2", "mistral": "m3"}
+    try:
+        # Seed: gemini attempted and sick -> demoted, cooldown = 1.
+        health.save_health(conn, _all_providers(dict(SICK)), NOW, models=models)
+        stored = health.load_health(conn)
+        assert stored["gemini"]["demoted_runs"] == 1
+
+        # Next run: gemini's key is missing -> adapter not built -> absent
+        # from stats, but still listed in `models` (configured).
+        stats_without_gemini = {n: dict(HEALTHY) for n in ORDER if n != "gemini"}
+        health.save_health(conn, stats_without_gemini,
+                           NOW + timedelta(hours=1), models=models)
+        stored = health.load_health(conn)
+
+        assert "gemini" in stored
+        assert stored["gemini"]["calls"] == SICK["calls"]   # sample untouched
+        assert stored["gemini"]["demoted_runs"] == 2        # cooldown advanced
+        assert health.cascade_order(ORDER, stored)[-1] == "gemini"
+    finally:
+        conn.close()

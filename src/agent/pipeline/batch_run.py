@@ -51,13 +51,10 @@ def process_element(
     language retry sends the SINGLE-cluster prompt (understand.txt's
     contract), so a drifting batch-mate is recovered with exactly today's
     retry, one extra call, batch-mates untouched."""
-    ok_bounds, bounds_reason = within_bounds(parsed, 0)
-    if not ok_bounds:
-        logger.error(
-            "understand: cluster %s out of contract -- skipped (%s)",
-            cluster.key, bounds_reason,
-        )
-        return None, "oversized"
+    # Content filter FIRST: an irrelevant/clickbait cluster is discarded on
+    # scope, so its summary bounds are moot -- validating them first (the old
+    # order) fated such clusters "oversized" and UNDERCOUNTED `irrelevant` in
+    # the run CSV, hiding the true size of the wasted-LLM-budget signal.
     if parsed.get("clickbait") or parsed.get("irrelevant"):
         logger.info(
             "understand: cluster %s dropped by content filter "
@@ -66,6 +63,13 @@ def process_element(
             bool(parsed.get("irrelevant")),
         )
         return None, "clickbait" if parsed.get("clickbait") else "irrelevant"
+    ok_bounds, bounds_reason = within_bounds(parsed, 0)
+    if not ok_bounds:
+        logger.error(
+            "understand: cluster %s out of contract -- skipped (%s)",
+            cluster.key, bounds_reason,
+        )
+        return None, "oversized"
     event = build_event(cluster, parsed, ctx.now)
     if drifts_from_persian(event.headline, event.summary):
         replacement, retry_status = recovery_payload(

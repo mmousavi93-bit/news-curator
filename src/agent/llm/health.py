@@ -81,7 +81,17 @@ def save_health(conn: sqlite3.Connection, stats: Mapping[str, Mapping[str, int]]
         except ValueError:
             fresh = {}
     merged: dict[str, dict] = {"_last_run": now.isoformat()}
-    for name, entry in stats.items():
+    # A configured provider ABSENT from `stats` (its adapter was not built
+    # this run -- key missing, disabled, or no model) must not silently lose
+    # its health record: a demotion + cooldown would vanish and the provider
+    # would re-admit to slot 0 the moment its key returns. Treat every
+    # still-configured provider that `stats` omitted as "not attempted" this
+    # run, judged on its PREVIOUS sample.
+    names: set[str] = set(stats)
+    if models is not None:
+        names.update(models)
+    for name in names:
+        entry = stats.get(name, {"calls": 0, "failed": 0})
         prev = fresh.get(name, {}) if isinstance(fresh.get(name), Mapping) else {}
         # A model id change means the sample was recorded against a DIFFERENT
         # model: start fresh rather than let a dead alias poison the new one.
