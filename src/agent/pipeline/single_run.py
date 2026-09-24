@@ -77,7 +77,6 @@ def run_single(
                     "understand: cluster %s skipped (status=%s)", cluster.key, result.status
                 )
             cluster_fates.append((cluster.key, result.status))
-            fate_reasons[cluster.key] = result.status
             continue
         saw_success = True  # the AI answered; parse quality is separate
 

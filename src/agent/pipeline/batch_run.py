@@ -158,8 +158,6 @@ def run_batches(
                     len(batch), batch[0].key[:8], result.status,
                 )
             cluster_fates.extend((c.key, result.status) for c in batch)
-            for c in batch:
-                fate_reasons[c.key] = result.status
             continue
         saw_success = True  # the AI answered; parse quality is separate
 
