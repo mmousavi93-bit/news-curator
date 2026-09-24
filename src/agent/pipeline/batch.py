@@ -167,7 +167,9 @@ def map_results(
     for index, element in enumerate(parsed if isinstance(parsed, list) else []):
         if not isinstance(element, dict):
             logger.error(
-                "understand: batch element %d is not an object -- discarded", index
+                "understand: batch element %d is not an object (type=%s) -- "
+                "discarded: %r",
+                index, type(element).__name__, str(element)[:160],
             )
             continue
         echoed = element.get("key")

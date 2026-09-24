@@ -199,10 +199,28 @@ def run_batches(
         for cluster in batch:
             element = mapped[cluster.key]
             if element is None:
-                # The model omitted this cluster from its array. No content
-                # arrived for it; batch-mates ship (brief requirement 1).
+                # The model omitted this cluster from its array (or emitted a
+                # non-object element for it). No content arrived in the batch,
+                # so retry the cluster ONCE with the single-object contract --
+                # the small free-tier model (ministral) answers one strict JSON
+                # object reliably but flaked on the array form in the live
+                # 2026-09-24 run (4/6 batches were non-object elements).
+                recovered, status = recovery_payload(
+                    ctx.router, render_prompt(single_template, cluster, body_chars)
+                )
+                if recovered is not None:
+                    event_provider[cluster.key] = result.provider or ""
+                    events.append(build_event(cluster, recovered, ctx.now))
+                    logger.info(
+                        "understand: cluster %s omitted from batch -- recovered "
+                        "via single-object retry",
+                        cluster.key,
+                    )
+                    continue
                 cluster_fates.append((cluster.key, "unavailable"))
-                fate_reasons[cluster.key] = "missing from response array"
+                fate_reasons[cluster.key] = (
+                    f"missing from response array; single-object retry {status}"
+                )
                 continue
             event, fate, reason = process_element(
                 ctx, cluster, element, logger, single_template, body_chars,

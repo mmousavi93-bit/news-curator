@@ -219,28 +219,57 @@ def test_batched_run_all_good_one_call_per_batch():
     assert ctx.llm_failed is False
 
 
-def test_batched_run_malformed_element_costs_one_summary_not_the_batch():
+def test_batched_run_malformed_element_recovered_via_single_retry():
+    # A non-object element (e.g. ministral emitting a string) orphans its
+    # cluster; that cluster is retried ONCE with the single-object contract,
+    # so the malformed element costs zero summaries instead of one.
     stage, log = _stage(batch_size=2)
     a, b = _cluster("https://x/ma"), _cluster("https://x/mb")
-    ctx = _Ctx(clusters=[a, b],
-               router=_StubRouter([_batch_result([_element("c2"), "garbage"])]))
+    recovered = json.dumps({"headline": "حمله در تنگه هرمز", "summary": "جزئیات حادثه.",
+                            "entities": ["IRGC"], "clickbait": False, "irrelevant": False})
+    router = _StubRouter([_batch_result([_element("c2"), "garbage"]),
+                          _ok(recovered)])
+    ctx = _Ctx(clusters=[a, b], router=router)
     stage.run(ctx)
-    assert len(ctx.events) == 1  # batch-mate shipped
-    assert ctx.events[0].event_key == b.key
-    fates = dict(ctx.cluster_fates)
-    assert fates[a.key] == "unavailable"  # malformed -> individually unavailable
-    assert b.key not in fates
+    assert len(ctx.events) == 2  # batch-mate AND the recovered orphan
+    assert {e.event_key for e in ctx.events} == {a.key, b.key}
+    assert len(router.prompts) == 2
+    assert "## cluster" not in router.prompts[1]  # single-object retry
+    assert "PERSIAN" in router.prompts[1]
+    assert any("recovered" in m for m in log.messages)
 
 
-def test_batched_run_missing_element_batch_mates_ship():
+def test_batched_run_missing_element_recovered_via_single_retry():
+    # A cluster the model silently omitted from the array is retried ONCE
+    # with the single-object contract (ministral answers one strict JSON
+    # object reliably; it flakes on the array form). One extra call.
+    stage, log = _stage(batch_size=2)
+    a, b = _cluster("https://x/rc"), _cluster("https://x/rd")
+    recovered = json.dumps({"headline": "حمله در تنگه هرمز", "summary": "جزئیات حادثه.",
+                            "entities": ["IRGC"], "clickbait": False, "irrelevant": False})
+    router = _StubRouter([_batch_result([_element("c1")]), _ok(recovered)])
+    ctx = _Ctx(clusters=[a, b], router=router)
+    stage.run(ctx)
+    assert len(ctx.events) == 2
+    assert {e.event_key for e in ctx.events} == {a.key, b.key}
+    assert len(router.prompts) == 2
+    assert "## cluster" not in router.prompts[1]
+    assert any("recovered" in m for m in log.messages)
+
+
+def test_batched_run_missing_element_recovery_failure_stays_unavailable():
+    # When the single-object retry ALSO fails (provider unavailable), the
+    # cluster stays unavailable -- no content, never a fabrication.
     stage, _ = _stage(batch_size=2)
     a, b = _cluster("https://x/na"), _cluster("https://x/nb")
-    ctx = _Ctx(clusters=[a, b],
-               router=_StubRouter([_batch_result([_element("c1")])]))
+    router = _StubRouter([_batch_result([_element("c1")]),
+                          LlmResult(ok=False, status=UNAVAILABLE)])
+    ctx = _Ctx(clusters=[a, b], router=router)
     stage.run(ctx)
-    assert len(ctx.events) == 1
+    assert len(ctx.events) == 1  # only the batch-mate ships
     assert ctx.events[0].event_key == a.key
     assert dict(ctx.cluster_fates)[b.key] == "unavailable"
+    assert len(router.prompts) == 2  # one batch call + one retry
 
 
 def test_batched_run_clickbait_element_filters_only_that_cluster():
