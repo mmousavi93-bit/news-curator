@@ -163,6 +163,24 @@ pipeline:
   # never the file size.
   samerun_pair_log_floor: 0.40
 
+  # PRE-LLM DROP -- gated OFF until CI calibration. Drops obviously
+  # off-mission clusters (max cosine to the mission anchors) BEFORE the LLM
+  # and the cap, so the ~46% of the understand budget spent classifying
+  # clusters later discarded as `irrelevant` (last-day runs: 66/142, 70/150)
+  # is saved instead. Two guards (pipeline/prellm_drop.py):
+  #   1. enabled=false => calibration mode: the stage only LOGS the score
+  #      distribution and writes each cluster's score to chosen.csv's
+  #      prellm_score column. It drops NOTHING.
+  #   2. keyword guard: a cluster priority.is_on_mission marks on-mission is
+  #      NEVER dropped, whatever its embedding score (embedding similarity
+  #      is a weaker judge than the LLM; the lexical signal is the last word).
+  # threshold is a max-cosine to DEFAULT_ANCHOR_TEXTS. Set it only after the
+  # chosen.csv prellm_score column shows a clear irrelevant/kept separation
+  # (tools/calibrate_prellm_threshold.py). Placeholder until then -- ignored
+  # while enabled=false.
+  prellm_drop_enabled: false
+  prellm_drop_threshold: 0.35
+
 # ---------------------------------------------------------------------------
 # RETENTION
 # ---------------------------------------------------------------------------

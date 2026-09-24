@@ -28,6 +28,8 @@ pipeline:
   embed_model: "paraphrase-multilingual-MiniLM-L12-v2"
   item_body_chars: 600
   samerun_pair_log_floor: 0.40
+  prellm_drop_enabled: false
+  prellm_drop_threshold: 0.35
 
 retention:
   url_hashes_days: 7

@@ -30,6 +30,24 @@ def _cluster_text(cluster: "Cluster") -> str:
     return "\n".join(f"{member.title}\n{member.body}" for member in cluster.members)
 
 
+def is_on_mission(cluster: "Cluster", config: Config) -> bool:
+    """The keyword-relevance binary the cap sort uses (`on_mission`): a
+    cluster is on-mission when it has a non-lead tier AND its text matches a
+    relevance keyword. A `lead` cluster (max_tier_weight 0.0, LEAD_HANDLING)
+    is always off-mission regardless of what score_relevance returns.
+
+    Single source of truth, shared by three consumers so they never drift:
+      * _priority_key below (cap ordering -- the demotion, never a drop);
+      * pipeline/prellm_drop.py (the keyword GUARD: an on-mission cluster is
+        never dropped by the pre-LLM gate, whatever its embedding score);
+      * report_csv_chosen.py (the machine-readable `on_mission` column).
+    """
+    tier_weight = cluster.max_tier_weight(
+        config.credibility, config.settings.scoring.tier_multipliers
+    )
+    return tier_weight > 0 and score_relevance(config.relevance, _cluster_text(cluster)) > 0
+
+
 def _priority_key(config: Config):
     """Sort key: ON-MISSION (binary) desc, then tier weight desc, then
     CORROBORATING SOURCE COUNT desc (capped), then recency desc, then size
@@ -65,14 +83,10 @@ def _priority_key(config: Config):
     """
     multipliers = config.settings.scoring.tier_multipliers
     credibility = config.credibility
-    relevance = config.relevance
 
     def key(cluster: "Cluster") -> tuple[int, float, int, float, int]:
+        on_mission = 1 if is_on_mission(cluster, config) else 0
         tier_weight = cluster.max_tier_weight(credibility, multipliers)
-        on_mission = 1 if (
-            tier_weight > 0
-            and score_relevance(relevance, _cluster_text(cluster)) > 0
-        ) else 0
         return (
             -on_mission,
             -tier_weight,

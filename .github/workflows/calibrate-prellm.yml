@@ -1,0 +1,62 @@
+name: calibrate-prellm
+
+# Rebuilds the last 7 days of run-reports artifacts against the real MiniLM
+# embedder, re-scores every historical cluster, and runs the offline
+# threshold analyzer. Produces calibration_rows.csv + curve.json + report.txt
+# so the pre-LLM drop threshold is set from measured evidence, not a guess.
+#
+# Purely additive and read-only w.r.t. the pipeline: it never touches a run,
+# never writes config, and the drop gate stays disabled (prellm_drop_enabled:
+# false) until a human reads the report and flips the threshold.
+
+on:
+  workflow_dispatch:
+  schedule:
+    # weekly, Monday 04:30 UTC -- refreshes the evidence after each week of runs
+    - cron: "30 4 * * 1"
+
+permissions:
+  contents: read
+  actions: read   # required to list + download workflow run artifacts
+
+jobs:
+  calibrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Cache MiniLM model
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-${{ runner.os }}-minilm-v1
+
+      - name: Install package (embeddings extra included)
+        run: pip install -e ".[embeddings]"
+
+      - name: Download last 7 days of run-reports artifacts
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python tools/download_run_reports.py --days 7 --out calibration/runs
+
+      - name: Rebuild + re-score historical clusters
+        run: python tools/score_historical_prellm.py calibration/runs --out calibration/calibration_rows.csv
+
+      - name: Calibrate threshold
+        run: |
+          set -o pipefail
+          python tools/calibrate_prellm_threshold.py calibration/calibration_rows.csv --json-out calibration/curve.json | tee calibration/report.txt
+
+      - name: Upload calibration evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prellm-calibration
+          path: calibration/**
+          retention-days: 30
+          if-no-files-found: ignore

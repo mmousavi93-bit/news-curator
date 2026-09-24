@@ -10,9 +10,8 @@ from __future__ import annotations
 import csv
 from pathlib import Path
 
-from agent.pipeline.priority import _cluster_text
+from agent.pipeline.priority import is_on_mission
 from agent.pipeline.rank import score_event
-from agent.pipeline.relevance import score_relevance
 from agent.report_csv_helpers import _best_tier, _sources
 
 
@@ -93,15 +92,22 @@ def _write_chosen(ctx, path: Path) -> Path:
         writer = csv.writer(fh)
         writer.writerow(["cluster_key", "fate", "reason", "n_members", "sources",
                          "provider", "best_tier", "category", "significance",
-                         "claim_status", "independent_count", "score", "headline",
-                         "summary"])
+                         "claim_status", "independent_count", "score",
+                         "prellm_score", "on_mission", "headline", "summary"])
         providers = getattr(ctx, "cluster_provider", None) or {}
+        # pre-LLM drop probe (prellm_drop.py): per-cluster max cosine to the
+        # mission anchors, recorded even when the gate is disabled -- this is
+        # the calibration signal (see tools/calibrate_prellm_threshold.py).
+        prellm_scores = getattr(ctx, "prellm_scores", None) or {}
         for cluster in clusters:
             event = events_by_key.get(cluster.key)
             fate, reason = _fate_for(cluster.key, events_by_key, ctx)
             score = ""
             if event is not None:
                 score = f"{score_event(event, cluster, credibility, ctx.config.settings, ctx.now):.3f}"
+            raw_prellm = prellm_scores.get(cluster.key)
+            prellm_score = f"{raw_prellm:.4f}" if raw_prellm is not None else ""
+            on_mission = 1 if is_on_mission(cluster, ctx.config) else 0
             writer.writerow([
                 cluster.key, fate, reason, len(cluster.members),
                 _sources(cluster), providers.get(cluster.key, ""),
@@ -111,6 +117,8 @@ def _write_chosen(ctx, path: Path) -> Path:
                 getattr(event, "claim_status", "") if event else "",
                 getattr(event, "independent_count", "") if event else "",
                 score,
+                prellm_score,
+                on_mission,
                 # Gate forensics need the text (the Masafer Yatta lesson:
                 # a drop is unjudgeable without the words the gate saw).
                 # Empty for fates recorded before an event existed.
@@ -122,8 +130,6 @@ def _write_chosen(ctx, path: Path) -> Path:
         # log line -- 36 of them on 2026-09-05, unauditable. The raw source
         # title goes in the headline column on purpose: `grep` over this one
         # file is the audit, and it has to reach cap losses too.
-        multipliers = ctx.config.settings.scoring.tier_multipliers
-        relevance = ctx.config.relevance
         for cluster in getattr(ctx, "clusters_cap_dropped", None) or []:
             title = (cluster.members[0].title or cluster.members[0].body or "").strip()
             # Fix 5, round-4 review: priority.py's actual cap sort key is
@@ -134,12 +140,12 @@ def _write_chosen(ctx, path: Path) -> Path:
             # cluster.py). Without on_mission/corroborating_count in the
             # reason, a cap_dropped row could not be checked against the
             # sort that actually produced it -- the owner would have to
-            # re-derive both from read.csv by hand.
-            tier_weight = cluster.max_tier_weight(credibility, multipliers)
-            on_mission = 1 if (
-                tier_weight > 0
-                and score_relevance(relevance, _cluster_text(cluster)) > 0
-            ) else 0
+            # re-derive both from read.csv by hand. is_on_mission is the
+            # single source of truth shared with that sort and the pre-LLM
+            # drop guard (priority.py), so the three can never drift.
+            on_mission = 1 if is_on_mission(cluster, ctx.config) else 0
+            raw_prellm = prellm_scores.get(cluster.key)
+            prellm_score = f"{raw_prellm:.4f}" if raw_prellm is not None else ""
             corroborating = cluster.corroborating_count(credibility)
             reason = (
                 f"over max_clusters_per_run; no LLM call. "
@@ -150,6 +156,27 @@ def _write_chosen(ctx, path: Path) -> Path:
                 len(cluster.members), _sources(cluster), "",
                 _best_tier(cluster, credibility),
                 "", "", "", cluster.independent_count(credibility), "",
-                title[:300], "",
+                prellm_score, on_mission, title[:300], "",
+            ])
+        # Clusters the pre-LLM drop cut before the cap or the LLM (only when
+        # prellm_drop_enabled -- otherwise this list is empty). Same audit
+        # contract as cap_dropped: raw source title + the score that dropped
+        # it, so a threshold call can be checked against both the words and
+        # the number. on_mission is 0 by construction (the keyword guard
+        # keeps on-mission clusters whatever their embedding score).
+        for cluster in getattr(ctx, "clusters_prellm_dropped", None) or []:
+            title = (cluster.members[0].title or cluster.members[0].body or "").strip()
+            raw_prellm = prellm_scores.get(cluster.key)
+            prellm_score = f"{raw_prellm:.4f}" if raw_prellm is not None else ""
+            reason = (
+                f"below prellm_drop_threshold; no LLM call. "
+                f"prellm_score={prellm_score}"
+            )
+            writer.writerow([
+                cluster.key, "prellm_dropped", reason,
+                len(cluster.members), _sources(cluster), "",
+                _best_tier(cluster, credibility),
+                "", "", "", cluster.independent_count(credibility), "",
+                prellm_score, 0, title[:300], "",
             ])
     return path

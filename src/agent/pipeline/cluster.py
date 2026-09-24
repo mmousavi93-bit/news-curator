@@ -25,6 +25,7 @@ from agent.pipeline.priority import (  # noqa: F401  (re-exported for callers)
     rank_and_truncate,
     split_at_cap,
 )
+from agent.pipeline.prellm_drop import prellm_pass
 
 # Items with no published_at sort as ancient, so undated items cluster last
 # rather than crowding out dated coverage.
@@ -167,12 +168,19 @@ class ClusterStage:
         clusters = cluster_items(
             items, vectors, self._config.settings.pipeline.cluster_similarity_threshold
         )
+        # Pre-LLM drop (gated off by default -- logs the score distribution
+        # and records per-cluster scores, drops nothing until calibrated).
+        clusters, prellm_dropped, prellm_scores = prellm_pass(
+            clusters, self._config, getattr(ctx, "embedder", None), self._logger
+        )
         clusters, dropped = split_at_cap(
             clusters, self._config.settings.pipeline.max_clusters_per_run,
             self._config, self._logger,
         )
         ctx.clusters = clusters
         ctx.clusters_cap_dropped = dropped
+        ctx.clusters_prellm_dropped = prellm_dropped
+        ctx.prellm_scores = prellm_scores
         ctx.counters["cluster"] = len(clusters)
         self._logger.info(
             "cluster: %d items -> %d clusters (threshold %.2f)",

@@ -44,6 +44,12 @@ class PipelineSettings:
     item_body_chars: int
     # Session 9s: pairs_csv row-count floor, NOT a threshold (settings.yaml).
     samerun_pair_log_floor: float
+    # Pre-LLM drop (prellm_drop.py): enabled=false logs the score
+    # distribution and records per-cluster scores into chosen.csv but drops
+    # NOTHING (calibration mode). The threshold is a max-cosine to the
+    # mission anchors, used only when enabled.
+    prellm_drop_enabled: bool
+    prellm_drop_threshold: float
 
 
 @dataclass(frozen=True, slots=True)
@@ -177,7 +183,8 @@ SECTIONS: tuple[tuple[str, type, tuple[str, ...]], ...] = (
     ("pipeline", PipelineSettings,
      ("max_clusters_per_run", "max_vision_calls_per_run", "cluster_similarity_threshold",
       "event_match_threshold", "vision_min_image_bytes", "embed_model",
-      "item_body_chars", "samerun_pair_log_floor")),
+      "item_body_chars", "samerun_pair_log_floor",
+      "prellm_drop_enabled", "prellm_drop_threshold")),
     ("retention", RetentionSettings,
      ("url_hashes_days", "events_days", "embeddings_days", "signal_events_days",
       "speaker_statements_days", "score_history_days", "scheduled_events_days")),
