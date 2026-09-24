@@ -44,8 +44,27 @@ def _get_json(url: str, token: str):
 
 def _download(url: str, token: str) -> bytes:
     request = urllib.request.Request(url, headers=_headers(token))
-    with urllib.request.urlopen(request, timeout=120) as resp:
+    opener = urllib.request.build_opener(_NoRedirect())
+    try:
+        resp = opener.open(request, timeout=120)
+    except urllib.error.HTTPError as err:
+        if err.code not in (301, 302, 307, 308):
+            raise
+        location = err.headers.get("Location")
+        if not location:
+            raise
+        # The artifact zip redirects to an Azure Blob signed URL. urllib would
+        # forward the Authorization header cross-host, which Azure rejects with
+        # a 401 -- the signed URL is self-authenticating, so re-request it bare.
+        with urllib.request.urlopen(location, timeout=120) as r2:
+            return r2.read()
+    with resp:
         return resp.read()
+
+
+class _NoRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, *args, **kwargs):
+        return None
 
 
 def main(argv=None) -> int:
@@ -77,7 +96,7 @@ def main(argv=None) -> int:
     out.mkdir(parents=True, exist_ok=True)
     for artifact in recent:
         target = out / str(artifact["id"])
-        if target.exists():
+        if target.exists() and list(target.rglob("read_*.csv")):
             print(f"have {artifact['id']} ({created(artifact):%Y-%m-%d}), skip", file=sys.stderr)
             continue
         target.mkdir(parents=True, exist_ok=True)

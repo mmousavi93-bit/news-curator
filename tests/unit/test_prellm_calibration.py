@@ -161,9 +161,47 @@ def test_render_report_states_the_verdict_and_catch():
     assert "drops 1 of 2 waste clusters" in text
 
 
+def test_dropped_anyway_clusters_are_not_keep_losses():
+    # A cap_dropped cluster below threshold is NOT a kept story lost -- the
+    # pre-LLM drop removing it is pure budget savings. keep_lost must count
+    # only sent-producing fates.
+    rows = [
+        Row(fate="irrelevant", score=0.10, on_mission=False),
+        Row(fate="cap_dropped", score=0.15, on_mission=False),  # dropped-anyway
+        Row(fate="sent", score=0.40, on_mission=False),
+    ]
+    points = {round(p.threshold, 2): p for p in sweep(rows, steps=101)}
+    assert points[0.30].waste_caught == 1
+    assert points[0.30].keep_lost == 0          # cap_dropped must not count
+    assert points[0.30].keep_total == 1          # only the sent row
+    best = recommend(sweep(rows, steps=101))
+    assert best is not None
+    assert best.waste_caught == 1
+    assert best.keep_lost == 0
+    assert best.threshold <= 0.40
+
+
+def test_other_bucket_separates_dropped_anyway():
+    from agent.pipeline.prellm_calibration import Loaded
+    loaded = Loaded(rows=[
+        Row(fate="sent", score=0.80, on_mission=False),
+        Row(fate="sent_followup", score=0.60, on_mission=False),
+        Row(fate="lead_only", score=0.55, on_mission=False),
+        Row(fate="irrelevant", score=0.10, on_mission=False),
+        Row(fate="repeat_dropped", score=0.20, on_mission=False),
+        Row(fate="oversized", score=0.25, on_mission=False),
+        Row(fate="rank_dropped", score=0.30, on_mission=False),
+    ])
+    assert len(loaded.keep) == 3
+    assert len(loaded.waste) == 1
+    assert len(loaded.other) == 3
+    assert {r.fate for r in loaded.other} == {"repeat_dropped", "oversized", "rank_dropped"}
+
+
 def test_empty_rows_is_not_a_crash():
     from agent.pipeline.prellm_calibration import Loaded
     loaded = Loaded()
     assert sweep(loaded.rows) == []
     assert recommend([]) is None
     assert "scored clusters : 0" in render_report(loaded, [])
+

@@ -28,6 +28,14 @@ from pathlib import Path
 # only rows the drop is trying to save budget on.
 WASTE_FATES = frozenset({"irrelevant", "clickbait"})
 
+# The fates that actually produced a sent story. Losing one of these to the
+# pre-LLM drop is the only real cost. Everything ELSE (repeat_dropped,
+# cap_dropped, oversized, rank_dropped, lang_dropped, relevance_dropped,
+# unparseable) never produces a story and is dropped later anyway, so a
+# threshold that removes it pre-LLM is budget savings, not a loss -- it is
+# reported separately and never counted in keep_lost.
+KEEP_FATES = frozenset({"sent", "sent_followup", "lead_only"})
+
 
 @dataclass(frozen=True, slots=True)
 class Row:
@@ -41,6 +49,10 @@ class Row:
     @property
     def is_waste(self) -> bool:
         return self.fate in WASTE_FATES
+
+    @property
+    def is_keep(self) -> bool:
+        return self.fate in KEEP_FATES
 
 
 @dataclass
@@ -57,7 +69,14 @@ class Loaded:
 
     @property
     def keep(self) -> list[Row]:
-        return [r for r in self.rows if not r.is_waste]
+        return [r for r in self.rows if r.is_keep]
+
+    @property
+    def other(self) -> list[Row]:
+        """Dropped-anyway clusters (repeat/cap/oversized/rank/lang/...): never
+        sent, dropped later by a cheaper gate or the cap. Removing them early
+        saves budget but is neither waste caught nor a kept story lost."""
+        return [r for r in self.rows if not r.is_waste and not r.is_keep]
 
 
 @dataclass(frozen=True, slots=True)
@@ -126,7 +145,7 @@ def sweep(rows, steps: int = 101) -> list[Point]:
     if not rows:
         return []
     waste_total = sum(1 for r in rows if r.is_waste)
-    keep_total = len(rows) - waste_total
+    keep_total = sum(1 for r in rows if r.is_keep)
     points = []
     for index in range(steps):
         threshold = index / (steps - 1)
@@ -135,7 +154,7 @@ def sweep(rows, steps: int = 101) -> list[Point]:
             threshold=threshold,
             waste_caught=sum(1 for r in droppable if r.is_waste),
             waste_total=waste_total,
-            keep_lost=sum(1 for r in droppable if not r.is_waste),
+            keep_lost=sum(1 for r in droppable if r.is_keep),
             keep_total=keep_total,
         ))
     return points
@@ -165,7 +184,9 @@ def render_report(loaded: Loaded, points: list[Point]) -> str:
     lines = [
         f"scored clusters : {len(loaded.rows)}",
         f"  waste (irrelevant/clickbait fate) : {len(loaded.waste)}",
-        f"  kept  (everything else)           : {len(loaded.keep)}",
+        f"  kept  (sent/sent_followup/lead_only) : {len(loaded.keep)}",
+        f"  other (dropped later anyway)      : {len(loaded.other)} -- budget the",
+        "        drop can also save pre-LLM, not scored as waste or loss",
     ]
     if loaded.unscored:
         lines.append(f"  SKIPPED (no prellm_score)         : {loaded.unscored}")
