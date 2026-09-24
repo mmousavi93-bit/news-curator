@@ -163,18 +163,22 @@ def run_batches(
 
         try:
             parsed = extract_json_array(result.text)
-        except ValueError:
-            # Includes the single-object-against-the-array-contract case:
-            # no safe per-cluster mapping exists -- guessing "the first
-            # cluster" invents content (constraint 11).
+        except ValueError as exc:
+            # Any parse failure -- invalid JSON (truncated), a single object
+            # against the array contract, or a scalar. The repair ladder in
+            # extract_json_array already salvaged whatever was unambiguously
+            # an array; what remains is unmappable without inventing content
+            # (constraint 11). The precise message (truncated vs object vs
+            # scalar) is persisted so the failure mode is calibratable from
+            # chosen_*.csv, not just the run log.
             logger.error(
                 "understand: batch of %d (first cluster %s) response "
-                "unparseable -- skipped",
-                len(batch), batch[0].key[:8],
+                "unparseable (%s) -- skipped",
+                len(batch), batch[0].key[:8], exc,
             )
             cluster_fates.extend((c.key, "unparseable") for c in batch)
             for c in batch:
-                fate_reasons[c.key] = "response not a JSON array"
+                fate_reasons[c.key] = str(exc) or "unparseable response"
             continue
         if len(result.text or "") > MAX_RESPONSE_CHARS * len(batch):
             # contract.py's raw-length cap scaled by batch size: a ramble

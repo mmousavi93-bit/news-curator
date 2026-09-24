@@ -146,12 +146,101 @@ def extract_json(text: str) -> dict:
     return parsed
 
 
+# Keys a model may use when it wraps the batch array in an object. Only a
+# list OF DICTS carrying a "key" field qualifies as the array -- an element's
+# own list fields (e.g. `entities`, a list of strings) must never be mistaken
+# for it (constraint 11).
+_WRAPPER_KEY_HINTS = (
+    "results", "clusters", "items", "summaries", "events", "entries", "data", "output",
+)
+
+
+def _is_element_array(value) -> bool:
+    """The batch array's elements are dicts carrying the echoed `key` field
+    (`map_results` maps by it). Anything else is not the array."""
+    return isinstance(value, list) and all(
+        isinstance(e, dict) and "key" in e for e in value
+    )
+
+
+def _unwrap_wrapped_array(obj: dict) -> list | None:
+    """Return the array a model wrapped in an object, or None when there is
+    no unambiguous one. Prefer a single element-array value; fall back to a
+    single element-array under a known wrapper key. The single-object case
+    (a dict whose fields ARE one cluster) has no element-array value and
+    returns None -- it stays unparseable, since guessing a per-cluster
+    mapping invents content (constraint 11)."""
+    arrays = [v for v in obj.values() if _is_element_array(v)]
+    if len(arrays) == 1:
+        return arrays[0]
+    hinted = [v for k, v in obj.items()
+              if _is_element_array(v) and k.lower() in _WRAPPER_KEY_HINTS]
+    if len(hinted) == 1:
+        return hinted[0]
+    return None
+
+
+def _scan_first_array(text: str) -> list | None:
+    """Bracket-scan the first balanced `[...]` that parses to a list.
+
+    Handles a model that prefixes prose before the array or appends trailing
+    text. Deterministic and bounded -- it re-parses text the model already
+    produced, never invents content (constraint 11)."""
+    start = text.find("[")
+    while start != -1:
+        depth = 0
+        in_str = False
+        escaped = False
+        for i in range(start, len(text)):
+            ch = text[i]
+            if in_str:
+                if escaped:
+                    escaped = False
+                elif ch == "\\":
+                    escaped = True
+                elif ch == '"':
+                    in_str = False
+                continue
+            if ch == '"':
+                in_str = True
+            elif ch == "[":
+                depth += 1
+            elif ch == "]":
+                depth -= 1
+                if depth == 0:
+                    candidate = text[start:i + 1]
+                    try:
+                        parsed = json.loads(candidate)
+                    except ValueError:
+                        break  # span isn't valid JSON; advance to the next '['
+                    return parsed if isinstance(parsed, list) else None
+        start = text.find("[", start + 1)
+    return None
+
+
 def extract_json_array(text: str) -> list:
     """The batch contract (session 9s): the response is a JSON ARRAY, one
-    object per cluster. A single-object answer against the array contract
-    is unparseable by definition -- guessing "the first cluster" invents
-    content (constraint 11)."""
-    parsed = json.loads(_strip_fences(text))
-    if not isinstance(parsed, list):
-        raise ValueError("response is not a JSON array")
-    return parsed
+    object per cluster.
+
+    Repair ladder before failing (zero LLM cost): (1) an object wrapping the
+    array -> unwrap its element-array value; (2) prose-wrapped / trailing
+    junk -> scan the first balanced `[...]`. Only an unambiguous ARRAY is
+    accepted; a dict whose fields ARE the clusters (the single-object case)
+    still raises, because guessing the per-cluster mapping invents content
+    (constraint 11)."""
+    stripped = _strip_fences(text)
+    try:
+        parsed = json.loads(stripped)
+    except ValueError:
+        arr = _scan_first_array(stripped)
+        if arr is not None:
+            return arr
+        raise ValueError("response is not valid JSON") from None
+    if isinstance(parsed, list):
+        return parsed
+    if isinstance(parsed, dict):
+        arr = _unwrap_wrapped_array(parsed)
+        if arr is not None:
+            return arr
+        raise ValueError("response is a JSON object, not an array") from None
+    raise ValueError("response is not a JSON array (scalar)")

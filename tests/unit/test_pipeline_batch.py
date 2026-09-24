@@ -11,6 +11,8 @@ fixture drift). No network, no MiniLM (mock mode, brief requirement 8).
 from __future__ import annotations
 
 import json
+
+import pytest
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -19,7 +21,7 @@ from agent.collectors.base import Item
 from agent.llm.errors import LlmResult, REFUSED_CAP, UNAVAILABLE
 from agent.pipeline.batch import build_event, build_payload, chunk, map_results, render_prompt
 from agent.pipeline.cluster import cluster_items
-from agent.pipeline.contract import MAX_RESPONSE_CHARS
+from agent.pipeline.contract import MAX_RESPONSE_CHARS, extract_json_array
 from agent.pipeline.understand import UnderstandStage
 
 _REPO_ROOT = Path(__file__).parent.parent.parent
@@ -291,6 +293,40 @@ def test_batched_run_non_array_response_fates_all_unparseable():
     assert ctx.events == []
     fates = dict(ctx.cluster_fates)
     assert fates[a.key] == "unparseable" and fates[b.key] == "unparseable"
+
+
+def test_extract_json_array_unwraps_wrapped_object():
+    # A model that wraps the batch array in an object (e.g. {"results": [...]})
+    # is salvageable -- the array is unambiguous, so no content is invented.
+    wrapped = {"results": [_element("c1"), _element("c2")]}
+    assert extract_json_array(json.dumps(wrapped)) == wrapped["results"]
+
+
+def test_extract_json_array_does_not_mistake_entities_for_array():
+    # The single-object-against-array case: an element's own `entities` field
+    # is a list of strings, NOT the array -- unwrapping it would invent a
+    # per-cluster mapping (constraint 11). It must still raise.
+    with pytest.raises(ValueError, match="object, not an array"):
+        extract_json_array(json.dumps(_element("c1")))
+
+
+def test_extract_json_array_scans_prose_wrapped_array():
+    # A model that prefixes prose before the array is salvageable by scanning
+    # for the first balanced `[...]`.
+    text = "Sure, here is the result:\n" + json.dumps([_element("c1"), _element("c2")])
+    assert extract_json_array(text) == [_element("c1"), _element("c2")]
+
+
+def test_extract_json_array_rejects_truncated_json():
+    # Truncation (max_tokens cut mid-JSON) leaves no balanced array: the
+    # repair ladder must decline to guess the missing tail (constraint 11).
+    with pytest.raises(ValueError, match="not valid JSON"):
+        extract_json_array('[{"key": "c1", "headline": "H", "summary": "S"')
+
+
+def test_extract_json_array_rejects_scalar():
+    with pytest.raises(ValueError, match="scalar"):
+        extract_json_array('"just a string"')
 
 
 def test_batched_run_oversized_element_fated_individually():
