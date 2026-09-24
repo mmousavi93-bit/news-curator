@@ -44,6 +44,7 @@ class ProviderSettings:
     halt_on_budget_exceeded: bool | None = None
     input_usd_per_mtok: float | None = None
     output_usd_per_mtok: float | None = None
+    batch_size: int | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -67,6 +68,7 @@ _PROVIDER_FIELDS: dict[str, type] = {
     "halt_on_budget_exceeded": bool,
     "input_usd_per_mtok": float,
     "output_usd_per_mtok": float,
+    "batch_size": int,
 }
 _PROVIDER_REQUIRED: tuple[str, ...] = ("supports_vision",)
 
@@ -191,3 +193,18 @@ def build_llm(raw: Any, errors: list[str]) -> dict[str, Any]:
         if key in raw:
             result[key] = raw[key]
     return result
+
+
+def effective_batch_size(llm: Any) -> int:
+    """The largest batch every cascade provider can legally serve: the
+    global llm.batch_size, floored by any per-provider batch_size declared
+    in llm.order. A provider with a smaller explicit batch_size (e.g. a
+    small model that omits clusters in large batches) shrinks the batch for
+    the whole loop -- the router can fail a batch over to it mid-run, and
+    the batch must remain legal for whichever provider finally answers."""
+    floor = llm.batch_size
+    for name in llm.order:
+        cfg = llm.providers.get(name)
+        if cfg is not None and cfg.batch_size is not None:
+            floor = min(floor, cfg.batch_size)
+    return floor

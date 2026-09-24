@@ -12,6 +12,7 @@ import pytest
 import yaml
 
 from agent.settings import Settings, SettingsError
+from agent.settings_llm import effective_batch_size
 
 _REPO_ROOT = Path(__file__).parent.parent.parent
 _FIXTURE = Path(__file__).parent.parent / "fixtures" / "settings_minimal.yaml"
@@ -210,3 +211,57 @@ def test_read_timeout_seconds_negative_rejected():
         lambda r: r["llm"]["providers"]["gemini"].__setitem__("read_timeout_seconds", -1),
         r"providers\.gemini\.read_timeout_seconds: must not be negative",
     )
+
+
+def test_provider_batch_size_accepted():
+    raw = _raw()
+    raw["llm"]["providers"]["gemini"]["batch_size"] = 3
+    settings = Settings.from_dict(raw)
+    assert settings.llm.providers["gemini"].batch_size == 3
+    assert settings.llm.providers["groq"].batch_size is None
+
+
+def test_provider_batch_size_string_rejected():
+    _expect_error(
+        lambda r: r["llm"]["providers"]["gemini"].__setitem__("batch_size", "3"),
+        r"providers\.gemini\.batch_size: expected int, got str",
+    )
+
+
+def test_provider_batch_size_zero_rejected():
+    # 0 would make chunk() call range(0, n, 0) -> crash. Guard must reject it.
+    _expect_error(
+        lambda r: r["llm"]["providers"]["gemini"].__setitem__("batch_size", 0),
+        r"providers\.gemini\.batch_size: must be at least 1",
+    )
+
+
+def test_effective_batch_size_floors_to_provider_min():
+    raw = _raw()
+    raw["llm"]["batch_size"] = 5
+    raw["llm"]["order"] = ["gemini", "groq"]
+    raw["llm"]["providers"]["gemini"]["batch_size"] = 2
+    raw["llm"]["providers"]["groq"]["batch_size"] = 4
+    settings = Settings.from_dict(raw)
+    assert effective_batch_size(settings.llm) == 2
+
+
+def test_effective_batch_size_ignores_providers_not_in_order():
+    raw = _raw()
+    raw["llm"]["batch_size"] = 5
+    raw["llm"]["order"] = ["gemini"]
+    # openrouter is in providers but not in order: its batch_size must not
+    # floor the effective batch.
+    raw["llm"]["providers"]["openrouter"]["batch_size"] = 1
+    settings = Settings.from_dict(raw)
+    assert effective_batch_size(settings.llm) == 5
+
+
+def test_real_settings_mistral_batch_size_floors_effective_batch():
+    raw = yaml.safe_load((_REPO_ROOT / "config" / "settings.yaml").read_text(encoding="utf-8"))
+    settings = Settings.from_dict(raw)
+    assert settings.llm.batch_size == 5
+    assert settings.llm.providers["mistral"].batch_size == 2
+    # The whole understand loop must shrink to mistral's floor so a batch
+    # the router fails over to mistral is still legal for it.
+    assert effective_batch_size(settings.llm) == 2

@@ -121,4 +121,15 @@ def cross_section_errors(built: dict[str, Any]) -> list[str]:
                     "provider's tpm"
                 )
 
+    # Per-provider batch_size (session 24b): a provider may demand a smaller
+    # batch than the global (a small model that omits clusters in large
+    # batches). It must remain a legal batch size -- 0 would crash chunk().
+    for name in llm.order:
+        cfg = llm.providers.get(name)
+        if cfg is not None and cfg.batch_size is not None and cfg.batch_size < 1:
+            errors.append(
+                f"settings.llm.providers.{name}.batch_size: must be at least 1, "
+                f"got {cfg.batch_size!r}"
+            )
+
     return errors

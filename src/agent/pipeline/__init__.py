@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Mapping, Protocol
 
 from agent.config import Config, ConfigError, load_yaml
+from agent.settings_llm import effective_batch_size
 from agent.util.logging import get_logger
 
 if TYPE_CHECKING:
@@ -113,8 +114,12 @@ def build_stages(
     # batch_size=1 -- the rollback path -- must not even READ the array
     # contract, let alone send it. A missing batch file with batching
     # enabled is a loud ConfigError, exactly like the single prompt.
+    # effective_batch_size() floors the global batch to any per-provider
+    # batch_size (e.g. mistral=2), so the batch is legal for every provider
+    # the router can fail a call over to.
+    effective_bs = effective_batch_size(config.settings.llm)
     batch_template = None
-    if config.settings.llm.batch_size > 1:
+    if effective_bs > 1:
         batch_template = _load_prompt("understand_batch.txt", base)
 
     stages = (
@@ -126,7 +131,7 @@ def build_stages(
         UnderstandStage(
             understand_prompt, config.settings.pipeline.item_body_chars, logger,
             batch_template=batch_template,
-            batch_size=config.settings.llm.batch_size,
+            batch_size=effective_bs,
         ),
         ValidateStage(config.credibility, logger),
         NoopStage("score"),     # v1.5 (Phase 11)

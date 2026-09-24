@@ -488,6 +488,14 @@ llm:
       rpd: 270000
       tpm: 625000
       supports_vision: false
+      # 2026-09-25: ministral-8b omits ~50% of clusters per call at the
+      # global batch_size=5 (retest run 36051610488: 40/80 clusters
+      # "missing from response array"; tokens_out 910-1382 vs max_tokens
+      # 2000, so NOT truncation -- it answers, but stops early). A smaller
+      # batch shrinks what the small model must hold at once. effective_
+      # batch_size() floors the whole loop to this value, so a batch the
+      # router fails over to mistral stays legal for it.
+      batch_size: 2
     openrouter:
       # VERDICT 2026-08-30 (run at 18:24 UTC): OpenRouter is DEAD for this
       # project under the zero-cost constraint. The sequence settled it:
