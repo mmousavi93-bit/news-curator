@@ -32,12 +32,17 @@ def run_single(
     """The 9r-era loop, unchanged. Returns (events, cluster_fates,
     saw_success, unavailable_total, skipped_statuses) -- exactly the
     state understand.run() merges into ctx. Provider provenance is set
-    on ctx directly, as before."""
+    on ctx directly, as before. Failure-fate reasons are stashed on
+    ctx.fate_reasons (Session 24), mirroring the batch path."""
     events: list[Event] = []
     cluster_fates: list[tuple[str, str]] = []
     saw_success = False
     unavailable_total = 0
     skipped_statuses: dict[str, int] = {}
+    # Session 24: the deterministic reason behind each failure fate
+    # (oversized word count, unparseable, unavailable status), persisted to
+    # chosen_*.csv so the LLM-understand failure set is calibratable.
+    fate_reasons: dict[str, str] = {}
     # Provider provenance per cluster/event (owner 2026-08-31: the
     # labeled-last-rung debugging trail -- which model answered what).
     ctx.cluster_provider = {}
@@ -72,6 +77,7 @@ def run_single(
                     "understand: cluster %s skipped (status=%s)", cluster.key, result.status
                 )
             cluster_fates.append((cluster.key, result.status))
+            fate_reasons[cluster.key] = result.status
             continue
         saw_success = True  # the AI answered; parse quality is separate
 
@@ -82,6 +88,7 @@ def run_single(
                 "understand: cluster %s response unparseable -- skipped", cluster.key
             )
             cluster_fates.append((cluster.key, "unparseable"))
+            fate_reasons[cluster.key] = "response not a JSON object"
             continue
 
         ok_bounds, bounds_reason = within_bounds(
@@ -95,6 +102,7 @@ def run_single(
                 cluster.key, bounds_reason,
             )
             cluster_fates.append((cluster.key, "oversized"))
+            fate_reasons[cluster.key] = bounds_reason
             continue
 
         if parsed.get("clickbait") or parsed.get("irrelevant"):
@@ -130,4 +138,5 @@ def run_single(
                 )
         ctx.event_provider[cluster.key] = result.provider or ""
         events.append(event)
+    ctx.fate_reasons = fate_reasons
     return events, cluster_fates, saw_success, unavailable_total, skipped_statuses

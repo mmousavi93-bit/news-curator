@@ -378,3 +378,33 @@ def test_run_pipeline_writes_reports_when_dir_set(tmp_path):
                      report_dir=tmp_path)
     run_pipeline(ctx, [], logging.getLogger("t"))
     assert len(list(tmp_path.glob("*.csv"))) == 5
+
+
+def test_oversized_reason_carries_bounds_word_count(tmp_path):
+    # Session 24: an `oversized` drop had no reason in the CSV -- the
+    # within_bounds word count was computed and logged, then thrown away.
+    # Without it the owner could not tell a 61-word formatting miss from a
+    # 120-word ramble, so the ceiling (90 words) could not be calibrated
+    # from the artifact. It must reach the reason column now.
+    ctx = _Ctx(tmp_path)
+    oversized = _cluster("o", "t2", "https://x/oversized")
+    ctx.clusters.append(oversized)
+    ctx.cluster_fates.append((oversized.key, "oversized"))
+    ctx.fate_reasons = {oversized.key: "summary 97 words (bounds (2, 60))"}
+    written = {p.name.split("_")[0]: p for p in write_run_reports(ctx, tmp_path)}
+    by_key = {r["cluster_key"]: r for r in _rows(written["chosen"])}
+    assert by_key[oversized.key]["fate"] == "oversized"
+    assert by_key[oversized.key]["reason"] == "summary 97 words (bounds (2, 60))"
+    # Every other fate is untouched -- reason stays "".
+    assert by_key[ctx.clusters[3].key]["reason"] == ""
+
+
+def test_fate_reason_defaults_to_empty_when_unset(tmp_path):
+    # No ctx.fate_reasons at all (older/mocked ctx) must not crash _fate_for
+    # and must fall back to the pre-session-24 "" behaviour.
+    ctx = _Ctx(tmp_path)
+    assert not hasattr(ctx, "fate_reasons")
+    written = {p.name.split("_")[0]: p for p in write_run_reports(ctx, tmp_path)}
+    by_key = {r["cluster_key"]: r for r in _rows(written["chosen"])}
+    assert by_key[ctx.clusters[3].key]["fate"] == "clickbait"
+    assert by_key[ctx.clusters[3].key]["reason"] == ""

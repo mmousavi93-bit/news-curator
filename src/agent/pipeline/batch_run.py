@@ -44,13 +44,18 @@ def process_element(
     logger: logging.Logger,
     single_template: str,
     body_chars: int,
-) -> tuple[Event | None, str | None]:
-    """One parsed batch element -> (event, None) or (None, fate). The same
-    output contract, content filter and language-drift retry the single
-    path applies -- see understand.py for the field-level rationale. The
+) -> tuple[Event | None, str | None, str]:
+    """One parsed batch element -> (event, None, "") or (None, fate, reason).
+    The same output contract, content filter and language-drift retry the
+    single path applies -- see understand.py for the field-level rationale. The
     language retry sends the SINGLE-cluster prompt (understand.txt's
     contract), so a drifting batch-mate is recovered with exactly today's
-    retry, one extra call, batch-mates untouched."""
+    retry, one extra call, batch-mates untouched.
+
+    `reason` is the contract-gate explanation for a failure fate (the
+    within_bounds word count for `oversized`); it is persisted to
+    chosen_*.csv via ctx.fate_reasons so a drop is calibratable, not just
+    counted (Session 24)."""
     # Content filter FIRST: an irrelevant/clickbait cluster is discarded on
     # scope, so its summary bounds are moot -- validating them first (the old
     # order) fated such clusters "oversized" and UNDERCOUNTED `irrelevant` in
@@ -62,14 +67,14 @@ def process_element(
             cluster.key, bool(parsed.get("clickbait")),
             bool(parsed.get("irrelevant")),
         )
-        return None, "clickbait" if parsed.get("clickbait") else "irrelevant"
+        return None, "clickbait" if parsed.get("clickbait") else "irrelevant", ""
     ok_bounds, bounds_reason = within_bounds(parsed, 0)
     if not ok_bounds:
         logger.error(
             "understand: cluster %s out of contract -- skipped (%s)",
             cluster.key, bounds_reason,
         )
-        return None, "oversized"
+        return None, "oversized", bounds_reason
     event = build_event(cluster, parsed, ctx.now)
     if drifts_from_persian(event.headline, event.summary):
         replacement, retry_status = recovery_payload(
@@ -87,7 +92,7 @@ def process_element(
                 "(%s); original kept, compose gate drops if needed",
                 cluster.key, retry_status,
             )
-    return event, None
+    return event, None, ""
 
 
 def run_batches(
@@ -105,7 +110,8 @@ def run_batches(
     """The batched loop. Returns (events, fates, saw_success,
     unavailable_total, skipped_statuses, cluster_provider, event_provider)
     -- exactly the state understand.run() merges into ctx, identical shape
-    to what the single-cluster loop produced before batching existed."""
+    to what the single-cluster loop produced before batching existed.
+    Failure-fate reasons are stashed on ctx.fate_reasons (Session 24)."""
     events: list[Event] = []
     cluster_fates: list[tuple[str, str]] = []
     saw_success = False
@@ -113,6 +119,11 @@ def run_batches(
     skipped_statuses: dict[str, int] = {}
     cluster_provider: dict[str, str] = {}
     event_provider: dict[str, str] = {}
+    # Session 24: the deterministic reason behind each failure fate
+    # (oversized word count, unparseable, unavailable status, raw-length
+    # overflow) -- persisted to chosen_*.csv so the LLM-understand failure
+    # set is calibratable from the artifact, not just the run log.
+    fate_reasons: dict[str, str] = {}
     batches = chunk(list(clusters), batch_size)
     for batch_index, batch in enumerate(batches):
         prompt = build_payload(batch, batch_template, body_chars)
@@ -147,6 +158,8 @@ def run_batches(
                     len(batch), batch[0].key[:8], result.status,
                 )
             cluster_fates.extend((c.key, result.status) for c in batch)
+            for c in batch:
+                fate_reasons[c.key] = result.status
             continue
         saw_success = True  # the AI answered; parse quality is separate
 
@@ -162,6 +175,8 @@ def run_batches(
                 len(batch), batch[0].key[:8],
             )
             cluster_fates.extend((c.key, "unparseable") for c in batch)
+            for c in batch:
+                fate_reasons[c.key] = "response not a JSON array"
             continue
         if len(result.text or "") > MAX_RESPONSE_CHARS * len(batch):
             # contract.py's raw-length cap scaled by batch size: a ramble
@@ -172,6 +187,10 @@ def run_batches(
                 len(batch), batch[0].key[:8],
             )
             cluster_fates.extend((c.key, "oversized") for c in batch)
+            for c in batch:
+                fate_reasons[c.key] = (
+                    f"batch response too long ({len(result.text or '')} chars)"
+                )
             continue
 
         mapped = map_results(batch, parsed, logger)
@@ -181,15 +200,18 @@ def run_batches(
                 # The model omitted this cluster from its array. No content
                 # arrived for it; batch-mates ship (brief requirement 1).
                 cluster_fates.append((cluster.key, "unavailable"))
+                fate_reasons[cluster.key] = "missing from response array"
                 continue
-            event, fate = process_element(
+            event, fate, reason = process_element(
                 ctx, cluster, element, logger, single_template, body_chars,
             )
             if fate is not None:
                 cluster_fates.append((cluster.key, fate))
+                fate_reasons[cluster.key] = reason
             else:
                 event_provider[cluster.key] = result.provider or ""
                 events.append(event)
+    ctx.fate_reasons = fate_reasons
     return (
         events, cluster_fates, saw_success, unavailable_total,
         skipped_statuses, cluster_provider, event_provider,

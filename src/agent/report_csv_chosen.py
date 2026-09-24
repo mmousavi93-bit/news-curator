@@ -20,7 +20,12 @@ def _fate_for(cluster_key: str, events_by_key: dict, ctx) -> tuple[str, str]:
     happened to it this run. Precedence follows the pipeline order."""
     fates = dict(getattr(ctx, "cluster_fates", None) or [])
     if cluster_key in fates:
-        return fates[cluster_key], ""
+        # Session 24: an LLM-understand failure fate (oversized, unparseable,
+        # unavailable, cap_refused) carries its contract-gate reason -- the
+        # within_bounds word count for oversized -- so a drop is calibratable
+        # from the artifact, not just the run log (mirror of repeat_drop_reasons).
+        reasons = getattr(ctx, "fate_reasons", None) or {}
+        return fates[cluster_key], reasons.get(cluster_key, "")
     sent_keys = set(getattr(ctx, "compose_kept_keys", None) or [])
     if cluster_key in sent_keys:
         # Fix 1, 2026-09-06: a bypassed repeat renders as a compact
