@@ -1,0 +1,15 @@
+name: Probe GPT-OSS (groq2 model diversity)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - name: Probe gpt-oss-20b + gpt-oss-120b for the understand task
+        env:
+          GROQ_API_KEY_2: ${{ secrets.GROQ_API_KEY_2 }}
+        run: python3 tools/probe_gpt_oss.py
