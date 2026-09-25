@@ -14,6 +14,7 @@ from __future__ import annotations
 import json
 import os
 import time
+import traceback
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError
 
@@ -52,6 +53,8 @@ def req(path: str, method: str = "GET", body: bytes | None = None):
         return resp.status, dict(resp.headers), resp.read().decode()
     except HTTPError as e:
         return e.code, dict(e.headers), e.read().decode()
+    except Exception as e:  # noqa: BLE001 - probe wants the raw error, not a crash
+        return 0, {}, f"EXCEPTION: {type(e).__name__}: {e}"
 
 
 def parse_check(content: str) -> None:
@@ -79,33 +82,41 @@ def parse_check(content: str) -> None:
               f"irrelevant={parsed.get('irrelevant')!r}")
 
 
-for model in MODELS:
-    print(f"\n===== {model} =====", flush=True)
-    payload = json.dumps({
-        "model": model,
-        "messages": [{"role": "user", "content": PROMPT}],
-        "max_tokens": 600,
-        "temperature": 0.2,
-    }).encode()
-    t0 = time.monotonic()
-    status, headers, body = req("/chat/completions", "POST", payload)
-    elapsed = time.monotonic() - t0
-    print(f"HTTP {status} ({elapsed:.1f}s)")
-    print("   --- x-ratelimit-* headers ---")
-    for k in sorted(headers):
-        if k.lower().startswith("x-ratelimit"):
-            print(f"   {k}: {headers[k]}")
-    if status == 200:
-        resp = json.loads(body)
-        content = resp["choices"][0]["message"]["content"]
-        usage = resp.get("usage", {})
-        print(f"   prompt_tokens={usage.get('prompt_tokens')} "
-              f"completion_tokens={usage.get('completion_tokens')}")
-        print("   --- RAW CONTENT ---")
-        print(content)
-        print("   --- PARSE CHECK ---")
-        parse_check(content)
-    else:
-        print(f"   Body: {body[:500]}")
+def main() -> None:
+    for model in MODELS:
+        print(f"\n===== {model} =====", flush=True)
+        payload = json.dumps({
+            "model": model,
+            "messages": [{"role": "user", "content": PROMPT}],
+            "max_tokens": 600,
+            "temperature": 0.2,
+        }).encode()
+        t0 = time.monotonic()
+        status, headers, body = req("/chat/completions", "POST", payload)
+        elapsed = time.monotonic() - t0
+        print(f"HTTP {status} ({elapsed:.1f}s)")
+        print("   --- x-ratelimit-* headers ---")
+        for k in sorted(headers):
+            if k.lower().startswith("x-ratelimit"):
+                print(f"   {k}: {headers[k]}")
+        if status == 200:
+            resp = json.loads(body)
+            content = resp["choices"][0]["message"]["content"]
+            usage = resp.get("usage", {})
+            print(f"   prompt_tokens={usage.get('prompt_tokens')} "
+                  f"completion_tokens={usage.get('completion_tokens')}")
+            print("   --- RAW CONTENT ---")
+            print(content)
+            print("   --- PARSE CHECK ---")
+            parse_check(content)
+        else:
+            print(f"   Body: {body[:500]}")
+    print("\n=== DONE ===")
 
-print("\n=== DONE ===")
+
+if __name__ == "__main__":
+    try:
+        main()
+    except Exception:  # noqa: BLE001 - always flush output and exit 0
+        traceback.print_exc()
+        print("\n=== DONE (with top-level error above) ===")
