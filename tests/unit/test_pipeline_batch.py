@@ -27,6 +27,7 @@ from agent.pipeline.understand import UnderstandStage
 _REPO_ROOT = Path(__file__).parent.parent.parent
 _TEMPLATE = (_REPO_ROOT / "config" / "prompts" / "understand.txt").read_text(encoding="utf-8")
 _BATCH_TEMPLATE = (_REPO_ROOT / "config" / "prompts" / "understand_batch.txt").read_text(encoding="utf-8")
+_MINIMAL_TEMPLATE = (_REPO_ROOT / "config" / "prompts" / "understand_minimal.txt").read_text(encoding="utf-8")
 
 T0 = datetime(2026, 8, 20, 12, 0, tzinfo=timezone.utc)
 
@@ -95,10 +96,12 @@ class _Ctx:
     now: datetime = T0
 
 
-def _stage(batch_size: int = 5, batch_template: str | None = _BATCH_TEMPLATE):
+def _stage(batch_size: int = 5, batch_template: str | None = _BATCH_TEMPLATE,
+           recovery_template: str | None = None):
     log = _Log()
     stage = UnderstandStage(_TEMPLATE, 600, log,
-                            batch_template=batch_template, batch_size=batch_size)
+                            batch_template=batch_template, batch_size=batch_size,
+                            recovery_template=recovery_template)
     return stage, log
 
 
@@ -270,6 +273,46 @@ def test_batched_run_missing_element_recovery_failure_stays_unavailable():
     assert ctx.events[0].event_key == a.key
     assert dict(ctx.cluster_fates)[b.key] == "unavailable"
     assert len(router.prompts) == 2  # one batch call + one retry
+
+
+def test_batched_run_recovery_uses_minimal_contract_when_provided():
+    # The batch-element recovery retry must use the MINIMAL contract
+    # (headline/summary/category/significance/clickbait/irrelevant -- no
+    # nested `entities`, no `why_matters`) when one is wired in. The heavy
+    # 8-field understand.txt made ministral dump bare entity-name lists
+    # (live 2026-09-24); the minimal shape is the one it follows cleanly.
+    stage, _ = _stage(batch_size=2, recovery_template=_MINIMAL_TEMPLATE)
+    a, b = _cluster("https://x/mn"), _cluster("https://x/mn2")
+    recovered = json.dumps({"headline": "حمله در تنگه هرمز", "summary": "جزئیات حادثه است.",
+                            "category": "military", "significance": "escalation",
+                            "clickbait": False, "irrelevant": False})
+    router = _StubRouter([_batch_result([_element("c1")]), _ok(recovered)])
+    ctx = _Ctx(clusters=[a, b], router=router)
+    stage.run(ctx)
+    assert len(ctx.events) == 2
+    retry_prompt = router.prompts[1]
+    assert "## cluster" not in retry_prompt      # single-object, not array
+    assert "entities" not in retry_prompt        # minimal drops the nested array
+    assert "why_matters" not in retry_prompt     # minimal drops the context field
+    assert "significance" in retry_prompt        # minimal keeps the impact tier
+
+
+def test_batched_run_recovery_content_filter_fates_scope_drop():
+    # A batch element omitted from the array whose single-object retry comes
+    # back irrelevant is a CORRECT drop (the cluster WAS analysed and deemed
+    # off-mission), fated "irrelevant" -- NOT "unavailable". The live
+    # 2026-09-24 run mislabelled these as losses, inflating the mistral
+    # unavailable count by 4.
+    stage, _ = _stage(batch_size=2)
+    a, b = _cluster("https://x/fi"), _cluster("https://x/fi2")
+    filtered = json.dumps({"headline": "تیتر", "summary": "خلاصه مطلب.",
+                           "entities": ["X"], "clickbait": False, "irrelevant": True})
+    router = _StubRouter([_batch_result([_element("c1")]), _ok(filtered)])
+    ctx = _Ctx(clusters=[a, b], router=router)
+    stage.run(ctx)
+    assert len(ctx.events) == 1  # only the batch-mate ships
+    assert ctx.events[0].event_key == a.key
+    assert dict(ctx.cluster_fates)[b.key] == "irrelevant"  # NOT unavailable
 
 
 def test_batched_run_clickbait_element_filters_only_that_cluster():

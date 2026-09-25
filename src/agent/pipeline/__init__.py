@@ -119,8 +119,15 @@ def build_stages(
     # the router can fail a call over to.
     effective_bs = effective_batch_size(config.settings.llm)
     batch_template = None
+    recovery_template = None
     if effective_bs > 1:
         batch_template = _load_prompt("understand_batch.txt", base)
+        # The recovery contract for batch elements the small free-tier model
+        # (ministral) omitted/garblings in array mode. It is intentionally
+        # MINIMAL (6 fields, no nested entities) because ministral dumps
+        # entity-name lists against the full 8-field understand.txt contract;
+        # the single proven-clean shape is this one (tools/probe_mistral.py).
+        recovery_template = _load_prompt("understand_minimal.txt", base)
 
     stages = (
         CollectStage(sources, config.settings, logger),
@@ -132,6 +139,7 @@ def build_stages(
             understand_prompt, config.settings.pipeline.item_body_chars, logger,
             batch_template=batch_template,
             batch_size=effective_bs,
+            recovery_template=recovery_template,
         ),
         ValidateStage(config.credibility, logger),
         NoopStage("score"),     # v1.5 (Phase 11)

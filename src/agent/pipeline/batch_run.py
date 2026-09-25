@@ -102,6 +102,7 @@ def run_batches(
     batch_size: int,
     batch_template: str,
     single_template: str,
+    recovery_template: str | None = None,
     body_chars: int,
     logger: logging.Logger,
 ) -> tuple[
@@ -201,12 +202,18 @@ def run_batches(
             if element is None:
                 # The model omitted this cluster from its array (or emitted a
                 # non-object element for it). No content arrived in the batch,
-                # so retry the cluster ONCE with the single-object contract --
-                # the small free-tier model (ministral) answers one strict JSON
-                # object reliably but flaked on the array form in the live
-                # 2026-09-24 run (4/6 batches were non-object elements).
+                # so retry the cluster ONCE with a single-object contract. The
+                # small free-tier model (ministral) cannot hold the full 8-field
+                # understand.txt contract and dumps entity-name lists against it
+                # (live 2026-09-24: 4/6 batches were non-object elements), so
+                # the retry uses the MINIMAL 6-field contract (headline/summary/
+                # category/significance/clickbait/irrelevant, no nested entities)
+                # that it demonstrably follows -- the one shape proven clean by
+                # tools/probe_mistral.py. Full contract stays the language-drift
+                # retry path in process_element.
                 recovered, status = recovery_payload(
-                    ctx.router, render_prompt(single_template, cluster, body_chars)
+                    ctx.router,
+                    render_prompt(recovery_template or single_template, cluster, body_chars),
                 )
                 if recovered is not None:
                     event_provider[cluster.key] = result.provider or ""
@@ -215,6 +222,16 @@ def run_batches(
                         "understand: cluster %s omitted from batch -- recovered "
                         "via single-object retry",
                         cluster.key,
+                    )
+                    continue
+                # A retry that parsed but was content-filtered is a CORRECT
+                # drop, not a loss: the cluster WAS analysed and deemed
+                # irrelevant/clickbait. Only a genuine contract failure
+                # (unparseable / oversized / unavailable) counts as a loss.
+                if status in ("clickbait", "irrelevant"):
+                    cluster_fates.append((cluster.key, status))
+                    fate_reasons[cluster.key] = (
+                        f"missing from response array; single-object retry {status}"
                     )
                     continue
                 cluster_fates.append((cluster.key, "unavailable"))

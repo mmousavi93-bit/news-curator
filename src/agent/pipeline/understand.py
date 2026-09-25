@@ -56,10 +56,12 @@ class UnderstandStage:
         logger: logging.Logger,
         batch_template: str | None = None,
         batch_size: int = 1,
+        recovery_template: str | None = None,
     ) -> None:
         self._template = prompt_template
         self._batch_template = batch_template
         self._batch_size = batch_size
+        self._recovery_template = recovery_template
         self._body_chars = body_chars
         self._logger = logger
 
@@ -74,6 +76,7 @@ class UnderstandStage:
                 batch_size=self._batch_size,
                 batch_template=self._batch_template,
                 single_template=self._template,
+                recovery_template=self._recovery_template,
                 body_chars=self._body_chars,
                 logger=self._logger,
             )

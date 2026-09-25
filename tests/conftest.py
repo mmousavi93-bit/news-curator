@@ -67,4 +67,10 @@ def tmp_config_dir(tmp_path: Path) -> Path:
         repo_root / "config" / "prompts" / "understand_batch.txt",
         prompts_dir / "understand_batch.txt",
     )
+    # The batch-element recovery contract (minimal 6-field shape). Loaded
+    # alongside understand_batch.txt whenever batching is on.
+    shutil.copy(
+        repo_root / "config" / "prompts" / "understand_minimal.txt",
+        prompts_dir / "understand_minimal.txt",
+    )
     return dest

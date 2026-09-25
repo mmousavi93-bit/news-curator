@@ -52,11 +52,17 @@ def recovery_payload(router, prompt: str):
         parsed = extract_json(result.text)
     except ValueError:
         return None, "unparseable"
+    # Content filter FIRST, before the bounds gate -- an irrelevant/clickbait
+    # answer's summary length is moot (same ordering fix process_element
+    # already applied: validating bounds first fated such clusters "oversized"
+    # and hid the real scope-drop signal).
+    if parsed.get("clickbait"):
+        return None, "clickbait"
+    if parsed.get("irrelevant"):
+        return None, "irrelevant"
     ok_bounds, _reason = within_bounds(parsed, len(result.text or ""))
     if not ok_bounds:
         return None, "oversized"
-    if parsed.get("clickbait") or parsed.get("irrelevant"):
-        return None, "filtered"
     headline = str(parsed.get("headline") or "").strip()
     summary = str(parsed.get("summary") or parsed.get("headline") or "")
     if drifts_from_persian(headline, summary):

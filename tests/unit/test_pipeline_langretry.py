@@ -155,11 +155,18 @@ def test_recovery_returns_none_on_oversized():
     assert payload is None and status == "oversized"
 
 
-def test_recovery_returns_none_on_filtered():
+def test_recovery_returns_none_on_irrelevant():
     router = _StubRouter([_payload("خبر مهم نظامی", "جزئیات خبر",
                                    irrelevant=True)])
     payload, status = recovery_payload(router, "p")
-    assert payload is None and status == "filtered"
+    assert payload is None and status == "irrelevant"
+
+
+def test_recovery_returns_none_on_clickbait():
+    router = _StubRouter([_payload("خبر مهم نظامی", "جزئیات خبر",
+                                   clickbait=True)])
+    payload, status = recovery_payload(router, "p")
+    assert payload is None and status == "clickbait"
 
 
 def test_recovery_returns_none_when_retry_still_non_persian():
