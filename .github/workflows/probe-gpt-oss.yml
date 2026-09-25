@@ -15,15 +15,20 @@ jobs:
       - name: Probe gpt-oss-20b + gpt-oss-120b for the understand task
         env:
           GROQ_API_KEY_2: ${{ secrets.GROQ_API_KEY_2 }}
-        run: python3 tools/probe_gpt_oss.py | tee outputs/gpt_oss_probe.txt
-      - name: Commit probe output back to main
-        # Azure-backed job logs are often unreachable from Iran, so the probe
-        # output is committed to the repo instead -- git push over api.github.com
+        run: |
+          python3 tools/probe_gpt_oss.py > gpt_oss_probe.txt 2>&1 || true
+      - name: Publish probe output to probe-results branch
+        if: always()
+        # Azure-backed job logs are often unreachable from Iran, so the output
+        # is pushed to an orphan branch instead -- git push over api.github.com
         # is the one channel that reliably works (same trick as pipeline.yml's
-        # state-branch force-push).
+        # state branch). No push to main, so ci.yml is not triggered.
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add outputs/gpt_oss_probe.txt
-          git commit -m "probe: gpt-oss understand-task result" || echo "no change to commit"
-          git push origin main
+          git checkout --orphan probe-results
+          git rm -rf . >/dev/null 2>&1 || true
+          cp gpt_oss_probe.txt probe_result.txt
+          git add probe_result.txt
+          git commit -m "probe: gpt-oss understand-task result $(date -u +%Y%m%dT%H%M%SZ)"
+          git push -f origin probe-results
