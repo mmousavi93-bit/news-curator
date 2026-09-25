@@ -75,4 +75,32 @@ for model in CANDIDATES:
         err_preview = body[:120].replace("\n", " ")
         print(f"❌ HTTP {status}: {err_preview}")
 
+# 3. Real call to the ACTUAL production model + per-account rate-limit headers.
+# The production model qwen/qwen3.8-27b was never exercised above (only
+# decommissioned candidates), and settings.yaml copies groq2's limits from
+# groq1's VERIFIED values (tpm 8000) -- groq2 is a SEPARATE account whose
+# limits were assumed, never measured. The x-ratelimit-* LIMIT headers are the
+# per-account truth; dump them all so settings.yaml can be corrected.
+print("\n3. Production model qwen/qwen3.8-27b + rate-limit headers...")
+payload = json.dumps({
+    "model": "qwen/qwen3.8-27b",
+    "messages": [{"role": "user", "content": "Say 'ok' in one word."}],
+    "max_tokens": 10,
+}).encode()
+t0 = time.monotonic()
+status, headers, body = req("/chat/completions", "POST", payload)
+elapsed = time.monotonic() - t0
+print(f"   HTTP {status} ({elapsed:.1f}s)")
+if status == 200:
+    resp = json.loads(body)
+    usage = resp.get("usage", {})
+    print(f"   prompt_tokens={usage.get('prompt_tokens')} "
+          f"completion_tokens={usage.get('completion_tokens')}")
+else:
+    print(f"   Body: {body[:300]}")
+print("   --- x-ratelimit-* headers (per-account limit truth) ---")
+for k in sorted(headers):
+    if k.lower().startswith("x-ratelimit"):
+        print(f"   {k}: {headers[k]}")
+
 print("\n=== DONE ===")
