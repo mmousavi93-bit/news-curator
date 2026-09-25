@@ -491,14 +491,20 @@ llm:
       rpd: 270000
       tpm: 625000
       supports_vision: false
-      # 2026-09-25: ministral-8b omits ~50% of clusters per call at the
-      # global batch_size=5 (retest run 36051610488: 40/80 clusters
-      # "missing from response array"; tokens_out 910-1382 vs max_tokens
-      # 2000, so NOT truncation -- it answers, but stops early). A smaller
-      # batch shrinks what the small model must hold at once. effective_
-      # batch_size() floors the whole loop to this value, so a batch the
-      # router fails over to mistral stays legal for it.
-      batch_size: 2
+      # 2026-09-25 (REVISED): ministral-8b omits ~50% of clusters per call
+      # at batch_size=5 (retest run 36051610488: 40/80 clusters "missing
+      # from response array"; tokens_out 910-1382 vs max_tokens 2000, so NOT
+      # truncation -- it answers, but stops early). The OLD mitigation pinned
+      # batch_size: 2 here, but effective_batch_size() floors the WHOLE loop
+      # to that value -- understand ran at batch 2 for every provider, so
+      # 150 clusters needed 75 calls against the 70-call budget and 52
+      # clusters were refused (run 36123832881). The omission is already
+      # recovered by the batch-element retry in batch_run.py (an omitted
+      # element retries ONCE via the minimal 6-field contract, the shape
+      # proven clean by probe_mistral.py), so the floor is redundant and its
+      # cost is real. No per-provider batch_size here: mistral inherits the
+      # global 5, and its rare omissions (it serves ~1% of calls) are
+      # recovered downstream.
     openrouter:
       # VERDICT 2026-08-30 (run at 18:24 UTC): OpenRouter is DEAD for this
       # project under the zero-cost constraint. The sequence settled it:

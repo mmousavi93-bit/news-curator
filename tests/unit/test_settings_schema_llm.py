@@ -257,11 +257,15 @@ def test_effective_batch_size_ignores_providers_not_in_order():
     assert effective_batch_size(settings.llm) == 5
 
 
-def test_real_settings_mistral_batch_size_floors_effective_batch():
+def test_real_settings_no_provider_floors_effective_batch():
+    # 2026-09-25 (REVISED): the per-provider mistral batch_size: 2 floor was
+    # REMOVED -- it floored the whole understand loop to 2 (150 clusters ->
+    # 75 calls against the 70-call budget, refusing 52 clusters in run
+    # 36123832881). Mistral's omission at batch 5 is recovered by the
+    # batch-element retry (batch_run.py, minimal 6-field contract), so the
+    # floor was redundant. No provider now floors the global batch.
     raw = yaml.safe_load((_REPO_ROOT / "config" / "settings.yaml").read_text(encoding="utf-8"))
     settings = Settings.from_dict(raw)
     assert settings.llm.batch_size == 5
-    assert settings.llm.providers["mistral"].batch_size == 2
-    # The whole understand loop must shrink to mistral's floor so a batch
-    # the router fails over to mistral is still legal for it.
-    assert effective_batch_size(settings.llm) == 2
+    assert settings.llm.providers["mistral"].batch_size is None
+    assert effective_batch_size(settings.llm) == 5
