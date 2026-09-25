@@ -22,11 +22,29 @@ deterministic risk engine. These are where a weak implementer costs more in rewo
 mid model costs outright. Phases 1, 2, 3, 9, 10 are skeleton, collectors, Telegram
 formatting, workflow YAML, and docs — mechanical, run them light.
 
+## Responsibility ladder (low → high)
+
+| Rank | Agent | Accountable for | Failure means |
+|---|---|---|---|
+| 1 | Scout | data is accurate | an invented URL / limit / feed |
+| 2 | Implementer | diff meets the brief | the gate fails |
+| 3 | Verifier | verdict is correct | a missed finding (caught at review) |
+| 4 | Architect | the phase is correct | the owner sees wrong output |
+
+A failure is reviewed by the next-higher-responsibility agent, never by the agent that
+produced it. Model tier (the Routing table above) is a *capability* axis and only decides
+how strong the reviewer is, not who reviews.
+
 ## The loop, per phase
 
 Architect writes brief → Implementer builds → Verifier attacks → Architect reviews the
-verdict and approves or rejects the gate → commit → **discard Implementer context** →
-next phase.
+verdict.
+
+- **Gate PASS** → commit → discard Implementer context → next phase.
+- **Gate FAIL** → Architect partitions the diff into `salvage` / `discard` → fresh
+  Implementer (new context) retries from the salvage + findings → **one retry** → second
+  failure → Architect implements. The Implementer never reviews its own failed work; the
+  `salvage` list is written by the Architect, not by the failed Implementer.
 
 Non-negotiables in the loop: the Implementer never verifies its own work, the Implementer
 never carries context across a phase boundary, and no phase starts before the previous gate
@@ -78,8 +96,13 @@ propose — the owner decides. When the owner asks for something that breaks a c
 a free-tier limit, say so with numbers before agreeing.
 
 At gate review you approve or reject. "Approve with notes" is not a verdict — either the
-gate passed or the phase is not done. Reject costs one more Implementer run; approving a
-soft pass costs you the phase you build on top of it.
+gate passed or the phase is not done.
+
+On reject, do not just rerun the Implementer. Read the failed diff yourself and partition
+it into `salvage` (correct parts to reuse) and `discard` (what caused the failure). Write a
+retry brief that names both, and hand it to a fresh Implementer (new context). One retry
+only: a second failure means you implement it yourself or narrow the scope — never a third
+blind Implementer run. Approving a soft pass costs you the phase you build on top of it.
 
 After every approved gate, output a specific patch to `CLAUDE.md`: facts verified, numbers
 measured, blockers resolved or discovered, phase status. Keep it lean — no frameworks, no
@@ -294,6 +317,10 @@ OUT OF SCOPE
 
 INPUTS THE IMPLEMENTER MAY READ
   CLAUDE.md, ARCHITECTURE.md phases table, <specific analysis doc>
+
+FAILURE REUSE — retry briefs only, required on a gate FAIL
+  SALVAGE: <files / tests / functions from the failed diff that are correct and reused>
+  FINDINGS: <the Verifier's FAIL findings, verbatim>
 ```
 
 ## Order of operations, first session

@@ -226,7 +226,7 @@ Prompts live in `config/prompts/*.txt` — edit those, never hardcode prompt tex
   constraint or a free-tier limit, say so with numbers before implementing.
 - **Mock mode is mandatory.** Every external call must be stubbable so tests run offline
   with no keys and no network.
-- **Routing: follow the `claude-agent-routing` skill** (canonical since 2026-08-29).
+- **Routing: follow the `engineering-doctrine` skill** (canonical since 2026-09-25; replaces `claude-agent-routing`).
   Mechanical work (bulk file ops, wide greps, repetitive extraction, source-list research) →
   Haiku scout with a scoped brief; note the routing in one line.
 - **Never run plain `git status` from the sandbox — use `git --no-optional-locks status`.**
