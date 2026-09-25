@@ -1,0 +1,50 @@
+name: Fetch run-reports artifact
+
+# One-off bridge for reading pipeline run CSVs when Azure-backed artifacts are
+# unreachable from the operator's network (Iran). A runner on GitHub's network
+# CAN reach Azure, so this downloads the `run-reports` artifact from a given
+# pipeline run and commits the CSVs to the orphan `run-reports` branch, which
+# the operator then `git fetch`es and reads. No push to main -> no ci.yml.
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: "Pipeline run id to fetch reports from"
+        required: true
+        type: string
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - name: Download run-reports artifact
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          curl -sL -H "Authorization: Bearer $GITHUB_TOKEN" \
+            "https://api.github.com/repos/mmousavi93-bit/news-curator/actions/runs/${{ inputs.run_id }}/artifacts" \
+            -o artifacts.json
+          ART_ID=$(python3 -c "import json; a=json.load(open('artifacts.json'))['artifacts']; print(next(x['id'] for x in a if x['name']=='run-reports'))")
+          echo "artifact id: $ART_ID"
+          curl -sL -H "Authorization: Bearer $GITHUB_TOKEN" \
+            "https://api.github.com/repos/mmousavi93-bit/news-curator/actions/artifacts/$ART_ID/zip" \
+            -o run_reports.zip
+          mkdir -p reports
+          unzip -o run_reports.zip -d reports/
+          ls -la reports/
+      - name: Commit reports to run-reports branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout --orphan run-reports
+          git rm -rf . >/dev/null 2>&1 || true
+          cp reports/*.csv .
+          git add -f ./*.csv
+          git commit -m "run-reports from run ${{ inputs.run_id }}"
+          git push -f origin run-reports
