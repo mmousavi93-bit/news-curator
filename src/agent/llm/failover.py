@@ -25,6 +25,16 @@ from agent.llm.token_pacer import estimate_tokens
 if TYPE_CHECKING:
     from agent.llm.router import Router
 
+# 503 saturation rest, vs the 30s 429 cooldown (router._COOLDOWN_SECONDS).
+# A 429 token wall (groq) refills in ~60s; gemini's free-tier 503 ("high
+# demand... usually temporary") recovered in ~27 min (run 35335314225) --
+# longer than the run's own ~10 min horizon. Cooling a 503 for only 30s
+# expired between batches, so gemini was re-tried first every batch and
+# burned 13 of 20 calls (65%) in run 36123832881. Cool a 503 for 10 min
+# so a saturated provider stays skipped while a healthy one serves the
+# run, and is re-probed only near the end.
+_SATURATION_COOLDOWN_SECONDS = 600.0
+
 
 def _acquire_slot(router: "Router", stage: str, use_reservation: str | None) -> bool:
     if use_reservation is not None:
@@ -163,7 +173,11 @@ def failover(
             # usually temporary" 503s -- the same transient class as a token
             # wall, which the breaker had been miscounting as sickness.
             now = router._clock()  # fresh: pacer wait + attempt have elapsed
-            router._cooldowns.cool(name, now)
+            cooldown = (
+                _SATURATION_COOLDOWN_SECONDS if http_status == 503
+                else router._cooldown_seconds
+            )
+            router._cooldowns.cool(name, now, cooldown)
             consecutive_wall[name] = consecutive_wall.get(name, 0) + 1
             ready_alt = any(
                 q.name != name

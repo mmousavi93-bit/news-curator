@@ -64,18 +64,22 @@ class CircuitBreaker:
 
 
 class CooldownRegister:
-    """Transient 429 state (2026-08-31): a per-minute token wall is a
+    """Transient-wall state (2026-08-31): a per-minute token wall is a
     waiting room, not sickness -- 16 budget calls were burned retrying
-    into it in one run. A 429'd provider rests for `seconds`; others
+    into it in one run. A walled provider rests for `seconds`; others
     serve meanwhile. When EVERY remaining provider is cooling, the
-    router proceeds anyway (spinning forever is worse than the wall)."""
+    router proceeds anyway (spinning forever is worse than the wall).
+
+    `cool(..., seconds=)` lets a caller override the default rest per
+    event -- a 503 saturation (gemini free tier) rests far longer than a
+    429 token wall (see failover._SATURATION_COOLDOWN_SECONDS)."""
 
     def __init__(self, seconds: float) -> None:
         self._seconds = seconds
         self._until: dict[str, float] = {}
 
-    def cool(self, name: str, now: float) -> None:
-        self._until[name] = now + self._seconds
+    def cool(self, name: str, now: float, seconds: float | None = None) -> None:
+        self._until[name] = now + (self._seconds if seconds is None else seconds)
 
     def is_cooling(self, name: str, now: float) -> bool:
         return now < self._until.get(name, 0.0)

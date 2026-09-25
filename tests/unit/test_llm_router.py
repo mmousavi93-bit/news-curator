@@ -284,6 +284,24 @@ def test_cooldown_expires_with_clock():
     assert len(gemini_calls) == 2  # once at t=0, once after expiry
 
 
+def test_503_cools_far_longer_than_429():
+    # 2026-09-25 run 36123832881: gemini 3.6-flash's free tier 503'd on 13
+    # of 20 calls (65%) during a saturation window. The 30s cooldown (sized
+    # for groq's ~60s token wall) expired between batches, so gemini was
+    # re-tried first every batch and burned 13 budget slots. A 503 recovers
+    # in ~27 min (run 35335314225), so it must stay skipped far longer than
+    # a 429 -- 600s, so a healthy provider serves the run and gemini is
+    # re-probed only near the end.
+    transport = MockHttpTransport(responses=[HttpResponse(503, {}), _GROQ_OK, _GROQ_OK])
+    clock = {"t": 0.0}
+    router = _router([_gemini(), _groq()], transport, clock=lambda: clock["t"])
+    assert router.complete("a").provider == "groq"  # gemini 503 -> cooled 600s
+    clock["t"] = 60.0  # a 429's 30s cooldown would have expired by now
+    assert router.complete("b").provider == "groq"  # gemini STILL cooling
+    gemini_calls = [c for c in transport.calls if GEMINI_URL_PREFIX in c["url"]]
+    assert len(gemini_calls) == 1  # not re-burned during the saturation rest
+
+
 def test_stage_unavailable_logged_once_per_run(caplog):
     import logging
 
