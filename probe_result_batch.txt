@@ -1,0 +1,30 @@
+prompt_chars=8673
+
+===== openai/gpt-oss-120b (batch 5, max_tokens=2000) =====
+HTTP 200 (4.5s)
+   --- x-ratelimit-* headers ---
+   x-ratelimit-limit-requests: 1000
+   x-ratelimit-limit-tokens: 8000
+   x-ratelimit-remaining-requests: 999
+   x-ratelimit-remaining-tokens: 5551
+   x-ratelimit-reset-requests: 1m26.4s
+   x-ratelimit-reset-tokens: 18.367s
+   finish_reason='length'  <-- 'length' = truncated by max_tokens
+   prompt_tokens=2121 completion_tokens=2000
+   reasoning_tokens=6536 chars
+   --- RAW CONTENT ---
+[
+  {
+    "key": "c1",
+    "headline": "کشتی نفتی در نزدیکی تنگه هرمز مورد شلیک قرار گرفت",
+    "summary": "یک کشتی تجاری نفتی توسط پرتابه‌ای در نزدیکی تنگه هرمز اصابت شد و خدمه آن سالم ماند. هیچ گروهی مسئولیت را ادعا نکرده و شرکت‌های بیمه خطر عبور از خلیج را افزایش دادند. این می‌تواند نگرانی‌های حمل و نقل نفت و قیمت جهانی را تشدید کند.",
+    "entities": ["تنگه هرمز", "کشتی نفتی", "خدمه کشتی", "شرکت‌های بیمه"],
+    "category": "security",
+    "clickbait": false,
+    "irrelevant": false,
+    "significance": "economy",
+    "why_matters": "این تحول برای تصویر جنگ آمریکا-اسرائیل-ایران از این جهت مهم است که حمله به کشتی‌های نفتی در تنگه هرمز می
+   --- SHAPE CHECK ---
+   JSON parse FAILED: Unterminated string starting at: line 11 column 20 (char 542)
+
+=== DONE ===
