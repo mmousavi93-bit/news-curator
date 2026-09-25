@@ -88,8 +88,8 @@ def main() -> None:
         payload = json.dumps({
             "model": model,
             "messages": [{"role": "user", "content": PROMPT}],
-            "max_tokens": 600,
-            "temperature": 0.2,
+            "max_tokens": 2000,  # production value (providers.py)
+            "temperature": 0.0,  # production value
         }).encode()
         t0 = time.monotonic()
         status, headers, body = req("/chat/completions", "POST", payload)
@@ -101,10 +101,18 @@ def main() -> None:
                 print(f"   {k}: {headers[k]}")
         if status == 200:
             resp = json.loads(body)
-            content = resp["choices"][0]["message"]["content"]
+            msg = resp["choices"][0]["message"]
+            content = msg.get("content") or ""
             usage = resp.get("usage", {})
+            # gpt-oss can spend tokens on a reasoning block before emitting
+            # content; report both so an empty content is diagnosable.
+            reasoning = msg.get("reasoning") or msg.get("reasoning_content")
             print(f"   prompt_tokens={usage.get('prompt_tokens')} "
                   f"completion_tokens={usage.get('completion_tokens')}")
+            if reasoning:
+                print(f"   reasoning_tokens={len(str(reasoning))} chars")
+                print(f"   --- REASONING (first 300 chars) ---")
+                print(str(reasoning)[:300])
             print("   --- RAW CONTENT ---")
             print(content)
             print("   --- PARSE CHECK ---")
