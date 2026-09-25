@@ -461,6 +461,9 @@ llm:
       # mixtral-8x7b) are decommissioned. Anti-ban now relies on KEY
       # SEPARATION alone (different account, different RPD pool); model
       # fingerprint is identical. Cascade overflow after groq1 429s.
+      # Limits CONFIRMED probe run 36126133522 (2026-09-25): identical to
+      # groq1 — x-ratelimit-limit-tokens 8000 / -requests 1000. tpm/rpd
+      # below are correct, not copied guesses.
       model: "qwen/qwen3.8-27b"
       rpm: 30
       rpd: 1000
