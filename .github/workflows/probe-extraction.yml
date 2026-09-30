@@ -1,0 +1,62 @@
+name: probe-extraction
+
+# Manual only. Phase 11 accuracy gate: cluster a frozen items snapshot and
+# run signals.extract() against EACH provider in isolation, dumping the raw
+# extractions as artifacts for offline precision/recall hand-labeling.
+#
+# Why per-provider and not the cascade: the gate's question is "which
+# provider extracts accurately enough to trust behind the deterministic
+# risk score", and the cascade routes to the first healthy provider, which
+# would hide the per-provider answer. The daily digest already shows the
+# cascade's real routing.
+#
+# CI-only (US runner), like probe-feeds/dump-body/probe-gemini: an Iran-side
+# run measures Iran's network, not the provider.
+
+on:
+  workflow_dispatch:
+    inputs:
+      clusters:
+        description: "Sample size (default 12)"
+        required: false
+        default: "12"
+      providers:
+        description: "Comma-separated providers (default gemini,groq,groq2,mistral)"
+        required: false
+        default: "gemini,groq,groq2,mistral"
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Identify the commit under test
+        run: echo "running ${{ github.sha }}"
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install
+        run: pip install -e ".[embeddings]"
+
+      - name: Run extraction probe
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GROQ_API_KEY_2: ${{ secrets.GROQ_API_KEY_2 }}
+          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+        run: |
+          python tools/probe_extraction.py \
+            --items-csv fixtures/extraction_eval/items_20260928.csv \
+            --out-dir reports/extraction \
+            --clusters "${{ inputs.clusters }}" \
+            --providers "${{ inputs.providers }}"
+
+      - uses: actions/upload-artifact@v5
+        with:
+          name: extraction-probe
+          path: reports/extraction/
+          if-no-files-found: error
