@@ -129,6 +129,17 @@ def test_space_variant_fireworks_exclusion_kills():
     assert matches == []
 
 
+def test_drill_exclusion_kills_air_defense_exercise():
+    # «رزمایش پدافند هوایی» (air-defense drill) hits the attack_air bucket
+    # + city ring but is a routine exercise, not an attack — the
+    # drill/exercise exclusion must kill it (2026-10-02 fix).
+    matches = _matches([_item(
+        "https://x/16",
+        "رزمایش پدافند هوایی در تهران برگزار شد",
+    )])
+    assert matches == []
+
+
 def test_wrong_config_version_fails_loudly():
     raw = yaml.safe_load((_REPO_ROOT / "config" / "flash_alert.yaml")
                          .read_text(encoding="utf-8"))

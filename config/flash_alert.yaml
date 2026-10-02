@@ -61,10 +61,10 @@ exclusions:
   # (reviewer finding 2026-08-31).
   fa: [سالگرد, یادبود, قدیمی, آرشیو, دیروز, دیشب, شب گذشته, فیلم, سینما, تئاتر,
        سریال, آتش‌بازی, آتش بازی, تکذیب, کذب, بی‌اساس, بی اساس, نقشه, بازداشت,
-       دستگیری, خنثی, کشف شد, تحلیل, یادداشت, سرمقاله]
+       دستگیری, خنثی, کشف شد, تحلیل, یادداشت, سرمقاله, رزمایش, مانور, رژه]
   en: [anniversary, memorial, archive, yesterday, last night, film, movie,
        theater, fireworks, denied, denial, no evidence, unsubstantiated,
-       plot, planned, arrested, defused, discovered, cyber, hack, analysis, op-ed]
+       plot, planned, arrested, defused, discovered, cyber, hack, analysis, op-ed, drill, exercise, wargame, parade]
   ar: [فيلم, سينما, مسلسل, ذكرى, أرشيف]
 
 classes:
