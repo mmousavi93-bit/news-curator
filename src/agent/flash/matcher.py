@@ -101,20 +101,30 @@ def _fresh(item, freshness_minutes: int, now: datetime) -> bool:
     return published >= now - timedelta(minutes=freshness_minutes)
 
 
+_SNIPPET_CAP = 200
+
+
+def text_snippet(item) -> str:
+    """One-line excerpt of the raw item text for the tuning CSV, so the
+    near-miss buckets (no_location / excluded) stay auditable."""
+    text = f"{item.title} {item.body}".strip()
+    return " ".join(text.split())[:_SNIPPET_CAP]
+
+
 def match_items(items, config: FlashConfig, now: datetime):
-    """(matches, kills). kills = (source_id, reason) for the alert log —
-    a no-term item is routine volume and is NOT logged, a term-hit that
-    fails location or exclusion is a near-miss and IS."""
+    """(matches, kills). kills = (source_id, reason, text) — a no-term item
+    is routine volume and is NOT logged, a term-hit that fails location or
+    exclusion is a near-miss and IS logged with its text for auditing."""
     matches: list[Match] = []
-    kills: list[tuple[str, str]] = []
+    kills: list[tuple[str, str, str]] = []
     for item in items:
         if not _fresh(item, config.freshness_minutes, now):
-            kills.append((item.source_id, "stale"))
+            kills.append((item.source_id, "stale", text_snippet(item)))
             continue
         text = normalize(f"{item.title}\n{item.body[:config.window_chars]}")
         full = normalize(f"{item.title}\n{item.body}")
         if any(term in full for term in config.exclusions):
-            kills.append((item.source_id, "excluded"))
+            kills.append((item.source_id, "excluded", text_snippet(item)))
             continue
         for class_name, alert_class in config.classes.items():
             bucket = _term_bucket(text, alert_class)
@@ -127,7 +137,8 @@ def match_items(items, config: FlashConfig, now: datetime):
                 # A term hit without an allowed location must not block
                 # later classes: «حمله موشکی» in a non-Tehran item is a
                 # tehran no_location — killed here, exactly as designed.
-                kills.append((item.source_id, f"{class_name}:no_location"))
+                kills.append((item.source_id, f"{class_name}:no_location",
+                              text_snippet(item)))
                 continue
             ring, token, display = location
             signature = (

@@ -74,7 +74,8 @@ def test_strike_outside_iran_territory_is_killed():
     assert matches == []
     # Term hit ("missile" -> tehran attack_air), location in neither ring:
     # one near-miss record.
-    assert kills == [("tg_src", "tehran:no_location")]
+    assert [(k[0], k[1]) for k in kills] == [("tg_src", "tehran:no_location")]
+    assert kills[0][2]  # text snippet captured for auditability
 
 
 # -- tehran class ---------------------------------------------------------

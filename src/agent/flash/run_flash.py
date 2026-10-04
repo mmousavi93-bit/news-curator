@@ -32,7 +32,7 @@ from agent.delivery.telegram import TelegramClient
 from agent.flash import history, store
 from agent.flash.config import FlashConfig
 from agent.flash.loader import validate_flash
-from agent.flash.matcher import match_items
+from agent.flash.matcher import match_items, text_snippet
 from agent.flash.policy import evaluate
 from agent.util.logging import PROCESS_FILTER, get_logger, register_env_secrets
 
@@ -86,13 +86,15 @@ def _write_tuning_csv(items, matches, kills, flash: FlashConfig, now: datetime) 
     with out.open("w", encoding="utf-8-sig", newline="") as fh:
         writer = csv.writer(fh)
         writer.writerow(["run_at_utc", "class", "term_bucket", "location_ring",
-                         "location_token", "source_id", "title", "kind"])
+                         "location_token", "source_id", "title", "kind", "text"])
         for match in matches:
             writer.writerow([now.isoformat(), match.class_name, match.term_bucket,
                              match.location_ring, match.location_token,
-                             match.item.source_id, match.item.title, "match"])
-        for source_id, reason in kills:
-            writer.writerow([now.isoformat(), "", "", "", "", source_id, "", reason])
+                             match.item.source_id, match.item.title, "match",
+                             text_snippet(match.item)])
+        for source_id, reason, text in kills:
+            writer.writerow([now.isoformat(), "", "", "", "", source_id, "",
+                             reason, text])
     get_logger("agent.flash").info("flash: tuning CSV -> %s", out)
 
 
