@@ -73,4 +73,10 @@ def tmp_config_dir(tmp_path: Path) -> Path:
         repo_root / "config" / "prompts" / "understand_minimal.txt",
         prompts_dir / "understand_minimal.txt",
     )
+    # Session 25: the synthesis ("big picture") prompt. Loaded unconditionally
+    # in build_stages (like understand.txt), so the fixture must provide it.
+    shutil.copy(
+        repo_root / "config" / "prompts" / "synthesis.txt",
+        prompts_dir / "synthesis.txt",
+    )
     return dest

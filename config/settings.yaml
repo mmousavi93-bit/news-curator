@@ -686,6 +686,15 @@ digest_rank:
   # gate too, which is the trade to weigh.
   event_repeat_threshold: 0.80
   repeat_bypass_score: 14.0      # was 11.0 pre-relevance; recalibrated +min_relevance (3)
+  # Session 25 (2026-10-25): the digest is capped at max_items -- the owner
+  # wants a LIMITED feed of the most important items, not everything above
+  # min_score. Follow-ups compete on score like any event; the cap cuts the
+  # rest (they are not marked delivered, so they do not suppress themselves).
+  # synthesis_enabled turns on the one-line "big picture" under the header
+  # (one extra LLM call, optional + cosmetic -- a failure omits the line).
+  max_items: 5
+  synthesis_enabled: true
+  queue_window_hours: 24        # ranked-but-not-delivered events stay candidates this long
 
 delivery:
   telegram_max_chars: 4096

@@ -30,6 +30,7 @@ from agent.pipeline.langgate import split_persian
 from agent.pipeline.rank import rank_events
 from agent.pipeline.render import _raw_fallback, build_digest_items
 from agent.pipeline.render_leads import build_lead_message
+from agent.pipeline.synthesis import build_synthesis
 from agent.util.jalali import format_jalali
 
 

@@ -224,3 +224,19 @@ CREATE TABLE IF NOT EXISTS delivered (
     delivered_at TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_delivered_at ON delivered (delivered_at);
+
+-- ---------------------------------------------------------------------------
+-- Session 25 (SCHEMA_VERSION 4): the 24h digest queue. Events ranked but NOT
+-- delivered this run stay here as candidates, so a #6 this morning can rise to
+-- #2 this afternoon instead of being dropped. `event_json` is the FULL Event
+-- (in-memory fields included: headline/category/significance/why_matters/
+-- follow_up/prior_context) because `events` stores only the persisted subset.
+-- `score` is the rank-time score -- a later run has no cluster to recompute it
+-- from. Rows are pruned by queue_window_hours and on delivery.
+CREATE TABLE IF NOT EXISTS pending (
+    event_key  TEXT PRIMARY KEY,
+    event_json TEXT NOT NULL,
+    score      REAL NOT NULL,
+    ranked_at  TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_pending_ranked ON pending (ranked_at);

@@ -29,7 +29,9 @@ from agent.util.logging import get_logger
 # upgrades.py -- old databases gain the table on open).
 # 3 = Phase 10 additive delivered table (owner received-marker for the
 # anti-repetition window; same additive pattern).
-SCHEMA_VERSION = 3
+# 4 = Session 25 additive pending table (24h digest queue -- ranked-but-not-
+# delivered events stay candidates across runs).
+SCHEMA_VERSION = 4
 
 _SCHEMA_PATH = Path(__file__).with_name("schema.sql")
 _VERSION_KEY = "schema_version"

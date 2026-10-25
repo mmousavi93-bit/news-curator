@@ -91,6 +91,11 @@ class Event:
     # MID-band survivors (a different, possibly more important story) below
     # every full entry with zero character pressure required.
     follow_up_high: bool = False
+    # Session 25: the best-matched prior's summary, so a follow-up that makes
+    # the digest can render as a self-contained thread (the reader may have
+    # missed the earlier message). In-memory only, like follow_up -- not
+    # persisted, the events table predates it.
+    prior_context: str = ""
 
 
 def event_to_row(event: Event) -> tuple:
@@ -198,3 +203,48 @@ def mark_delivered(
         rows,
     )
     return int(cursor.rowcount)
+
+
+def event_to_json(event: Event) -> str:
+    """Full-fidelity JSON for the pending queue (Session 25) -- the in-memory
+    fields the `events` table does not persist (headline/category/significance/
+    why_matters/follow_up/prior_context) so a deferred event re-renders exactly
+    as it was ranked."""
+    return json.dumps({
+        "event_key": event.event_key,
+        "summary": event.summary,
+        "headline": event.headline,
+        "entities": list(event.entities),
+        "category": event.category,
+        "significance": event.significance,
+        "why_matters": event.why_matters,
+        "claim_status": event.claim_status,
+        "source_count": event.source_count,
+        "independent_count": event.independent_count,
+        "follow_up": event.follow_up,
+        "follow_up_high": event.follow_up_high,
+        "prior_context": event.prior_context,
+        "first_seen_at": to_utc_iso(event.first_seen_at),
+        "last_updated_at": to_utc_iso(event.last_updated_at),
+    })
+
+
+def event_from_json(raw: str) -> Event:
+    d = json.loads(raw)
+    return Event(
+        event_key=d["event_key"],
+        summary=d["summary"],
+        headline=d.get("headline", ""),
+        entities=tuple(d.get("entities") or []),
+        category=d.get("category", "other"),
+        significance=d.get("significance", "economy"),
+        why_matters=d.get("why_matters", ""),
+        claim_status=d.get("claim_status", "unconfirmed"),
+        source_count=int(d.get("source_count", 0)),
+        independent_count=int(d.get("independent_count", 0)),
+        follow_up=bool(d.get("follow_up", False)),
+        follow_up_high=bool(d.get("follow_up_high", False)),
+        prior_context=d.get("prior_context", ""),
+        first_seen_at=from_utc_iso(d["first_seen_at"]) if d.get("first_seen_at") else None,
+        last_updated_at=from_utc_iso(d["last_updated_at"]) if d.get("last_updated_at") else None,
+    )

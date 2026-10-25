@@ -125,7 +125,15 @@ def drop_repeats(
             # Band split (round-4 review, fix 1): MID renders as a full
             # normal entry (a different story), HIGH as the compact
             # one-liner (the same story retold) -- see Event.follow_up_high.
-            kept.append(replace(event, follow_up=True, follow_up_high=(band == "high")))
+            # Session 25: carry the best-matched prior's summary so the
+            # follow-up renders as a self-contained thread.
+            best_prior = next(
+                (p for p in matched if p.event_key == best_prior_key), matched[0]
+            )
+            kept.append(replace(
+                event, follow_up=True, follow_up_high=(band == "high"),
+                prior_context=best_prior.summary,
+            ))
             logger.info(
                 "validate: %s matched a repeat (sim %.2f) but bypassed "
                 "as a follow-up (band=%s) (%s)", event.event_key[:8], best, band, reason,

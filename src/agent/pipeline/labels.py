@@ -74,6 +74,9 @@ LABELS: Mapping[str, Mapping[str, str]] = {
         "lead_prefix": "سرنخ",
         "follow_up": "پیگیری",
         "why_matters": "چرا مهم است:",
+        "synthesis_header": "📌 تصویر امروز",
+        "prior_context": "قبلتر",
+        "now_context": "اکنون",
     },
     "en": {
         "header": "News Curator",
@@ -104,6 +107,9 @@ LABELS: Mapping[str, Mapping[str, str]] = {
         "lead_prefix": "LEAD",
         "follow_up": "FOLLOW-UP",
         "why_matters": "why it matters:",
+        "synthesis_header": "📌 Today's picture",
+        "prior_context": "earlier",
+        "now_context": "now",
     },
 }
 

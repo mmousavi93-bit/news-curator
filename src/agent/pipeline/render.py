@@ -158,7 +158,7 @@ def build_digest_items(kept: list, clusters: dict, settings, labels: dict) -> tu
             headline = f"{labels['rumour']} · {headline}"
         elif event.claim_status == "unconfirmed":
             headline = f"{labels['unconfirmed']} · {headline}"
-        headline = f"{category_icon(event.category)} {headline}"
+        headline = f"{to_persian_digits(str(normal_index + 1))}. {category_icon(event.category)} {headline}"
         meta_bits = [name]
         if getattr(event, "independent_count", 0) >= 2:
             meta_bits.append(labels["sources_count"].format(
@@ -175,6 +175,11 @@ def build_digest_items(kept: list, clusters: dict, settings, labels: dict) -> tu
             # Optional context line (owner 2026-09-06): a footer marked as
             # context, not reporting -- visually distinct from the summary.
             detail = f"{detail}\n{labels['why_matters']} {event.why_matters}"
+        # Session 25: a follow-up carries the prior story's gist so the
+        # thread reads whole even if the reader missed the earlier message.
+        prior = getattr(event, "prior_context", "")
+        if prior:
+            detail = f"{detail}\n{labels['prior_context']}: {_headline(prior)}"
         items.append(Item(
             headline=headline,
             priority=normal_index,
@@ -182,9 +187,17 @@ def build_digest_items(kept: list, clusters: dict, settings, labels: dict) -> tu
         ))
     for event in high_events:
         headline = event.headline.strip() if event.headline else _headline(event.summary)
+        detail = event.summary if event.summary else ""
+        prior = getattr(event, "prior_context", "")
+        if prior:
+            # Session 25: whole-thread summary -- the prior gist first, the
+            # latest development emphasised.
+            detail = f"{labels['prior_context']}: {_headline(prior)}"
+            if event.summary:
+                detail = f"{detail} · {labels['now_context']}: {event.summary}"
         items.append(Item(
             headline=f"{labels['follow_up']} · {headline}",
             priority=worst_normal_priority,
-            detail=event.summary if event.summary else "",
+            detail=detail,
         ))
     return items, ordered_events

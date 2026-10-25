@@ -146,6 +146,13 @@ class DigestRankSettings:
     # settings.yaml.
     event_repeat_threshold: float
     repeat_bypass_score: float
+    # Session 25: hard cap on digest item count (owner: "too many news") and
+    # the on/off for the one-line synthesis ("big picture").
+    max_items: int
+    synthesis_enabled: bool
+    # Session 25: the 24h queue window -- ranked-but-not-delivered events stay
+    # candidates for this long before expiring.
+    queue_window_hours: int
 
 
 @dataclass(frozen=True, slots=True)
@@ -207,7 +214,8 @@ SECTIONS: tuple[tuple[str, type, tuple[str, ...]], ...] = (
      ("category_weights", "significance_weights", "corroboration_weight", "tier_bonus",
       "recency_max_bonus", "recency_window_hours", "size_boost_per_member",
       "size_boost_cap", "min_score", "max_messages", "repeat_window_hours",
-      "event_repeat_threshold", "repeat_bypass_score")),
+      "event_repeat_threshold", "repeat_bypass_score", "max_items",
+      "synthesis_enabled")),
     ("delivery", DeliverySettings,
      ("telegram_max_chars", "char_budget", "truncate_priority", "output_language",
       "source_languages", "flash_watchdog_enabled",

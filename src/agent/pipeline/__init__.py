@@ -110,6 +110,7 @@ def build_stages(
         embedder = MiniLmEmbedder(config.settings.pipeline.embed_model)
 
     understand_prompt = _load_prompt("understand.txt", base)
+    synthesis_template = _load_prompt("synthesis.txt", base)
     # The batch template is loaded only when batching is on (session 9s):
     # batch_size=1 -- the rollback path -- must not even READ the array
     # contract, let alone send it. A missing batch file with batching

@@ -35,6 +35,9 @@ SUMMARY_SOFT_CEILING_WORDS = 90
 # sinks the event (headline/summary gate the event; context degrades
 # gracefully). Lower bound 1: anything non-empty is acceptable.
 WHY_MATTERS_WORD_BOUNDS = (1, 30)
+# Session 25: the one-line synthesis ("big picture") -- a TRIM/omit, never a
+# gate: an over/under-length line is dropped, the digest's events are not.
+SYNTHESIS_WORD_BOUNDS = (4, 40)
 # A compliant digest answer is ~120 words ≈ well under 1,000 chars of JSON.
 MAX_RESPONSE_CHARS = 2000
 

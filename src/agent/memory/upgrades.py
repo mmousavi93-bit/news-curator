@@ -24,4 +24,13 @@ CREATE TABLE IF NOT EXISTS delivered (
 );
 CREATE INDEX IF NOT EXISTS idx_delivered_at ON delivered (delivered_at);
 """,
+    3: """
+CREATE TABLE IF NOT EXISTS pending (
+    event_key  TEXT PRIMARY KEY,
+    event_json TEXT NOT NULL,
+    score      REAL NOT NULL,
+    ranked_at  TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_pending_ranked ON pending (ranked_at);
+""",
 }
