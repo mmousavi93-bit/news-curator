@@ -178,6 +178,9 @@ def test_bypass_via_independent_count_growth_when_floor_also_met(tmp_path):
                               prior_independent=2, prior_claim_status="likely")
     assert len(kept) == 1
     assert kept[0].follow_up is True
+    # Session 25: a bypassed follow-up carries the best-matched prior's
+    # summary so it can render as a self-contained thread.
+    assert kept[0].prior_context == "old summary"
     # Round-4 review, fix 1: HIGH band must set follow_up_high so
     # render.py renders the compact one-liner, not a full entry.
     assert kept[0].follow_up_high is True

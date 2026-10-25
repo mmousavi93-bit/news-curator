@@ -27,6 +27,7 @@ from agent.pipeline.deescalation import is_escalation, maybe_deescalation_notice
 from agent.pipeline.flash_watchdog import flash_warning
 from agent.pipeline.labels import labels_for
 from agent.pipeline.langgate import split_persian
+from agent.pipeline.queue import select_digest
 from agent.pipeline.rank import rank_events
 from agent.pipeline.render import _raw_fallback, build_digest_items
 from agent.pipeline.render_leads import build_lead_message
@@ -40,8 +41,9 @@ class ComposeStage:
 
     name = "compose"
 
-    def __init__(self, logger: logging.Logger) -> None:
+    def __init__(self, logger: logging.Logger, synthesis_template: str = "") -> None:
         self._logger = logger
+        self._synthesis_template = synthesis_template
 
     def run(self, ctx) -> None:
         settings = ctx.config.settings
@@ -145,6 +147,12 @@ class ComposeStage:
             )
             return
 
+        # Session 25: the digest is the top `max_items` from a 24h queue --
+        # this run's fresh events plus prior runs' ranked-but-not-delivered
+        # ones. A #6 this morning can rise to #2 this afternoon; it is
+        # deferred, never dropped.
+        kept = select_digest(ctx, kept, settings, self._logger)
+
         now_tehran = to_tehran(ctx.now)
         marker = (
             f" — {labels['digest_marker']}"
@@ -154,6 +162,15 @@ class ComposeStage:
             f"{labels['header']} — {format_jalali(now_tehran, with_time=True)}"
             f" {labels['tehran']}{marker}"
         )
+        # Session 25: the one-line synthesis ("big picture") under the header.
+        synthesis = ""
+        if (settings.digest_rank.synthesis_enabled and len(kept) >= 2
+                and self._synthesis_template):
+            synthesis = build_synthesis(
+                ctx, kept, self._synthesis_template, self._logger
+            )
+        if synthesis:
+            header = f"{header}\n{labels['synthesis_header']}: {synthesis}"
         if preamble:
             # Above the digest header on purpose: the watchdog warning is a
             # statement about the system, the de-escalation notice about the

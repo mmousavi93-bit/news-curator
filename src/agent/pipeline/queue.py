@@ -20,7 +20,8 @@ from __future__ import annotations
 import logging
 from datetime import timedelta
 
-from agent.memory.event_models import Event, event_from_json, event_to_json
+from agent.memory.event_json import event_from_json, event_to_json
+from agent.memory.event_models import Event
 
 
 def load_pending(ctx, now) -> list[tuple[Event, float]]:
@@ -82,12 +83,17 @@ def select_digest(ctx, fresh: list[Event], settings, logger: logging.Logger) -> 
         (e, score_event(e, clusters.get(e.event_key), credibility, settings, now))
         for e in fresh
     ]
-    by_key: dict[str, tuple[Event, float]] = {}
-    for e, s in load_pending(ctx, now):
-        by_key[e.event_key] = (e, s)
+    pending = load_pending(ctx, now)
+    pending_by_key = {e.event_key: (e, s) for e, s in pending}
+    pool: list[tuple[Event, float]] = []
     for e, s in fresh_scored:
-        by_key[e.event_key] = (e, s)  # fresh supersedes a stale pending copy
-    pool = sorted(by_key.values(), key=lambda es: (-es[1], es[0].event_key))
+        # A fresh event supersedes a stale pending copy with the SAME key; it
+        # never collapses another fresh event (a same-key collision inside
+        # `fresh` is preserved, matching the pre-queue behaviour).
+        pending_by_key.pop(e.event_key, None)
+        pool.append((e, s))
+    pool.extend(pending_by_key.values())
+    pool.sort(key=lambda es: (-es[1], es[0].event_key))
     top = [e for e, _ in pool[: settings.digest_rank.max_items]]
     top_keys = {e.event_key for e in top}
     deferred = [(e, s) for e, s in fresh_scored if e.event_key not in top_keys]

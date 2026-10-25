@@ -144,7 +144,7 @@ def build_stages(
         ),
         ValidateStage(config.credibility, logger),
         NoopStage("score"),     # v1.5 (Phase 11)
-        ComposeStage(logger),
+        ComposeStage(logger, synthesis_template=synthesis_template),
         DeliverStage(environment, logger),
     )
     return stages, router, embedder

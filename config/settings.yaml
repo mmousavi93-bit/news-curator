@@ -637,7 +637,15 @@ digest_rank:
   recency_window_hours: 12
   size_boost_per_member: 0.1
   size_boost_cap: 1.0
-  min_score: 11                  # importance floor (incl. significance): below, no show
+  min_score: 15                  # importance floor (incl. significance): below, no show.
+  # Session 25 (2026-10-25, astra-design): raised 11 -> 15 as the queue's
+  # admission floor. 15 admits a fresh tier-2 economy story with one
+  # corroborating group (3+5+2+2+3) and an older strategic military balance
+  # shift (5+6+2+2+0), while 16 would drop fresh single-source economic
+  # reporting -- the owner's audience is an Iranian with war AND economy
+  # worries. A static floor, not a percentile: the top-5 cap bounds OUTPUT,
+  # the floor bounds the queue's ADMISSION (a #6-15 can still rise within
+  # the 24h window). Replay the queue chronologically before tightening.
   max_messages: 6                # safety valve; count is dynamic by design
   repeat_window_hours: 72        # events matching a recent stored event are repeats
   # TWO-BAND REPEAT GATE (round-2 review, 2026-09-06, fix 1 -- REPLACES the

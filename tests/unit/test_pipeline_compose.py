@@ -446,6 +446,9 @@ def test_category_icons_render():
     ComposeStage(_Log()).run(ctx)
     assert "⚔️" in ctx.messages[0]
     assert "🏛️" in ctx.messages[0]
+    # Session 25: numbered items (۱، ۲) for scannability.
+    assert "۱." in ctx.messages[0]
+    assert "۲." in ctx.messages[0]
 
 
 def test_multi_source_event_renders_corroboration_count():
@@ -481,13 +484,16 @@ def test_below_threshold_events_never_reach_the_message():
     assert ctx.messages == [NOTHING_NEW_FA]  # everything dropped -> honest line
 
 
-def test_busy_day_splits_into_multiple_messages_within_char_cap():
+def test_busy_day_is_capped_to_max_items():
+    # Session 25: the digest is capped at max_items (5), never "everything
+    # that fits". A busy 25-event day delivers exactly 5 items, one message.
     ctx = _Ctx(config=_config())
     for i in range(25):
         event = _event(f"خبر شماره {i}. نظامی اسرائیل " + "جزئیات " * 40, category="security")
         ctx.events.append(_with_cluster(ctx, event))
     ComposeStage(_Log()).run(ctx)
-    assert 1 < len(ctx.messages) <= 6  # max_messages is the safety valve (2026-08-30)
+    assert ctx.counters["compose"] == 5
+    assert len(ctx.messages) == 1
     for text in ctx.messages:
         assert len(text.encode("utf-16-le")) // 2 <= 4096
 
@@ -631,7 +637,10 @@ def test_high_band_follow_up_carries_summary_but_no_full_entry_chrome():
     # HIGH band (same story retold). round-4 review, fix 1 -- follow_up
     # alone no longer implies anything; only follow_up_high does (see
     # test_mid_band_follow_up_renders_as_full_entry for the MID contrast).
-    followup_event = replace(followup_event, follow_up=True, follow_up_high=True)
+    followup_event = replace(
+        followup_event, follow_up=True, follow_up_high=True,
+        prior_context="عملیات اسرائیل آغاز شده بود",
+    )
     ctx.events = [normal, followup_event]
     ComposeStage(_Log()).run(ctx)
     text = ctx.messages[0]
@@ -639,6 +648,11 @@ def test_high_band_follow_up_carries_summary_but_no_full_entry_chrome():
     assert "تیتر پیگیری کوتاه اسرائیل" in text
     # NEW: the summary is now carried as the detail line.
     assert "این خلاصه پیگیری به‌روزرسانی عملیات اسرائیل است" in text
+    # Session 25: the follow-up renders the whole thread -- the prior gist
+    # first, the latest development emphasised.
+    assert labels_for("fa")["prior_context"] in text
+    assert "عملیات اسرائیل آغاز شده بود" in text
+    assert labels_for("fa")["now_context"] in text
     # Still NOT a full entry: no category icon glued to the follow-up
     # marker (the normal entry's own "⚔️ " prefix is the only icon line).
     assert "⚔️ پیگیری" not in text
@@ -854,13 +868,10 @@ def test_escalation_run_character_budget_holds_for_full_mid_band_entries():
 
     total_units = sum(utf16_len(text) for text in ctx.messages)
     max_budget = 6 * 4096  # settings_minimal.yaml: max_messages=6, telegram_max_chars=4096
-    # The brief's own estimate (~14-20 full entries at ~300 chars each =
-    # ~4,200-6,000 chars) -- 18 entries here, so the measured total must
-    # land inside a generously wide band around that estimate and, more
-    # importantly, well under the 24,576-unit ceiling with room to spare.
-    assert 3000 <= total_units <= 12000
+    # Session 25: the digest is capped at max_items (5), so this 18-event
+    # escalation day delivers 5 and the budget is trivially safe.
+    assert ctx.counters["compose"] == 5
     assert total_units < max_budget
-    assert len(ctx.messages) <= 6
     assert getattr(ctx, "compose_truncated", []) == []  # nothing cut
 
 

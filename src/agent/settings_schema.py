@@ -215,7 +215,7 @@ SECTIONS: tuple[tuple[str, type, tuple[str, ...]], ...] = (
       "recency_max_bonus", "recency_window_hours", "size_boost_per_member",
       "size_boost_cap", "min_score", "max_messages", "repeat_window_hours",
       "event_repeat_threshold", "repeat_bypass_score", "max_items",
-      "synthesis_enabled")),
+      "synthesis_enabled", "queue_window_hours")),
     ("delivery", DeliverySettings,
      ("telegram_max_chars", "char_budget", "truncate_priority", "output_language",
       "source_languages", "flash_watchdog_enabled",

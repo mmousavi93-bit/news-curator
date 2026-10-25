@@ -133,16 +133,17 @@ def test_non_integer_schema_version_halts(tmp_path: Path) -> None:
         memory_db.open_db(path)
 
 
-def test_schema_v2_upgrades_additively_to_v3(tmp_path: Path) -> None:
-    """The additive-upgrade path (SCHEMA_VERSION 3, delivered table): a
-    genuine v2 database gains the table on open, keeps every row, and
-    reports v3. This is what the live encrypted DB will do on the first
-    run after the update ships."""
+def test_schema_v2_upgrades_additively_to_v4(tmp_path: Path) -> None:
+    """The additive-upgrade path (SCHEMA_VERSION 4, delivered + pending
+    tables): a genuine v2 database gains both tables on open, keeps every
+    row, and reports v4. This is what the live encrypted DB will do on the
+    first run after the update ships."""
     path = tmp_path / "state.db"
     conn = memory_db.initialize(path)
-    # Rewind to a genuine v2 database: meta back to 2, delivered absent,
-    # one event row that must survive the upgrade untouched.
+    # Rewind to a genuine v2 database: meta back to 2, the two additive
+    # tables absent, one event row that must survive the upgrade untouched.
     conn.execute("DROP TABLE delivered")
+    conn.execute("DROP TABLE pending")
     conn.execute("UPDATE meta SET value = '2' WHERE key = 'schema_version'")
     conn.execute(
         "INSERT INTO events (event_key, summary, first_seen_at, last_updated_at) "
@@ -152,25 +153,28 @@ def test_schema_v2_upgrades_additively_to_v3(tmp_path: Path) -> None:
 
     conn = memory_db.open_db(path)
     try:
-        assert memory_db.read_schema_version(conn) == 3
+        assert memory_db.read_schema_version(conn) == 4
         tables = {r[0] for r in conn.execute(
             "SELECT name FROM sqlite_master WHERE type='table'")}
         assert "delivered" in tables
+        assert "pending" in tables
         rows = conn.execute("SELECT event_key, summary FROM events").fetchall()
         assert [tuple(r) for r in rows] == [("k", "s")]
     finally:
         conn.close()
 
 
-def test_schema_v1_upgrades_stepwise_to_v3(tmp_path: Path) -> None:
-    """Review finding 2026-08-30: a dormant v1 database must gain BOTH
-    additive tables (lead_outcomes AND delivered) before the meta row
-    moves -- one-script-per-key would stamp 3 without creating delivered,
-    and the lied-about meta row would block every retry."""
+def test_schema_v1_upgrades_stepwise_to_v4(tmp_path: Path) -> None:
+    """Review finding 2026-08-30: a dormant v1 database must gain ALL the
+    additive tables (lead_outcomes AND delivered AND pending) before the
+    meta row moves -- one-script-per-key would stamp the new version
+    without creating the later tables, and the lied-about meta row would
+    block every retry."""
     path = tmp_path / "state.db"
     conn = memory_db.initialize(path)
     conn.execute("DROP TABLE delivered")
     conn.execute("DROP TABLE lead_outcomes")
+    conn.execute("DROP TABLE pending")
     conn.execute("UPDATE meta SET value = '1' WHERE key = 'schema_version'")
     conn.execute(
         "INSERT INTO events (event_key, summary, first_seen_at, last_updated_at) "
@@ -180,11 +184,12 @@ def test_schema_v1_upgrades_stepwise_to_v3(tmp_path: Path) -> None:
 
     conn = memory_db.open_db(path)
     try:
-        assert memory_db.read_schema_version(conn) == 3
+        assert memory_db.read_schema_version(conn) == 4
         tables = {r[0] for r in conn.execute(
             "SELECT name FROM sqlite_master WHERE type='table'")}
         assert "delivered" in tables
         assert "lead_outcomes" in tables
+        assert "pending" in tables
         rows = conn.execute("SELECT event_key, summary FROM events").fetchall()
         assert [tuple(r) for r in rows] == [("k", "s")]
     finally:
