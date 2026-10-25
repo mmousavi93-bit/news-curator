@@ -1,0 +1,25 @@
+{
+  "cutoff": "2026-10-18T12:25:26.538727+00:00",
+  "pipeline": {
+    "runs": 28,
+    "events": {
+      "schedule": 28
+    },
+    "conclusions": {
+      "success": 28
+    },
+    "median_gap_hours": 4.743333333333333,
+    "max_gap_hours": 12.619722222222222
+  },
+  "flash": {
+    "runs": 44,
+    "events": {
+      "schedule": 44
+    },
+    "conclusions": {
+      "success": 44
+    },
+    "median_gap_hours": 3.3091666666666666,
+    "max_gap_hours": 7.345
+  }
+}

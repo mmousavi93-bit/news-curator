@@ -1,0 +1,81 @@
+======================================================================
+PIPELINE — 28 runs
+======================================================================
+runs parsed: 28
+  items            total=11377  min=230 med=421 max=572
+  clusters         total= 3973  min= 78 med=150 max=150
+  events           total= 1140  min= 19 med= 45 max= 53
+  sent             total=  756  min= 13 med= 27 max= 38
+  messages         total=   85  min=  2 med=  3 max=  4
+  llm_failed       total=    0  min=  0 med=  0 max=  0
+  lang_drops       total=   21  min=  0 med=  0 max=  4
+  rank_dropped     total=   72  min=  0 med=  2 max=  7
+  repeat_dropped   total=  775  min= 14 med= 26 max= 39
+  provider calls: {'gemini': 49, 'groq': 731, 'groq2': 450, 'mistral': 409}
+  provider fails: {'gemini': 40, 'groq': 268, 'groq2': 101, 'mistral': 0}
+    gemini     calls=  49 fails=  40 fail_rate=82%
+    groq       calls= 731 fails= 268 fail_rate=37%
+    groq2      calls= 450 fails= 101 fail_rate=22%
+    mistral    calls= 409 fails=   0 fail_rate=0%
+
+chosen rows: 4722
+  fate distribution:
+    irrelevant                   1515
+    repeat_dropped               775
+    cap_dropped                  749
+    sent_followup                645
+    clickbait                    297
+    relevance_dropped            291
+    cap_refused                  183
+    sent                         111
+    rank_dropped                 72
+    lead_only                    37
+    lang_dropped                 21
+    unavailable                  17
+    oversized                    9
+  provider x fate (top 25):
+    -            cap_dropped              749
+    groq2        irrelevant               637
+    groq         irrelevant               587
+    groq         repeat_dropped           326
+    groq         sent_followup            299
+    mistral      irrelevant               275
+    groq2        repeat_dropped           253
+    mistral      repeat_dropped           195
+    -            cap_refused              183
+    mistral      sent_followup            174
+    groq2        sent_followup            170
+    groq         clickbait                131
+    groq2        clickbait                128
+    groq         relevance_dropped        116
+    groq2        relevance_dropped        91
+    mistral      relevance_dropped        82
+    groq         sent                     46
+    groq2        sent                     42
+    mistral      clickbait                35
+    groq         rank_dropped             33
+    groq2        rank_dropped             29
+    mistral      sent                     22
+    mistral      lead_only                20
+    mistral      unavailable              17
+    gemini       irrelevant               16
+
+summaries rows (sent): 756
+  sent categories: {'military': 301, 'politics': 221, 'security': 75, 'economy': 159}
+  sent significance: {'escalation': 263, 'balance': 333, 'economy': 160}
+
+  per-digest 'sent' count: min=13 med=27 max=38
+  digests with sent>=10: 28 / 28
+
+======================================================================
+FLASH — 44 runs
+======================================================================
+flash rows: 1481
+  kind distribution:
+    stale                          1036
+    tehran:no_location             323
+    excluded                       117
+    match                          5
+  term_bucket: {'': 1476, 'attack_air': 5}
+  location_ring: {'': 1476, 'city': 5}
+  rows with class set (fired?): 5

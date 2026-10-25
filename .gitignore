@@ -31,6 +31,9 @@ htmlcov/
 .cache/
 models/
 
+# --- private VPS continuation evidence / agent execution logs ---
+.continuation/
+
 # --- per-run observability CSVs (artifact-only, never committed) ---
 reports/
 outputs/

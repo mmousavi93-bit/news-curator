@@ -1,0 +1,33 @@
+{
+  "fixture": "synthetic; real production classification, ranking, settings",
+  "results": [
+    {
+      "source": "t2",
+      "age_minutes": 0,
+      "independent_count": 1,
+      "score": 15.0,
+      "admitted": true
+    },
+    {
+      "source": "t2",
+      "age_minutes": 1,
+      "independent_count": 1,
+      "score": 14.996,
+      "admitted": false
+    },
+    {
+      "source": "t2",
+      "age_minutes": 60,
+      "independent_count": 1,
+      "score": 14.75,
+      "admitted": false
+    },
+    {
+      "source": "t3",
+      "age_minutes": 0,
+      "independent_count": 0,
+      "score": 11.0,
+      "admitted": false
+    }
+  ]
+}

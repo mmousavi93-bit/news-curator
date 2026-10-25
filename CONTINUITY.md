@@ -19,5 +19,16 @@ DEVELOPMENT: edit code, commit, push to this VPS hub; the laptop relays to GitHu
 Branches `state`, `flash-state`, `probe-results`, `run-reports` are CI-owned runtime state —
 the VPS agent touches **`main` only**.
 
+## Active continuation — Session 25 → 26
+
+Read `SESSION_25_VPS_HANDOFF.md` first, then `agents/briefs/SESSION_26_VPS_BRIEF.md`.
+The owner moved development to the VPS. The handoff preserves Astra's review,
+parent-verified findings, corrected audit statistics, decisions and evidence paths.
+First increment: queue retention, quiet-run selection, per-message delivery
+acknowledgments and accurate queued-event reporting. No ranking/flash/provider
+changes bundled in. Runtime remains GitHub Actions. Check
+`analysis/SESSION_26_PROGRESS.md` and `.continuation/session26/` for the active
+job before starting another writer.
+
 ## Laptop catch-up
 At logon, the laptop runs `pull-all.sh` to bring down the VPS agent's work.
