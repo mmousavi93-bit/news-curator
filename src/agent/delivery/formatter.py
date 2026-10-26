@@ -81,6 +81,7 @@ def format_split_tracked(
     message: Message,
     max_units: int = DEFAULT_MAX_UNITS,
     max_messages: int = DEFAULT_MAX_MESSAGES,
+    *, page_forms: list[dict[int, str]] | None = None,
 ) -> tuple[list[str], set[int]]:
     """Same as `format_split`, plus the SET of `message.items` INDICES that
     were truncated -- never rendered into any page (round-2 review, fix 3).
@@ -88,4 +89,5 @@ def format_split_tracked(
     `_render_fragment`'s `order` -- compose.py maps these straight back to
     the events that produced them."""
     header_text, fragments, footer_text = _prepare(message)
-    return fit_split_tracked(header_text, fragments, footer_text, max_units, max_messages)
+    return fit_split_tracked(header_text, fragments, footer_text, max_units, max_messages,
+                             page_forms=page_forms)

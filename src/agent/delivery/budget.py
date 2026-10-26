@@ -1,15 +1,8 @@
-"""UTF-16 length counting and priority-based fitting for Telegram's
-4,096-character cap (CLAUDE.md constraint #8).
+"""UTF-16 budgeting and whole-fragment priority packing for Telegram.
 
-Telegram counts length in UTF-16 code units, not Python `len()`/UTF-8 bytes;
-Persian/Arabic/Hebrew stay 1:1 with `len()` (all BMP), but emoji need 2
-units per Python character -- get this wrong and a message that looks like
-it fits under a naive count fails to send.
-
-Fitting works on whole rendered fragments only -- included whole or dropped
-whole, never sliced, so an HTML tag emitted by formatter.py can never be
-split. The header is the one exception: always plain text with no markup,
-so truncating it as a last resort is safe.
+Messages stay within 4,096 UTF-16 units (emoji consume two units). HTML
+fragments are included whole or dropped whole; only the plain-text header
+may be truncated. Final packing also exposes exact page/item metadata.
 """
 
 from __future__ import annotations
@@ -101,7 +94,8 @@ def _greedy_pack(
 
 
 def _pack_page(
-    header: str, fragments: list[Fragment], max_units: int, *, is_final: bool
+    header: str, fragments: list[Fragment], max_units: int, *, is_final: bool,
+    page_forms: dict[int, str] | None = None,
 ) -> tuple[str, list[Fragment], list[Fragment]]:
     """Fill one message body from `header` + as many `fragments` as fit,
     ranked best-priority-first. An item that doesn't fit in full is retried
@@ -141,9 +135,11 @@ def _pack_page(
         marker_budget = max(max_units - utf16_len(prefix), 0)
         marker = utf16_truncate(marker, marker_budget)
         body = prefix + marker
-        return body, leftover, dropped
-
-    body = header + "".join(chosen[order] for order in sorted(chosen))
+    else:
+        body = header + "".join(chosen[order] for order in sorted(chosen))
+    if page_forms is not None:
+        page_forms.update({f.order: "full" if chosen[f.order] == _SEPARATOR + f.body
+                           else "headline_only" for f in fragments if f.order in chosen})
     return body, leftover, dropped
 
 
@@ -162,21 +158,25 @@ def fit_split_tracked(
     footer: str,
     max_units: int,
     max_messages: int = DEFAULT_MAX_MESSAGES,
+    *, page_forms: list[dict[int, str]] | None = None,
 ) -> tuple[list[str], set[int]]:
-    """Same assembly as `fit_split`, plus the `.order` of every fragment that
-    was truncated -- never rendered into any page (round-2 review, fix 3).
-    A non-final page's unfit fragments are deferred to the next page, not
-    dropped, so only the LAST page processed (the one with `is_final=True`,
-    or an earlier one that emptied `remaining`) can contribute real drops."""
+    """Return pages and dropped orders; optionally expose each page's packing.
+
+    Metadata comes from the final greedy pass, including overflow re-packing;
+    no text scanning can confuse identical headlines or header/footer text.
+    """
     remaining = sorted(fragments, key=lambda f: (f.priority, f.order))
     pages: list[str] = []
     dropped_orders: set[int] = set()
     for i in range(max_messages):
         is_final = i == max_messages - 1
         page_header = header if i == 0 else f"{header} (cont.)"
+        forms: dict[int, str] = {}
         body, remaining, dropped = _pack_page(
-            page_header, remaining, max_units, is_final=is_final
+            page_header, remaining, max_units, is_final=is_final, page_forms=forms
         )
+        if page_forms is not None:
+            page_forms.append(forms)
         pages.append(body)
         dropped_orders.update(frag.order for frag in dropped)
         if not remaining:

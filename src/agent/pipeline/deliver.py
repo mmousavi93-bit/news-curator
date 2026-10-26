@@ -30,10 +30,15 @@ class DeliverStage:
     def run(self, ctx) -> None:
         messages = list(getattr(ctx, "messages", None) or [])
         ctx.counters.setdefault("deliver", 0)
+        ctx.delivery_states = {k: "not_attempted" for k in getattr(ctx, "compose_kept_keys", [])}
+        ctx.delivered_keys = []
+        ctx.delivery_page_states = ["not_attempted"] * len(messages)
         if not messages:
             self._logger.info("deliver: nothing to send")
             return
         if getattr(ctx, "dry_run", False):
+            ctx.delivery_states = dict.fromkeys(ctx.delivery_states, "dry_run")
+            ctx.delivery_page_states = ["dry_run"] * len(messages)
             for text in messages:
                 self._logger.info("deliver: dry-run, would have sent:\n%s", text)
             return
@@ -41,8 +46,15 @@ class DeliverStage:
         if client is None:
             return
         results = []
-        for text in messages:
-            results.append(self._send(ctx, client, text, is_lead=False))
+        pages = getattr(ctx, "message_event_keys", None)
+        for index, text in enumerate(messages):
+            result = self._send(ctx, client, text, is_lead=False)
+            results.append(result)
+            state = ("mocked" if result.mocked else "acknowledged" if result.ok
+                     else "failed_or_unknown")
+            ctx.delivery_page_states[index] = state
+            keys = pages[index] if pages is not None and index < len(pages) else []
+            self._record_page(ctx, keys, state)
         self._mark_if_all_real(ctx, results)
 
         lead_text = getattr(ctx, "lead_message", None)
@@ -54,20 +66,27 @@ class DeliverStage:
                     "deliver: lead events stored but not sent (no leads channel configured)"
                 )
 
+    def _record_page(self, ctx, keys, state) -> None:
+        """Persist each real receipt before attempting the next page."""
+        if state == "acknowledged" and keys:
+            if getattr(ctx, "db", None) is not None:
+                mark_delivered(ctx.db, keys, ctx.now)
+            ctx.delivered_keys.extend(k for k in keys if k not in ctx.delivered_keys)
+        ctx.delivery_states.update(dict.fromkeys(keys, state))
+
     def _mark_if_all_real(self, ctx, results) -> None:
-        """Write the received-markers (compose's kept keys) only when every
-        main-feed send REALLY succeeded. Marking before send -- or on a
-        mocked send -- would re-create the ghost suppression the delivered
-        table exists to kill: send failure is non-fatal by contract, and
-        the owner never saw these events."""
+        """Keep notice/escalation whole-batch semantics.
+
+        Older callers without page metadata retain the conservative whole-batch
+        receipt gate. Production compose supplies exact per-page metadata.
+        """
         if not results:
             return
         if any(getattr(r, "mocked", False) or not getattr(r, "ok", False)
                for r in results):
             return
-        keys = getattr(ctx, "compose_kept_keys", None)
-        if keys and getattr(ctx, "db", None) is not None:
-            mark_delivered(ctx.db, keys, ctx.now)
+        if getattr(ctx, "message_event_keys", None) is None:
+            self._record_page(ctx, getattr(ctx, "compose_kept_keys", []) or [], "acknowledged")
         # De-escalation state (9z), same all-real gate as the markers above:
         # record today as an escalation-delivered day and stamp the notice's
         # cooldown clock only after every real send succeeded.

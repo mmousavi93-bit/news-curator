@@ -23,86 +23,102 @@ from datetime import timedelta
 from agent.memory.event_json import event_from_json, event_to_json
 from agent.memory.event_models import Event
 
+_EXPIRY_PREFIX = "digest_queue_expired:"
+
 
 def load_pending(ctx, now) -> list[tuple[Event, float]]:
-    """Pending events within `queue_window_hours`, not yet delivered, with
-    their stored scores. Returns [] when ctx.db is absent (dry-run/mock)."""
+    """Eligible undelivered snapshots, strictly younger than the lifetime."""
     db = getattr(ctx, "db", None)
     if db is None:
         return []
-    window = ctx.config.settings.digest_rank.queue_window_hours
-    cutoff = (now - timedelta(hours=window)).isoformat()
+    cutoff = (now - timedelta(hours=ctx.config.settings.digest_rank.queue_window_hours)).isoformat()
     rows = db.execute(
-        "SELECT event_key, event_json, score FROM pending "
-        "WHERE ranked_at >= ? AND event_key NOT IN "
-        "(SELECT event_key FROM delivered)",
-        (cutoff,),
+        "SELECT event_json, score FROM pending WHERE ranked_at > ? "
+        "AND event_key NOT IN (SELECT event_key FROM delivered)", (cutoff,),
     ).fetchall()
-    return [(event_from_json(row[1]), float(row[2])) for row in rows]
+    return [(event_from_json(row[0]), float(row[1])) for row in rows]
 
 
 def store_pending(ctx, entries: list[tuple[Event, float]], now) -> None:
-    """Upsert `entries` (event, score) into the queue, ranked at `now`."""
+    """Persist admissions; refresh payload/score without renewing ranked_at.
+
+    Production SQLite autocommit makes each admission durable before send.
+    Expired keys cannot be readmitted while their memory marker exists.
+    """
     db = getattr(ctx, "db", None)
     if db is None or not entries:
         return
     db.executemany(
-        "INSERT OR REPLACE INTO pending (event_key, event_json, score, ranked_at) "
-        "VALUES (?, ?, ?, ?)",
-        [(e.event_key, event_to_json(e), score, now.isoformat())
+        "INSERT INTO pending (event_key, event_json, score, ranked_at) "
+        "SELECT ?, ?, ?, ? WHERE NOT EXISTS (SELECT 1 FROM meta WHERE key = ?) "
+        "ON CONFLICT(event_key) DO UPDATE SET event_json=excluded.event_json, score=excluded.score",
+        [(e.event_key, event_to_json(e), score, now.isoformat(), _EXPIRY_PREFIX + e.event_key)
          for e, score in entries],
     )
 
 
 def prune_pending(ctx, now) -> None:
-    """Delete expired and already-delivered pending rows (bounded growth)."""
+    """Remember terminal expiry before deleting the full snapshot.
+
+    Compact key/time markers use existing meta, not a schema change. They
+    expire after retention.events_days from observed expiry, consistent with
+    the existing finite event/delivery memory. Never gate on publish time.
+    With autocommit, markers are durable BEFORE snapshot deletion.
+    """
+    ctx.queue_expired = []
     db = getattr(ctx, "db", None)
     if db is None:
         return
-    window = ctx.config.settings.digest_rank.queue_window_hours
-    cutoff = (now - timedelta(hours=window)).isoformat()
-    db.execute("DELETE FROM pending WHERE ranked_at < ?", (cutoff,))
-    db.execute(
-        "DELETE FROM pending WHERE event_key IN (SELECT event_key FROM delivered)"
-    )
+    memory_cutoff = (now - timedelta(days=ctx.config.settings.retention.events_days)).isoformat()
+    db.execute("DELETE FROM meta WHERE key GLOB ? AND value <= ?",
+               (_EXPIRY_PREFIX + "*", memory_cutoff))
+    cutoff = (now - timedelta(hours=ctx.config.settings.digest_rank.queue_window_hours)).isoformat()
+    rows = db.execute(
+        "SELECT event_key, event_json FROM pending WHERE ranked_at <= ? "
+        "AND event_key NOT IN (SELECT event_key FROM delivered)", (cutoff,),
+    ).fetchall()
+    ctx.queue_expired = [event_from_json(row[1]) for row in rows]
+    db.executemany("INSERT OR IGNORE INTO meta (key, value) VALUES (?, ?)",
+                   [(_EXPIRY_PREFIX + row[0], now.isoformat()) for row in rows])
+    db.execute("DELETE FROM pending WHERE ranked_at <= ?", (cutoff,))
+    db.execute("DELETE FROM pending WHERE event_key IN (SELECT event_key FROM delivered)")
 
 
 def select_digest(ctx, fresh: list[Event], settings, logger: logging.Logger) -> list[Event]:
-    """Top `max_items` from the 24h pool (fresh + pending), score-sorted.
+    """Select at most max_items from admissions, never from publish age.
 
-    A fresh event supersedes a stale pending copy with the same event_key.
-    Fresh events below the cut are persisted to the queue (deferred, never
-    dropped); the queue is pruned of expired/delivered rows. Returns the
-    selected Events in score order -- compose renders them directly."""
+    Same-key updates preserve first admission. Terminal-key memory prevents
+    replay after pruning, even without a snapshot publication timestamp.
+    Fresh-vs-fresh same-key behavior and stored-score policy are unchanged.
+    """
     from agent.pipeline.rank import score_event
 
     clusters = {c.key: c for c in getattr(ctx, "clusters", None) or []}
-    credibility = ctx.config.credibility
-    now = ctx.now
+    prune_pending(ctx, ctx.now)
+    db = getattr(ctx, "db", None)
+    expired_keys = {r[0][len(_EXPIRY_PREFIX):] for r in db.execute(
+        "SELECT key FROM meta WHERE key GLOB ?", (_EXPIRY_PREFIX + "*",)
+    )} if db is not None else set()
+    reported_expiry = {e.event_key for e in ctx.queue_expired}
+    ctx.queue_expired.extend(e for e in fresh if e.event_key in expired_keys - reported_expiry)
+    acknowledged = {r[0] for r in db.execute("SELECT event_key FROM delivered")} if db else set()
     fresh_scored = [
-        (e, score_event(e, clusters.get(e.event_key), credibility, settings, now))
-        for e in fresh
+        (e, score_event(e, clusters.get(e.event_key), ctx.config.credibility, settings, ctx.now))
+        for e in fresh if e.event_key not in expired_keys | acknowledged
     ]
-    pending = load_pending(ctx, now)
-    pending_by_key = {e.event_key: (e, s) for e, s in pending}
-    pool: list[tuple[Event, float]] = []
-    for e, s in fresh_scored:
-        # A fresh event supersedes a stale pending copy with the SAME key; it
-        # never collapses another fresh event (a same-key collision inside
-        # `fresh` is preserved, matching the pre-queue behaviour).
+    store_pending(ctx, fresh_scored, ctx.now)
+    pending_by_key = {e.event_key: (e, s) for e, s in load_pending(ctx, ctx.now)}
+    ctx.queue_pending_keys = set(pending_by_key) - {e.event_key for e, _ in fresh_scored}
+    pool = list(fresh_scored)
+    for e, _ in fresh_scored:
         pending_by_key.pop(e.event_key, None)
-        pool.append((e, s))
     pool.extend(pending_by_key.values())
     pool.sort(key=lambda es: (-es[1], es[0].event_key))
-    top = [e for e, _ in pool[: settings.digest_rank.max_items]]
-    top_keys = {e.event_key for e in top}
-    deferred = [(e, s) for e, s in fresh_scored if e.event_key not in top_keys]
-    if deferred:
-        store_pending(ctx, deferred, now)
-    prune_pending(ctx, now)
-    if len(fresh_scored) > len(top):
-        logger.info(
-            "queue: %d fresh ranked -> %d delivered, %d deferred to 24h queue",
-            len(fresh_scored), len(top), len(deferred),
-        )
+    top = [e for e, _ in pool[:settings.digest_rank.max_items]]
+    selected_keys = {e.event_key for e in top}
+    ctx.queue_deferred = [e for e, _ in pool if e.event_key not in selected_keys]
+    ctx.queue_scores = {e.event_key: score for e, score in pool}
+    ctx.queue_selected = top
+    logger.info("queue: %d fresh admitted, %d selected, %d deferred, %d expired",
+                len(fresh_scored), len(top), len(ctx.queue_deferred), len(ctx.queue_expired))
     return top

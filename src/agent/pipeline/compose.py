@@ -1,19 +1,7 @@
-"""The compose stage: ranked events become one or more budgeted Telegram
-messages, or an honest one-liner.
-
-Owner's output contract (2026-08-29): Persian, informative headlines (the
-reader decides from the headline whether to read on), concise details,
-category symbols, importance-sorted, multi-message when the day is busy,
-and never "news anchor" dramatisation. Tone lives in config/prompts; this
-stage owns ORDER, LABELS and BUDGET. Order comes from pipeline/rank.py
-(deterministic -- NOT the Phase-11 risk engine). Dates are Jalali, Tehran
-wall-clock, display-only; date_only items say the time was not stated.
-
-The pure text helpers (_headline, _raw_fallback, _when_text, build_digest_
-items) live in pipeline/render.py; the lead channel message builder
-(build_lead_message) lives in pipeline/render_leads.py -- split out
-2026-09-05 / 2026-09-06 / 2026-09-08 to keep these files under the
-~200-line cap (constraint 12).
+"""Compose Persian digests from fresh and pending candidates, or an honest
+one-liner. Deterministic ranking, labels, Jalali dates, whole-item packing
+and exact per-message event mappings belong here. Text construction lives
+in render.py/render_leads.py; configurable prose stays in config/prompts.
 """
 
 from __future__ import annotations
@@ -51,6 +39,13 @@ class ComposeStage:
         events = list(getattr(ctx, "events", None) or [])
         clusters = {c.key: c for c in getattr(ctx, "clusters", None) or []}
         ctx.compose_kept_keys = []
+        ctx.compose_selected = []
+        ctx.compose_truncated = []
+        ctx.compose_render_forms = {}
+        ctx.message_event_keys = []
+        ctx.delivery_states = {}
+        ctx.delivered_keys = []
+        ctx.delivery_page_states = []
         # Flash-monitor liveness (9r). Computed BEFORE any budgeting so the
         # line is inside the character budget, never appended after the split
         # (constraint 8: never discover the 4,096 cap at send time). It rides
@@ -107,51 +102,28 @@ class ComposeStage:
             fates, labels,
         )
 
-        if not events:
-            if lang_dropped:
-                # Events existed but none rendered Persian: say so, never
-                # "nothing new" -- that would be a lie about the world
-                # (constraint 11).
-                text = labels["lang_dropped"]
-            elif getattr(ctx, "llm_failed", False):
-                text = labels["ai_unavailable"]
-            else:
-                text = labels["nothing_new"]
-            if raw_fallback:
-                text += "\n\n" + escape_html(raw_fallback)
-            ctx.messages = [f"{preamble}\n\n{text}" if preamble else text]
-            ctx.counters["compose"] = 0
-            self._logger.info("compose: no events -- honest one-liner")
-            return
-
-        kept, dropped, gated = rank_events(
+        fresh, dropped, gated = rank_events(
             events, clusters, ctx.config.credibility, settings, ctx.now,
             self._logger,
         )
         ctx.rank_dropped = dropped
         ctx.relevance_dropped = gated
-
+        # Selection always considers pending, even on quiet/degraded runs.
+        kept = select_digest(ctx, fresh, settings, self._logger)
+        coverage = (labels["lang_dropped"] if lang_dropped and not events
+                    else labels["ai_unavailable"] if getattr(ctx, "llm_failed", False)
+                    else "")
         if not kept:
-            # Everything fell below the importance threshold: the honest
-            # one-liner, never a bare header with nothing under it.
-            text = (
-                labels["ai_unavailable"] if getattr(ctx, "llm_failed", False)
-                else labels["nothing_new"]
-            )
+            text = coverage or labels["nothing_new"]
             if raw_fallback:
                 text += "\n\n" + escape_html(raw_fallback)
             ctx.messages = [f"{preamble}\n\n{text}" if preamble else text]
             ctx.counters["compose"] = 0
-            self._logger.info(
-                "compose: all %d event(s) below min_score -- honest one-liner", len(events)
-            )
+            self._logger.info("compose: no eligible fresh or pending events")
             return
-
-        # Session 25: the digest is the top `max_items` from a 24h queue --
-        # this run's fresh events plus prior runs' ranked-but-not-delivered
-        # ones. A #6 this morning can rise to #2 this afternoon; it is
-        # deferred, never dropped.
-        kept = select_digest(ctx, kept, settings, self._logger)
+        # Earlier summaries do not imply this run's fresh coverage succeeded.
+        if coverage:
+            preamble = "\n\n".join(p for p in (preamble, coverage) if p)
 
         now_tehran = to_tehran(ctx.now)
         marker = (
@@ -190,23 +162,20 @@ class ComposeStage:
         message = Message(header=header, items=tuple(items),
                           footer=raw_fallback or None)
         max_units = settings.delivery.telegram_max_chars
-        # format_split_tracked budgets and splits by priority; the digest may
-        # span up to digest_rank.max_messages messages (owner decision).
-        # `truncated_orders` are `message.items` indices that never rendered
-        # into any page (round-2 review, fix 3): the OLD unconditional
-        # `ctx.compose_kept_keys = [e.event_key for e in kept]` marked EVERY
-        # kept event delivered regardless, including ones the budget cut
-        # entirely. Fix 1 makes a follow-up the always-first-cut priority
-        # class, so a truncated follow-up would have been marked delivered
-        # unseen AND permanently raised its story's high-water mark --
-        # silently suppressing it for the rest of the 72h window. `items`
-        # was built with exactly one Item per event, in order, with no
-        # skips, matching `ordered_events` (round-4 review, fix 1: HIGH-band
-        # compact lines move to the end of `items`, so `ordered_events` --
-        # NOT `kept` -- is the list whose index i maps 1:1 to items[i]).
+        # The packer supplies exact item indices and full/headline-only forms.
+        # This follows ordered_events, not rank order or text/headline matching.
+        page_forms: list[dict[int, str]] = []
         ctx.messages, truncated_orders = format_split_tracked(
-            message, max_units=max_units, max_messages=settings.digest_rank.max_messages
+            message, max_units=max_units, max_messages=settings.digest_rank.max_messages,
+            page_forms=page_forms,
         )
+        ctx.message_event_keys = [
+            [ordered_events[i].event_key for i in sorted(forms)] for forms in page_forms
+        ]
+        ctx.compose_render_forms = {
+            ordered_events[i].event_key: form for forms in page_forms for i, form in forms.items()
+        }
+        ctx.compose_selected = ordered_events
         ctx.counters["compose"] = len(kept)
         delivered = [e for i, e in enumerate(ordered_events) if i not in truncated_orders]
         ctx.escalation_delivered = any(
@@ -215,14 +184,8 @@ class ComposeStage:
         ctx.compose_truncated = [
             e for i, e in enumerate(ordered_events) if i in truncated_orders
         ]
-        # Received-marker keys for the anti-repetition window, recorded
-        # after the rank cut (below-threshold events were never seen and
-        # must not suppress their own follow-ups) AND after truncation
-        # (fix 3 above) -- only events that actually rendered into a sent
-        # message may enter this list. The deliver stage writes the markers
-        # itself, only after real sends succeeded -- marking here would
-        # re-create the ghost suppression on send failure (review finding
-        # 2026-08-30).
+        # Only actually rendered keys may receive delivery markers; DeliverStage
+        # writes those markers after each real-success page, never at composition.
         ctx.compose_kept_keys = [e.event_key for e in delivered]
         if ctx.compose_truncated:
             self._logger.info(

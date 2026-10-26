@@ -127,8 +127,8 @@ def test_deferred_fresh_events_persist_to_pending(tmp_path):
     top = select_digest(ctx, fresh, ctx.config.settings, _Log())
     top_keys = {e.event_key for e in top}
     pending_keys = {e.event_key for e, _ in load_pending(ctx, NOW)}
-    assert pending_keys == {e.event_key for e in fresh} - top_keys
-    assert len(pending_keys) == 3  # 8 fresh - 5 delivered
+    assert pending_keys == {e.event_key for e in fresh}
+    assert len(pending_keys) == 8  # selection is not a delivery acknowledgment
 
 
 def test_deferred_event_rises_when_fresh_is_weaker(tmp_path):

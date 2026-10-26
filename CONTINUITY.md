@@ -19,16 +19,18 @@ DEVELOPMENT: edit code, commit, push to this VPS hub; the laptop relays to GitHu
 Branches `state`, `flash-state`, `probe-results`, `run-reports` are CI-owned runtime state —
 the VPS agent touches **`main` only**.
 
-## Active continuation — Session 25 → 26
+## Active continuation — Session 26 (supersedes VPS development notes above)
 
-Read `SESSION_25_VPS_HANDOFF.md` first, then `agents/briefs/SESSION_26_VPS_BRIEF.md`.
-The owner moved development to the VPS. The handoff preserves Astra's review,
-parent-verified findings, corrected audit statistics, decisions and evidence paths.
-First increment: queue retention, quiet-run selection, per-message delivery
-acknowledgments and accurate queued-event reporting. No ranking/flash/provider
-changes bundled in. Runtime remains GitHub Actions. Check
-`analysis/SESSION_26_PROGRESS.md` and `.continuation/session26/` for the active
-job before starting another writer.
+The owner restored VPS access but chose **local development**. Single active writer:
+`Hermes Projects/News Curator/session26-local`, branch `dev/session26-queue-local`.
+The old VPS runner made no changes and is not running; do not restart it.
+Read `SESSION_25_VPS_HANDOFF.md`, `analysis/SESSION_26_PROGRESS.md` and
+`docs/SESSION_26_QUEUE_RELIABILITY.md`. The bounded reliability increment passed
+1059 tests and final independent review (SHIP 38/40, zero BLOCKING/MAJOR).
+The owner then authorized commit/push. Publication uses GitHub CI; no manual
+live-Telegram dispatch is part of this release. Runtime remains GitHub Actions.
+Ranking/synthesis/flash/provider redesign remains a separate increment.
+Private local evidence is under `.continuation/session26-local/`.
 
 ## Laptop catch-up
 At logon, the laptop runs `pull-all.sh` to bring down the VPS agent's work.

@@ -1,76 +1,51 @@
-"""chosen.csv: one row per CLUSTER with its FATE and the deterministic
-reason why -- split out of report_csv.py 2026-09-06 (round-2 review, fix 5)
-when that file crossed the ~200-line cap (constraint 12). Same no-LLM/
-no-clock-read contract as the parent module; report_csv.write_run_reports
-calls _write_chosen from here.
-"""
+"""Chosen clusters and queue-only snapshots with composition/receipt states.
 
+Legacy fate `sent` means composed, NOT a delivery receipt. Only the explicit
+`delivery_state` column establishes an acknowledged real send.
+"""
 from __future__ import annotations
 
 import csv
 from pathlib import Path
 
 from agent.pipeline.priority import is_on_mission
-from agent.pipeline.rank import score_event
 from agent.report_csv_helpers import _best_tier, _sources
+from agent.report_csv_lifecycle import LIFECYCLE_COLUMNS, event_map, lifecycle_columns, pending_keys, score_text
 
 
 def _fate_for(cluster_key: str, events_by_key: dict, ctx) -> tuple[str, str]:
-    """(fate, reason) for one cluster -- the deterministic story of what
-    happened to it this run. Precedence follows the pipeline order."""
+    """Stage fates stay backward-compatible; receipts are separate columns."""
     fates = dict(getattr(ctx, "cluster_fates", None) or [])
-    if cluster_key in fates:
-        # Session 24: an LLM-understand failure fate (oversized, unparseable,
-        # unavailable, cap_refused) carries its contract-gate reason -- the
-        # within_bounds word count for oversized -- so a drop is calibratable
-        # from the artifact, not just the run log (mirror of repeat_drop_reasons).
+    queued = {e.event_key for attr in ("queue_selected", "queue_deferred", "queue_expired")
+              for e in getattr(ctx, attr, None) or []}
+    if cluster_key in fates and cluster_key not in queued:
         reasons = getattr(ctx, "fate_reasons", None) or {}
         return fates[cluster_key], reasons.get(cluster_key, "")
     sent_keys = set(getattr(ctx, "compose_kept_keys", None) or [])
     if cluster_key in sent_keys:
-        # Fix 1, 2026-09-06: a bypassed repeat renders as a compact
-        # follow-up line (compose.py), not a full entry -- distinguish it
-        # in the audit trail from a normal "sent" so the CSV can tell the
-        # two apart without re-deriving it from priority.py's output.
-        # Fix 5, round-2 review: a SURVIVING event that matched the repeat
-        # gate carries the same band/sim/score reason a dropped one does
-        # (pipeline/repeats.py's `reasons` dict is populated for every
-        # matched event, bypassed or not) -- the owner can only calibrate
-        # event_repeat_threshold/repeat_bypass_score from BOTH sides of
-        # the gate, not just the drops.
         reasons = getattr(ctx, "repeat_drop_reasons", None) or {}
         reason = reasons.get(cluster_key, "")
         event = events_by_key.get(cluster_key)
         if event is not None and getattr(event, "follow_up", False):
             return "sent_followup", reason
         return "sent", reason
-    # Fix 3/5, round-2 review: an event that survived every gate but was cut
-    # by the character budget (compose.py's format_split_tracked) is
-    # neither "sent" (compose_kept_keys excludes it on purpose -- it never
-    # rendered) nor one of the earlier stages' drops -- its own fate, so a
-    # truncated follow-up doesn't masquerade as a normal drop or a silent
-    # "event_unresolved" anomaly.
     truncated = {e.event_key for e in getattr(ctx, "compose_truncated", None) or []}
     if cluster_key in truncated:
         return "truncated", "cut by the character budget; not marked delivered"
+    for attr, fate, reason in (
+        ("queue_deferred", "deferred", "eligible; outside this run's selection cap; retained in queue"),
+        ("queue_expired", "expired", "first-admission queue lifetime elapsed; not delivered"),
+    ):
+        if cluster_key in {e.event_key for e in getattr(ctx, attr, None) or []}:
+            return fate, reason
     for fate_attr, fate in (
-        ("lang_dropped", "lang_dropped"),
-        ("rank_dropped", "rank_dropped"),
-        ("relevance_dropped", "relevance_dropped"),
-        ("repeat_dropped", "repeat_dropped"),
+        ("lang_dropped", "lang_dropped"), ("rank_dropped", "rank_dropped"),
+        ("relevance_dropped", "relevance_dropped"), ("repeat_dropped", "repeat_dropped"),
         ("lead_events", "lead_only"),
     ):
         dropped = getattr(ctx, fate_attr, None) or []
         if cluster_key in {e.event_key for e in dropped}:
             if fate in ("repeat_dropped", "rank_dropped", "relevance_dropped"):
-                # Fix E, 2026-09-06 review, extended round-3 review fix 4:
-                # a MID-band repeat survivor carries a band=/sim=/score=/
-                # prior= reason in ctx.repeat_drop_reasons (validate.py) --
-                # if compose.py later cuts that SAME event on rank or
-                # relevance, the old code threw that context away and
-                # wrote reason="". Falling back to the same dict for all
-                # three fates means the repeat-gate reason (if any)
-                # survives however the event finally left the pipeline.
                 reasons = getattr(ctx, "repeat_drop_reasons", None) or {}
                 return fate, reasons.get(cluster_key, "")
             return fate, ""
@@ -81,35 +56,24 @@ def _fate_for(cluster_key: str, events_by_key: dict, ctx) -> tuple[str, str]:
 
 def _write_chosen(ctx, path: Path) -> Path:
     clusters = list(getattr(ctx, "clusters", None) or [])
-    # ctx.events is the SURVIVING set -- validate physically removes repeats
-    # from it, so a repeat_dropped row used to be written with empty
-    # headline/summary and the drop was unjudgeable (2026-09-05: seven
-    # events dropped at cosine 0.56-0.67, one of them the run's largest
-    # cluster, and there was no text to tell over-cut from correct). Fold
-    # the dropped sets back in for TEXT only; _fate_for still decides fate.
-    events_by_key = {e.event_key: e for e in getattr(ctx, "events", None) or []}
-    for attr in ("repeat_dropped", "lang_dropped", "rank_dropped",
-                 "relevance_dropped", "lead_events", "compose_truncated"):
-        for event in getattr(ctx, attr, None) or []:
-            events_by_key.setdefault(event.event_key, event)
+    events_by_key = event_map(ctx)
+    pending = pending_keys(ctx)
     credibility = ctx.config.credibility
     with path.open("w", encoding="utf-8-sig", newline="") as fh:
         writer = csv.writer(fh)
         writer.writerow(["cluster_key", "fate", "reason", "n_members", "sources",
                          "provider", "best_tier", "category", "significance",
                          "claim_status", "independent_count", "score",
-                         "prellm_score", "on_mission", "headline", "summary"])
+                         "prellm_score", "on_mission", "headline", "summary", *LIFECYCLE_COLUMNS])
         providers = getattr(ctx, "cluster_provider", None) or {}
-        # pre-LLM drop probe (prellm_drop.py): per-cluster max cosine to the
-        # mission anchors, recorded even when the gate is disabled -- this is
-        # the calibration signal (see tools/calibrate_prellm_threshold.py).
         prellm_scores = getattr(ctx, "prellm_scores", None) or {}
+        written_keys = set()
         for cluster in clusters:
+            if cluster.key in pending:
+                continue  # Write the queue snapshot below, without current-run provenance.
+            written_keys.add(cluster.key)
             event = events_by_key.get(cluster.key)
             fate, reason = _fate_for(cluster.key, events_by_key, ctx)
-            score = ""
-            if event is not None:
-                score = f"{score_event(event, cluster, credibility, ctx.config.settings, ctx.now):.3f}"
             raw_prellm = prellm_scores.get(cluster.key)
             prellm_score = f"{raw_prellm:.4f}" if raw_prellm is not None else ""
             on_mission = 1 if is_on_mission(cluster, ctx.config) else 0
@@ -121,67 +85,54 @@ def _write_chosen(ctx, path: Path) -> Path:
                 getattr(event, "significance", "") if event else "",
                 getattr(event, "claim_status", "") if event else "",
                 getattr(event, "independent_count", "") if event else "",
-                score,
-                prellm_score,
-                on_mission,
-                # Gate forensics need the text (the Masafer Yatta lesson:
-                # a drop is unjudgeable without the words the gate saw).
-                # Empty for fates recorded before an event existed.
+                score_text(ctx, event, cluster), prellm_score, on_mission,
                 getattr(event, "headline", "") if event else "",
                 getattr(event, "summary", "") if event else "",
+                *lifecycle_columns(ctx, cluster.key),
             ])
-        # Clusters the cap cut before any LLM saw them. They are not in
-        # ctx.clusters, so without this block they left only hex keys in one
-        # log line -- 36 of them on 2026-09-05, unauditable. The raw source
-        # title goes in the headline column on purpose: `grep` over this one
-        # file is the audit, and it has to reach cap losses too.
+        # Cap/embedding losses retain raw source text and the actual priority
+        # diagnostics; these are not fabricated Event summaries.
         for cluster in getattr(ctx, "clusters_cap_dropped", None) or []:
+            if cluster.key in pending:
+                continue
+            written_keys.add(cluster.key)
             title = (cluster.members[0].title or cluster.members[0].body or "").strip()
-            # Fix 5, round-4 review: priority.py's actual cap sort key is
-            # (on_mission, tier_weight, corroborating_count, recency, size)
-            # -- NOT the independent_count column below, which is a
-            # different, wider count (every tier, leads excluded) kept for
-            # its own stable meaning (independent_count docstring,
-            # cluster.py). Without on_mission/corroborating_count in the
-            # reason, a cap_dropped row could not be checked against the
-            # sort that actually produced it -- the owner would have to
-            # re-derive both from read.csv by hand. is_on_mission is the
-            # single source of truth shared with that sort and the pre-LLM
-            # drop guard (priority.py), so the three can never drift.
             on_mission = 1 if is_on_mission(cluster, ctx.config) else 0
             raw_prellm = prellm_scores.get(cluster.key)
             prellm_score = f"{raw_prellm:.4f}" if raw_prellm is not None else ""
             corroborating = cluster.corroborating_count(credibility)
-            reason = (
-                f"over max_clusters_per_run; no LLM call. "
-                f"on_mission={on_mission} corroborating_count={corroborating}"
-            )
+            reason = (f"over max_clusters_per_run; no LLM call. "
+                      f"on_mission={on_mission} corroborating_count={corroborating}")
             writer.writerow([
                 cluster.key, "cap_dropped", reason,
-                len(cluster.members), _sources(cluster), "",
-                _best_tier(cluster, credibility),
+                len(cluster.members), _sources(cluster), "", _best_tier(cluster, credibility),
                 "", "", "", cluster.independent_count(credibility), "",
-                prellm_score, on_mission, title[:300], "",
+                prellm_score, on_mission, title[:300], "", *lifecycle_columns(ctx, cluster.key),
             ])
-        # Clusters the pre-LLM drop cut before the cap or the LLM (only when
-        # prellm_drop_enabled -- otherwise this list is empty). Same audit
-        # contract as cap_dropped: raw source title + the score that dropped
-        # it, so a threshold call can be checked against both the words and
-        # the number. on_mission is 0 by construction (the keyword guard
-        # keeps on-mission clusters whatever their embedding score).
         for cluster in getattr(ctx, "clusters_prellm_dropped", None) or []:
+            if cluster.key in pending:
+                continue
+            written_keys.add(cluster.key)
             title = (cluster.members[0].title or cluster.members[0].body or "").strip()
             raw_prellm = prellm_scores.get(cluster.key)
             prellm_score = f"{raw_prellm:.4f}" if raw_prellm is not None else ""
-            reason = (
-                f"below prellm_drop_threshold; no LLM call. "
-                f"prellm_score={prellm_score}"
-            )
+            reason = f"below prellm_drop_threshold; no LLM call. prellm_score={prellm_score}"
             writer.writerow([
                 cluster.key, "prellm_dropped", reason,
-                len(cluster.members), _sources(cluster), "",
-                _best_tier(cluster, credibility),
+                len(cluster.members), _sources(cluster), "", _best_tier(cluster, credibility),
                 "", "", "", cluster.independent_count(credibility), "",
-                prellm_score, 0, title[:300], "",
+                prellm_score, 0, title[:300], "", *lifecycle_columns(ctx, cluster.key),
+            ])
+        # Queue snapshots can outlive their source run's clusters/providers.
+        # Unknown provenance remains empty, never guessed from current feeds.
+        queue_keys = {e.event_key for attr in ("queue_selected", "queue_deferred", "queue_expired")
+                      for e in getattr(ctx, attr, None) or []}
+        for key in sorted(queue_keys - written_keys):
+            event = events_by_key[key]
+            fate, reason = _fate_for(key, events_by_key, ctx)
+            writer.writerow([
+                key, fate, reason, "", "", "", "", event.category, event.significance,
+                event.claim_status, event.independent_count, score_text(ctx, event, None),
+                "", "", event.headline, event.summary, *lifecycle_columns(ctx, key),
             ])
     return path

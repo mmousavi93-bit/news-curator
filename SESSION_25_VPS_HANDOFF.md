@@ -2,11 +2,11 @@
 
 ## Active handoff / resume point
 
-Owner explicitly moved continued development to the VPS. Working directory: `/home/hermes/work/news-curator`, branch main. Runtime remains GitHub Actions; do NOT deploy the news pipeline as a VPS service.
+Owner subsequently restored VPS access and explicitly chose **local development**. Active writer: `Hermes Projects/News Curator/session26-local`, branch `dev/session26-queue-local`, based on `72a568eda00d5eeff132b6abf52bbd6869b6cff3`. Runtime remains GitHub Actions; do NOT deploy a VPS news service.
 
-Read next: `agents/briefs/SESSION_26_VPS_BRIEF.md`. The first approved bounded increment is queue reliability, acknowledgment accounting and lifecycle observability. One Codex implementation job; parent independently reviews/tests. No ranking/flash/provider/presentation changes bundled into this increment. Do not publish to GitHub or dispatch anything during implementation.
+The old VPS job made no changes: bubblewrap blocked execution despite wrapper exit0. VPS is clean at the same base, with **1034 tests passing** in a parent-run validation after recovery. No remote implementation job is running or was restarted; no remote work needs merging.
 
-Progress record: `analysis/SESSION_26_PROGRESS.md` (created by implementer). Detailed execution report and logs: `.continuation/session26/` on VPS. Review final report before starting another writer. No simultaneous laptop edits while VPS development is active.
+The bounded increment remains `agents/briefs/SESSION_26_VPS_BRIEF.md` (local paths/branch supersede its VPS-only narrative). **Locally accepted: 1059 tests passed** (1034 baseline + 25 new cases), focused **99 passed**, final fresh `deepseek-v4-pro` round 3 **SHIP 38/40, zero BLOCKING/MAJOR**. Parent verified all 11 source/test SHA256s unchanged and independently reran 19 reviewer assertions plus an 18-case report matrix. Publication/admission-clock and same-key snapshot/fate/provenance reporting regressions are fixed. Two non-blocking reporting nits and durability limits are recorded in `analysis/SESSION_26_PROGRESS.md`; full contract is `docs/SESSION_26_QUEUE_RELIABILITY.md`, evidence `.continuation/session26-local/`. The owner subsequently authorized commit/push; fresh prepublication tests again passed 1059/1059. Verify the remote commit and its GitHub CI before claiming publication complete. No manual production workflow/live send or ranking/flash/provider/presentation redesign is part of this release. Broader product work has not started. Keep a single local writer.
 
 ## Product requirements
 
