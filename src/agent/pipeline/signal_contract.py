@@ -30,11 +30,12 @@ PREDICATES = {
     "D1": "leader_ultimatum timeframe_or_targets", "D2": "same_leader_negative_shift",
     "D3": "iranian_route_closure_shift", "D4": "chronic_threat_or_anonymous_preparation",
     "E1": "iran_attributed commercial_vessel_impact gulf_waters",
-    "E2": "distinct_second_vessel_attack", "E3": "us_gulf_asset_impact",
+    "E2": "distinct_second_vessel_attack iran_attributed commercial_vessel_impact gulf_waters", "E3": "us_gulf_asset_impact",
     "E4": "proxy_front_widens", "E5": "major_interception_or_near_miss",
     "E6": "major_infrastructure_cyberattack corroborated_attribution",
     "H1": "mass_protests lethal_crackdown", "H2": "national_blackout measurement_org",
     "H3": "comparable_bazaar_rial",
+    "soothing": "soothing official_statement", "schedule": "schedule",
 }
 STATE_ENDS = {
     "A1": "csg_exits_or_order_cancelled", "A2": "theater_count_below_two",
@@ -89,9 +90,15 @@ def validate_candidate(raw, items, catalog, *, calendar=False):
     if not isinstance(raw, dict):
         raise EvidenceError("candidate must be an object")
     sid = _required(raw, "signal_id")
-    allowed = {"C1"} if calendar else set(catalog) - {"C1", "G1", "G2"}
+    allowed = ({"C1"} if calendar is True else {calendar}) if calendar else set(catalog) - {"C1", "G1", "G2"}
     if sid not in allowed or sid not in PREDICATES:
         raise EvidenceError(f"unknown/foreign signal ID: {sid}")
+    allowed_fields = {"signal_id", "claim", "actor", "action", "object", "location",
+                      "occurrence_id", "episode_anchor", "supports", "predicates",
+                      "occurrence_date", "transition", "effective_date", "prior_ids",
+                      "numbers", "dates", "status"}
+    if set(raw) - allowed_fields:
+        raise EvidenceError("unknown candidate fields (model event dates are forbidden)")
     names = ("claim", "actor", "action", "object", "location", "occurrence_id", "episode_anchor")
     fields = {name: _required(raw, name) for name in names}
     if raw.get("status") != "current_affirmative":
@@ -169,9 +176,10 @@ def validate_envelope(payload):
         raise EvidenceError("explicit none boolean required")
     signals = payload.get("signals", [])
     countdowns = payload.get("countdowns", [])
-    if not isinstance(signals, list) or not isinstance(countdowns, list):
+    side = [payload.get(name, []) for name in ("soothing_statements", "scheduled_events")]
+    if not all(isinstance(rows, list) for rows in [signals, countdowns, *side]):
         raise EvidenceError("candidates must be lists")
-    if payload["none"] and (signals or countdowns):
+    if payload["none"] and (signals or countdowns or any(side)):
         raise EvidenceError("none plus candidates contradiction")
-    if not payload["none"] and not signals and not countdowns:
+    if not payload["none"] and not signals and not countdowns and not any(side):
         raise EvidenceError("empty extraction must explicitly say none")

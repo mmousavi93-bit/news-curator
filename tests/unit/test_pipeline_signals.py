@@ -11,6 +11,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import date, datetime, timezone
 from pathlib import Path
+import json
+from unit.test_signal_attribution import raw_candidate, evidence, NOW
+from agent.pipeline.signal_contract import validate_candidate, EvidenceError
 
 import pytest
 
@@ -117,7 +120,7 @@ def test_prompt_file_migrated_and_wire_ready():
     assert text.startswith("You are the signal-extraction stage")
     assert "{items}" in text  # render_prompt placeholder
     assert "SIGNAL CATALOG" in text
-    assert "A1★" in text
+    assert "| A1 |" in text
     assert "H3" in text
 
 
@@ -155,32 +158,16 @@ def test_parse_signals_missing_or_wrong_type():
 # --- extract happy path -----------------------------------------------------
 
 def test_extract_ok_returns_typed_signals():
-    text = (
-        '{"signals": ['
-        '{"signal_id": "B1", "claim": "US embassy ordered departure.", '
-        '"actor": "State Dept", "event_date": "2026-06-11", '
-        '"sources": ["Reuters", "AP"], "quote": "ordered departure", '
-        '"confidence_notes": null, "state_update": false},'
-        '{"signal_id": "E1", "claim": "Vessel hit in Hormuz.", '
-        '"actor": "x", "event_date": "2026-07-06T10:00:00", '
-        '"sources": ["AP"], "quote": "q", "confidence_notes": null, '
-        '"state_update": false}'
-        "]}"
-    )
-    stub = _Stub(text=text)
-    cluster = _cluster(_item("ukmto", "http://a"))
-    result = extract(stub, cluster, template=TEMPLATE, body_chars=100,
-                     catalog=CATALOG, credibility={}, logger=_Log())
+    raw, items, cred = evidence("B1")
+    text = json.dumps({"none": False, "signals": [raw]})
+    result = extract(_Stub(text), _cluster(*items.values()), template=TEMPLATE,
+                     body_chars=1000, catalog=CATALOG, credibility=cred, logger=_Log())
     assert result.status == "ok"
     assert result.provider == "stub"
-    assert result.none is False
-    assert result.dropped_ids == ()
-    assert [s.signal_id for s in result.signals] == ["B1", "E1"]
-    assert result.signals[0].event_date == date(2026, 6, 11)
-    assert result.signals[1].event_date == date(2026, 7, 6)  # ISO datetime
-    assert result.signals[0].sources == ("Reuters", "AP")
-    assert result.signals[0].state_update is False
-
+    assert not result.none and not result.dropped_ids
+    assert result.signals == (validate_candidate(raw, items, CATALOG),)
+    assert result.raw_response == text
+    assert result.signals[0].occurrence_date is None
 
 def test_extract_passes_stage_signals_and_renders_items():
     stub = _Stub(text='{"none": true}')
@@ -205,17 +192,15 @@ def test_extract_none():
 
 
 def test_extract_drops_unknown_ids_and_logs():
-    stub = _Stub(text='{"signals": [' +
-                     '{"signal_id": "B1", "event_date": "2026-06-11"},' +
-                     '{"signal_id": "ZZ9", "event_date": "2026-06-11"}]}')
+    raw, items, cred = evidence("B1")
     log = _Log()
-    result = extract(stub, _cluster(_item("ukmto", "http://a")),
-                     template=TEMPLATE, body_chars=100, catalog=CATALOG,
-                     credibility={}, logger=log)
+    text = json.dumps({"none": False, "signals": [raw, {"signal_id": "ZZ9"}]})
+    result = extract(_Stub(text), _cluster(*items.values()), template=TEMPLATE,
+                     body_chars=1000, catalog=CATALOG, credibility=cred, logger=log)
     assert [s.signal_id for s in result.signals] == ["B1"]
+    assert result.status == "partial"
     assert result.dropped_ids == ("ZZ9",)
     assert any("ZZ9" in w for w in log.warnings)
-
 
 def test_extract_unparseable():
     stub = _Stub(text="not json at all")
@@ -241,35 +226,37 @@ def test_extract_provider_failure_propagates_status():
 # --- source-tier attribution ------------------------------------------------
 
 def test_cluster_source_tier_picks_best_corroborating_tier():
-    cred = {
-        "t1": _Cred(1, "g1"),
-        "t2": _Cred(2, "g2"),
-        "t3": _Cred(3, None),
-        "lead": _Cred("lead", None),
-    }
-    via_attribute = lambda *src: attribute_signal_event(
-        _cluster(*[_item(s, f"http://{s}") for s in src]),
-        cred,
-        ExtractedSignal("B1", "c", "a", date(2026, 6, 11), (), "q", None, False),
-    )
-    assert via_attribute("t1").source_tier == 1
-    assert via_attribute("t2").source_tier == 2
-    assert via_attribute("t3").source_tier == 2          # rumour -> moot default
-    assert via_attribute("lead").source_tier == 2
-    assert via_attribute("t1", "t2").source_tier == 1    # best wins
+    raw, items, cred = evidence("B1")
+    sig = validate_candidate(raw, items, CATALOG)
+    unrelated = _item("unrelated", "http://unrelated")
+    cred["unrelated"] = _Cred(1, "unrelated")
+    event = attribute_signal_event(_cluster(*items.values(), unrelated), cred, sig, now=NOW)
+    assert event.source_tier == 2
+    assert event.independent_source_count == 2
+
+def test_attribute_bridges_to_signal_event_with_claim_evidence():
+    raw, items, cred = evidence("B1")
+    sig = validate_candidate(raw, items, CATALOG)
+    event = attribute_signal_event(_cluster(*items.values()), cred, sig, now=NOW)
+    assert event == SignalEvent("B1", NOW.date(), 2, 2, 1.0, None)
 
 
-def test_attribute_bridges_to_signal_event_with_proxies():
-    cred = {"ukmto": _Cred(1, "mil"), "reuters": _Cred(1, "wire")}
-    cluster = _cluster(_item("ukmto", "http://a"), _item("reuters", "http://b"))
-    sig = ExtractedSignal("B1", "c", "a", date(2026, 6, 11), ("Reuters",),
-                          "q", None, False)
-    event = attribute_signal_event(cluster, cred, sig)
-    assert event == SignalEvent(
-        signal_id="B1",
-        event_date=date(2026, 6, 11),
-        source_tier=1,
-        independent_source_count=2,   # two distinct tier-1 groups
-    )
-    assert event.novelty == 1.0
-    assert event.state_end_date is None
+@pytest.mark.parametrize("payload", [
+    {"none": True, "signals": [{"signal_id": "B1"}]},
+    {"signals": []}, {"none": False, "signals": []},
+    {"none": False, "signals": [42]},
+])
+def test_invalid_envelope_never_becomes_none(payload):
+    result = extract(_Stub(json.dumps(payload)), _cluster(_item("x", "http://a")),
+                     template=TEMPLATE, body_chars=100, catalog=CATALOG,
+                     credibility={}, logger=_Log())
+    assert result.status == "rejected" and not result.none
+
+
+def test_truncated_unseen_quote_rejected_and_ids_rendered():
+    raw, items, cred = evidence("B1")
+    stub = _Stub(json.dumps({"none": False, "signals": [raw]}))
+    result = extract(stub, _cluster(*items.values()), template=TEMPLATE,
+                     body_chars=2, catalog=CATALOG, credibility=cred, logger=_Log())
+    assert result.status == "rejected"
+    assert all(url in stub.prompts[0] for url in items)

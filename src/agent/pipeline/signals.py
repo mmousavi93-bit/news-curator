@@ -10,16 +10,15 @@ DELIBERATELY NOT WIRED into build_stages yet: the same-call-vs-separate-call
 decision is deferred until measured accuracy + token cost are known. A
 separate call per cluster doubles LLM load and breaks the ~40-call budget
 (constraint 2). This module makes exactly one router call per cluster and
-returns engine.SignalEvent objects; it persists nothing and scores nothing.
+returns validated candidates; it persists nothing and scores nothing.
 
-The prompt lives in config/prompts/signal_extraction.txt (migrated verbatim
-from analysis/AGENT_PROMPT.md, its Phase 7 instruction).
+The prompt lives in config/prompts/signal_extraction.txt. Candidate evidence
+is validated before deterministic attribution; no model date fallback is used.
 """
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from datetime import date, datetime
+from dataclasses import dataclass, replace
 from typing import Mapping
 
 from agent.config import ConfigError
@@ -27,6 +26,9 @@ from agent.pipeline.batch import render_prompt
 from agent.pipeline.cluster import Cluster
 from agent.pipeline.contract import extract_json
 from agent.risk.engine import SignalEvent
+from agent.pipeline.signal_contract import (Candidate, EvidenceError, validate_candidate,
+                                            validate_envelope)
+from agent.pipeline.signal_attribution import derive
 
 
 def signal_catalog(weights_raw: Mapping[str, object]) -> frozenset[str]:
@@ -39,35 +41,25 @@ def signal_catalog(weights_raw: Mapping[str, object]) -> frozenset[str]:
     if not isinstance(signals, dict) or not signals:
         raise ConfigError("risk_weights.yaml: expected a non-empty 'signals' mapping")
     market_only = set(weights_raw.get("covered_by_markets_fetcher") or ())
-    return frozenset(signals) - {"C1"} - market_only
+    return frozenset(signals) - {"C1", "G1", "G2"} - market_only
 
 
-@dataclass(frozen=True)
-class ExtractedSignal:
-    """One signal the model extracted, exactly as the prompt schema defines it
-    (countdowns/scheduled_events/soothing_statements/economic_events are
-    consumed by a later layer, not here)."""
-
-    signal_id: str
-    claim: str
-    actor: str
-    event_date: date
-    sources: tuple[str, ...]
-    quote: str
-    confidence_notes: str | None
-    state_update: bool
+# The evidence envelope stays outside the unchanged six-field scorer input.
+ExtractedSignal = Candidate
 
 
 @dataclass(frozen=True)
 class ExtractionResult:
-    """Outcome of extracting one cluster. `status` is "ok" | "none" |
-    "unparseable" | the LlmResult status (REFUSED_CAP/UNAVAILABLE/FATAL)."""
-
-    signals: tuple[ExtractedSignal, ...]
+    signals: tuple[Candidate, ...]
     status: str
     provider: str | None
-    none: bool  # the model answered none:true
-    dropped_ids: tuple[str, ...]  # signal_ids emitted but not in the catalog
+    none: bool
+    dropped_ids: tuple[str, ...]
+    rejected: tuple[str, ...] = ()
+    countdowns: tuple[Candidate, ...] = ()
+    raw_response: str = ""
+    soothing_statements: tuple[Candidate, ...] = ()
+    scheduled_events: tuple[Candidate, ...] = ()
 
 
 def parse_signals(payload: dict, catalog: frozenset[str]) -> tuple[list[dict], list[str]]:
@@ -90,68 +82,34 @@ def parse_signals(payload: dict, catalog: frozenset[str]) -> tuple[list[dict], l
     return valid, dropped
 
 
-def _parse_event_date(raw: object, fallback: date) -> date:
-    """ISO date (or ISO datetime) -> date; anything unparseable falls back to
-    the cluster's latest publish date. Timing integrity is the whole product
-    (prompt Rule 7), so a broken date must not silently become 'today'."""
-    if isinstance(raw, str):
-        text = raw.strip()
-        try:
-            return datetime.fromisoformat(text).date()
-        except ValueError:
-            try:
-                return date.fromisoformat(text)
-            except ValueError:
-                pass
-    return fallback
+def attribute_signal_event(cluster, credibility, signal, *, now, history=None):
+    """Claim-specific, deterministic bridge; never use model event dates."""
+    fields = derive(signal, {m.url: m for m in cluster.members}, credibility,
+                    now=now, history=history)
+    return SignalEvent(**fields.fields())
 
 
-def _cluster_source_tier(cluster: Cluster, credibility: Mapping[str, object]) -> int:
-    """Best (lowest numeric) credibility tier among the cluster's members.
-    Mirrors independence.py: only tiers 1/2 corroborate; tier 3 and `lead`
-    never do. Returns 1 if any tier-1 member, else 2 -- a rumour-only cluster
-    (no corroborating member) is gated by Step 1 regardless of this value."""
-    best = 2
-    for member in cluster.members:
-        entry = credibility.get(member.source_id)
-        tier = getattr(entry, "tier", 3) if entry is not None else 3
-        if isinstance(tier, int) and tier in (1, 2) and tier < best:
-            best = tier
-    return best
+def attribute_run(candidates, items, credibility, *, now, history, weights,
+                  complete=True, linked_consequences=()):
+    """Offline replay with injected history; no production wiring/persistence.
 
-
-def attribute_signal_event(
-    cluster: Cluster, credibility: Mapping[str, object], signal: ExtractedSignal
-) -> SignalEvent:
-    """Bridge an extracted signal to the engine's scoring input.
-
-    PROXIES (documented, refined later): `independent_source_count` is the
-    cluster's corroborating-group count -- an UPPER bound on the signal's own
-    corroboration (per-signal source attribution from `sources` is a
-    downstream storage-layer concern); `source_tier` is the cluster's best
-    corroborating tier; `state_end_date` is always None (state END is
-    computed by later runs, not extraction)."""
-    return SignalEvent(
-        signal_id=signal.signal_id,
-        event_date=signal.event_date,
-        source_tier=_cluster_source_tier(cluster, credibility),
-        independent_source_count=cluster.corroborating_count(credibility),
-    )
-
-
-def _to_extracted(raw: dict, cluster: Cluster) -> ExtractedSignal:
-    sources = raw.get("sources")
-    notes = raw.get("confidence_notes")
-    return ExtractedSignal(
-        signal_id=raw["signal_id"],
-        claim=str(raw.get("claim") or ""),
-        actor=str(raw.get("actor") or ""),
-        event_date=_parse_event_date(raw.get("event_date"), cluster.latest().date()),
-        sources=tuple(str(s) for s in sources) if isinstance(sources, list) else (),
-        quote=str(raw.get("quote") or ""),
-        confidence_notes=notes if isinstance(notes, str) and notes else None,
-        state_update=raw.get("state_update") is True,
-    )
+    Missing history halts. Callers validate raw candidates before this boundary.
+    Apply all resets before materializing both new and historical contributions.
+    """
+    if history is None:
+        raise EvidenceError("missing required history")
+    for sid in history.ledger:
+        history.factor(sid)
+    new = []
+    for candidate in sorted(candidates, key=lambda c: (c.transition != "end", c.signal_id,
+                                                       c.occurrence_id)):
+        event = derive(candidate, items, credibility, now=now, history=history)
+        if history.accept(candidate, event, items, credibility, now=now):
+            new.append(event)
+    history.advance(now=now, complete=complete, new_ids={e.signal_id for e in new},
+                    linked_consequences=linked_consequences)
+    history.reset_for(new, weights)
+    return tuple(SignalEvent(**e.fields()) for e in history.materialize())
 
 
 def extract(
@@ -170,7 +128,9 @@ def extract(
     shape UnderstandStage uses); `catalog` is signal_catalog(weights_raw),
     computed once per run, not per cluster.
     """
-    prompt = render_prompt(template, cluster, body_chars)
+    blocks = [f"item_id: {item.url}\n" + render_prompt(
+        "{items}", replace(cluster, members=[item]), body_chars) for item in cluster.members]
+    prompt = template.replace("{items}", "\n\n".join(blocks))
     result = router.complete(prompt, stage="signals")
     if not result.ok:
         return ExtractionResult((), result.status, result.provider, False, ())
@@ -179,14 +139,34 @@ def extract(
     except ValueError:
         logger.error("signals: cluster %s response unparseable -- skipped", cluster.key)
         return ExtractionResult((), "unparseable", result.provider, False, ())
-    if parsed.get("none") is True:
-        return ExtractionResult((), "none", result.provider, True, ())
+    try:
+        validate_envelope(parsed)
+    except EvidenceError as exc:
+        return ExtractionResult((), "rejected", result.provider, False, (),
+                                (str(exc),), raw_response=result.text)
+    if parsed["none"]:
+        return ExtractionResult((), "none", result.provider, True, (), raw_response=result.text)
     valid, dropped = parse_signals(parsed, catalog)
     if dropped:
-        logger.warning(
-            "signals: cluster %s emitted unknown signal ids %s -- dropped",
-            cluster.key,
-            sorted(set(dropped)),
-        )
-    signals = tuple(_to_extracted(signal, cluster) for signal in valid)
-    return ExtractionResult(signals, "ok", result.provider, False, tuple(dropped))
+        logger.warning("signals: cluster %s emitted unknown signal ids %s -- dropped",
+                       cluster.key, sorted(set(dropped)))
+    # Quotes must match the actual supplied excerpt, not unseen body text.
+    items = {item.url: replace(item, body=item.body[:body_chars]) for item in cluster.members}
+    accepted, countdowns, rejected, soothing, schedules = [], [], [], [], []
+    for rows, output, calendar in ((valid, accepted, False),
+                                   (parsed.get("countdowns", []), countdowns, True),
+                                   (parsed.get("soothing_statements", []), soothing, "soothing"),
+                                   (parsed.get("scheduled_events", []), schedules, "schedule")):
+        for raw in rows:
+            try:
+                output.append(validate_candidate(raw, items, catalog, calendar=calendar))
+            except EvidenceError as exc:
+                rejected.append(str(exc))
+    if any(not isinstance(row, dict) for row in parsed.get("signals", [])):
+        rejected.append("candidate must be an object")
+    status = "partial" if rejected or dropped else "ok"
+    if not accepted and not countdowns and not soothing and not schedules:
+        status = "rejected"
+    return ExtractionResult(tuple(accepted), status, result.provider, False, tuple(dropped),
+                            tuple(rejected), tuple(countdowns), result.text,
+                            tuple(soothing), tuple(schedules))
