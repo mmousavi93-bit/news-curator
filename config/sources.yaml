@@ -704,3 +704,84 @@ sources:
     topic: macro
     enabled: true
     signals_covered: [H3]
+
+  - id: tg_avatoday
+    name: AVATODAY (javanmardi77)
+    url: https://t.me/s/javanmardi77
+    type: telegram
+    lang: fa
+    topic: military
+    enabled: true
+    signals_covered: [A3, A4, A5, A6, B3, B6, E1, E2, E3, E4, E5]
+
+  - id: tg_iran_didehban
+    name: Iran Didehban (ایران دیده‌بان)
+    url: https://t.me/s/IRAN_DIDEHBAN
+    type: telegram
+    lang: fa
+    topic: military
+    enabled: true
+    signals_covered: [A3, A4, A5, A6, B3, B6, E1, E2, E3, E4, E5]
+
+  - id: tg_kaavoush
+    name: Kaavoush (کاوش)
+    url: https://t.me/s/kaavoush
+    type: telegram
+    lang: fa
+    topic: military
+    enabled: true
+    signals_covered: [A3, A4, A5, A6, B3, B6, E1, E2, E3, E4, E5]
+
+  - id: tg_mamlekate
+    name: Mamlekate (مملکته)
+    url: https://t.me/s/mamlekate
+    type: telegram
+    lang: fa
+    topic: iran_domestic
+    enabled: true
+    signals_covered: []
+
+  - id: tg_kh_b2
+    name: KH_B2 (اخبارفوری جنگ امریکا و ایران)
+    url: https://t.me/s/KH_B2
+    type: telegram
+    lang: fa
+    topic: iran_domestic
+    enabled: true
+    signals_covered: []
+
+  - id: tg_m0_hm
+    name: M0_HM (اخبارفوری جنگ امریکا فوری)
+    url: https://t.me/s/M0_HM
+    type: telegram
+    lang: fa
+    topic: iran_domestic
+    enabled: true
+    signals_covered: []
+
+  - id: tg_p_raetorio
+    name: Praetorio (P_raetorio)
+    url: https://t.me/s/P_raetorio
+    type: telegram
+    lang: fa
+    topic: military
+    enabled: true
+    signals_covered: []
+
+  - id: tg_mohem_mat
+    name: Mohem Mat (مهمات)
+    url: https://t.me/s/mohem_mat
+    type: telegram
+    lang: fa
+    topic: iran_domestic
+    enabled: true
+    signals_covered: []
+
+  - id: tg_vahid_oonline
+    name: VahidOOnline (وحید اون‌لاین)
+    url: https://t.me/s/VahidOOnLine
+    type: telegram
+    lang: fa
+    topic: iran_domestic
+    enabled: true
+    signals_covered: []

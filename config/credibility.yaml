@@ -421,6 +421,18 @@ sources:
     note: "Parvaz Capital market-education channel. Distinct from the CUT
            `tg_parvaz_capital` (dead preview); this `_tel` handle is live via t.me/s/.
            Market colour (طلا/دلار/بورس/نفت/کریپتو); nominates H3."
+  tg_avatoday:
+    tier: 3
+    group: null
+    note: "Sourced regional news aggregator (Reuters-cited). Nominates, never corroborates."
+  tg_iran_didehban:
+    tier: 3
+    group: null
+    note: "Domestic military-activity watcher (fighter sorties, explosions, official denials)."
+  tg_kaavoush:
+    tier: 3
+    group: null
+    note: "Regional intel curator, ~35% forwarded. Original curation, partial relay."
 
 # --- lead class (weight 0.0). See DECISION 7. ---
   tg_padeshah_fxn:
@@ -432,7 +444,7 @@ sources:
     note: "Owner downgraded this from candidate source to lead on 2026-08-16."
   tg_vahid_online:
     tier: lead
-    group: null
+    group: vahid
   tg_tweet_mardomi:
     tier: lead
     group: osint_repost
@@ -461,6 +473,30 @@ sources:
     note: "Owner set 3; overridden to lead 2026-08-16. 'Iran Azad' is NCRI/MEK
            advocacy branding -- an advocacy organisation, not a newsroom. Same
            structural-bias problem as tg_behold_israel, opposite direction."
+  tg_mamlekate:
+    tier: lead
+    group: null
+    note: "Crowd/eyewitness reports + official quotes. Surface-early only."
+  tg_kh_b2:
+    tier: lead
+    group: iran_war_rumor
+    note: "Iran war-rumor aggregator. Same genre as tg_m0_hm; grouped so they cannot corroborate each other."
+  tg_m0_hm:
+    tier: lead
+    group: iran_war_rumor
+    note: "Iran war-rumor aggregator. Same genre as tg_kh_b2; grouped."
+  tg_p_raetorio:
+    tier: lead
+    group: null
+    note: "Regional + regime-change commentary."
+  tg_mohem_mat:
+    tier: lead
+    group: null
+    note: "Mixed domestic/regional, partial Hebrew."
+  tg_vahid_oonline:
+    tier: lead
+    group: vahid
+    note: "Same operator as tg_vahid_online; grouped so they never corroborate each other."
 
 # CUT 2026-08-17: tg_parvaz_capital. t.me/s/parvaz_capital returns HTTP 200 with zero
 # posts -- web preview disabled or the channel requires joining. Constraint 6 forbids
