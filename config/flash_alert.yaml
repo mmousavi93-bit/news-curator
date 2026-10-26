@@ -38,6 +38,11 @@ flash_source_ids:
   - osint613_a
   - al_manar
   - sky_news_arabia
+  # Added 2026-10-26 (session 10C): tg_fighter_radar = Persian military-aviation
+  # watcher (attack_air signal, fast); tg_mamlekate = crowd/eyewitness burst
+  # signal (lead-tier, same rationale as tg_tweet_mardomi already here).
+  - tg_fighter_radar
+  - tg_mamlekate
 
 matching:
   freshness_minutes: 120      # only items published in the last 2h can fire
