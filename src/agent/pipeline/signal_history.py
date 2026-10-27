@@ -62,7 +62,7 @@ class Baseline:
 class SignalHistory:
     def __init__(self, catalog):
         self.catalog = frozenset(catalog)
-        self.ledger = {sid: Cycle() for sid in catalog}
+        self.ledger = {sid: Cycle() for sid in self.catalog}
         self.records = {}
         self.baselines = {}
         self.baseline_evidence = {}
@@ -102,6 +102,8 @@ class SignalHistory:
                   if state_key(r.candidate) == state_key(candidate)
                   and r.event.state_end_date is None and r.event.independent_source_count >= 2]
         if candidate.transition == "end":
+            if old is not None and old.event.state_end_date == event.state_end_date:
+                return False  # replay of the same explicit end is idempotent
             if old is None or old not in active:
                 raise EvidenceError("unmatched/conflicting state end")
             if event.state_end_date < old.event.event_date:
@@ -138,7 +140,7 @@ class SignalHistory:
                    and normalize(r.candidate.occurrence_id) == normalize(candidate.occurrence_id)
                    for r in self.records.values()):
                 raise EvidenceError("ambiguous occurrence/episode identity")
-            if any(r.event.signal_id == candidate.signal_id and
+            if any(state_key(r.candidate) == state_key(candidate) and
                    {s.item_id for s in r.candidate.supports} & {s.item_id for s in candidate.supports}
                    for r in self.records.values()):
                 raise EvidenceError("ambiguous shared-item occurrence: review required")
@@ -203,5 +205,7 @@ class SignalHistory:
                 cycle.factor = 1.0
 
     def materialize(self):
+        for sid in self.catalog:
+            self.factor(sid)
         return tuple(replace(r.event, novelty=self.factor(r.event.signal_id))
                      for _, r in sorted(self.records.items()))

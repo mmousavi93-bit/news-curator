@@ -153,7 +153,7 @@ def derive(candidate: Candidate, items, credibility, *, now, history=None):
         if candidate.signal_id not in STATE_ENDS or count < 2:
             raise EvidenceError("uncorroborated/invalid state end")
         if candidate.signal_id == "A2" and (len(candidate.numbers) != 1
-                                             or not 0 <= candidate.numbers[0] < 2):
+                                             or candidate.numbers[0] not in (0, 1)):
             raise EvidenceError("A2 end requires confirmed theater count below two")
         end = candidate.effective_date or day
         if end > local_day(now):

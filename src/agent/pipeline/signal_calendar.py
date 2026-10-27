@@ -35,6 +35,8 @@ class SignalCalendar:
             raise EvidenceError("calendar update has no grounded prior deadline")
         if old and (old.candidate.actor != candidate.actor or old.candidate.object != candidate.object):
             raise EvidenceError("conflicting deadline authority/topic")
+        if old and old.candidate == candidate and old.observed == day:
+            return  # replay must not extend, cancel or append the same update twice
         if action == "cancel":
             due = old.due
         else:

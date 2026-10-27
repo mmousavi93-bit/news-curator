@@ -139,6 +139,8 @@ def fixture(sid="B1", *, text="affirmative source evidence", day=NOW, identity="
                episode_anchor=identity, predicates=PREDICATES[sid].split())
     raw.update(updates)
     items = {k: replace(v, body=text, published_at=day) for k, v in items.items()}
+    if identity != "incident":
+        items = {f"{k}/{identity}": replace(v, url=f"{k}/{identity}") for k, v in items.items()}
     raw["supports"] = [{"item_id": k, "quote": text} for k in items]
     candidate = validate_candidate(raw, items, CATALOG | {sid},
                                    calendar=True if sid == "C1" else sid if sid in {"soothing", "schedule"} else False)
@@ -297,3 +299,73 @@ def test_five_frozen_calibration_scenarios_exact_parity():
             assert score < 15
         actual.append(score)
     assert actual == [100.0, 63.9, 100.0, 87.3, 8.1]
+
+@pytest.mark.parametrize("sid,kind", [("D2", "positive_statement"), ("D3", "route_control"),
+                                      ("B3", "advisory"), ("B5", "schedule"), ("C3", "schedule")])
+def test_history_joins_require_same_actor_topic_and_valid_window(sid, kind):
+    history = SignalHistory(CATALOG)
+    yesterday = NOW - timedelta(days=1)
+    prior, pitems, cred = fixture("schedule", day=yesterday, predicates=["schedule", kind],
+                                 dates=["2026-06-10"], text="Scheduled for 2026-06-10")
+    history.add_baseline("baseline", kind, prior, pitems, cred, now=NOW,
+                         due=date(2026, 6, 10) if kind == "schedule" else None)
+    candidate, items, cred = fixture(sid, prior_ids=["baseline"])
+    assert derive(candidate, items, cred, now=NOW, history=history).signal_id == sid
+    with pytest.raises(EvidenceError, match="insufficient_history"):
+        derive(replace(candidate, actor="other"), items, cred, now=NOW, history=history)
+    with pytest.raises(EvidenceError, match="insufficient_history"):
+        derive(replace(candidate, object="other topic"), items, cred, now=NOW, history=history)
+    history.baselines["baseline"] = replace(history.baselines["baseline"], observed=NOW.date()-timedelta(days=31))
+    with pytest.raises(EvidenceError, match="insufficient_history"):
+        derive(candidate, items, cred, now=NOW, history=history)
+
+
+@pytest.mark.parametrize("gap,accepted", [(0, False), (1, True), (14, True), (15, False)])
+def test_d2_positive_negative_statement_interval(gap, accepted):
+    history = SignalHistory(CATALOG)
+    prior, pitems, cred = fixture("soothing", day=NOW-timedelta(days=gap),
+                                 predicates=["soothing", "official_statement", "positive_statement"])
+    history.add_baseline("positive", "positive_statement", prior, pitems, cred, now=NOW)
+    candidate, items, cred = fixture("D2", prior_ids=["positive"])
+    if accepted:
+        derive(candidate, items, cred, now=NOW, history=history)
+    else:
+        with pytest.raises(EvidenceError, match="same-day or out-of-window"):
+            derive(candidate, items, cred, now=NOW, history=history)
+
+
+@pytest.mark.parametrize("gap,accepted", [(0, True), (7, True), (8, False)])
+def test_second_attack_requires_distinct_accepted_identity_within_seven_days(gap, accepted):
+    history = SignalHistory(CATALOG)
+    earlier = NOW-timedelta(days=gap)
+    text = f"Iranian attack occurred {earlier.date().isoformat()}"
+    prior, pitems, cred = fixture("E1", day=earlier, identity="first", text=text,
+                                 occurrence_date=earlier.date().isoformat())
+    event = derive(prior, pitems, cred, now=NOW, history=history)
+    history.accept(prior, event, pitems, cred, now=NOW)
+    current, items, cred = fixture("E2", occurrence_date=NOW.date().isoformat(),
+        text=f"Second Iranian attack {NOW.date().isoformat()}", prior_ids=[occurrence_key(prior)])
+    if accepted:
+        derive(current, items, cred, now=NOW, history=history)
+    else:
+        with pytest.raises(EvidenceError, match="distinct accepted attack"):
+            derive(current, items, cred, now=NOW, history=history)
+    with pytest.raises(EvidenceError, match="distinct accepted attack"):
+        derive(replace(current, occurrence_id="first"), items, cred, now=NOW, history=history)
+
+
+def test_old_first_report_and_future_occurrence_are_temporal_review():
+    for occurred in ["2026-06-10", "2026-06-12"]:
+        candidate, items, cred = fixture("E1", occurrence_date=occurred, text=f"Attack {occurred}")
+        with pytest.raises(EvidenceError, match="temporal review|future occurrence"):
+            derive(candidate, items, cred, now=NOW, history=SignalHistory(CATALOG))
+
+
+@pytest.mark.parametrize("sid", ["B1", "B2", "B6", "E1", "E2"])
+def test_rumours_cannot_trigger_engine_floors(sid):
+    from agent.risk.engine import RiskEngine
+    root = Path(__file__).resolve().parents[2]
+    engine = RiskEngine(yaml.safe_load((root / "config/risk_weights.yaml").read_text(encoding="utf-8")))
+    events = [SignalEvent(s, NOW.date(), 1, independent_source_count=1, novelty=1, state_end_date=None)
+              for s in {sid, "B1", "B2", "E1", "E2", "B6"}]
+    assert engine.evaluate(events, NOW.date()).tact.capped == 0

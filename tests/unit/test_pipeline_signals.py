@@ -260,3 +260,35 @@ def test_truncated_unseen_quote_rejected_and_ids_rendered():
                      body_chars=2, catalog=CATALOG, credibility=cred, logger=_Log())
     assert result.status == "rejected"
     assert all(url in stub.prompts[0] for url in items)
+
+
+def test_offline_history_context_and_unparseable_response_replay():
+    text = "invalid response kept for audit"
+    stub = _Stub(text)
+    result = extract(stub, _cluster(_item("src", "http://a")),
+                     template=TEMPLATE + "\n{history}", body_chars=100,
+                     catalog=CATALOG, credibility={}, logger=_Log(),
+                     history_context="baseline-id: own-speaker positive statement")
+    assert result.raw_response == text
+    assert "baseline-id" in stub.prompts[0]
+    assert "{history}" not in stub.prompts[0]
+
+
+def test_soothing_and_schedule_candidates_stay_in_side_channels():
+    from unit.test_signal_attribution import fixture
+    soothing, items, cred = fixture("soothing")
+    schedule, _, _ = fixture("schedule", predicates=["schedule"])
+    def raw(candidate):
+        row = vars(candidate).copy()
+        row["supports"] = [vars(s).copy() for s in candidate.supports]
+        row["predicates"] = sorted(candidate.predicates)
+        row["prior_ids"], row["numbers"], row["dates"] = [], [], []
+        return row
+    payload = {"none": False, "soothing_statements": [raw(soothing)],
+               "scheduled_events": [raw(schedule)]}
+    result = extract(_Stub(json.dumps(payload)), _cluster(*items.values()), template=TEMPLATE,
+                     body_chars=1000, catalog=CATALOG, credibility=cred, logger=_Log())
+    assert result.status == "ok"
+    assert not result.signals
+    assert result.soothing_statements == (soothing,)
+    assert result.scheduled_events == (schedule,)
