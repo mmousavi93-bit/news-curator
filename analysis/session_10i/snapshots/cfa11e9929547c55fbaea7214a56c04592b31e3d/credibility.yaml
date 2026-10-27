@@ -1,0 +1,483 @@
+# credibility.yaml — source tier and independence grouping
+#
+# Two separate jobs, do not confuse them:
+#
+#   tier  -> HOW MUCH a source's signal is worth   (rulebook Step 5 multiplier)
+#   group -> WHETHER two sources count as independent confirmation (Step 1)
+#
+# DECISION 4 — independence groups.
+#
+# Rulebook Step 1 requires >=2 independent non-Tier-3 sources before a signal can
+# score at all. As written, "independent" meant "different entry in this file",
+# which is wrong in three common ways:
+#
+#   1. Reuters and AP running the same wire copy is one report, not two.
+#   2. BBC English and BBC Persian are one newsroom in two languages.
+#   3. IRNA, Press TV and Tehran Times share an editorial line and a state owner.
+#
+# All three would have manufactured confirmation and fed a fabricated signal into
+# a deterministic score. Step 1 must count distinct GROUPS, not distinct sources.
+#
+# Rule: two sources confirm each other only if group_a != group_b.
+# Sources with no group default to a group of their own id (fully independent).
+
+version: 1
+
+# DECISION 7 (session 3, 2026-08-12) — the `lead` class.
+#
+# The owner wants to follow several Telegram channels he explicitly does not trust,
+# because they surface things early. Tier 3 is not the right home for them: tier 3
+# still carries a 0.5 weight multiplier, so a tier-3 claim still moves a score.
+#
+# `lead` carries weight 0.0. It can do exactly one thing: mark a topic as worth
+# checking. A lead never scores, never corroborates, never satisfies Step 1, and
+# never appears in output on its own. If a tier 1/2 source independently reports the
+# same thing, the signal fires on THAT source's weight and the lead is not credited.
+# If no trusted source ever backs it, the lead expires silently.
+#
+# This is the difference between "a channel told me" and "it happened". Keep it.
+
+tiers:
+  1: "Official / mechanical. Primary documents, government notices, regulator feeds."
+  2: "Established press with editorial accountability and a correction record."
+  3: "OSINT, aggregators, anonymous channels. Nominates signals, never corroborates."
+  lead: "Untrusted tip-off. Weight 0.0. Triggers a verification lookup, nothing more."
+
+# ---------------------------------------------------------------------------
+# TIER 1 — official and mechanical
+# Each is its own institution, so each is its own independence group.
+# ---------------------------------------------------------------------------
+sources:
+  ukmto:
+    tier: 1
+    group: ukmto
+    note: "Maritime advisories. Primary for B-class shipping signals."
+  us_embassy_alerts:
+    tier: 1
+    group: us_govt
+  state_dept_travel:
+    tier: 1
+    group: us_govt          # same government, NOT independent of embassy alerts
+  marad_msci:
+    tier: 1
+    group: us_govt
+    note: "MARAD MSCI maritime advisories. Staged 2026-08-19 to replace the dead
+           tg_ukmto_mirror; url still UNVERIFIED, see sources_candidates_r6.csv.
+           Entered here BEFORE it is collected, deliberately -- the 2026-08-17
+           defect was 13 usable sources silently resolving to defaults tier 3
+           because a missing key degrades instead of erroring.
+           group=us_govt is institutionally correct and matches the existing
+           convention for state_dept_travel / centcom / us_embassy_alerts.
+           OPEN RISK for Phase 7, recorded rather than silently created: MSCI
+           advisories frequently RELAY UKMTO and JMIC reporting, so if a working
+           UKMTO source is ever restored, marad_msci + ukmto would read as two
+           independent groups on what is partly identical copy -- the DECISION 4
+           failure mode. It is not put in group=ukmto because MARAD also carries
+           independent US Navy/ONI assessment, and that would throw away its real
+           value. Decide the split when a UKMTO path actually exists; today
+           there is none, so the risk is inert."
+  centcom:
+    tier: 1
+    group: us_govt
+  iaea:
+    tier: 1
+    group: iaea
+  safeairspace:
+    tier: 1
+    group: safeairspace
+    note: "NOTAM aggregation. Primary for airspace-closure signals."
+  isw:
+    tier: 1
+    group: isw
+    note: "Analytical but sources its claims. Treated as Tier 1 for posture only."
+  fred:
+    tier: 1
+    group: fred
+  stooq:
+    tier: 1
+    group: stooq
+
+# ---------------------------------------------------------------------------
+# TIER 2 — established press
+# Grouping is where the real work is. Wires and multi-language newsrooms collapse.
+# ---------------------------------------------------------------------------
+  reuters:
+    tier: 2
+    group: wire_west
+    note: "Reuters and AP frequently run identical wire copy. One group."
+  ap:
+    tier: 2
+    group: wire_west
+  afp:
+    tier: 2
+    group: wire_west
+  bbc_en:
+    tier: 2
+    group: bbc
+  bbc_persian:
+    tier: 2
+    group: bbc              # one newsroom, two languages
+  al_jazeera:
+    tier: 2
+    group: al_jazeera
+  times_of_israel:
+    tier: 2
+    group: israeli_press
+  ynet:
+    tier: 2
+    group: israeli_press
+    note: "Distinct outlets, but both routinely relay IDF Spokesperson releases.
+           Grouped conservatively. Split them only if evidence shows independent
+           sourcing in practice."
+  al_monitor:
+    tier: 2
+    group: al_monitor
+  amwaj:
+    tier: 2
+    group: amwaj
+  naval_news:
+    tier: 2
+    group: naval_trade
+  the_war_zone:
+    tier: 2
+    group: naval_trade
+  aviationist:
+    tier: 2
+    group: naval_trade
+  irna:
+    tier: 2
+    group: iran_state
+  press_tv:
+    tier: 2
+    group: iran_state
+  tehran_times:
+    tier: 2
+    group: iran_state       # shared state ownership and editorial line
+  iran_international:
+    tier: 2
+    group: iran_intl
+    note: "Opposition-aligned, Saudi-funded. Independent OF state media, but carries
+           its own directional bias. Tier 2 with the group kept separate is correct."
+
+# --- Arabic and Hebrew sources, CI-probed 2026-08-17 (tag=r5). Closes the ar/he
+# --- coverage hole: the project spec says sources in en/fa/ar/he and there were zero
+# --- of the last two. 10 of 13 guessed URLs returned a live feed.
+  ajar:
+    tier: 2
+    group: al_jazeera       # AJ Arabic and AJ English are one newsroom. Cannot
+                            # corroborate each other, by construction.
+  sky_news_arabia:
+    tier: 2
+    group: sky_news_arabia
+    note: "Abu Dhabi based. Gulf editorial line. Genuinely separate newsroom from
+           aawsat, so the groups stay separate — but on Iran topics both are
+           Gulf-state-aligned, so convergence between them is weak evidence, not
+           strong. Read a sky+aawsat pair as one directional bloc reporting twice."
+  aawsat:
+    tier: 2
+    group: saudi_press
+    note: "Saudi-owned (SRMG) pan-Arab daily. VOLUME RISK: the feed returned 300
+           items on first probe — it is a general newspaper, not a security wire.
+           Needs a topic prefilter before Phase 6 clustering or it will dominate
+           every run's cluster budget on its own."
+  al_manar:
+    tier: 3
+    group: al_manar
+    note: "Hezbollah-owned. A party organ, not a newsroom — so it nominates and
+           never corroborates. Tier 3 rather than `lead` because it is an
+           attributable institution with a masthead, unlike an anonymous channel.
+           Kept because it is first on the Lebanon front and carries
+           resistance-axis framing before Western wires pick it up."
+  ynet_he:
+    tier: 2
+    group: israeli_press    # same newsroom as `ynet`, two languages
+  walla:
+    tier: 2
+    group: israeli_press
+  maariv:
+    tier: 2
+    group: israeli_press
+    note: "Breaking-news-only feed — good shape for a curator, low noise.
+           KNOWN CONSEQUENCE of grouping all six Israeli outlets together: an
+           Israel-sourced event can never reach the >=2-independent-groups bar on
+           Israeli reporting alone, so it stays RUMOUR until a non-Israeli group
+           confirms. That is deliberate. On military matters these outlets
+           overwhelmingly relay the same IDF Spokesperson copy under the same
+           military censor, so treating them as independent would manufacture
+           confirmations. Failing toward silence is the project's stated bias."
+
+# --- Round-4 ids that were USE in the probe but had NO entry here, added 2026-08-17.
+# --- Found by joining every USE row across merged_r4 + merged_tg1 + merged_r5 against
+# --- these keys: 13 usable sources were silently resolving to `defaults: tier 3,
+# --- group unlisted`. That is the "Reuters scored as an anonymous channel" failure the
+# --- session-3 notes warned about, and it was live for Reuters, AP, BBC ME, DW, France24,
+# --- NPR, Haaretz and Mehr simultaneously. A missing key does not error — it degrades.
+# --- ROOT CAUSE, same shape as the session-3 name-vs-id finding: the probe CSVs invent
+# --- per-URL ids (`reuters_gnews`, `bbc_en_me`) that do not match the newsroom ids here
+# --- (`reuters`, `bbc_en`). Every id a collector will use must exist as a key here.
+  reuters_gnews:
+    tier: 2
+    group: wire_west        # SAME newsroom as `reuters`. Not a second confirmation.
+    note: "Google News `site:` proxy — the only reachable path since Reuters killed public
+           RSS. Body is a Google snippet, not full text, which is thin for embedding and
+           clustering. USE_CAVEAT: decide at Phase 6 whether snippets cluster usefully."
+  ap_gnews:
+    tier: 2
+    group: wire_west        # same group as `ap` AND `reuters` — identical wire copy
+    note: "Same Google News proxy caveat as reuters_gnews."
+  bbc_en_me:
+    tier: 2
+    group: bbc              # BBC Middle East is not independent of BBC English
+  haaretz:
+    tier: 2
+    group: israeli_press
+    note: "Added here deliberately rather than left to the defaults. Haaretz operates
+           under the same military censor as Ynet/Walla/Maariv, so by this file's own
+           rationale it belongs in `israeli_press`. Had it stayed unlisted it would have
+           landed in `unlisted` — a DIFFERENT group — and haaretz + any one of the other
+           five would have cleared min_independent_sources: 2 on Israeli press alone,
+           silently voiding the whole point of the israeli_press group."
+  mehr:
+    tier: 2
+    group: iran_state       # same state ownership/editorial line as irna, press_tv
+  dw:
+    tier: 2
+    group: dw
+  france24:
+    tier: 2
+    group: france24
+  npr:
+    tier: 2
+    group: npr
+    note: "US public radio. Largely rewrites wire copy on Middle East breaking news, so
+           an npr + wire_west pair is weak convergence. Kept separate because it does run
+           its own correspondents; revisit if it proves to be a pure wire echo."
+  cnbc:
+    tier: 2
+    group: cnbc
+  mee:
+    tier: 2
+    group: mee
+    note: "Middle East Eye. A real newsroom with a distinctly Qatar-aligned,
+           anti-Gulf-monarchy editorial line. Tier 2 for reporting, but read a
+           mee + al_jazeera agreement as one directional bloc, not independent
+           corroboration — same as the aawsat/sky_news_arabia pairing."
+  wotr:
+    tier: 2
+    group: wotr
+    note: "War on the Rocks — analysis and commentary, NOT breaking news. 100 items on
+           probe. Valuable for interpretation, near-useless for event detection, and it
+           must never be what makes an event 'confirmed': it comments on reports rather
+           than witnessing anything. Candidate for a low priority weight at Phase 6."
+  oilprice:
+    tier: 3
+    group: oilprice
+    note: "Tier 3, not 2. Commodity trade press that aggregates and re-reports heavily
+           with thin sourcing. Useful as a market-signal tripwire, not as an event
+           witness — which is exactly what tier 3 encodes: nominates, never corroborates."
+  seeking_alpha:
+    tier: 3
+    group: seeking_alpha
+    note: "Tier 3. Contributor-written financial commentary, not a newsroom with editorial
+           control. Market colour only."
+
+# CUT 2026-08-17 (tag=r5), all three on HTTP 403 from the GitHub US runner:
+#   al_arabiya    https://www.alarabiya.net/.mrss/ar.xml
+#   al_mayadeen   https://www.almayadeen.net/rss/all
+#   israel_hayom  https://www.israelhayom.co.il/rss.xml
+# Classified CUT_BOT_BLOCKED, not URL_WRONG, per the session-4 rule: a 403 means the
+# server answered and refused, which is a block, not a bad path. ci4 already falsified
+# the header hypothesis — a full browser UA changed 0 of 15 blocked rows — so the
+# refusal is IP-level (Azure datacenter ranges) and no request-shaping in the
+# collector will recover them. Weaker evidence than ISW/UKMTO had (one URL variant
+# each, not two), but not worth a sixth probe round.
+# Coverage cost is absorbed: the Gulf counterweight survives via aawsat +
+# sky_news_arabia, resistance-axis framing survives via al_manar, and three Hebrew
+# feeds remain. Only the right-leaning Israeli line (israel_hayom) has no substitute.
+
+# ---------------------------------------------------------------------------
+# TIER 3 — OSINT. Nominates, never corroborates. (scoring.tier3_can_corroborate)
+# Groups still matter: they prevent one rumour echoing across five channels from
+# looking like five reports in the RUMOUR/watchlist display.
+# ---------------------------------------------------------------------------
+  tg_tanker_trackers:
+    tier: 3
+    group: osint_maritime
+    note: "Handle supplied by owner 2026-08-17: @TankerTrackers. Real OSINT outfit,
+           not an institution, so tier 3. Pending r5 probe."
+  tg_mornovosti:
+    tier: 3
+    group: osint_maritime
+    note: "@mornovosti. Russian-language maritime news. Shares osint_maritime with
+           TankerTrackers deliberately -- both watch the same hulls and republish each
+           other. Pending r5 probe."
+  tg_ukmto_mirror:
+    tier: 3
+    group: ukmto
+    note: "@UK_MTO_TM -- UNOFFICIAL mirror of UKMTO advisories. group=ukmto is
+           load-bearing: without it, UKMTO plus this mirror would satisfy the
+           two-independent-source test on identical copy. It may nominate. It may
+           never confirm UKMTO. Pending r5 probe."
+  tg_kpler_public:
+    tier: 3
+    group: osint_maritime
+    note: "PLACEHOLDER -- no real handle. Slot reserved, not populated."
+  tg_flight_osint:
+    tier: 3
+    group: osint_air
+    note: "PLACEHOLDER -- no real handle. Owner offered @FlightAlerts_Bot, which is a
+           BOT: no t.me/s/ preview exists, and constraint 6 forbids MTProto. Unusable.
+           Airspace coverage is the largest remaining hole in the source set."
+  tg_incident_aggregators:
+    tier: 3
+    group: osint_general
+    note: "PLACEHOLDER -- no real handle."
+
+# --- Owner's channels, CI-probed 2026-08-17 (tag=tg1). 20 of 21 returned posts. ---
+# Groups are `null` (= own id = independent) unless a mirror or shared-origin
+# relationship is actually KNOWN. Per LEAD_HANDLING.md rev 2, config groups are a
+# FALLBACK: real independence is computed from near-duplicate text collapse and
+# forward-from attribution at cluster time. Do not invent groups to look careful --
+# an unjustified group destroys real independence just as surely as a missing one
+# manufactures fake independence.
+  tg_fighter_radar:
+    tier: 3
+    group: null
+  tg_world_newsly:
+    tier: 3
+    group: null
+  tg_wfwitness:
+    tier: 3
+    group: null
+  tg_tabzlive:
+    tier: 3
+    group: null
+  tg_iranian_militarism:
+    tier: 3
+    group: null
+  tg_minas_tirith:
+    tier: 3
+    group: null
+  tg_mes:
+    tier: 3
+    group: null
+  tg_militarywave:
+    tier: 3
+    group: null
+  tg_geopwatch:
+    tier: 3
+    group: null
+  tg_exciton_missile:
+    tier: 3
+    group: null
+    note: "Owner set 2; overridden to 3 on 2026-08-16. Tier 2 would let one anonymous
+           single-author channel satisfy the two-independent-source test alone, which
+           is the exact path DECISION 4 exists to close. Owner may veto."
+  tg_rnintel:
+    tier: 3
+    group: null
+    note: "Owner set 2; overridden to 3 for the same reason as tg_exciton_missile.
+           Tier 2 is for institutions, not anonymous OSINT."
+  tg_defenderdome:
+    tier: 3
+    group: osint_defender
+    note: "Telegram mirror of the @sentdefender Twitter account, which has no legal
+           free collection path (deferred to v2). Grouped so the mirror and any future
+           direct feed cannot corroborate each other."
+  osint613_a:
+    tier: 3
+    group: osint613
+    note: "osint613.com/feed -- 70 items, CI-OK 2026-08-17. Replaces the uncollectable
+           @Osint613 Twitter account. Same group for the same reason as defenderdome."
+
+  tg_entekhab:
+    tier: 3
+    group: null
+    note: "Official channel of Entekhab (reformist Persian news site, not state
+           media). Tier 3 per Telegram-mirror convention -- the newsroom's own
+           domain is canonical, this channel is a mirror. Owner may upgrade to
+           tier 2 if the channel is treated as the org's primary feed."
+  tg_tsepress:
+    tier: 3
+    group: null
+    note: "Tehran bourse/market press. r7 probe: unknown editorial provenance, so
+           never tier 2. Market colour (شاخص/ارز/دلار/طلا); nominates the H3
+           currency-collapse signal. Owner may upgrade later."
+  tg_kianmeli:
+    tier: 3
+    group: null
+    note: "Persian geo/military aggregator (@kianmeli1). Curated, cites sources but is
+           not an original witness. Nominates E4 proxy strikes, B6 airspace closures,
+           D3 Hormuz rhetoric. Never corroborates on its own."
+  tg_eco_ehsan:
+    tier: 3
+    group: null
+    note: "Ehsan Moslemi (economist) personal channel. Market colour (دلار/طلا/تتر/نفت)
+           plus sanctions effects; nominates H3 currency collapse. Commentary, not a
+           newsroom."
+  tg_parvaz_capital_tel:
+    tier: 3
+    group: null
+    note: "Parvaz Capital market-education channel. Distinct from the CUT
+           `tg_parvaz_capital` (dead preview); this `_tel` handle is live via t.me/s/.
+           Market colour (طلا/دلار/بورس/نفت/کریپتو); nominates H3."
+
+# --- lead class (weight 0.0). See DECISION 7. ---
+  tg_padeshah_fxn:
+    tier: lead
+    group: null
+  tg_geopolitics_prime:
+    tier: lead
+    group: null
+    note: "Owner downgraded this from candidate source to lead on 2026-08-16."
+  tg_vahid_online:
+    tier: lead
+    group: null
+  tg_tweet_mardomi:
+    tier: lead
+    group: osint_repost
+    note: "Crowd-sourced repost aggregator. Grouped with other aggregators because its
+           content is by definition someone else's."
+  tg_esellco:
+    tier: lead
+    group: null
+    note: "Economy/commerce, not military. Owner kept it against my recommendation and
+           his argument was correct: fuel, currency and strike reporting are genuine
+           early warning for the military feed. Lead class keeps it from becoming fact."
+  tg_vira_university:
+    tier: lead
+    group: null
+    note: "Off-core-topic. Kept on the same argument as tg_esellco."
+  tg_behold_israel:
+    tier: lead
+    group: null
+    note: "Owner set 3; overridden to lead 2026-08-16, and an independent review called
+           tier 3 indefensible. Amir Tsarfati's channel is evangelical prophecy-framed
+           commentary, structurally early on escalation because escalation is the
+           thesis. Useful as a lead. Cannot corroborate anything. Owner may veto."
+  tg_irane_azad_news:
+    tier: lead
+    group: ncri
+    note: "Owner set 3; overridden to lead 2026-08-16. 'Iran Azad' is NCRI/MEK
+           advocacy branding -- an advocacy organisation, not a newsroom. Same
+           structural-bias problem as tg_behold_israel, opposite direction."
+
+# CUT 2026-08-17: tg_parvaz_capital. t.me/s/parvaz_capital returns HTTP 200 with zero
+# posts -- web preview disabled or the channel requires joining. Constraint 6 forbids
+# MTProto, so there is no way to read it. Not a URL error; do not retry.
+
+# ---------------------------------------------------------------------------
+# DEFAULTS for a source not listed above
+# ---------------------------------------------------------------------------
+# CHANGED 2026-08-17 after adversarial review of LEAD_HANDLING.md rev 1.
+# `group: null` here was a live hole: null resolves to "own id", so every unlisted
+# source counted as fully independent. Twelve Telegram channels reposting one original
+# would have registered as twelve independent confirmations -- exactly the failure
+# DECISION 4 was written to prevent, arriving through the defaults block instead.
+# Unlisted sources now SHARE one group, so they can never corroborate each other.
+# Being unknown must fail toward silence, not toward confidence.
+defaults:
+  tier: 3                   # unknown sources are assumed weakest, never strongest
+  group: unlisted           # shared -> unlisted sources cannot corroborate each other
+  warn_on_unlisted: true    # surface unlisted sources in the daily digest so the
+                            # owner can tier them deliberately

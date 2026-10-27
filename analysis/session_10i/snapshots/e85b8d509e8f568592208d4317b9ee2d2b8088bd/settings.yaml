@@ -1,0 +1,405 @@
+# settings.yaml — thresholds, schedules, feature flags
+#
+# Every value the owner might want to change lives here. Nothing in this file
+# should require reading Python to understand.
+#
+# WARNING: values marked [BACKTESTED] are validated by analysis/backtest_weights.py.
+# Changing one without re-running that script invalidates the only proof the
+# scoring works. Do not tune them by feel.
+
+version: 1
+
+# ---------------------------------------------------------------------------
+# SCHEDULE
+# ---------------------------------------------------------------------------
+schedule:
+  timezone: "Asia/Tehran"
+
+  # Pipeline runs every 3 hours (8/day). Owner chose per-run delivery over
+  # threshold-only. Runs with no score change send a short honest one-liner.
+  pipeline_cron: "0 */3 * * *"
+
+  # DECISION 1 — the canonical daily evaluation.
+  #
+  # The scoring rulebook is day-granular: AGE is in whole days, half-lives are in
+  # days, and Step 12 counts "7 consecutive DAILY evaluations". Running 8x/day
+  # made that ambiguous (7 days or 56 runs?). Resolved: the 07:00 digest run is
+  # THE daily evaluation. Regime counters, the trailing 7-day mean, and novelty
+  # cycles advance only there.
+  #
+  # Intra-day runs still compute and report scores — a new signal dated today
+  # gets AGE 0 and registers within 3 hours — but they never advance regime state.
+  # This keeps WARTIME entry/exit deterministic.
+  digest_cron: "0 7 * * *"
+  canonical_daily_run: "07:00"
+
+  # A skipped or delayed GitHub cron must not lose data.
+  lookback_hours: 6
+
+# ---------------------------------------------------------------------------
+# COLLECTION
+# ---------------------------------------------------------------------------
+collection:
+  max_items_per_source: 20
+  concurrency: 8
+  per_source_timeout_seconds: 10
+  # DECIDED 2026-08-18. Was `true` from the first draft, but nothing implemented it and
+  # no probe round ever fetched a robots.txt, so all 51 source verdicts were earned
+  # without it. Set false deliberately, and the reasoning is load-bearing, not a shrug:
+  #
+  # robots.txt is a convention for crawlers that DISCOVER and TRAVERSE links. This client
+  # does neither. It fetches a fixed, hand-curated list of URLs, the RSS/Atom ones being
+  # endpoints their publishers created expressly to be read by machines. No feed reader
+  # checks robots.txt -- not Feedly, Inoreader, NetNewsWire or Thunderbird -- because a
+  # feed reader is a user agent, not a crawler. Collector requests also present a browser
+  # User-Agent (see the note below), which states the same thing. A config key claiming
+  # crawler etiquette while the client is not a crawler was incoherent in both directions.
+  #
+  # THE OBLIGATION DOES NOT DISAPPEAR, IT MOVES. What makes `false` defensible is the
+  # rate discipline below, which is therefore not tunable for convenience:
+  #   - max_items_per_source: 20, and >=3h between runs (8/day). ~1 request per source
+  #     per 3 hours is below any published crawl-delay in normal use.
+  #   - Serialised per host, so no host ever sees concurrent requests from this system.
+  #   - A 403 or 429 is a DEFINITIVE REFUSAL. Mark the source dead and stop. Never retry
+  #     it with different headers, a different path, a proxy, or an archive mirror.
+  # That last rule is already this project's demonstrated behaviour: when ci4 falsified
+  # the header hypothesis, seven sources were cut rather than worked around. Honouring a
+  # refusal actually issued matters more than pre-reading a file about hypothetical ones,
+  # and the CUT_BOT_BLOCKED path has been exercised across five probe rounds.
+  #
+  # Rejected: honouring it everywhere (needs a sixth probe round to learn which of the 51
+  # are disallowed, reopening closed source discovery, and means dropping the UA that
+  # earned the verdicts). Also rejected: honouring it only for the t.me/s/ HTML pages.
+  # That sounds more careful and delivers less -- it adds a branch plus a per-host robots
+  # request on the ONE host carrying 23 of 51 sources, so a robots.txt timeout on a CI
+  # runner either kills all Telegram collection or falls open, which is this setting with
+  # extra failure modes. See the pending item: whether telegram.org disallows /s/ is a
+  # real question, and it gets answered by the PROBE TOOL once, not by pipeline code.
+  #
+  # Key kept rather than deleted so the decision stays visible, typed and reversible.
+  respect_robots_txt: false
+  # LOAD-BEARING, Phase 3 req 2 (agents/briefs/PHASE_3_BRIEF.md). Matches
+  # tools/check_feeds.py's `UA` (line 48-49) EXACTLY -- every url in
+  # sources.yaml was verified to answer 200 against this specific string,
+  # after the old "compatible; ...-feedcheck/1.0" crawler form was found to
+  # draw Cloudflare 403s on nine round-2 rows, including both ISW and both
+  # UKMTO url variants. The previous value here, "news-curator/1.0 (personal
+  # research agent)", never earned any verdict at all -- a source that
+  # answered 200 to the probe UA can still 403 a collector sending a
+  # different one. Do not change this without re-probing every source with
+  # the new UA first; a mismatch here silently reopens sources that were
+  # already fixed.
+  user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
+
+  # A source that yields zero parseable items this many runs in a row is marked
+  # degraded and reported in the daily digest. It is not silently dropped.
+  degraded_after_empty_runs: 3
+
+# ---------------------------------------------------------------------------
+# PIPELINE BUDGETS
+# ---------------------------------------------------------------------------
+pipeline:
+  # Hard ceiling, enforced in code (session-5 decision 1): cluster.py ranks
+  # by tier-then-recency-then-size and truncates deterministically. Dropped
+  # clusters are logged once; they get no LLM call. The old "deferred to the
+  # next run" comment predated that decision and was wrong -- a budget that
+  # only fires on the busiest day must not rely on tomorrow being quieter.
+  max_clusters_per_run: 40
+  max_vision_calls_per_run: 10
+
+  # Cosine similarity for agglomerative clustering. UNTUNED — placeholder until
+  # Phase 10 measures it on real multilingual data. Expect to change.
+  cluster_similarity_threshold: 0.62
+
+  # Matching a new cluster to an already-open event in memory.
+  event_match_threshold: 0.55
+
+  # Images below this are logos/avatars, never sent to vision.
+  vision_min_image_bytes: 20000
+
+  # Local multilingual MiniLM (ARCHITECTURE.md tech choices). Owner-editable;
+  # only CI loads it (optional [embeddings] extra -- see pyproject.toml).
+  embed_model: "paraphrase-multilingual-MiniLM-L12-v2"
+
+  # Per-item body characters rendered into the understand prompt. Bounds the
+  # per-cluster prompt so token costs stay predictable on busy days.
+  item_body_chars: 600
+
+# ---------------------------------------------------------------------------
+# RETENTION
+# ---------------------------------------------------------------------------
+# DECISION 2 — split retention. A flat 30 days silently corrupts scores.
+#
+# H1 has a 30-day half-life: a state that ended 60 days ago still contributes
+# 12 x 0.8 x 0.5^2 = 2.4 points. C5's half-life is 21 days. Rulebook Step 2
+# novelty needs per-signal fire history across multiple 14-day quiet cycles.
+# D2/D3 need a full 30-day rhetoric baseline PER SPEAKER before they work at all.
+#
+# Signal rows are ~60 bytes. 180 days costs about 2 MB. Cheap insurance against
+# permanently under-contributing stateful signals.
+retention:
+  url_hashes_days: 7          # was 30 — pure dedup, no scoring value after a week
+  events_days: 30             # the RAG. "has this happened before" window
+  embeddings_days: 30         # must match events_days
+  signal_events_days: 180     # NEW — feeds decay, novelty, posture persistence
+  speaker_statements_days: 45 # NEW — D2/D3 need a 30d baseline plus headroom
+  score_history_days: 365     # NEW — trailing means, trend charts, calibration
+  scheduled_events_days: 365  # registry: past entries prove ghost-meeting patterns
+
+# ---------------------------------------------------------------------------
+# SCORING
+# ---------------------------------------------------------------------------
+scoring:
+  # [BACKTESTED] Do not change without re-running analysis/backtest_weights.py.
+  tier_multipliers:
+    1: 1.0
+    2: 0.8
+    3: 0.5
+
+  # [BACKTESTED] Rulebook Step 1. Tier-3 sources nominate, they never corroborate.
+  min_independent_sources: 2
+  tier3_can_corroborate: false
+
+  # [BACKTESTED] Rulebook Step 3. Stateful signals decay from state END, not first
+  # report. Without this, Feb 21 2026 scores 40.1 against a 55-70 target; with it,
+  # 63.9. This single rule is the difference between 4/5 and 5/5 on the backtest.
+  stateful_decay_from_state_end: true
+
+  # [BACKTESTED] Steps 7, 8, 9.
+  category_caps: { D: 20, G: 10 }
+  convergence_step: 0.15
+  convergence_max: 1.6
+  deception_multiplier: 1.3
+  deception_window_hours: 72
+
+  # [BACKTESTED] Step 2.
+  novelty_quiet_days: 14
+  novelty_decay_factor: 0.6
+  novelty_floor: 0.3
+  novelty_reset_min_contribution: 15
+
+  # DECISION 3 — persist the uncapped score.
+  #
+  # Jun 11 2025 computes to 176.4 and displays 100.0. Feb 27 2026 STRAT also pins
+  # at 100. Once saturated, Step 12 rule (i) — "TACT >= trailing 7-day mean + 10" —
+  # is mathematically dead, because 100 can never exceed 110. Store both: display
+  # the capped value, compute deltas on the uncapped one. Rule (i) starts working
+  # again inside WARTIME, which is exactly when you need it.
+  display_cap: 100
+  persist_uncapped: true
+  delta_basis: "uncapped"
+
+  tier_bands:                 # [BACKTESTED] Step 11
+    0: [0, 14.9]
+    1: [15, 34.9]
+    2: [35, 54.9]
+    3: [55, 74.9]
+    4: [75, 100]
+
+# ---------------------------------------------------------------------------
+# ALERTING — message layer only. Never modifies a score. (Rulebook Step 12)
+# ---------------------------------------------------------------------------
+alerting:
+  wartime_enter_tact: 75
+  wartime_enter_consecutive_days: 7
+  wartime_exit_tact: 55
+  wartime_exit_consecutive_days: 7
+  wartime_delta_trigger: 10       # vs trailing 7-day mean, computed on UNCAPPED
+  new_dimension_silent_days: 14   # a category silent this long going loud = alert
+  exit_from_wartime_is_full_alert: true   # de-escalation is news
+
+# ---------------------------------------------------------------------------
+# MARKETS
+# ---------------------------------------------------------------------------
+# DECISION 5 — stop fetching daily-close series eight times a day.
+#
+# VIXCLS, T10Y2Y and BAMLH0A0HYM2 publish once daily. Fetching them per run was
+# 64 requests/day for 8 useful values. Intraday series (oil, gold, equities) still
+# move within the day and matter for G1, so those stay per-run.
+markets:
+  fred_api_key_env: "FRED_API_KEY"   # free, no card. Keyless fredgraph.csv works
+                                     # but is undocumented and fragile.
+  daily_series:                      # fetched on canonical_daily_run, or if stale
+    - { id: "VIXCLS",        source: "fred",  label: "VIX" }
+    - { id: "BAMLH0A0HYM2",  source: "fred",  label: "HY credit spread" }
+    - { id: "T10Y2Y",        source: "fred",  label: "10y-2y curve" }
+  intraday_series:                   # fetched every run
+    - { id: "cb.f",  source: "stooq", label: "Brent" }
+    - { id: "cl.f",  source: "stooq", label: "WTI" }
+    - { id: "xauusd", source: "stooq", label: "Gold" }
+    - { id: "^spx",  source: "stooq", label: "S&P 500" }
+    - { id: "usdirr", source: "manual", label: "USD/IRR open market" }
+  daily_stale_after_hours: 12
+  # [BACKTESTED] G-signal trigger thresholds
+  triggers:
+    oil_daily_move_pct: 5.0
+    gold_daily_move_pct: 3.0
+
+# ---------------------------------------------------------------------------
+# LLM ROUTING
+# ---------------------------------------------------------------------------
+# DECISION 6 — Gemini for v1. Haiku wired but DISABLED pending measurement.
+#
+# Anthropic Haiku 4.5 is $1/MTok in, $5/MTok out. Measured against this pipeline:
+#   wholesale swap, no caching ......... ~$60/month
+#   wholesale swap, in-run caching ..... ~$38/month
+#   Gemini triage -> Haiku adjudicate ... ~$11/month
+#   status quo, all Gemini free ........   $0/month
+#
+# Extraction is the one stage where model quality compounds, because a missed or
+# hallucinated signal propagates into a deterministic score. That is a real
+# argument. It is NOT yet a measured one — there is no pipeline and no extraction
+# data. Phase 7 measures Gemini's extraction F1 against the hand-labelled signal
+# sets already specified in the five backtest scenarios. Decide then.
+#
+# If enabled: use the cascade, not the swap. Vision and compose stay on Gemini —
+# transcribing an image and writing prose are low-leverage and errors there are
+# cosmetic, not scoring.
+#
+# NOTE: Haiku 4.5 predates the tokenizer that emits ~30% more tokens for identical
+# text. Do not "upgrade" to a later Haiku without recomputing the table above;
+# headline rate can be unchanged while real cost rises a third.
+llm:
+  # OWNER DECISION 2026-08-29 (session 8): ceiling = 51 -- the worst case
+  # (40 clusters + 10 vision + 1 compose). The owner's rule: keep the
+  # project free, use the free tools' caps. 9 runs/day x 51 = 459 calls vs
+  # Gemini's 1,500 RPD; RPM 10 is paced proactively (llm/limits.py).
+  # Enforcement is real, not advisory: llm/router.py refuses call N+1
+  # before a request is built (CLAUDE.md constraint #2).
+  max_calls_per_run: 51
+  order: ["gemini", "groq", "openrouter"]
+
+  stages:
+    vision:    { provider: "gemini" }
+    compose:   { provider: "gemini" }
+    understand:
+      provider: "gemini"
+      # Flip to true only after the Phase 7 gate passes/fails on evidence.
+      cascade_enabled: false
+      cascade_adjudicator: "anthropic"
+      # Only clusters where the triage pass reported >=1 candidate signal are
+      # re-adjudicated. Quiet days ~5-8 clusters, war days 20+.
+      cascade_trigger: "any_candidate_signal"
+
+  providers:
+    gemini:
+      # 2026-08-29, run-log evidence: gemini-2.5-flash is LISTED by the API
+      # but generateContent 404s (discontinued June 2026 -- listed-but-dead).
+      # gemini-3-flash does not exist (only -preview). The ALIAS is the
+      # self-healing choice: it always points at the current GA flash and
+      # cannot be retired. Pin a specific model only when v1.5 scoring
+      # arrives and output stability starts to matter; the pipeline log's
+      # "List available Gemini models" step is the ground truth on every run.
+      model: "gemini-flash-latest"
+      rpm: 10
+      rpd: 1500
+      supports_vision: true
+      # DECISION 2026-08-30 (first automated run, POSTMORTEMS.md): read
+      # timeout 20s, not the 60s default. Evidence: Gemini hung until the
+      # 60s read timeout, and at 4 attempts x 2 failing calls that is ~8
+      # minutes of an ~8-min run burned before the breaker opens. 20s keeps
+      # a merely-slow Gemini alive and fails a dead one over in seconds.
+      # Connect timeout stays 10s everywhere.
+      read_timeout_seconds: 20
+    groq:
+      # 2026-08-29, run-log evidence: llama-3.3-70b-versatile is gone from
+      # Groq's roster (404). qwen3.8-27b from the live list (probe step).
+      model: "qwen/qwen3.8-27b"
+      rpm: 30
+      rpd: 14400
+      supports_vision: false
+      # 2026-08-30 cascade evidence: Groq free-tier TPM caps capacity at
+      # ~13-14 calls per run regardless of correct 30-RPM pacing (429s at
+      # call ~14). ACCEPTED (owner decision, POSTMORTEMS.md): on
+      # Gemini-outage days each run covers its priority-ordered top ~14 of
+      # 40 clusters. A 429 here is NOT a pacing bug -- do not "fix" the
+      # pacer, there is nothing to fix.
+    openrouter:
+      # Roster rotates weekly; this free model is a placeholder default.
+      # Owner-editable -- the adapter refuses to run without a model line.
+      model: "meta-llama/llama-3.1-8b-instruct:free"
+      rpm: 20
+      rpd: 50          # emergency parachute, not a real fallback
+      supports_vision: false
+    anthropic:
+      enabled: false
+      model: "claude-haiku-4-5"
+      supports_vision: true
+      prompt_cache: true          # catalog is ~2700 tokens, above the 2048 minimum
+      # CONSTRAINT 15 -- an unattended process on a metered API needs a hard stop.
+      # A retry loop costs nothing on Gemini and a rent payment on Anthropic.
+      # Enforced per-run by llm/limits.py ProviderBudget (cross-run accounting
+      # deliberately not built -- a retry loop is a within-run event).
+      max_calls_per_run: 15
+      max_spend_usd_per_month: 20
+      halt_on_budget_exceeded: true
+      # Rate card verified 2026-08-01 (CLAUDE.md). Used for the spend guard.
+      input_usd_per_mtok: 1.00
+      output_usd_per_mtok: 5.00
+
+  backoff:
+    max_retries: 3
+    base_delay_seconds: 2
+    # PHASE 6 wiring reconciliation: with max_retries=3 the rotation loop
+    # makes at most 4 attempts, so a threshold of 5 could never open. Two
+    # consecutive failures (schema garbage, repeated 429s) now skip the
+    # provider for the rest of the run -- the mechanism was gate-tested in
+    # Phase 5, only the number changed.
+    circuit_breaker_failures: 2   # then degrade: collect + store, deliver a notice
+
+# ---------------------------------------------------------------------------
+# DELIVERY
+# ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# DIGEST RANKING -- "what should I read first", owner decision 2026-08-29.
+# NOT the Phase-11 risk engine: that scores escalation probability from the
+# 36-signal catalog. This scores display order from what the run already
+# knows. Deterministic (constraint 3): identical input -> identical order.
+# score = category_weight + corroboration_weight*min(groups,3) + tier_bonus
+#         + recency bonus (decays to 0 at recency_window_hours) + size boost
+# Arithmetic for min_score (defaults): economy rumour from a tier-3 channel
+# = 2+0+0+3 = 5 -> dropped. "other" from a tier-2 = 0+2+2+3 = 7 -> dropped.
+# military rumour = 5+0+0+3 = 8 -> kept. politics tier-2 fresh = 3+2+2+3 = 10.
+# ---------------------------------------------------------------------------
+digest_rank:
+  # military: 6 (not 5) -- a fresh military RUMOUR from the owner's own
+  # channels is exactly the early warning this system exists for; 6 keeps
+  # it visible for ~4h of recency decay, then it drops out.
+  category_weights: {military: 6, security: 4, politics: 3, economy: 2, other: 0}
+  corroboration_weight: 2        # per independent corroborating group
+  tier_bonus: {1: 3, 2: 2, 3: 0} # best source tier among cluster members
+  recency_max_bonus: 3
+  recency_window_hours: 12
+  size_boost_per_member: 0.1
+  size_boost_cap: 1.0
+  min_score: 8                   # events below this never reach the message
+  max_messages: 3                # one digest may span up to N messages
+  repeat_window_hours: 72        # events matching a recent stored event are repeats
+
+delivery:
+  telegram_max_chars: 4096
+  # Budget explicitly. Never discover the limit at send time.
+  char_budget:
+    header: 200
+    top_events: 2200
+    risk_block: 900
+    watchlist: 500
+    footer: 150
+  truncate_priority: ["watchlist", "top_events", "risk_block"]
+  # Owner decision 2026-08-29: the digest is Persian (headlines, summaries,
+  # labels, Jalali dates).
+  output_language: "fa"
+  source_languages: ["en", "fa", "ar", "he"]
+
+# ---------------------------------------------------------------------------
+# OPERATIONS
+# ---------------------------------------------------------------------------
+ops:
+  mock_mode: false          # true = no network, fixtures only. Used by all tests.
+  dry_run: false            # run everything, send nothing
+  halt_on_state_decrypt_failure: true   # constraint 14. Never start from empty.
+  halt_on_db_integrity_failure: true
+  # DECISION 6b — startup coverage check. A source covering no signal is dead
+  # weight; a signal covered by no source can never fire and you would never know.
+  require_signal_coverage_check: true
+  coverage_check_fails_build: false     # warn in digest, do not block the run
