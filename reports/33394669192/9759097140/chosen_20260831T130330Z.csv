@@ -1,0 +1,41 @@
+﻿cluster_key,fate,reason,n_members,sources,best_tier,category,claim_status,independent_count,score,headline,summary
+883744ad585ae860,irrelevant,,2,maariv,2,,,,,,
+de42e9bdcfdf0384,clickbait,,1,tehran_times,2,,,,,,
+018a3b2bb3b46c37,repeat_dropped,,4,aawsat|al_manar|al_monitor|mee,2,,,,,,
+bfc469e166528342,fatal,,18,al_manar|maariv|osint613_a|tg_behold_israel|tg_defenderdome|tg_fighter_radar|tg_geopwatch|tg_iranian_militarism|tg_mes|tg_minas_tirith|tg_tabzlive|tg_vira_university|tg_wfwitness|walla,2,,,,,,
+35fb097f6c15b9d1,irrelevant,,1,aviationist,2,,,,,,
+a375e54c8ac062d8,repeat_dropped,,3,al_monitor|mee|sky_news_arabia,2,,,,,,
+a4a882e9029a469c,irrelevant,,1,maariv,2,,,,,,
+a56ffd1e198ec427,sent,,11,al_jazeera|osint613_a|tg_tabzlive|tg_wfwitness,2,politics,unconfirmed,1,10.965,ترکیه، عربستان سعودی و پاکستان نخستین نشست پیمان دفاعی مکه را در استانبول برگزار کردند,وزیر خارجه ترکیه تأکید کرد این ائتلاف جایگزین ناتو نیست و با هدف گسترش آینده‌ای تشکیل شده است.
+7ce7ebde3a3eeb7a,sent,,1,tehran_times,2,economy,unconfirmed,1,8.965,وزیر راه و شهرسازی از آغاز ساخت ۹۴ هزار واحد مسکونی کارگری خبر داد,وزیر راه و شهرسازی اعلام کرد که در فاز نخست، ۶ هزار واحد اجاره‌ای به زوج‌های جوان اختصاص خواهد یافت.
+c981e46795cc912d,clickbait,,1,irna,2,,,,,,
+f3f74e66a5e67b77,repeat_dropped,,2,haaretz|maariv,2,,,,,,
+b38fd41741becd56,sent,,4,irna|mehr,2,politics,unconfirmed,1,10.254,پزشکیان و وزیر خارجه ایران در بیشکک با مقامات پاکستان، تاجیکستان و مغولستان دیدار کردند,این دیدارها در حاشیه نشست سازمان همکاری شانگهای در بیشکک انجام شد. جزئیات گفتگوها منتشر نشده است.
+950cdb99bf654c30,clickbait,,1,mee,2,,,,,,
+1ecfba2b4fd48d86,repeat_dropped,,3,dw|france24|tg_rnintel,2,,,,,,
+c71979dc47a37132,irrelevant,,1,maariv,2,,,,,,
+679edfd87a8578a8,fatal,,6,ajar|al_manar|maariv|tg_fighter_radar,2,,,,,,
+710728340dea1782,repeat_dropped,,4,dw|osint613_a|tg_rnintel|tg_tabzlive,2,,,,,,
+0ac4077649caa7ec,sent,,4,al_jazeera|osint613_a|tg_mes,2,military,unconfirmed,1,13.210,امارات پهپاد ایرانی را در آسمان خود سرنگون کرد,امارات متحده عربی اعلام کرد یک پهپاد شناسایی از ایران را رهگیری کرده است. همزمان گزارش‌های غیررسمی از سرنگونی یک پهپاد آمریکایی توسط دفاع هوایی ایران در خلیج فارس منتشر شده است.
+28d959be2b2f6639,repeat_dropped,,3,mee|osint613_a|tg_tabzlive,2,,,,,,
+0dd1ed5ef45f3f54,sent,,13,al_jazeera|maariv|osint613_a|tg_behold_israel|tg_fighter_radar|tg_irane_azad_news|tg_iranian_militarism|tg_mes|tg_rnintel|tg_tabzlive|tg_wfwitness,2,politics,likely,2,12.900,ترامپ ایران را رسماً کشور شکست‌خورده و مرده اعلام کرد,رئیس‌جمهور آمریکا در شبکه تروث سوشال ادعا کرد که ایران نیروی دریایی و هوایی ندارد و تورم آن ۳۰۰ درصد است. او همچنین مدعی شد بیش از ۱۰۰ هزار معترض کشته شده‌اند، در حالی که شب قبل عدد ۵۲ هزار نفر را اعلام کرده بود.
+6b6ed5e792b5136a,sent,,2,ajar|tg_minas_tirith,2,security,unconfirmed,1,10.986,دولت عراق اعلام کرد تحویل سلاح گروه‌های مسلح نزدیک به پایان است,بغداد تأکید کرد که مذاکرات برای تحویل سلاح توسط گروه‌های مسلح پیشرفت کرده و تا ۳۰ سپتامبر تمام خواهد شد تا حاکمیت دولت برقرار شود.
+e4670c761df3640a,repeat_dropped,,7,ajar|al_manar|maariv|mee,2,,,,,,
+d19d8f350efce136,repeat_dropped,,1,walla,2,,,,,,
+63b52fcf25789a0b,repeat_dropped,,1,mehr,2,,,,,,
+65958e7d62f3d05c,repeat_dropped,,2,maariv|walla,2,,,,,,
+546156f5edadcb0f,irrelevant,,1,maariv,2,,,,,,
+9209e138c40773be,sent,,1,aawsat,2,economy,unconfirmed,1,8.816,ترامپ از تولیدکنندگان انرژی به دلیل افزایش قیمت نفت انتقاد کرد,رئیس‌جمهور آمریکا تولیدکنندگان سوخت‌های فسیلی را به کسب سودهای کلان از طریق اختلال در تأمین انرژی ناشی از بسته‌بندی تنگه هرمز متهم کرد.
+b706ddcb1c18b1fc,sent,,1,sky_news_arabia,2,economy,unconfirmed,1,8.814,اضطراب‌های دریایی پس از جنگ ایران، سرمایه‌گذاری در صنعت کشتیرانی را افزایش داد,افزایش هزینه‌های حمل‌ونقل و ارزش ناوگان، صندوق‌های بازنشستگی و سرمایه‌گذاران جدید را به این بخش جذب کرده است.
+2f4d8a9260d31c84,sent,,1,walla,2,security,unconfirmed,1,10.810,دو داروساز نظامی اسرائیلی به اتهام فروش داروهای ارتش در بازار سیاه دستگیر شدند,این دو فرد که به عنوان پیمانکاران خارجی وزارت دفاع کار می‌کردند، متهم به سرقت و فروش سیستماتیک داروهای اختصاصی سربازان هستند.
+8aa32db989c6205e,repeat_dropped,,3,al_monitor|tg_iranian_militarism|tg_rnintel,2,,,,,,
+2c60b06afc73e397,sent,,1,haaretz,2,politics,unconfirmed,1,9.793,مدارس فلسطینی در اورشلیم شرقی به برنامه درسی اسرائیل پیوستند,تحت فشار والدین و دولت اسرائیل، دانش‌آموزان جدید کلاس اول و هفتم در مدارس دولتی فلسطینی در اورشلیم شرقی از این پس برای آزمون دیپلم اسرائیل درس خواهند خواند.
+b402d2f26d29097a,cap_refused,,1,walla,2,,,,,,
+2a96481da9be352b,cap_refused,,1,walla,2,,,,,,
+ee935321a769051b,cap_refused,,1,walla,2,,,,,,
+9e9f9a0e7d0386fc,cap_refused,,2,al_jazeera|bbc_en,2,,,,,,
+680a3fd0e27cecf7,cap_refused,,1,maariv,2,,,,,,
+f4b82e5968504c4a,cap_refused,,2,irna,2,,,,,,
+e25aa2914b2fa9a3,cap_refused,,1,sky_news_arabia,2,,,,,,
+cb52d71706c97e7d,cap_refused,,1,maariv,2,,,,,,
+9bf928ba61de725e,cap_refused,,2,maariv|osint613_a,2,,,,,,

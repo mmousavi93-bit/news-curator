@@ -1,0 +1,41 @@
+﻿cluster_key,fate,reason,n_members,sources,provider,best_tier,category,claim_status,independent_count,score,headline,summary
+61e04c54ba78c6ca,irrelevant,,1,state_dept_travel,groq,1,,,,,,
+9964dd1b003e5973,repeat_dropped,,3,aawsat|al_jazeera|tg_irane_azad_news,groq,2,,,,,,
+c11dbb9469ad53d4,irrelevant,,2,ajar|sky_news_arabia,groq,2,,,,,,
+af2327b4341d6e47,repeat_dropped,,4,ajar|tg_rnintel|tg_tabzlive,groq,2,,,,,,
+aaa4b5a256b7bb7f,repeat_dropped,,3,al_manar|tg_iranian_militarism|ynet_he,groq,2,,,,,,
+7e40551096d29469,fatal,,7,al_jazeera|al_monitor|iran_international|reuters_gnews|tg_vira_university,bai_deepseek,2,,,,,,
+dd5765a52ca4d8cc,fatal,,1,mee,bai_deepseek,2,,,,,,
+d76c2ff6d075fe8e,repeat_dropped,,15,al_manar|maariv|mee|tg_behold_israel|tg_fighter_radar|tg_irane_azad_news|tg_iranian_militarism|tg_mes|tg_minas_tirith|tg_padeshah_fxn,gemini,2,,,,,,
+2401dca4d6d1bb01,irrelevant,,2,sky_news_arabia|tg_wfwitness,gemini,2,,,,,,
+813923204f20789b,irrelevant,,2,maariv|tg_geopolitics_prime,gemini,2,,,,,,
+7d694850d0501bcc,sent,,2,aawsat|bbc_persian,groq,2,politics,likely,2,12.048,سخنگوی دولت ایران از شدت اعتراضات دی‌ماه نسبت به جنگ‌های گذشته سخن گفت,مهاجرانی در مصاحبه تلویزیونی از خشونت‌های اجتماعی انتقاد کرد؛ در حالی که تحلیل‌ها بر پیوند ادعای ترامپ از سادگی جنگ با ایران و انتخابات میان‌دوره‌ای آمریکا تأکید دارند.
+6c01611673b39708,sent,,3,ajar|al_manar,groq,2,military,unconfirmed,1,13.138,حمله نظامی اسرائیل به مناطق مختلف فلسطین اشغالی و لبنان,نیروهای اسرائیلی ۶ فلسطینی را در کرانه باختری بازداشت کردند و یک مزرعه مرغداری در بیق غربی لبنان را هدف قرار دادند.
+c49250681c32303e,irrelevant,,1,irna,groq,2,,,,,,
+7c6e57ff8037999d,clickbait,,1,tehran_times,groq,2,,,,,,
+cd91a142de3b8e23,sent,,6,ajar|maariv|tg_irane_azad_news|tg_iranian_militarism|tg_padeshah_fxn|tg_vahid_online,groq,2,security,likely,2,13.385,بازداشت مادر دو معترض جان‌باخته در لاهیجان,نزهت میرراضی، مادر علی و عماد شوش، پس از انتشار ویدئویی به مناسبت زادروز فرزندش بازداشت شد. اطلاعاتی درباره نهاد بازداشت‌کننده، محل نگهداری و اتهامات احتمالی او منتشر نشده است.
+f0e32b642241777f,irrelevant,,1,walla,bai,2,,,,,,
+e038f918ec82081d,sent,,2,al_manar|maariv,groq,2,military,unconfirmed,1,12.977,وزارت بهداشت لبنان ۴۳۵۸ کشته و ۱۲۳۵۹ زخمی از آغاز جنگ اعلام کرد,این آمار مربوط به دوره ۲ مارس تا ۵ سپتامبر است. خبر دیگر درباره مصدومیت یک مرد ۳۰ ساله در تل‌آویو است که ارتباطی با آمار لبنان ندارد.
+6e9db2911c5c3bf2,repeat_dropped,,1,mee,groq,2,,,,,,
+5294763b7dd90153,sent,,2,aawsat|ajar,groq,2,security,likely,2,12.956,حمله به منزل رهبر محلی در سویدا و برگزاری نمایشگاه اسارت در دمشق,منابع درزی از خشم عمومی پس از حمله «حرس ملی» به خانه عاطف هنیدی خبر دادند؛ همزمان وزارت داخله سوریه در نمایشگاه بین‌المللی دمشق، رکنی از شکنجه‌های رژیم سابق را به نمایش گذاشت.
+09bf76e0c0d39e01,sent,,2,al_jazeera|bbc_en_me,groq,2,politics,likely,2,11.927,گسترش ساخت‌وساز و تخریب زمین‌های کشاورزی فلسطینی در کرانه باختری,گزارش‌ها از افزایش چشمگیر ساخت‌وساز و جاده‌سازی در مناطق اشغالی و تخریب مزارع در منطقه «الف» کرانه باختری خبر می‌دهند.
+b5360fb2ae322d09,irrelevant,,1,sky_news_arabia,groq,2,,,,,,
+89c3d7bfc14433e8,relevance_dropped,,3,al_manar|maariv|walla,groq,2,politics,unconfirmed,1,10.014,پوتین و زلنسکی دستور توقف حملات بر شهرهای تحت مذاکره را صادر کردند,این اقدام در پی بازدید نمایندگان آمریکا از مسکو و کی‌یف برای پیشبرد پایان جنگ انجام شد؛ زلنسکی از توقف حملات به مسکو خبر داد و انتظار دارد روسیه نیز حملات به کی‌یف را متوقف کند.
+025be48c9137ba22,irrelevant,,1,al_jazeera,groq,2,,,,,,
+bf8cd1fe09d0cdb5,irrelevant,,1,tehran_times,gemini,2,,,,,,
+4348045bc208e1c5,fatal,,1,haaretz,openrouter,2,,,,,,
+7c4a1eff0d13b8c3,irrelevant,,2,ajar|sky_news_arabia,groq,2,,,,,,
+e3c2d14e64570e7c,repeat_dropped,,1,mee,groq,2,,,,,,
+265d534525bf2a62,sent,,1,maariv,groq,2,politics,unconfirmed,1,9.695,انتشار ویدیوی پرواز هلیکوپتر نتانیاهو در نوه جنوبی,این ویدیو که در شبکه‌های اجتماعی منتشر شده، توجه‌ها را به جزئیات پرواز و حضور نخست‌وزیر در آن منطقه جلب کرده است.
+6d13ee7e63f60ad3,sent,,1,irna,groq,2,politics,unconfirmed,1,9.688,سفیر ایران در روم مدارک خود را به رئیس‌جمهور این کشور ارائه کرد,سید محسن عمیدی در دیداری با نیکوسور دان، رئیس‌جمهور روم، اعتمادنامه خود را تسلیم وی نمود.
+22c0fd47527274a4,sent,,1,maariv,groq,2,politics,unconfirmed,1,9.682,نتانیاهو تصمیم به عدم نجات برخی از اعضای حزب لیکود گرفت,این تصمیم در راستای بازگشت احتمالی حزب شاس به ائتلاف حاکمانه اتخاذ شده است.
+d63a7c5f8d384f58,sent,,1,mee,groq,2,politics,unconfirmed,1,9.658,تهدید به طرح دعوای حقوقی علیه سازمان مالیاتی بریتانیا به دلیل تجارت با مستعمرات,یک مرکز حقوقی غیرانتفاعی مستقر در ایالات متحده اعلام کرده که سازمان درآمد و گمرکات بریتانیا (HMRC) اجازه ورود کالاهای تولیدشده در مستعمرات اسرائیل به بازار این کشور را داده است.
+ea3f3bc6b7e5b85f,repeat_dropped,,2,mehr|ynet,groq,2,,,,,,
+3680853424c6722e,clickbait,,1,al_jazeera,groq,2,,,,,,
+7f56d4679d271ebf,irrelevant,,1,maariv,groq,2,,,,,,
+ada1117ac0e4f7b0,unparseable,,1,al_jazeera,gemini,2,,,,,,
+81aa4606361e8b2f,clickbait,,1,ajar,bai,2,,,,,,
+2814caaa0791fe5b,relevance_dropped,,1,ajar,groq,2,politics,unconfirmed,1,9.212,برگزاری مراسم تأبین رسمی برای راتکو ملادیتش در بلغراد,این مراسم دو روز پیش از خاکسپاری وی برگزار شد، علیرغم اینکه ملادیتش به ارتکاب نسل‌کشی و جنایات جنگی در بوسنی محکوم شده است.
+ec7db8f563bb2501,sent,,1,ajar,groq,2,economy,unconfirmed,1,8.200,بانک مرکزی عراق از ورشکستگی نهادهای بانکی کشور رد شد,مسئولان بانک مرکزی بر سلامت و نقدینگی کافی سیستم بانکی تأکید کردند، هرچند ۹۱.۷ درصد از پول صادرشده خارج از چرخه بانکی باقی مانده است.
+619e2649061046ee,irrelevant,,1,ajar,groq,2,,,,,,
+c3c7c84453e0fe7a,irrelevant,,1,ajar,groq,2,,,,,,

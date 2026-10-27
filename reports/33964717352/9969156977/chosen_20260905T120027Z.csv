@@ -1,0 +1,41 @@
+﻿cluster_key,fate,reason,n_members,sources,provider,best_tier,category,claim_status,independent_count,score,headline,summary
+c33f709e5ea95015,relevance_dropped,,11,ajar|al_jazeera|bbc_en|bbc_persian|tg_minas_tirith|tg_rnintel|tg_tabzlive|tg_wfwitness,groq,2,politics,likely,2,12.991,نمایندگان ترامپ برای مذاکرات صلح وارد مسکو شدند,ویتکاف و کوشنر پیش از سفر به کی‌یف با مقامات روس دیدار می‌کنند؛ زلنسکی حملات شبانه روسیه به فرودگاه‌ها را واکنش به این دیپلماسی خواند.
+0c00c7f01c80c3ef,repeat_dropped,,1,mee,groq,2,,,,,,
+8cd42ea9e7cf0679,irrelevant,,1,bbc_persian,groq,2,,,,,,
+9e96882e5bdc6ccc,fatal,,1,maariv,bai_deepseek,2,,,,,,
+c427db6882b72bda,fatal,,11,ajar|al_manar|tg_fighter_radar|tg_irane_azad_news|tg_iranian_militarism|tg_padeshah_fxn|tg_tweet_mardomi,bai_deepseek,2,,,,,,
+b9baa73b80531da2,fatal,,2,sky_news_arabia,openrouter,2,,,,,,
+da991d3663eb3117,repeat_dropped,,17,ajar|al_manar|mee|tg_fighter_radar|tg_geopwatch|tg_padeshah_fxn|tg_tabzlive|tg_tweet_mardomi|tg_wfwitness,groq,2,,,,,,
+e478aa0b93441cb7,sent,,1,mehr,groq,2,politics,unconfirmed,1,9.956,رئیس قوه قضاییه ایران از بریکس خواستار محکومیت حملات آمریکا و اسرائیل شد,موسی‌نژاد از کشورهای عضو بریکس خواست تا از مجرمان جنگ‌های علیه ایران محاکمه کنند و این حملات را محکوم نمایند.
+8ad23507b8128ff3,repeat_dropped,,4,ajar|al_manar|maariv|tg_padeshah_fxn,groq,2,,,,,,
+dce09a3b3b7e0871,sent,,3,aawsat|al_monitor|mee,groq,2,politics,likely,3,14.142,سفیر آمریکا در اسرائیل خواستار عواقب شدید برای توقف خشونت در کرانه باختری شد,مایک هاکابی در بازدید از شهرک تورمس عیا اعلام کرد که طرحی برای اخراج اجباری فلسطینیان از غزه وجود ندارد و بر لزوم پاسخگویی به خشونت‌های مستعمره‌نشینان تأکید کرد.
+7519bdd9cd97273e,repeat_dropped,,2,maariv|tg_padeshah_fxn,groq,2,,,,,,
+afdb6e0f8c4cb1ed,irrelevant,,1,sky_news_arabia,groq,2,,,,,,
+81b0072b947683fb,irrelevant,,1,al_jazeera,bai,2,,,,,,
+2bcee18964032eca,fatal,,1,mehr,openrouter,2,,,,,,
+e9381a2af8638ea3,repeat_dropped,,4,aawsat|tg_rnintel|tg_wfwitness,groq,2,,,,,,
+b7a1731b40a3e81d,irrelevant,,1,sky_news_arabia,groq,2,,,,,,
+0b85c74a094faae8,sent,,2,al_jazeera|iran_international,groq,2,military,likely,2,14.948,ترامپ تهدید به حمله به تونل‌های کوه چکش در نزدیکی نطنز کرد,این تهدید در حالی مطرح شد که یک تانکر نفتی در نزدیکی جزیره خارگ هدف قرار گرفت. کوه چکش تنها سایت مهم باقی‌مانده برنامه هسته‌ای ایران است که در درگیری‌های اخیر دست‌نخورده مانده است.
+3d701bf7d080d48d,repeat_dropped,,3,sky_news_arabia|tg_padeshah_fxn|tg_wfwitness,groq,2,,,,,,
+be45bb1b20f282c0,sent,,1,mee,groq,2,security,unconfirmed,1,10.803,نیروهای اسرائیلی چند کشاورز فلسطینی را در کرانه باختری بازداشت کردند,شورای روستای یارزا اعلام کرد که این اقدامات بخشی از فشارهای مداوم برای وادار کردن ساکنان به ترک خانه‌ها و زمین‌هایشان است.
+c571ee0650618ac9,repeat_dropped,,4,ajar|al_manar|tg_tabzlive,groq,2,,,,,,
+7d0604b120411f03,sent,,1,sky_news_arabia,groq,2,security,unconfirmed,1,10.792,عراق اعلام می‌کند مخیم الهول به‌زودی به‌طور کامل بسته می‌شود,وزارت مهاجرت و مهاجرین عراق تأکید کرد که ۲۱ هزار بازگشت‌کننده توانمندسازی شده‌اند و هیچ نقض امنیتی در این فرآیند رخ نداده است.
+bfb59bd96ec5335d,irrelevant,,1,walla,groq,2,,,,,,
+3e9b7927e24b4446,clickbait,,1,mehr,groq,2,,,,,,
+b08e3746a32c2910,clickbait,,1,maariv,groq,2,,,,,,
+178ed662261b37d5,repeat_dropped,,1,walla,groq,2,,,,,,
+24d8782475af02be,irrelevant,,1,tehran_times,groq,2,,,,,,
+39d8433a0ddc4c9d,repeat_dropped,,3,ajar|mehr|tg_fighter_radar,groq,2,,,,,,
+03b86e2a6706ec3a,sent,,1,irna,groq,2,security,unconfirmed,1,10.720,نیروی زمینی سپاه پاسداران تیمی تروریستی در سیستان و بلوچستان را منهدم کرد,کماندوهای نیروی زمینی سپاه اعلام کردند که این تیم تروریستی در جنوب شرقی ایران خنثی شده است.
+4f3bb044463bc0aa,irrelevant,,1,tehran_times,groq,2,,,,,,
+4d200f6e3bafa262,irrelevant,,1,tehran_times,groq,2,,,,,,
+7882c03f140a4c71,irrelevant,,1,al_jazeera,groq,2,,,,,,
+61f7736fa035122d,irrelevant,,2,mehr,groq,2,,,,,,
+9cf7cc72fab979d9,irrelevant,,1,sky_news_arabia,groq,2,,,,,,
+650afbd66b844f5b,clickbait,,2,maariv,groq,2,,,,,,
+b12e3143959f9c2c,repeat_dropped,,2,mee|tg_fighter_radar,groq,2,,,,,,
+f4e5fb381f86be48,sent,,1,irna,groq,2,politics,unconfirmed,1,9.625,بحث مقامات قضایی ایران و هند درباره همکاری‌های حقوقی در حاشیه نشست بریکس,در این دیدار که در دهلی نو برگزار شد، بر گسترش روابط قضایی دوجانبه و چندجانبه، به‌ویژه در زمینه داوری و میانجی‌گری، تأکید شد.
+307e64317db41ac8,irrelevant,,1,maariv,groq,2,,,,,,
+2c64daffe4a5332f,repeat_dropped,,5,aawsat|al_monitor|ap_gnews|sky_news_arabia|tg_rnintel,groq,2,,,,,,
+3a644d5ed4255119,irrelevant,,1,irna,groq,2,,,,,,
+c58e93f7ba3718be,clickbait,,5,bbc_persian|tg_fighter_radar|tg_iranian_militarism,groq,2,,,,,,

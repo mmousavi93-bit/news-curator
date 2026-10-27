@@ -1,0 +1,157 @@
+﻿cluster_key,fate,reason,n_members,sources,provider,best_tier,category,significance,claim_status,independent_count,score,headline,summary
+44c398e22b87b7b9,sent_followup,band=mid sim=0.56 score=19.63 kept=above_floor prior=4d119f60,8,ajar|haaretz|osint613_a|sky_news_arabia|tg_fighter_radar|tg_padeshah_fxn|tg_tabzlive,groq,2,politics,balance,likely,3,19.631,بن‌گیور درخواست وزارت دفاع و نتانیاهو جلسه امنیتی اضطراری با ایران,ایتمار بن‌گیور اعلام کرد برای وزارت دفاع در دولت بعدی رقابت خواهد کرد و نتانیاهو جلسه امنیتی اضطراری با دستگاه‌های نظامی درباره ایران برگزار کرد. منابع مختلف درباره نتایج دقیق نظرسنجی‌های انتخاباتی و برنامه‌های دقیق نتانیاهو در سازمان ملل اختلاف‌نظر دارند.
+4b23b5229cdd00d3,sent_followup,band=mid sim=0.72 score=22.74 kept=above_floor prior=bb689409,10,al_jazeera|ap_gnews|france24|iran_international|mehr|sky_news_arabia|tehran_times|tg_geopolitics_prime,groq,2,politics,escalation,likely,6,22.739,ترامپ تهدید به نابودی ایران و برگزاری مذاکرات غیرمستقیم سه ساعته,دونالد ترامپ در سازمان ملل تهدید به نابودی جمهوری اسلامی کرد، اما همزمان مذاکرات غیرمستقیم سه ساعته با میانجی‌ها را «بسیار خوب» توصیف کرد. مقامات ایرانی از وجود شکاف بین جناح‌های مذاکره‌کننده و سخت‌گیران در تهران خبر دادند.
+4878cc26aac7bb4a,relevance_dropped,band=mid sim=0.77 score=17.03 kept=above_floor prior=b80e901d,4,al_monitor|mehr|osint613_a|reuters_gnews,groq,2,military,none,likely,3,17.032,حمله هوایی اسرائیل به غزه و کشته شدن مسئول مالی حماس,حمله هوایی اسرائیل به غزه دست‌کم چهار فلسطینی را کشت و تل‌آویو اعلام کرد هدف این حمله رئیس بخش مالی حماس بوده است. منابع محلی از کشته شدن دو نفر در خان یونس و دو نفر دیگر در شهر غزه و ديرالبلح خبر دادند.
+bff3131059c8dab7,relevance_dropped,,2,aawsat|al_monitor,groq,2,politics,none,likely,2,12.090,دموکرات‌های سنای آمریکا طرح تحریم پروژه استیتون E1 را ارائه می‌دهند,گروهی از سناتورهای دموکرات طرحی را برای تحریم افراد و گروه‌هایی که پروژه استیتون E1 در کرانه باختری را تسهیل می‌کنند، ارائه خواهند داد. این پروژه که به‌شدت محکوم شده، از سرزمینی عبور می‌کند که فلسطینیان آن را برای تشکیل دولت خود می‌خواهند.
+5a63c728f6c063f7,sent_followup,band=high sim=0.87 score=17.78 kept=development prior=73eed3ca,9,bbc_persian|osint613_a|sky_news_arabia|tg_entekhab|tg_fighter_radar|tg_geopwatch|tg_padeshah_fxn,groq,2,economy,economy,likely,2,17.778,ادامه پروازهای ایران ایر به استانبول و توقف خدمات در برخی فرودگاه‌ها,پرواز ایران ایر از تهران به استانبول در روز اول تحریم‌های جدید هواپیمایی آمریکا انجام شد، در حالی که عمان و عراق خدمات خود را متوقف کرده‌اند. فرودگاه نجف اعلام کرد پروازهای ایران طبق برنامه ادامه دارد و دستور توقفی صادر نشده است.
+e5390b5698835485,oversized,,4,bbc_en_me|france24|osint613_a,mistral,2,,,,,,,
+e67dca7a0ca28db3,irrelevant,,2,ajar|maariv,mistral,2,,,,,,,
+c7e6f38a2db7cbf3,oversized,,2,irna|mee,mistral,2,,,,,,,
+a168db05e4a9cb6a,oversized,,4,al_jazeera|irna|tg_mes,mistral,2,,,,,,,
+29898d7eac53fe0c,oversized,,3,al_monitor|osint613_a|reuters_gnews,mistral,2,,,,,,,
+6ccbe6c8b0d8b287,oversized,,6,ajar|osint613_a|sky_news_arabia|tg_tsepress,mistral,2,,,,,,,
+608c3b984227c96c,oversized,,3,al_manar|mee|sky_news_arabia,mistral,2,,,,,,,
+ea76c6f7a7b34842,irrelevant,,2,maariv|sky_news_arabia,mistral,2,,,,,,,
+77bd3ce7e9889025,oversized,,3,ajar|reuters_gnews|tg_wfwitness,mistral,2,,,,,,,
+23efe66f0cf38953,oversized,,2,bbc_en|tg_wfwitness,mistral,2,,,,,,,
+05078adeec5eb52f,sent_followup,band=mid sim=0.76 score=15.48 kept=above_floor prior=6da03fb2,6,maariv|tg_entekhab|tg_fighter_radar|tg_padeshah_fxn|tg_tweet_mardomi,groq,2,politics,balance,unconfirmed,1,15.478,دیدار سه‌جانبه وزرای خارجه ترکیه، سوریه و عربستان در نیویورک,وزیران خارجه ترکیه، سوریه و عربستان در حاشیه مجمع عمومی سازمان ملل متحد دیدار سه‌جانبه برگزار کردند. جزئیات مذاکرات و نتایج آن در منابع ارائه‌شده ذکر نشده است.
+de1d6ca0626c4236,sent,,1,mee,groq,2,military,balance,unconfirmed,1,17.963,ارتش لبنان ۳ میلیارد دلار برای افزایش توان دفاعی درخواست کرد,ارتش لبنان برای پاسخ به افزایش مسئولیت‌ها و پر کردن خلأ امنیتی، ۳ میلیارد دلار کمک مالی درخواست کرده است. منابع نظامی و دولتی می‌گویند حمایت‌های بین‌المللی تاکنون محدود بوده و معین نشده است.
+8ed4f9f5a9bef294,repeat_dropped,band=mid sim=0.61 score=10.06 blocked=below_floor prior=33544f7c,2,france24,groq,2,politics,none,unconfirmed,1,10.060,بحث درباره جنگ ایران و ریسک‌های هوش مصنوعی در مجمع عمومی سازمان ملل,روز دوم مجمع عمومی سازمان ملل با سخنرانی‌های رهبران از جمله رئیس‌جمهور ایران آغاز شد. همچنین جلسه‌ای در شورای امنیت با حضور مدیران شرکت‌های هوش مصنوعی برای بحث درباره امنیت برگزار می‌شود.
+d54bbec1789c5242,sent_followup,band=mid sim=0.61 score=14.96 kept=above_floor prior=8a6fa71b,1,aawsat,groq,2,economy,economy,unconfirmed,1,14.955,اتحادیه بین‌المللی گاز: جنگ ایران باعث کمبود طولانی‌مدت عرضه می‌شود,دبیرکل اتحادیه بین‌المللی گاز اعلام کرد بازارهای جهانی در حال محاسبه ادامه کمبود عرضه گاز فراتر از فصل زمستان هستند. این پیش‌بینی مستقیماً به تأثیرات جنگ ایران بر زنجیره تأمین انرژی نسبت داده شده است.
+dbbbb96109d9e2e6,sent_followup,band=mid sim=0.79 score=15.00 kept=above_floor prior=2314bba2,2,bbc_en|osint613_a,groq,2,politics,balance,unconfirmed,1,14.996,دیدار ترامپ و شی جین‌پینگ با محوریت روابط چین و ایران,دونالد ترامپ و شی جین‌پینگ در واشنگتن دیدار می‌کنند. انتظار می‌رود حمایت‌های اطلاعاتی چین از ایران و تأثیر آن بر امنیت آمریکا در این مذاکرات مطرح شود.
+bb44ec72036ae04d,sent_followup,band=mid sim=0.59 score=17.99 kept=above_floor prior=8900d497,2,haaretz|osint613_a,groq,2,military,balance,unconfirmed,1,17.994,راه‌اندازی کارخانه پهپاد اسرائیلی در صربستان و تشکیل یگان پهپادی چندملیتی آمریکا,رئیس‌جمهور صربستان اولین کارخانه تولید پهپادهای اسرائیلی در بلگراد را افتتاح کرد. همزمان، فرمانده CENTCOM اعلام کرد که نیروی مشترک در حال توسعه اولین یگان پهپاد حمله‌ای چندملیتی جهان است.
+340d48861c4b6a41,irrelevant,,1,sky_news_arabia,groq,2,,,,,,,
+1a2ef3e31cedae34,sent_followup,band=mid sim=0.57 score=14.98 kept=above_floor prior=71c1b6d1,2,aawsat|tg_tsepress,groq,2,economy,economy,unconfirmed,1,14.984,افزایش قیمت نفت برنت به بالای ۱۰۰ دلار پس از اظهارات ترامپ,قیمت نفت برنت پس از اظهارات ترامپ درباره دیزل از مرز ۱۰۰ دلار عبور کرد. بازارها پس از آرامش نسبی اخیر، دوباره با نوسانات قیمتی مواجه شدند.
+1ce3e0b064db9fc9,clickbait,,8,ajar|al_manar|tg_entekhab|tg_fighter_radar,groq,2,,,,,,,
+e7630a1b38d5f282,irrelevant,,1,al_jazeera,groq,2,,,,,,,
+6fb755c2d8a47042,sent_followup,band=mid sim=0.71 score=15.05 kept=above_floor prior=59039d9a,3,irna|mehr|tg_wfwitness,groq2,2,politics,balance,unconfirmed,1,15.054,نقد وزیر خارجه توسط نماینده مجلس و تأکید وزیر دفاع بر آمادگی,نماینده کمیسیون امنیت ملی مجلس، عباس عراقچی را به دلیل دیدار با نماینده آمریکا مورد انتقاد قرار داد. همزمان، وزیر دفاع موقت ایران بر ضرورت آمادگی برای تهدیدات آینده بر اساس درس‌های جنگ تأکید کرد.
+5735698ca17dd86a,irrelevant,,1,tehran_times,groq2,2,,,,,,,
+cf1809d8d5e90c02,irrelevant,,1,haaretz,groq2,2,,,,,,,
+b1d384ecccb65460,sent_followup,band=mid sim=0.59 score=18.82 kept=above_floor prior=5ba27f8d,1,tehran_times,groq2,2,security,escalation,unconfirmed,1,18.819,دانش‌آموز میناب از دانش‌آموزان آمریکایی خواستار امنیت مدارس شد,دانش‌آموزی از میناب در یادبود کشته‌شدگان حمله به مدرسه شجره طیبه، از دانش‌آموزان آمریکایی خواست مدارس امن بمانند. این پیام در پی حمله نظامی آمریکا به مدرسه ارسال شد.
+2bcd22c5a209deb8,irrelevant,,1,irna,groq2,2,,,,,,,
+35855bf11f0bd6e4,irrelevant,,1,bbc_en,groq2,2,,,,,,,
+7352542775521475,irrelevant,,1,tehran_times,groq2,2,,,,,,,
+e4a2d2b8f1d7199e,irrelevant,,2,irna|tg_mes,groq2,2,,,,,,,
+1a642f8e4bc20239,sent_followup,band=mid sim=0.73 score=21.06 kept=above_floor prior=7d74f484,4,mee|tg_defenderdome|tg_geopwatch,groq2,2,military,escalation,unconfirmed,1,21.057,تخریب یک کشتی باربری در تنگه هرمز با پرتابه ناشناخته,مرکز عملیات تجارت دریایی بریتانیا گزارش داد که یک کشتی باربری در تنگه هرمز با پرتابه‌ای ناشناخته هدف قرار گرفت و آتش گرفت. دو نفر از خدمه مجروح شدند و همه خدمه تخلیه شدند؛ گزارش‌های اولیه از پرتاب موشک کروز توسط ایران وجود دارد اما هنوز تأیید رسمی نشده است.
+5c55c2b1d57b3653,repeat_dropped,band=mid sim=0.58 score=10.85 blocked=below_floor prior=ade69318,2,haaretz|tg_wfwitness,groq2,2,security,none,unconfirmed,1,10.847,کشف گروه تروریستی فلسطینی برای ترور بن‌گور در اسرائیل,نیروهای امنیتی اسرائیل اعلام کردند که گروهی از نابلس را شناسایی کرده‌اند که قصد ترور ایتامار بن‌گور با پهپاد انفجاری را داشتند. دو مظنون که از سال ۲۰۲۳ در حال تجهیز و آموزش بودند، دستگیر شدند.
+3b7900fd5f5c3f11,relevance_dropped,,1,aawsat,mistral,2,security,none,unconfirmed,1,10.738,دولت ایران در روز یادبود مهسا امینی، دستگیری‌های گسترده‌تری را علیه فعالان و ورزشکاران انجام داد.,سازمان‌های امنیتی ایران در چهارمین سالگرد کشته‌شدن مهسا امینی، اقدامات سخت‌گیرانه‌تری را علیه اعتراضات و فعالیت‌های اجتماعی و ورزشی آغاز کردند. هیچ منبعی به جز گزارش‌های رسمی اشاره‌ای به تعداد دقیق دستگیرشدگان یا نوع اقدامات نکرد. این اقدامات در چارچوب سیاست‌های داخلی و کنترل اجتماعی صورت گرفته و به‌طور مستقیم بر روابط خارجی یا امنیت منطقه‌ای تأثیر نمی‌گذارد.
+f50d28898ec152a8,relevance_dropped,,1,tehran_times,mistral,2,politics,none,unconfirmed,1,9.731,ایران در نشست COP7 در تهران، همکاری‌های بیشتر در حفاظت از دریاچه ارومیه و اکوسیستم دریای خزر را تأکید کرد.,شینا انصاری، رئیس سازمان محیط‌زیست ایران، در نشست هفتم کنوانسیون تهران برای حفاظت از محیط دریایی دریای خزر، بر اهمیت همکاری‌های منطقه‌ای برای حفظ این اکوسیستم تأکید کرد. این نشست به عنوان یک مبادله دیپلماتیک و علمی در نظر گرفته می‌شود و هیچ اقدام عملی یا تغییر قابل‌توجهی در سیاست‌های محیط‌زیستی را گزارش نمی‌کند.
+6133f463cf5d2923,irrelevant,,1,maariv,mistral,2,,,,,,,
+39be75cda5b88a85,irrelevant,,1,tehran_times,mistral,2,,,,,,,
+54f9273b59059a1a,irrelevant,,1,tehran_times,mistral,2,,,,,,,
+6e7352c0f92611ea,irrelevant,,1,tehran_times,groq,2,,,,,,,
+c14003493544cdeb,sent_followup,band=mid sim=0.60 score=15.66 kept=above_floor prior=24c04a53,1,sky_news_arabia,groq,2,security,balance,unconfirmed,1,15.661,یونفیل از آغاز فرآیند مرحله‌ای خروج از جنوب لبنان خبر داد,سخنگوی یونفیل اعلام کرد که خروج نیروهای حفظ صلح از جنوب لبنان پس از پایان مأموریت در پایان سال جاری به صورت مرحله‌ای طی چند ماه انجام خواهد شد. او وضعیت امنیتی منطقه را «حساس و ناپایدار» توصیف کرد.
+354ed08cb9582b7d,irrelevant,,1,tehran_times,groq,2,,,,,,,
+ffeddd946587f6ed,relevance_dropped,,2,mee,groq,2,security,none,unconfirmed,1,10.718,شکایت از ارتش اسرائیل به دلیل ریشه‌کنی درختان زیتون قدیمی در لبنان,یک شهروند فرانسوی-لبنانی شکایتی را به اتهام ارتکاب جنایات جنگی علیه ارتش اسرائیل در پاریس ثبت کرد. او مدعی است که ۶۰۰ درخت زیتون چندصد ساله متعلق به خانواده‌اش در روستای زوطر شرقیه ریشه‌کن شده‌اند.
+597d760005c270cb,sent_followup,band=mid sim=0.65 score=14.64 kept=above_floor prior=358aa919,2,mehr|tg_wfwitness,groq,2,politics,balance,unconfirmed,1,14.643,کرملین آمادگی پوتین برای دیدار با ترامپ در نیویورک را اعلام کرد,دمیتری پسکوف، سخنگوی کرملین، اعلام کرد که ولادیمیر پوتین آماده دیدار با دونالد ترامپ است، اما زمان‌بندی دقیق آن هنوز مشخص نیست. او افزود که پیش‌شرایط‌های لازم برای مذاکرات صلح هنوز وجود ندارد و کییف را به ادامه فعالیت‌های تروریستی متهم کرد.
+6aa50238c873cda2,relevance_dropped,,1,iran_international,groq2,2,other,none,unconfirmed,1,6.541,پخش آلودگی نفتی در سواحل جنوبی ایران تا سال‌ها ادامه دارد,آلودگی نفتی در بخش‌هایی از ساحل هرمزگان و ورودی کانال‌های پرورش میگو در سیریک مشاهده شده است. مقامات محیط زیست هشدار می‌دهند که بخشی از این آلودگی ممکن است سال‌ها در محیط دریایی باقی بماند.
+615b6abc910c2460,irrelevant,,1,tehran_times,groq2,2,,,,,,,
+e98196acfcccc78b,sent_followup,band=mid sim=0.75 score=14.43 kept=above_floor prior=a40b6727,1,al_jazeera,groq2,2,politics,balance,unconfirmed,1,14.431,قطر بر ادامه تلاش‌های دیپلماتیک برای پایان درگیری آمریکا و ایران تأکید کرد,مجد الانصاری، مقام قطری، اعلام کرد که دوحه عزم خود را برای موفقیت دیپلماسی در پایان دادن به تعارض آمریکا و ایران جزم کرده است. او تأکید کرد که نمی‌توانند اجازه دهند دیپلماسی شکست بخورد.
+a76c717c472087e6,relevance_dropped,,1,haaretz,groq2,2,politics,none,unconfirmed,1,9.400,دادگاه عالی اسرائیل تصمیم درباره پرونده ۷ اکتبر را تا پس از انتخابات به تعویق انداخت,دادگاه عالی اسرائیل رسیدگی به درخواست‌های مربوط به بررسی دولتی ۷ اکتبر را تا پس از انتخابات به تعویق انداخت. قاضیان از دولت خواستار شدند تا ۱۵ ژانویه موضع خود را به‌روزرسانی کنند.
+144ae084d8825ed1,relevance_dropped,,1,sky_news_arabia,groq2,2,economy,none,unconfirmed,1,11.396,برگزاری نمایشگاه آدیبک ۲۰۲۶ در ابوظبی در ماه نوامبر,نمایشگاه و کنفرانس آدیبک ۲۰۲۶ از ۲ تا ۵ نوامبر در مرکز آدنیک ابوظبی برگزار می‌شود. این رویداد با هدف جذب سرمایه‌گذاری برای تقویت سیستم‌های انرژی انعطاف‌پذیر و هوشمند طراحی شده است.
+7c4cdcbaf3d8cf3c,clickbait,,1,mee,mistral,2,,,,,,,
+3fcb153798cf8bbf,irrelevant,,1,al_jazeera,mistral,2,,,,,,,
+b31b2b39d9db5ea2,relevance_dropped,,1,iran_international,mistral,2,security,none,unconfirmed,1,10.282,در ایران، دستگاه‌های ارتباطی بدون دلیل قطع می‌شوند,در ایران، دستگاه‌های ارتباطی مانند تلفن‌های همراه بدون هشدار یا دلیل مشخص قطع می‌شوند. این موضوع به عنوان یک روش کنترل و محدودیت در دسترسی به اطلاعات و ارتباطات مطرح شده است. این موضوع مربوط به محدودیت‌های داخلی و نظارت بر ارتباطات است.
+125f929212c0cb57,oversized,,2,irna|mehr,mistral,2,,,,,,,
+4bc2d0185142aade,irrelevant,,1,sky_news_arabia,mistral,2,,,,,,,
+7d7c378aea90bce4,oversized,,1,ap_gnews,mistral,2,,,,,,,
+2fb9cd17b678b3ec,repeat_dropped,band=mid sim=0.68 score=10.23 blocked=below_floor prior=059ade8a,1,al_jazeera,mistral,2,security,none,unconfirmed,1,10.231,قوات یمنی کنترل کوه قرفان در طائف را پس گرفت و پنج جنگجوی هوثی کشته شدند.,قوات یمنی تحت فرماندهی سرلشکر عبدالعزیز المجیدی اعلام کردند که پس از «مبارزات شدید»، پنج جنگجوی هوثی کشته و بیست نفر زخمی شدند. هیچ منبع مستقل از هوثی‌ها تأیید این ادعا نکرده است. این پیشرفت ممکن است به کاهش فشار هوثی‌ها بر مناطق تحت کنترل دولت یمن کمک کند، اما تأثیر مستقیم بر ایران یا منطقه خلیج فارس ندارد.
+227fb0e45b4836e8,irrelevant,,1,sky_news_arabia,mistral,2,,,,,,,
+e908cd56037248c4,irrelevant,,1,ajar,mistral,2,,,,,,,
+0c51283d6122faf1,irrelevant,,1,ajar,mistral,2,,,,,,,
+babd06d48d1e041d,relevance_dropped,,1,ajar,mistral,2,security,none,unconfirmed,1,9.935,هزاران خانواده از ساحل غربی یمن به مارب گریختند به دلیل جنگ با هوثیان,در پی شدت یافتن جنگ در ساحل غربی یمن، هزاران خانواده به استان مارب، یکی از مناطق درگیر، پناهنده شدند. اطلاعات دقیق از تعداد دقیق کشته‌ها یا تلفات نیروهای طرفین در دسترس نیست. این مهاجرت ناگهانی به دلیل خطرات جنگ و عدم امنیت در مناطق دیگر صورت گرفته است.
+21bee964acb6235c,repeat_dropped,band=mid sim=0.66 score=11.00 blocked=below_floor prior=71c1b6d1,1,tg_entekhab,mistral,3,economy,economy,rumour,0,10.998,قیمت نفت بر اساس انتخاب به ۱۰۰٫۵ دلار در هر بشکه رسید,قیمت نفت بر اساس گزارش انتخاب به ۱۰۰٫۵ دلار در هر بشکه رسید. این قیمت ممکن است تحت تأثیر عوامل بازار جهانی و تقاضا و عرضه باشد. تأثیر این قیمت بر اقتصاد ایران و بازارهای داخلی نفت و بنزین هنوز مشخص نیست.
+ab7f9863134e062e,repeat_dropped,band=mid sim=0.66 score=11.19 blocked=below_floor prior=f9d0548b,3,osint613_a|tg_tabzlive,mistral,3,politics,balance,rumour,0,11.193,رئیس‌جمهور سوریه تأکید کرد که منطقه گولان همچنان تحت حاکمیت سوریه است,احمد الشرا، رئیس‌جمهور سوریه، در سخنان خود تأکید کرد که هرگونه تلاش برای نقض حاکمیت سوریه و منطقه گولان به عنوان خاک سوریه، متوقف خواهد شد. او همچنین خواستار عقب‌نشینی نیروهای اسرائیلی به خطوط ۸ دسامبر ۲۰۲۴ شد. این سخنان در پی افزایش حملات اسرائیلی به سوریه بیان شده است.
+f890bb17e6be65ff,oversized,,6,osint613_a|tg_tabzlive,mistral,3,,,,,,,
+a922051476654ca9,repeat_dropped,band=mid sim=0.71 score=7.68 blocked=below_floor prior=0c66bb8f,8,tg_entekhab|tg_fighter_radar|tg_iranian_militarism|tg_padeshah_fxn|tg_tabzlive,mistral,3,security,none,rumour,0,7.684,افغانستان با ۸ پهپاد به پاکستان حمله کرد که همه توسط پاکستان رهگیری شدند,طالبان افغانستان با ۸ پهپاد، از جمله پهپادهای خودکشی و کامیکاز، به پاکستان حمله کردند که همه توسط نیروهای پاکستان در مناطق کوهستانی خارج از کوهات و نزدیکی ترکهم رهگیری شدند. این درگیری در نوار مرزی بین دو کشور رخ داد. اطلاعاتی از تلفات یا آسیب‌های جدی در دسترس نیست.
+27d9c2855935d82e,irrelevant,,4,tg_tabzlive,groq2,3,,,,,,,
+64ff77d4294eb332,sent,,2,tg_mes|tg_militarywave,groq2,3,military,balance,rumour,0,14.049,حمله پهپادی به مرکز کنترل در خرسون و کشتار گروهی در سراوان,مرکز کنترل پهپاد اوکراینی در خرسون توسط پهپاد روسی تخریب شد. همزمان، نیروهای ویژه سپاه پاسداران با استفاده از پهپاد FPV گروهی از تروریست‌ها را در سراوان کشتند. جزئیات بیشتر درباره مکان دقیق یا تعداد قربانیان در منابع ذکر نشده است.
+cda10245be107202,clickbait,,1,al_manar,groq2,3,,,,,,,
+d7fdce0aed08a447,irrelevant,,3,tg_irane_azad_news|tg_iranian_militarism,groq2,3,,,,,,,
+0c2256d27c5f57a1,sent_followup,band=mid sim=0.78 score=17.11 kept=above_floor prior=9f883f6c,3,tg_mes|tg_padeshah_fxn|tg_rnintel,groq2,3,military,escalation,rumour,0,17.111,حمله موشکی ایران به یک کشتی تجاری در تنگه هرمز,ایران یک کشتی باربری در تنگه هرمز را هدف حمله موشکی قرار داد که منجر به آتش‌سوزی و تخلیه خدمه شد. سازمان عملیات تجارت دریایی بریتانیا (UKMTO) این رویداد را تأیید کرد. این حمله نشان‌دهنده تشدید تنش‌های امنیتی در مسیرهای آبی حیاتی است.
+9a4756af14d8c03b,clickbait,,3,tg_fighter_radar|tg_minas_tirith,groq,3,,,,,,,
+ae2d4ab2c33f95f6,relevance_dropped,,2,osint613_a,groq,3,military,none,rumour,0,8.987,کشف تونل ۶۰۰ متری حماس در نوار غزه توسط ارتش اسرائیل,نیروهای مهندسی ارتش اسرائیل تونلی به طول تقریبی ۶۰۰ متر در منطقه اردوگاه‌های مرکزی غزه کشف کردند. این تونل از شرق خط زرد عبور می‌کرد و در جریان عملیات پاکسازی منطقه مسدود شد.
+e6822853791f4e2c,repeat_dropped,band=mid sim=0.65 score=11.09 blocked=below_floor prior=ef8b8c0c,3,tg_fighter_radar|tg_irane_azad_news|tg_tsepress,groq,3,politics,balance,rumour,0,11.087,تأیید مجوز دیدار عراقچی با هیأت آمریکایی توسط نماینده مجلس,مجتبی زارعی، نماینده مجلس، تأیید کرد که دیدار عباس عراقچی با هیأت آمریکایی مجوز لازم از سوی ساختارهای حاکمیتی را داشته است. او اعلام کرد مذاکره‌ای صورت نگرفته و شروط هفت‌گانه ایران به نماینده دولت آمریکا ابلاغ شده است.
+602542f59dd4aee0,sent_followup,band=mid sim=0.71 score=15.26 kept=above_floor prior=7d74f484,5,osint613_a|tg_entekhab|tg_fighter_radar|tg_minas_tirith|tg_wfwitness,groq,3,security,escalation,rumour,0,15.255,هدف قرار گرفتن کشتی باربری در تنگه هرمز با پرتابه ناشناس,مرکز عملیات تجارت دریایی بریتانیا (UKMTO) از برخورد یک پرتابه ناشناس با یک کشتی باربری (تانکر LPG) در حال خروج از تنگه هرمز خبر داد. دو نفر از خدمه زخمی شدند و کشتی در آتش سوخت و تخلیه شد.
+a2a6acb5b2e33948,irrelevant,,3,tg_tabzlive,groq,3,,,,,,,
+3f0a3b23facb5600,relevance_dropped,,7,tg_fighter_radar|tg_iranian_militarism,groq,3,security,none,rumour,0,7.443,درگیری مسلحانه در سراوان و بازگشت سلاح ژ۳ به خدمت سپاه,یگان‌های پلیس و سپاه درگیری‌های مسلحانه در سراوان را با خودروهای ضدگلوله و پهپادهای FPV مهار کرده‌اند. منابع غیررسمی از بازگشت سلاح ژ۳ به سازمان رزم سپاه پس از جمع‌آوری از ارتش خبر می‌دهند.
+280a9626d44aba9d,clickbait,,1,tg_iranian_militarism,groq,3,,,,,,,
+e6e830ce5fff41ae,clickbait,,1,tg_entekhab,groq,3,,,,,,,
+9ade7950f10263d2,repeat_dropped,band=mid sim=0.69 score=13.79 blocked=below_floor prior=b80e901d,2,tg_geopwatch|tg_padeshah_fxn,groq,3,military,balance,rumour,0,13.787,ادعای سرنگونی پهپاد اسرائیلی در ماریب و ترور مقام حماس,سخنگوی انصارالله ادعا کرده است پهپاد «وینگ لوونگ ۲» اسرائیل را در ماریب سرنگون کرده است. نتانیاهو نیز ترور رئیس بخش مالی حماس در جنوب غزه را تأیید کرده است؛ جزئیات فنی سرنگونی پهپاد هنوز تأیید نشده است.
+b2b547f1da978c2a,repeat_dropped,band=mid sim=0.56 score=10.48 blocked=below_floor prior=71c1b6d1,1,tg_wfwitness,groq,3,economy,economy,rumour,0,10.485,افزایش قیمت دیزل در آمریکا و بحث ممنوعیت صادرات,قیمت دیزل در آمریکا به رکورد ۶.۵۱ دلار رسیده و فشار بر دولت ترامپ برای ممنوعیت صادرات افزایش یافته است. تحلیلگران هشدار می‌دهند این اقدام می‌تواند عرضه جهانی سوخت را کاهش و قیمت‌ها را بالا ببرد.
+aa31aef7e55e4280,relevance_dropped,,1,osint613_a,groq,3,security,none,rumour,0,6.408,اعتقال یک سرهنگ امنیتی فلسطینی در جنوب نابلس,نیروهای مخفی اسرائیلی یک سرهنگ از سرویس امنیت پیشگیرنده‌ی فلسطین را در کفر قلیل جنوب نابلس دستگیر کردند. این فرد به عنوان یک عامل فداک که در فعالیت‌های تروریستی نقش داشته، تحت تعقیب بود و اکنون در اختیار شین‌بت قرار دارد.
+afa81237092fcb70,rank_dropped,,1,tg_tsepress,groq,3,economy,economy,rumour,0,10.373,آغاز معاملات پنجشنبه در بازار مشتقه بورس کالا,بورس کالا از آغاز معاملات روزهای پنجشنبه در بازار گواهی سپرده کالایی و قراردادهای مشتقه خبر داد. این تغییر در برنامه معاملاتی بازارهای مالی ایران اعمال می‌شود.
+fd6da85424b6deff,repeat_dropped,band=high sim=0.97 score=10.26 blocked=both prior=388dcc2b,1,tg_tsepress,groq,3,economy,economy,rumour,0,10.258,افزایش هزینه اجاره نفتکش‌ها در مسیر خاورمیانه و آسیا,هزینه اجاره یک نفتکش غول‌پیکر در مسیرهای میان خاورمیانه و آسیا از روزانه ۱.۲ میلیون دلار فراتر رفته است. حدود ۱۵ درصد از ناوگان جهانی نفتکش‌ها در سواحل عمان در انتظار هستند.
+7866e050fcc8340f,irrelevant,,2,ajar|maariv,groq,2,,,,,,,
+d430240c6588235e,irrelevant,,1,al_jazeera,groq,2,,,,,,,
+eea907ddb49fcf1e,irrelevant,,4,aviationist|tg_tabzlive|tg_wfwitness,groq2,2,,,,,,,
+5f4c2482f294d921,irrelevant,,1,al_jazeera,groq2,2,,,,,,,
+e7712d6dcb8116c7,clickbait,,1,al_jazeera,groq2,2,,,,,,,
+a9720e41389eb3ce,irrelevant,,1,tehran_times,groq2,2,,,,,,,
+a97aae223c01294e,irrelevant,,2,ajar|al_manar,groq2,2,,,,,,,
+6f82dae96cf11ff2,relevance_dropped,,1,haaretz,groq2,2,security,none,unconfirmed,1,10.823,اعتقال سه نوجوان به اتهام تخریب یک کنیسه در اورشلیم,پلیس سه نوجوان را به دلیل تخریب کنیسه کول هانشما در اورشلیم دستگیر کرد. این کنیسه در هفته‌های اخیر حداقل چهار بار مورد تخریب قرار گرفته است.
+700bf1b82609b9a7,irrelevant,,2,al_jazeera|tg_tabzlive,groq2,2,,,,,,,
+6171772d09fa4ab3,irrelevant,,1,aviationist,groq2,2,,,,,,,
+0c0a9bdfe4e736b0,irrelevant,,1,al_jazeera,groq2,2,,,,,,,
+f9792ddc40e3ea71,clickbait,,2,maariv,groq2,2,,,,,,,
+331127cd2009b6e0,irrelevant,,1,bbc_en,groq,2,,,,,,,
+77468abd8e9aa1b5,sent_followup,band=mid sim=0.65 score=14.85 kept=above_floor prior=2314bba2,2,ajar|al_jazeera,groq,2,economy,economy,unconfirmed,1,14.852,شی جین‌پینگ در واشنگتن با ترامپ دیدار کرد,رئیس‌جمهور چین در واشنگتن با ترامپ دیدار کرد تا تنش‌های تجاری را مدیریت کند. تحلیل‌ها نشان می‌دهد که جدایی اقتصادی بین دو کشور پرهزینه است اما اعتمادسازی دشوار می‌باشد.
+ca2d0936b9e7f044,sent_followup,band=mid sim=0.70 score=20.93 kept=above_floor prior=26de02c3,3,al_manar|maariv,groq,2,military,escalation,unconfirmed,1,20.931,کشتی تجاری در تنگه هرمز با پرتابه ناشناخته آتش گرفت,یک کشتی باربری در تنگه هرمز پس از اصابت پرتابه‌ای ناشناخته آتش گرفت و دو نفر زخمی شدند. همه خدمه از کشتی تخلیه شدند و علت دقیق حادثه هنوز مشخص نیست.
+5ce9b3e814c96dcb,clickbait,,1,maariv,groq,2,,,,,,,
+52f48429ac44d78a,relevance_dropped,,1,maariv,groq,2,security,none,unconfirmed,1,10.704,تلاش برای دهلیل با خودرو در جنوب کرانه باختری و زخمی شدن فردی,در جنوب کرانه باختری، فردی در تلاش برای دهلیل با خودرو زخمی شد. این حادثه به عنوان یک رویداد امنیتی گزارش شده است.
+f1a790e22199cd4c,irrelevant,,1,maariv,groq,2,,,,,,,
+c0d1794d1c81839a,irrelevant,,1,sky_news_arabia,groq,2,,,,,,,
+c5013e3aa51b2933,irrelevant,,1,bbc_en,groq,2,,,,,,,
+0a016c5cfc289dfd,irrelevant,,1,aviationist,groq,2,,,,,,,
+1c308f454925ff14,irrelevant,,2,al_jazeera|al_manar,groq,2,,,,,,,
+f4566f14265ed509,irrelevant,,1,al_jazeera,groq,2,,,,,,,
+4d55105f851f15e6,irrelevant,,1,maariv,groq,2,,,,,,,
+bbc5b941c798cb5a,relevance_dropped,,1,maariv,groq,2,politics,none,unconfirmed,1,9.532,بن‌گبیر در واکنش به گزارش شین‌بت: این یازدهمین تلاش برای حذف من است,ایتامار بن‌گبیر، وزیر اسرائیلی، در واکنش به انتشار گزارش شین‌بت (موسس امنیت داخلی) ادعا کرد که این یازدهمین تلاش برای حذف اوست. او همچنین گفت که نگرانی وجود دارد که او به عنوان وزیر دفاع انتخاب شود.
+c3ae332ff82f6c5c,irrelevant,,2,maariv,groq,2,,,,,,,
+9cf23763c208fb52,sent_followup,band=mid sim=0.61 score=14.50 kept=above_floor prior=6ff30932,1,maariv,groq,2,economy,economy,unconfirmed,1,14.499,برآورد در آمریکا: بانک انگلستان نرخ بهره را در نوامبر و فوریه افزایش می‌دهد,برآوردهای انجام شده در آمریکا نشان می‌دهد که بانک مرکزی انگلستان قصد دارد نرخ بهره را در ماه‌های نوامبر و فوریه افزایش دهد. این پیش‌بینی‌ها بر اساس تحلیل‌های اقتصادی فعلی ارائه شده است.
+9269351bda70a6cc,irrelevant,,1,bbc_en,groq,2,,,,,,,
+4336b0b6c47c150f,relevance_dropped,,1,maariv,groq,2,politics,none,unconfirmed,1,9.484,بیش از ۱۸۰ خانواده در تابستان به شمال اسرائیل مهاجرت کردند,بر اساس گزارش جدید، بیش از ۱۸۰ خانواده در تابستان به مناطق شمالی اسرائیل نقل مکان کردند. از این تعداد، ۵۰ خانواده به شهر کریت شمواعه مهاجرت کرده‌اند.
+8bc3c4aaf63ac8cd,irrelevant,,1,sky_news_arabia,groq,2,,,,,,,
+bc218472db96b374,relevance_dropped,,1,maariv,groq,2,security,none,unconfirmed,1,10.433,اشاره به طرح تروریستی برای ترور بن‌گبیر در منطقه شام,دادستانی علیه یک گروه تروریستی در منطقه شام پرونده تشکیل داد. این گروه قصد داشت به بن‌گبیر حمله کند.
+63e7e850a16ceb68,irrelevant,,1,al_jazeera,groq,2,,,,,,,
+1fc11359c326ca1a,irrelevant,,1,maariv,groq,2,,,,,,,
+d63ca1ab87461d10,sent_followup,band=mid sim=0.56 score=17.30 kept=above_floor prior=c3acd675,1,aviationist,groq,2,military,balance,unconfirmed,1,17.301,لوکهید مارتین قابلیت شبکه‌سازی سنسورهای IRST را در F-16 آزمایش کرد,لوکهید مارتین قابلیت جدیدی را برای اشتراک‌گذاری داده‌های ردیابی بین دو پهپاد F-16 مجهز به سنسور Legion IRST آزمایش کرد. این فناوری دقت ردیابی را افزایش می‌دهد و امکان رنج‌یابی غیرفعال فوری را فراهم می‌کند.
+8e5a463e87e729b1,irrelevant,,1,sky_news_arabia,groq,2,,,,,,,
+5548583430df3c7f,sent_followup,band=mid sim=0.62 score=20.28 kept=above_floor prior=b198356a,1,tehran_times,groq,2,military,escalation,unconfirmed,1,20.284,گزارش: انصارالله کنترل تنگه باب‌المندب را تشدید کرده است,مجله اسپکتروم گزارش می‌دهد که انصارالله کنترل خود بر تنگه باب‌المندب را تشدید کرده است. جزئیات عملیاتی یا تأیید مستقلی در این خبر ارائه نشده است.
+984359c05884a4c7,relevance_dropped,,1,al_jazeera,groq,2,politics,none,unconfirmed,1,9.281,ترامپ و شی جینپینگ همکاری محدودی در ایمنی هوش مصنوعی توافق می‌کنند,پیش‌بینی می‌شود ترامپ و شی جینپینگ در قله خود تنها به همکاری محدودی در زمینه ایمنی هوش مصنوعی دست یابند. این تصمیم در حالی گرفته می‌شود که رهبران هوش مصنوعی از فاجعه‌های احتمالی هشدار داده‌اند.
+8ea1d23b00cc48cd,irrelevant,,1,sky_news_arabia,groq,2,,,,,,,
+415351b150dfd4e4,clickbait,,1,al_jazeera,groq,2,,,,,,,
+302530c273820d45,irrelevant,,1,ajar,groq,2,,,,,,,
+6a2601131635db66,irrelevant,,1,ajar,groq,2,,,,,,,
+51afa8807e165532,irrelevant,,1,ajar,groq,2,,,,,,,
+438708ffdd61e8cc,clickbait,,1,reuters_gnews,groq,2,,,,,,,
+e2b3c0122f383908,irrelevant,,1,ajar,groq,2,,,,,,,
+fb4cfea2d8da455f,irrelevant,,1,ajar,groq,2,,,,,,,
+096f80860cf873b9,irrelevant,,1,ajar,groq,2,,,,,,,
+580b9fc543bfb2c1,irrelevant,,1,ajar,groq,2,,,,,,,
+5f71116466c9757c,irrelevant,,1,ajar,groq,2,,,,,,,
+cf041cad213fae7c,irrelevant,,1,bbc_en,groq,2,,,,,,,
+23614f160a3f7d6b,repeat_dropped,band=mid sim=0.68 score=11.00 blocked=below_floor prior=2eb80798,1,tg_tabzlive,groq,3,politics,balance,rumour,0,10.999,برگزاری دیدار لاوروف و روبیو در نیویورک,وزیر خارجه روسیه و وزیر خارجه آمریکا قرار است در حاشیه مجمع عمومی سازمان ملل در نیویورک دیدار کنند. این دیدار بر اساس گزارش‌های خبری برای فردا برنامه‌ریزی شده است.
+fbd1955dfc51a245,irrelevant,,1,tg_wfwitness,groq,3,,,,,,,
+4a398ef34cd4b66f,clickbait,,1,osint613_a,groq,3,,,,,,,
+907c5ccae5143b11,irrelevant,,1,tg_tabzlive,groq2,3,,,,,,,
+58146a18e8348bda,irrelevant,,11,osint613_a|tg_defenderdome|tg_geopwatch|tg_mes|tg_padeshah_fxn|tg_rnintel,groq2,3,,,,,,,
+7c4f13933b936647,relevance_dropped,,1,al_manar,groq2,3,military,none,rumour,0,8.794,زخمی شدن کودک و مسن در حملات به خان یونس,مجمع ناصر پزشکی اعلام کرد یک کودک نوزاد در جنوب خان یونس و یک مسن در غرب این شهر زخمی شده‌اند. این زخمی‌شدگی‌ها ناشی از شلیک نیروهای اشغالگر است.
+8729c8eae69f8e87,irrelevant,,2,tg_mornovosti,groq2,3,,,,,,,
+9af362d513594b01,irrelevant,,1,tg_entekhab,groq2,3,,,,,,,
+2217cdc45e35f721,irrelevant,,1,tg_rnintel,groq2,3,,,,,,,
+f59c2ce3237996b7,clickbait,,1,tg_militarywave,groq2,3,,,,,,,
+477b6ccaf6c15f4b,irrelevant,,1,tg_mornovosti,groq2,3,,,,,,,
+a0f1230645dbd10e,irrelevant,,5,tg_rnintel,groq2,3,,,,,,,
+7f4203ccb35357f3,irrelevant,,1,tg_militarywave,groq2,3,,,,,,,
+d13a27a6fa171393,irrelevant,,1,tg_defenderdome,groq2,3,,,,,,,
+87da3dcfb789f26f,irrelevant,,1,tg_defenderdome,groq2,3,,,,,,,
+9f0801917087cb18,lead_only,,1,tg_geopolitics_prime,groq2,3,military,balance,unconfirmed,0,13.949,نمایش تجهیزات نظامی غنیمت‌شده توسط حوثی‌ها در یمن,حوثی‌ها پس از پیشروی در الموکا، تجهیزات نظامی و خودروهای غنیمت‌شده را به نمایش گذاشتند. آن‌ها ادعا می‌کنند این اقلام متعلق به نیروهای زمینی سعودی هستند که در خاک یمن حضور دارند.
+333cc427cce4a199,irrelevant,,1,tg_vira_university,groq2,3,,,,,,,
+b523514ffe7313e4,irrelevant,,1,tg_vira_university,groq2,3,,,,,,,
+20142b23740af52c,cap_dropped,over max_clusters_per_run; no LLM call. on_mission=0 corroborating_count=0,1,tg_vira_university,,3,,,,0,,داروی آزمایشی جدید راهی برای مقابله با مقاومت سرطان به درمان نشان داد مقاومت سلول‌های سرطانی در برابر داروها یکی از چالش‌های مهم درمان سرطان است. اکنون پژوهشگران دانشکده پزشکی بیلور داروی آزمایشی جدیدی به نام CS18 را معرفی کرده‌اند که با هدف قرار دادن چندین مسیر حیاتی در سلول‌های سرطانی، ممکن است تو,
+bc07e63e33751f80,cap_dropped,over max_clusters_per_run; no LLM call. on_mission=0 corroborating_count=0,1,tg_behold_israel,,3,,,,0,,"Gazan Journalist Caught Red-Handed: Watch a Gazan journalist stage a scene with an 'injured' child, only for the 'victim' to walk away completely fine while the crew reviews their creation. Notice how a hospital nurse helps orchestrate the fake scene. (GAZAWOOD)",
+e0ec2d29293110b9,cap_dropped,over max_clusters_per_run; no LLM call. on_mission=0 corroborating_count=0,1,tg_behold_israel,,3,,,,0,,Hamas released a video showing CHILDREN participating in terrorist activities. Recruiting or using children under the age of 15 to participate actively in hostilities is a war crime and a blatant violation of international law.,
+fa66325313e03384,cap_dropped,over max_clusters_per_run; no LLM call. on_mission=0 corroborating_count=0,1,tg_geopolitics_prime,,3,,,,0,,"🇬🇧 🛰 Britain touts new space warfare unit The so-called No. III Space Effects Squadron is the British Royal Air Force’s first unit dedicated to protecting UK satellites. While No. I Space Operations Squadron and No. II Space Warning Squadron are tasked with detecting potential space threats, No. III",
+466419c12d336b7c,cap_dropped,over max_clusters_per_run; no LLM call. on_mission=0 corroborating_count=0,1,tg_geopolitics_prime,,3,,,,0,,"🇺🇸 🛩 US braces for Ukraine-trained cartel drone operators to enter drug war Narco-terrorists returning from Ukraine will “almost certainly” undermine Donald Trump’s war on drugs across the Western Hemisphere, The Washington Post reports. The Ukraine conflict alumni, chiefly from Colombia, boast skil",
+0e86e4150b0ed4f4,cap_dropped,over max_clusters_per_run; no LLM call. on_mission=0 corroborating_count=0,1,tg_geopolitics_prime,,3,,,,0,,🇻🇪 💰 US finalizes de facto theft of Venezuela’s gold reserve Some 31 tons of Venezuelan gold worth about $4 billion is being shipped from London to the United States where it will be stored at the Federal Reserve Bank of New York. The bullion remained trapped in Britain since 2019 when London refuse,

@@ -1,0 +1,41 @@
+﻿cluster_key,fate,reason,n_members,sources,provider,best_tier,category,claim_status,independent_count,score,headline,summary
+66afb5b7e2ffb4a8,sent,,10,al_manar|bbc_persian|tg_fighter_radar|tg_irane_azad_news|tg_padeshah_fxn,groq,2,politics,unconfirmed,1,10.895,عباس عراقچی با فرمانده ارتش پاکستان گفت‌وگو کرد,وزیر امور خارجه ایران با عاصم منیر، فرمانده ارتش پاکستان، تماس برقرار کرده است. این گفت‌وگو در حالی صورت می‌گیرد که تنش‌های منطقه‌ای ادامه دارد.
+b28e0f5db6f777e7,fatal,,1,maariv,bai_deepseek,2,,,,,,
+74549a33b63cf51e,fatal,,4,irna|mee|tg_fighter_radar|tg_geopolitics_prime,bai_deepseek,2,,,,,,
+f0bdeddc0fd32a9e,irrelevant,,1,maariv,bai,2,,,,,,
+859797781edefda7,irrelevant,,2,al_jazeera|mee,groq,2,,,,,,
+8a06529683353bf3,sent,,3,mee|tg_tabzlive|tg_wfwitness,groq,2,politics,unconfirmed,1,10.153,ویتکاف و کوشنر برای مذاکرات به مسکو و کی‌یف سفر می‌کنند,بر اساس گزارش‌ها، این سفر که نخستین حضور آن‌ها در کی‌یف پس از روی کار آمدن ترامپ است، برای گفتگوهای پایان جنگ در اوکراین برنامه‌ریزی شده است.
+3422902a3d6d16d9,repeat_dropped,,1,bbc_en_me,groq,2,,,,,,
+281012bc404dec9e,fatal,,1,mee,openrouter,2,,,,,,
+05cc20ffd123e8d5,repeat_dropped,,3,al_manar|bbc_en|tg_tabzlive,groq,2,,,,,,
+4faccd8440873cc0,repeat_dropped,,2,al_jazeera|tg_padeshah_fxn,groq,2,,,,,,
+50f1266c8c0c2038,repeat_dropped,,2,al_manar|maariv,groq,2,,,,,,
+38a1bea96a8b5cc8,sent,,1,al_jazeera,groq,2,politics,unconfirmed,1,9.928,مصر با تصمیم راهبردی در رقابت هوش مصنوعی چین و آمریکا مواجه است,کایرو در حال ارزیابی گزینه‌های توسعه مراکز داده هوش مصنوعی است و بین دو قدرت بزرگ چین و ایالات متحده برای کسب برتری در این حوزه قرار گرفته است.
+bf3b949eb2b8e15c,fatal,,11,aawsat|ajar|al_manar|al_monitor|sky_news_arabia|tg_fighter_radar|tg_irane_azad_news|tg_padeshah_fxn|tg_tweet_mardomi,openrouter,2,,,,,,
+2337d022efa61d40,sent,,3,aawsat|tg_wfwitness,groq,2,politics,unconfirmed,1,10.108,جوزاف عون امضای قانون عفو عمومی در لبنان را تأیید کرد,این قانون که سه هفته پیش توسط پارلمان تصویب شده بود، اکنون به مرحله اجرا می‌رسد و نخست‌وزیر نیز برای انتشار رسمی آن اقدام کرده است.
+bc0ae694f23c9240,irrelevant,,1,aawsat,groq,2,,,,,,
+5bdd579343c5a8f3,sent,,3,ajar|haaretz|tg_tabzlive,groq,2,politics,likely,2,12.099,استطلاع جدید نشان می‌دهد مخالفان نتانیاهو با ۵۷ کرسی بر ائتلاف او پیشی گرفته‌اند,در صورت برگزاری انتخابات امروز، حزب‌های مخالف ۵۷ و ائتلاف حاکم ۵۱ کرسی خواهند داشت؛ نتانیاهو نیز با انتشار ویدیوی هوش مصنوعی از رقبای خود تبلیغات انتخاباتی خود را ادامه می‌دهد.
+fd99ca1c0e48099b,irrelevant,,1,maariv,groq,2,,,,,,
+e8741979b93b1436,sent,,1,mee,groq,2,military,unconfirmed,1,12.868,سازمان ملل: شبکه‌های اماراتی تسلیحات و مزدوران را به سودان ارسال می‌کنند,گزارش تحقیقاتی سازمان ملل نشان می‌دهد که عملیات جذب نیروهای خارجی، از جمله کلمبیایی‌ها، توسط شبکه‌های وابسته به ابوظبی برای نیروهای مسلح شبه‌نظامی سودان انجام شده است.
+e1a7375be588779f,irrelevant,,1,al_jazeera,groq,2,,,,,,
+d4665b7e339cd1b9,irrelevant,,3,maariv,groq,2,,,,,,
+2191402978663d95,repeat_dropped,,7,ajar|al_monitor|osint613_a|sky_news_arabia|tg_fighter_radar|tg_tabzlive|tg_wfwitness,groq,2,,,,,,
+81a502a7db490e74,irrelevant,,1,al_jazeera,groq,2,,,,,,
+67b73c7526b6a70e,repeat_dropped,,5,mehr|tg_iranian_militarism|tg_padeshah_fxn|tg_rnintel,groq,2,,,,,,
+f354533c419f083b,irrelevant,,1,sky_news_arabia,groq,2,,,,,,
+c16436744a2bf451,irrelevant,,3,bbc_en|tg_tabzlive|tg_wfwitness,groq,2,,,,,,
+27f6fda1085f8eb2,repeat_dropped,,3,aawsat|ajar|osint613_a,groq,2,,,,,,
+5c88b522d29ce7da,relevance_dropped,,1,sky_news_arabia,groq,2,economy,unconfirmed,1,8.732,مجموعه الدار نخستین تأمین مالی ملکی بر اساس طرح در ابوظبی را انجام داد,این معامله در چارچوب جدید مرکز املاک ابوظبی صورت گرفت که امکان ثبت رسمی نام بانک تأمین‌کننده در سند قبل از تحویل ملک را فراهم می‌کند.
+85d0d67e6e3e72e9,relevance_dropped,,1,haaretz,groq,2,politics,unconfirmed,1,9.727,بن‌گیور یک کرسی پارلمانی برای تالی گوتلیو در فهرست حزبی خود رزرو کرد,این اقدام پس از خروج گوتلیو از حزب لیکود صورت گرفت؛ او پیش‌تر ادعا کرده بود که قربانی حذف سیاسی شده است.
+afe8e749c95cfa5f,irrelevant,,2,al_jazeera|tg_irane_azad_news,groq,2,,,,,,
+3b7637b747aadf41,clickbait,,1,mee,groq,2,,,,,,
+cda3d0f70eab99f8,sent,,2,mee,groq,2,economy,unconfirmed,1,8.771,گزارش جدید از تأمین ۲۲ میلیون بشکه نفت خام برای اسرائیل توسط شرکت‌های اماراتی و سوئیسی,بر اساس گزارش Oil Change International و SOMO، شرکت‌های Vitol و Heritage Petroleum FZCO در بازه زمانی اکتبر ۲۰۲۳ تا ژوئن ۲۰۲۶ حدود ۱۱ درصد از کل واردات نفت خام اسرائیل را تأمین کرده‌اند. بخش قابل توجهی از این محموله‌ها با وجود تحریم‌های تجاری آنکارا، از طریق ترکیه حمل شده است.
+ea30e2b641ce9905,sent,,1,walla,groq,2,politics,unconfirmed,1,9.647,یوئلت استراتژیک نتانیاهو در مصاحبه‌ای درباره همکاری‌های گذشته صحبت کرد,دکتر روت بار، که به عنوان مشاور استراتژیک سابق نتانیاهو و طرف مقابل در پرونده ضبط صدا شناخته می‌شود، در اولین مصاحبه خود از همکاری با نخست‌وزیر و تحلیل رفتار او سخن گفت.
+1396b8aeba3365b2,irrelevant,,1,tehran_times,groq,2,,,,,,
+a2ce509610936750,sent,,1,sky_news_arabia,groq,2,politics,unconfirmed,1,9.617,ترامپ ادعا کرد آمریکا با دوربین‌ها از نزدیک سایت‌های هسته‌ای ایران را رصد می‌کند,رئیس‌جمهور آمریکا مدعی شد که هویت تمام افرادی که به این تأسیسات ورود و خروج دارند را شناسایی می‌کند.
+60ee922c446c399a,sent,,2,ajar|tg_esellco,groq,2,politics,unconfirmed,1,9.717,اتحادیه اروپا اعلام کرد برای افزایش فشار بر ایران با واشنگتن و گروه ۷ همکاری می‌کند,وزیر خزانه‌داری آمریکا از پیوستن اروپا به کمپین «منبوذ اقتصادی» تشکر کرد، اما حجم بالای تجارت با ایران اثربخشی این اقدام را زیر سؤال می‌برد.
+aa4d0558f5bdf4dd,cap_refused,,1,tehran_times,,2,,,,,,
+c600190aaf4cba4c,cap_refused,,1,tehran_times,,2,,,,,,
+4a4c4ade647246e7,cap_refused,,1,tehran_times,,2,,,,,,
+32a4300206ccebde,cap_refused,,1,sky_news_arabia,,2,,,,,,
+387be36ffcf0ceb2,cap_refused,,1,bbc_persian,,2,,,,,,

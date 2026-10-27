@@ -1,0 +1,41 @@
+﻿cluster_key,fate,reason,n_members,sources,provider,best_tier,category,claim_status,independent_count,score,headline,summary
+8c6e8b08e6bb6c65,sent,,23,ajar|al_manar|tg_fighter_radar|tg_irane_azad_news|tg_iranian_militarism|tg_padeshah_fxn|tg_tweet_mardomi,groq,2,economy,unconfirmed,1,9.996,افزایش قیمت دلار به ۲۱۵ هزار تومان و تهدید مقامات به محاصره آمریکا,قیمت دلار در بازار تهران به ۲۱۵ هزار تومان رسید. همزمان، مقامات نظامی و سیاسی ایران از آمادگی کامل برای پاسخ به حملات و هدف قرار دادن آمریکا در محاصره سخن گفتند.
+7176755cbd2a6bae,sent,,1,tehran_times,groq,2,economy,unconfirmed,1,8.986,وزیر اقتصاد بر لزوم سرمایه‌گذاری بزرگ‌نقش صندوق توسعه ملی در تولید ارز تأکید کرد,وزیر امور اقتصادی و دارایی خواستار تغییر رویکرد صندوق توسعه ملی به سمت پروژه‌های بالادستی نفت و گاز با قابلیت تولید ارز و استفاده اهرمی از منابع شد.
+bfba592b97b36126,repeat_dropped,,6,al_manar|irna|mehr|osint613_a|tg_tabzlive,groq,2,,,,,,
+448bbd3ed1a93a0f,sent,,2,irna|mehr,bai_deepseek,2,politics,unconfirmed,1,10.079,نخست‌وزیر پاکستان: تجاوز به ایران عامل اصلی بحران منطقه‌ای است,شهباز شریف در اسلام‌آباد گفت که تنها راه‌حل پایدار دیپلماسی است. دو خبرگزاری گزارش یکسانی داده‌اند.
+5c3c2fc15db69735,irrelevant,,7,irna|mehr|tg_iranian_militarism,bai_deepseek,2,,,,,,
+fa385fd5d7b2ba1d,irrelevant,,1,sky_news_arabia,bai_deepseek,2,,,,,,
+0db6892844792b5e,repeat_dropped,,14,al_jazeera|al_manar|al_monitor|mee|mehr|reuters_gnews|sky_news_arabia|tg_geopwatch,bai_deepseek,2,,,,,,
+b27bab5b87a380d7,sent,,1,tehran_times,bai_deepseek,2,politics,unconfirmed,1,9.965,وزیر انرژی ایران: برق به فعالیت‌های مولد اقتصادی اختصاص می‌یابد,عباس علی‌آبادی گفت سیاست دولت چهاردهم هدایت برق به صنایع برای رشد تولید ناخالص داخلی و ارزش آفرینی اقتصادی است.
+dc314106af69ad65,repeat_dropped,,5,al_jazeera|tg_irane_azad_news|tg_padeshah_fxn|tg_tweet_mardomi,groq,2,,,,,,
+7dd435986a10b2ce,irrelevant,,1,maariv,groq,2,,,,,,
+2ea693c1b8df898f,sent,,6,al_monitor|iran_international|mee|reuters_gnews|tehran_times|tg_irane_azad_news,groq,2,economy,likely,5,13.455,رییس بانک مرکزی ایران اعلام کرد ذخایر ارزی کشور کافی است,همتی اعلام کرد بانک مرکزی آمادگی تزریق تا ۲ میلیارد دلار به بازار ارز برای ثبات ریال را دارد و افزایش قیمت ارز را ناشی از عوامل روانی دانست.
+b4b64f7dafaea976,clickbait,,1,iran_international,groq,2,,,,,,
+8865dad9a203e698,irrelevant,,1,mehr,bai_deepseek,2,,,,,,
+936c4afa72daebd6,unparseable,,1,haaretz,bai_deepseek,2,,,,,,
+59dbb017df002fa5,unparseable,,1,maariv,bai_deepseek,2,,,,,,
+1628a0e13445cd24,unparseable,,6,al_manar|mee|tg_behold_israel|tg_fighter_radar|tg_wfwitness,bai_deepseek,2,,,,,,
+fe12fec4499005d3,repeat_dropped,,5,france24|haaretz|sky_news_arabia|tg_irane_azad_news,groq,2,,,,,,
+340d8416ecc815bc,irrelevant,,1,al_jazeera,groq,2,,,,,,
+82665d085e23c417,irrelevant,,1,al_jazeera,groq,2,,,,,,
+371a818247860ca4,irrelevant,,1,bbc_en,groq,2,,,,,,
+b6e8f2acd46df565,irrelevant,,1,bbc_en,bai_deepseek,2,,,,,,
+6323fa631924b493,unparseable,,6,ajar|haaretz|mee|tg_geopolitics_prime|tg_tabzlive|walla,bai_deepseek,2,,,,,,
+1331cac1895db6ec,clickbait,,1,al_jazeera,bai_deepseek,2,,,,,,
+817113346b17b8ea,sent,,2,al_manar|walla,groq,2,politics,unconfirmed,1,9.962,دیوان عالی اسرائیل دستور موقت برای رفع موانع در شهرک‌های عربی صادر کرد,این دستور در پی اعتراضات سازمان حقوق مدنی صادر شد و موانع بتنی در برخی مناطق همچنان برقرار است.
+58c724494b9a791f,repeat_dropped,,2,aawsat|mehr,groq,2,,,,,,
+251b903e2eb58228,repeat_dropped,,5,bbc_en_me|osint613_a|tg_tabzlive,groq,2,,,,,,
+8b1d595044fe2228,sent,,1,mee,groq,2,politics,unconfirmed,1,9.854,دو سازمان از دولت بریتانیا خواستار اقدام فوری علیه طرح استیصال E1 شدند,شبکه مسلمانان حزب کار و مرکز بین‌المللی عدالت برای فلسطینیان بریفینگ حقوقی منتشر کردند تا دولت بریتانیا را به اقدام «فوری و جامع» در برابر طرح استیصال E1 اسرائیل ترغیب کنند.
+3170aa207721141f,irrelevant,,1,al_jazeera,bai_deepseek,2,,,,,,
+6d8534bc4df7888d,unparseable,,2,maariv|tg_militarywave,bai_deepseek,2,,,,,,
+01eeab47bc2339c6,repeat_dropped,,1,maariv,bai_deepseek,2,,,,,,
+0b72402d50f71a19,repeat_dropped,,10,al_jazeera|al_monitor|ap_gnews|dw|irna|mee|mehr|reuters_gnews,bai_deepseek,2,,,,,,
+9f2706ec03f49085,irrelevant,,1,sky_news_arabia,groq,2,,,,,,
+ef0ce1b116a6b18e,sent,,2,walla,groq,2,security,unconfirmed,1,10.921,دوازده مامور زندان اسرائیلی به قتل عمدی یک زندانی امنیتی متهم شدند,بر اساس دادخواست، متهمان با ضرب و شتم زندانی به نام تار ابوعاصب منجر به مرگ او شدند و همچنین از حمله به هشت زندانی دیگر متهم هستند.
+b1cbc77591c09afc,irrelevant,,3,ajar|bbc_persian|tg_iranian_militarism,bai_deepseek,2,,,,,,
+16afe817fbea3d39,unparseable,,1,mehr,bai_deepseek,2,,,,,,
+f37bbaab1fd80198,unparseable,,1,maariv,bai_deepseek,2,,,,,,
+bf20d5d9711c4cbc,clickbait,,1,walla,bai_deepseek,2,,,,,,
+48bfa5e063376da7,repeat_dropped,,3,irna|tehran_times,groq,2,,,,,,
+44b45a94e08ebff8,repeat_dropped,,11,irna|mehr|osint613_a|tehran_times|tg_mes|tg_tabzlive|tg_wfwitness,groq,2,,,,,,
+fd0e88820b33e396,irrelevant,,1,maariv,groq,2,,,,,,

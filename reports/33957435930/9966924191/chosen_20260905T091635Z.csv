@@ -1,0 +1,41 @@
+﻿cluster_key,fate,reason,n_members,sources,provider,best_tier,category,claim_status,independent_count,score,headline,summary
+02ac67073ac7cf41,sent,,8,al_monitor|dw|mee|mehr|reuters_gnews|sky_news_arabia|tg_geopwatch|tg_wfwitness,groq,2,military,likely,6,17.691,گزارش از پرتاب چهار موشک به سمت یک کشتی نفتکش ایرانی در نزدیکی جزیره خرج,منابع محلی و رسانه‌های ایرانی از اصابت چهار موشک به یک کشتی کوچک نفتکش در نزدیکی جزیره خرج خبر داده‌اند؛ تاکنون تلفاتی گزارش نشده و سرنشینان کشتی تخلیه شده‌اند.
+4419a69f174f5b91,irrelevant,,1,bbc_en,groq,2,,,,,,
+bf4361c236793388,irrelevant,,5,ap_gnews|bbc_en,groq,2,,,,,,
+aa08a80bdcd21d6f,sent,,14,ajar|sky_news_arabia|tg_fighter_radar|tg_iranian_militarism|tg_padeshah_fxn|tg_tweet_mardomi,groq,2,military,likely,2,15.981,سپاه ایران کره جنوبی را به دخالت در تنگه هرمز تهدید کرد,پس از بریتانیا، کره جنوبی نیز اعلام آمادگی برای شرکت در عملیات بازگشایی تنگه هرمز کرده است. مقامات سپاه پاسداران هشدار دادند که هرگونه دخالت این کشور را حمله به ایران تلقی کرده و به آن پاسخ خواهند داد.
+1919ea3b17a98b19,fatal,,8,irna|mee|mehr|tg_irane_azad_news|tg_iranian_militarism|walla,bai_deepseek,2,,,,,,
+14e421729eabd19d,irrelevant,,2,al_jazeera|bbc_persian,groq,2,,,,,,
+b12281b266082e84,repeat_dropped,,3,ajar|al_manar|tg_geopolitics_prime,groq,2,,,,,,
+309f0ccf0df9b9ec,repeat_dropped,,8,bbc_persian|maariv|sky_news_arabia|tg_fighter_radar|tg_geopwatch|tg_irane_azad_news|tg_tweet_mardomi,groq,2,,,,,,
+815e329da3f392bf,lang_dropped,,2,al_manar|sky_news_arabia,groq,2,security,unconfirmed,1,11.057,تصعيد إسرائيلي في الضفة الغربية مع سرقات في النبطية,واصلت قوات الاحتلال عمليات الاقتحام والاعتقال وتوسع الاستيطان في الضفة الغربية، بينما كشفت قوى الأمن اللبنانية عن سرقات استغل فيها شخص غياب السكان في النبطية.
+27e10e4c27d77823,irrelevant,,1,maariv,groq,2,,,,,,
+333a83dba2c1f42c,repeat_dropped,,3,al_manar|haaretz|mee,groq,2,,,,,,
+1d059411cd370ebf,sent,,1,iran_international,groq,2,security,unconfirmed,1,10.941,پزشکیان از افتتاح دبیرستان پلیس در ایران بازدید کرد,این اقدام بخشی از برنامه‌های گسترش آموزش نیروهای امنیتی آینده است.
+d05596154e81bbbd,repeat_dropped,,18,al_manar|france24|maariv|sky_news_arabia|tg_esellco|tg_fighter_radar|tg_irane_azad_news|tg_iranian_militarism|tg_padeshah_fxn|tg_vira_university|walla,groq,2,,,,,,
+c9a4fd583254339f,sent,,8,mee|tg_fighter_radar|tg_minas_tirith|tg_padeshah_fxn|tg_tanker_trackers|tg_wfwitness,groq,2,economy,unconfirmed,1,9.636,انتقال ۲۴ میلیون بشکه نفت به روش کشتی به کشتی در دریای عمان ثبت شد,رسدگان دریایی ۱۷ عملیات انتقال نفت خام و گاز در ۴ سپتامبر رصد کردند. همچنین ۷.۲۵ میلیون بشکه دیگر در انتظار اسکورت نظامی آمریکا برای عبور از تنگه هرمز بودند.
+289bdf4a7ae56ad7,fatal,,4,ajar|tg_geopwatch|tg_tweet_mardomi,openrouter,2,,,,,,
+649dd476d3ac7b77,fatal,,3,tg_fighter_radar|tg_tweet_mardomi|walla,openrouter,2,,,,,,
+e42268bcf9dc71f4,repeat_dropped,,10,al_manar|haaretz|mehr|tg_fighter_radar|tg_geopwatch|tg_iranian_militarism|tg_wfwitness,groq,2,,,,,,
+e9ef188534700aac,irrelevant,,1,al_jazeera,groq,2,,,,,,
+1c02679bca99f176,irrelevant,,9,al_jazeera|bbc_en|maariv|mehr|tg_geopwatch|tg_tabzlive|tg_wfwitness,groq,2,,,,,,
+391883aeb891cd64,sent,,1,al_jazeera,groq,2,politics,unconfirmed,1,9.851,منصور عباس با یهودی‌های اسرائیلی برای افزایش تأثیر رأی‌های فلسطینی ائتلاف می‌بندد,این ائتلاف با هدف کسب پذیرش بیشتر در سیاست‌های ائتلافی اسرائیل شکل گرفته است.
+92ec6fbb07f99500,repeat_dropped,,3,maariv|tg_tabzlive|walla,groq,2,,,,,,
+8213e9a102ddb467,repeat_dropped,,7,al_jazeera|mee|sky_news_arabia|tg_defenderdome|tg_irane_azad_news|tg_tabzlive|walla,groq,2,,,,,,
+c247269fb457b8ed,clickbait,,3,maariv|tg_iranian_militarism,groq,2,,,,,,
+087ebef011dc6009,repeat_dropped,,1,irna,groq,2,,,,,,
+c9f5e684975c94ac,sent,,1,iran_international,groq,2,economy,unconfirmed,1,8.809,بحران مواد اولیه و کاهش تقاضا صنعت لوازم خانگی ایران را در آستانه فروپاشی قرار داده است,این صنعت با کمبود مواد اولیه و از دست دادن دو مرکز صنعتی اصلی از ماه مارس مواجه شده است که توانایی خانواده‌ها برای تعمیر یا جایگزینی لوازم را محدود کرده است.
+dcad6acb12261962,irrelevant,,2,ajar|sky_news_arabia,groq,2,,,,,,
+d211c76b9dedef9b,clickbait,,2,ajar|sky_news_arabia,groq,2,,,,,,
+c752d05f99e25641,irrelevant,,3,maariv|mehr|tg_wfwitness,groq,2,,,,,,
+e16a40dfd956f780,irrelevant,,1,tehran_times,groq,2,,,,,,
+ca33435b42739c3d,sent,,1,al_jazeera,groq,2,politics,unconfirmed,1,9.742,امارات متحده عربی شاعر و فعال مصری عبدالرحمن القرضاوی را آزاد کرد,این فعال که به دلیل حکم بازداشت شورای وزیران داخلی عرب با ۱۰ سال حبس مواجه بود، از سوی امارات عفو شد.
+7fe1d952a4fdce3c,irrelevant,,1,maariv,groq,2,,,,,,
+76eacef44e7f20f0,relevance_dropped,,1,sky_news_arabia,groq,2,economy,unconfirmed,1,8.723,سرمایه‌گذاری‌های هوش مصنوعی از رکود اقتصاد جهانی در برابر بحران‌ها جلوگیری کرد,اقتصاد جهانی در مواجهه با نوسانات ژئوپلیتیک و افزایش هزینه‌های وام‌گیری، به دلیل حمایت از سوی سرمایه‌گذاری‌های سنگین در هوش مصنوعی، پایداری خود را حفظ کرده است.
+54c83263fb3ff00d,irrelevant,,1,al_jazeera,groq,2,,,,,,
+fe9262900ee9b132,sent,,1,dw,groq,2,politics,unconfirmed,1,9.693,بسیاری از سوری‌ها حکم اعدام اسد را کافی نمی‌دانند,در حالی که دادگاه سوریه در ماه جولای بشار اسد را به اعدام محکوم کرد، بازماندگان جنگ مدتی طولانی‌تر برای عدالت انتقالی مطالبه‌گر اقدامات بیشتر هستند.
+a588b798e71422b6,cap_refused,,1,sky_news_arabia,,2,,,,,,
+3837bab8c855f687,cap_refused,,2,irna,,2,,,,,,
+4ebcea0b4ae50f4e,cap_refused,,1,naval_news,,2,,,,,,
+8cbdd15b5031ad10,cap_refused,,1,walla,,2,,,,,,
+6254dfd458ac2275,cap_refused,,1,al_jazeera,,2,,,,,,
+cd7c3fd654f6674d,cap_refused,,7,ajar|irna|mee|mehr|tg_iranian_militarism,,2,,,,,,

@@ -1,0 +1,41 @@
+﻿cluster_key,fate,reason,n_members,sources,provider,best_tier,category,claim_status,independent_count,score,headline,summary
+cdfd5af728e866e6,repeat_dropped,,2,al_manar|irna,groq,2,,,,,,
+bf8a15e0c0b3593a,sent,,2,sky_news_arabia,groq,2,economy,unconfirmed,1,9.081,کاهش تحوطات بزرگ‌ترین سرمایه‌گذاران در برابر ریسک سقوط دلار,تحلیل‌ها نشان می‌دهد که صندوق‌های بازنشستگی و بیمه‌ای سطح محافظت خود را در برابر نوسانات ارزی کاهش داده‌اند. این وضعیت در کنار موج فروش اوراق قرضه جهانی، ریسک نوسانات شدیدتر بازارهای مالی را افزایش می‌دهد.
+2a1182f2cc7d1362,sent,,4,iran_international|tg_iranian_militarism|tg_padeshah_fxn|tg_tabzlive,groq,2,economy,unconfirmed,1,9.275,ترامپ و کاتز هشدار از فروپاشی اقتصادی و اقدامات ناامیدانه ایران,ترامپ اقتصاد ایران را بی‌ارزش و در آستانه فروپاشی خواند و کاتز نگرانی از اقدامات ناامیدانه تهران به دلیل فشار اقتصادی را ابراز کرد.
+8e2e147396aa5d0a,repeat_dropped,,17,al_monitor|ap_gnews|france24|haaretz|mee|osint613_a|reuters_gnews|tg_behold_israel|tg_exciton_missile|tg_fighter_radar|tg_iranian_militarism|tg_wfwitness|walla,groq,2,,,,,,
+e7afcae70a4f548f,sent,,1,bbc_en_me,groq,2,security,unconfirmed,1,10.960,کشته شدن دو نوجوان فلسطینی در حمله مستعمره‌نشینان به روستای المغایر,شورای روستا می‌گوید قربانیان هنگام تلاش برای جلوگیری از دزدی گوسفندان کشته شدند، اما ارتش اسرائیل ادعا می‌کند که آن‌ها سنگ به سمت سربازان پرتاب کرده بودند.
+47a538f1b22993eb,fatal,,5,mehr|tg_irane_azad_news|tg_iranian_militarism|tg_minas_tirith,bai_deepseek,2,,,,,,
+1a9560455332416a,fatal,,8,tg_fighter_radar|tg_geopolitics_prime|tg_tabzlive|tg_wfwitness|walla,bai_deepseek,2,,,,,,
+54c31cc1e3a0663b,irrelevant,,1,sky_news_arabia,gemini,2,,,,,,
+68860e57b6d30155,repeat_dropped,,12,ajar|sky_news_arabia|tg_fighter_radar|tg_geopwatch|tg_irane_azad_news|tg_padeshah_fxn|tg_tweet_mardomi|tg_vahid_online,gemini,2,,,,,,
+9cd88b0b38571785,irrelevant,,1,walla,bai,2,,,,,,
+5bf341f006ee75a4,irrelevant,,4,al_jazeera|osint613_a|tg_mornovosti|tg_tabzlive,groq,2,,,,,,
+ac1b6ea0e25bdc8c,sent,,10,al_manar|mee|sky_news_arabia|tg_wfwitness,groq,2,military,likely,2,15.812,نیروی‌های اسرائیلی در جنوب لبنان عملیات نظامی و گروگان‌گیری انجام دادند,گزارش‌ها از توپ‌بازی، انفجار و ورود نیروها به روستاهایی مانند حلتا و حیداثا حکایت دارد؛ منابع از بازداشت حدود ۱۵ نفر در حلتا خبر داده‌اند.
+be3459c71e23be15,sent,,5,ajar|mee|sky_news_arabia,groq,2,politics,likely,3,14.305,نتنیاوه اعلام کرد اسرائیل برای سرنگونی حکومت ایران تلاش می‌کند,این ادعا در مصاحبه با شبکه i24NEWS مطرح شد. همچنین گزارش‌هایی درباره تأخیر در تماس او با فرماندهان نظامی در روز ۷ اکتبر منتشر شده است.
+cc8836a6d130dd66,irrelevant,,3,ajar|al_jazeera,gemini,2,,,,,,
+6c52a8fe7e4382e4,fatal,,7,ajar|al_manar|al_monitor|reuters_gnews|tg_fighter_radar,openrouter,2,,,,,,
+db05c00f2941f85c,irrelevant,,1,bbc_en,groq,2,,,,,,
+c4c621f95e634f17,irrelevant,,1,maariv,groq,2,,,,,,
+b78fc268eb17ce76,sent,,1,al_jazeera,groq,2,politics,unconfirmed,1,9.877,وزرای خارجه اتحادیه اروپا بر سر تحریم‌های اسرائیل و کمک به اوکراین به توافق نرسیدند,در نشست ایرلند، اختلاف‌نظرها مانع از تصویب بسته‌های تجاری علیه اسرائیل و حمایت نظامی از اوکراین شد.
+62b12e9d7f3cf0c0,sent,,4,france24|mee|osint613_a,groq,2,military,likely,2,15.177,ایران مین‌گذاری جدید در تنگه هرمز را تأیید و ادعای کنترل آمریکا را رد کرد,در حالی که نیروی دریایی آمریکا از اسکورت محموله‌های نفتی در تنگه خبر داد، مقامات ایرانی بر حق انحصاری خود در بازگشایی مسیر تأکید کردند و از عقب‌نشینی حریفان سخن گفتند.
+d7b1e67ed8919e4c,repeat_dropped,,1,aawsat,groq,2,,,,,,
+d87f5bce264ddefb,irrelevant,,1,bbc_en,groq,2,,,,,,
+3ca9c41f9c94fe60,irrelevant,,1,maariv,groq,2,,,,,,
+38917b06b338dcde,sent,,2,naval_news|tg_fighter_radar,groq,2,military,unconfirmed,1,12.948,تحویل سومین زیردریایی کلاس دلفین به نیروی دریایی اسرائیل,این زیردریایی مجهز به سیستم پیش‌سوزان هوا (AIP) و قابلیت پرتاب موشک جدید است و از آلمان به مقصد اسرائیل حرکت کرده است.
+d570d4ae457cc687,fatal,,2,aawsat|tg_esellco,openrouter,2,,,,,,
+c84cdd2f752f93e5,clickbait,,1,al_jazeera,groq,2,,,,,,
+e5ccb68fd70b9b39,repeat_dropped,,4,maariv|osint613_a|tg_irane_azad_news|tg_padeshah_fxn,groq,2,,,,,,
+a14106c473aadedb,sent,,1,haaretz,groq,2,politics,unconfirmed,1,9.797,نظرسنجی جدید نشان می‌دهد بلوک نتانیاهو و آیزنکوت در ۵۳ کرسی برابرند,بر اساس نظرسنجی کانال ۱۳، احزاب راست‌گرا از آستانه عبور کرده‌اند اما تحریم احزاب عربی توسط برخی مخالفان، تشکیل اکثریت ۶۷ کرسی‌ای علیه دولت را مسدود می‌کند.
+35ec099a14469b4b,clickbait,,4,tg_mes|walla,groq,2,,,,,,
+e78b283dca2087a3,irrelevant,,3,maariv|walla,groq,2,,,,,,
+8441ead0d63f0c1a,sent,,1,walla,groq,2,security,unconfirmed,1,10.785,پلیس اسرائیل ۱۶ نفر را به اتهام ازدواج با کودکان در یبنئال بازداشت کرد,عملیات پلیس در این شهر با هدف کشف و جلوگیری از ازدواج‌های غیرقانونی با افراد زیر سن قانونی انجام شد.
+894e3c80e36f6b77,sent,,1,sky_news_arabia,groq,2,military,unconfirmed,1,12.773,رسید حمله هوای آمریکا «ابراهام لینکلن» با لکه‌های زنگ‌زدگی به بندر تایلند,این حمله هوای پس از ماه‌ها عملیات دریایی به مقصد رسید و تصاویر منتشرشده از بدنه آن نشان‌دهنده فرسودگی و زنگ‌زدگی است.
+803fec2a0dd76e3e,sent,,4,bbc_persian|tg_fighter_radar|tg_padeshah_fxn|walla,groq,2,security,likely,2,13.068,تأیید حکم ۱۲ سال و نیم حبس صادق ساعدی‌نیا در دیوان عالی کشور,دیوان عالی کشور حکم محکومیت صادق ساعدی‌نیا، کارآفرین ایرانی، به ۱۲ سال و ۶ ماه و یک روز حبس تعزیری و مصادره اموال را تأیید کرد. قوه قضاییه این پرونده را مرتبط با اعتراضات دی ۱۴۰۳ و تحریک خسارت به اماکن عمومی در استان قم معرفی کرده است.
+18a29a7c72ac7af1,sent,,1,irna,groq,2,military,unconfirmed,1,12.767,سازمان اطلاعات سپاه پاسداران از حمله هوایی به مراسم عروسی در هرمزگان خبر داد,سپاه پاسداران این رویداد را جنایت جنگی خوانده و از واشنگتن خواسته است پاسخگوی آن باشد.
+58065b3ae417f130,repeat_dropped,,1,al_jazeera,groq,2,,,,,,
+37aa865239c5a579,repeat_dropped,,5,al_manar|irna|mee|mehr,groq,2,,,,,,
+e978b1e2bd65b766,sent,,4,ajar|al_manar|tg_fighter_radar|walla,groq,2,politics,likely,2,12.050,آریه درعی در مصاحبه ادعا کرد ارتش اسرائیل علاقه‌ای به جذب یهودیان حared ندارد,رهبر حزب شاس در جریان کمپین انتخاباتی گفت که نیازی به فراخواندن حaredهای غیردانشجو به خدمت نظامی نیست و تأکید کرد که ارتش اسرائیل در این زمینه تمایلی نشان نداده است.
+e9a32dd84b7d553f,repeat_dropped,,10,france24|mee|tg_behold_israel|tg_defenderdome|tg_geopwatch|tg_irane_azad_news|tg_iranian_militarism|tg_wfwitness,groq,2,,,,,,
+ef71159942661573,irrelevant,,2,al_monitor|osint613_a,groq,2,,,,,,
+4ffab3d9ec8e1547,irrelevant,,1,sky_news_arabia,groq,2,,,,,,
+d50ea14e6e64202d,irrelevant,,1,maariv,groq,2,,,,,,

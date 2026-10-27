@@ -1,0 +1,2 @@
+﻿run_at_utc,daily_digest,items,clusters,events,sent,lang_drops,rank_dropped,repeat_dropped,lead_events,llm_failed,messages,deliver,calls_gemini,fails_gemini,calls_groq,fails_groq,calls_groq2,fails_groq2,calls_mistral,fails_mistral
+2026-10-24T09:45:32.084328+00:00,1,432,150,52,32,2,5,26,0,0,4,4,4,3,33,7,13,2,5,0

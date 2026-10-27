@@ -1,0 +1,41 @@
+﻿cluster_key,fate,reason,n_members,sources,provider,best_tier,category,claim_status,independent_count,score,headline,summary
+ba386979cf4e9b12,repeat_dropped,,9,mee|tg_fighter_radar|tg_irane_azad_news|tg_minas_tirith,groq,2,,,,,,
+7ee82c783350fc09,sent,,2,ajar|sky_news_arabia,groq,2,economy,likely,2,11.087,وزیر انرژی آمریکا پیش‌بینی دوبرابر شدن تولید نفت ونزوئلا در سال‌های آینده را اعلام کرد,کریس رایت تأکید کرد که توافق‌های جدید با شرکت‌های نفتی بین‌المللی در کاراکاس منجر به افزایش چشمگیر تولید خواهد شد.
+42751138d5a48873,repeat_dropped,,1,maariv,groq,2,,,,,,
+bf9ee6078be341d3,sent,,7,al_manar|irna|mehr|tg_fighter_radar|tg_irane_azad_news|tg_padeshah_fxn|tg_tabzlive,groq,2,politics,unconfirmed,1,10.571,قالیباف حملات آمریکا به اهداف مدنی ایران را تکرار اعمال شیطان خواند,رئیس مجلس شورای اسلامی با اشاره به حمله اخیر به یک عروسی در جزیره سیریک و سایر اهداف مدنی، ادعا کرد که آمریکا با حمایت از «شیطان کوچک‌تر» خود را «شیطان بزرگ» نشان می‌دهد.
+5946d824fc11f150,unparseable,,5,al_manar|mee,bai_deepseek,2,,,,,,
+a89f896c2c56541c,unparseable,,6,al_monitor|mehr|osint613_a|reuters_gnews|tg_wfwitness,bai_deepseek,2,,,,,,
+2c662bd1c71b17d5,unparseable,,5,maariv|tg_mes|tg_wfwitness,bai_deepseek,2,,,,,,
+c594e8d5226bd636,repeat_dropped,,24,ajar|al_manar|bbc_persian|tg_fighter_radar|tg_irane_azad_news|tg_iranian_militarism|tg_padeshah_fxn|tg_tweet_mardomi|tg_vahid_online|walla,groq,2,,,,,,
+7b56a67a3015d8d1,irrelevant,,1,sky_news_arabia,groq,2,,,,,,
+c0335e8c60ca1bf2,unparseable,,4,haaretz|tg_behold_israel|tg_fighter_radar,bai_deepseek,2,,,,,,
+5062459b94a6d6e7,relevance_dropped,,6,al_monitor|bbc_persian|osint613_a|tg_geopwatch|tg_tabzlive|walla,bai_deepseek,2,military,likely,3,17.448,ناو هواپیمابر آمریکایی یواساس آبراهام لینکلن پس از ۲۸۶ روز در دریا در تایلند پهلو گرفت,نیروی دریایی آمریکا دشواری شرایط را پذیرفته، اما گزارش‌ها از کمبود غذا، خرابی توالت‌ها و فشار روانی بر حدود ۵۰۰۰ خدمه خبر می‌دهد و قانونگذاران نگرانی کرده‌اند.
+f9993d639f26ad01,repeat_dropped,,11,maariv|tg_fighter_radar|tg_iranian_militarism|tg_mes|tg_minas_tirith|tg_padeshah_fxn|tg_vahid_online,groq,2,,,,,,
+7d0c523516fbb3c4,repeat_dropped,,3,mee|osint613_a|sky_news_arabia,groq,2,,,,,,
+9913c7d242b8f814,repeat_dropped,,6,iran_international|mehr|osint613_a|tg_mes|tg_tabzlive|tg_wfwitness,bai_deepseek,2,,,,,,
+209425ab4c03e95c,unparseable,,1,haaretz,bai_deepseek,2,,,,,,
+329cf5653b65605d,unparseable,,5,ajar|al_monitor|irna|mee|tg_tabzlive,bai_deepseek,2,,,,,,
+829f310e05d75b0c,irrelevant,,1,haaretz,groq,2,,,,,,
+77c36f2c0b88a214,sent,,13,al_jazeera|maariv|mee|osint613_a|tg_behold_israel|tg_fighter_radar|tg_mes|tg_padeshah_fxn|tg_tabzlive|tg_vira_university|tg_wfwitness|walla,groq,2,military,likely,3,17.902,وزیر دفاع اسرائیل از آمادگی برای پاسخ به حمله احتمالی ایران در تعطیلات خبر داد,کاتز با اشاره به افزایش فشارهای اقتصادی بر ایران، احتمال حمله به اسرائیل را در ایام تعطیلات یهودی مطرح کرد و تأکید کرد که ارتش برای دفاع و حمله آماده است.
+5d912b9153ecc04b,irrelevant,,1,maariv,groq,2,,,,,,
+869583df60b206f2,unparseable,,7,iran_international|maariv|sky_news_arabia|tg_behold_israel|tg_defenderdome|tg_exciton_missile|tg_fighter_radar,bai_deepseek,2,,,,,,
+01d487f4e297914b,irrelevant,,1,tehran_times,bai_deepseek,2,,,,,,
+04e7ebcacab97f00,unparseable,,3,al_jazeera|bbc_en,bai_deepseek,2,,,,,,
+e5235dc5ba0e3a35,irrelevant,,2,sky_news_arabia,groq,2,,,,,,
+3beb92a627e23a42,sent,,1,irna,groq,2,military,unconfirmed,1,12.827,نماینده مجلس ایران از ناتوانی آمریکا در تمایز اهداف نظامی و غیرنظامی انتقاد کرد,حسن قشغوی، سخنگوی کمیسیون امنیت ملی، پس از حمله آمریکا به یک مراسم عروسی در سیریک، از عدم تمایز بین اهداف نظامی و غیرنظامی توسط واشنگتن پرسش کرد.
+13305a0187ce7c3b,repeat_dropped,,2,bbc_persian|iran_international,groq,2,,,,,,
+87385b087141d3bb,clickbait,,1,maariv,groq,2,,,,,,
+ac53c43829d7913f,repeat_dropped,,4,maariv|mehr|tg_tweet_mardomi,groq,2,,,,,,
+f5a5f2b7e6174408,unparseable,,1,maariv,bai_deepseek,2,,,,,,
+9f8e72759949f9a3,unparseable,,6,al_monitor|naval_news|osint613_a|sky_news_arabia|tg_minas_tirith|walla,bai_deepseek,2,,,,,,
+b19a395d0f75403a,irrelevant,,1,maariv,bai_deepseek,2,,,,,,
+57070b4955de696b,sent,,1,sky_news_arabia,groq,2,economy,unconfirmed,1,8.783,کویت قانونی برای قرض‌گیری از صندوق نسل‌های آینده تصویب کرد,این قانون با هدف حمایت از ذخایر عمومی کشور صادر شده و شامل پنج بند اساسی و سه ضابطه سقفی برای حفاظت از دارایی‌های صندوق است.
+3a9714c9670454d0,irrelevant,,1,maariv,groq,2,,,,,,
+e187f3eb33952b35,sent,,2,haaretz|walla,groq,2,politics,unconfirmed,1,9.871,نتانیاهو رد ادعای خیانت داخلی در ۷ اکتبر را کرد,این اظهارات پس از انتقادات شدید به همسرش صورت گرفت که از تلاش‌های رقیب سیاسی برای نجات قربانیان نووا شک داشت. نخست‌وزیر با اشاره به مسئولان امنیتی تأکید کرد که او در آن روز بیدار نشده است.
+31f8714bdf32249b,repeat_dropped,,5,al_jazeera|al_monitor|mehr|tg_geopolitics_prime|tg_mes,bai_deepseek,2,,,,,,
+5b229aa465f57b6b,unparseable,,1,walla,bai_deepseek,2,,,,,,
+b0dbf4f1b8f4cba2,unparseable,,1,sky_news_arabia,bai_deepseek,2,,,,,,
+cab4a6d562808956,sent,,2,naval_news|tg_minas_tirith,groq,2,military,unconfirmed,1,12.830,ژاپن برنامه‌ریزی می‌کند موشک ضد کشتی ASM-3ER را با قابلیت هوابه‌هوا در سال مالی ۲۰۲۷ استقرار دهد,وزارت دفاع ژاپن در سند بودجه جدید، نقش دوتایی این موشک سوپرسونیک برای هدف‌گیری هواپیماهای هشداردهنده و سوخت‌رسان در فاصله دور را تأیید کرد. این ارتقا از رادار آرایه‌ای فعال استفاده می‌کند و در کنار نسخه‌های فعلی و در حال توسعه، توانایی دفاع هوایی را افزایش می‌دهد.
+6ffe21cb585d2886,repeat_dropped,,2,tg_geopolitics_prime|walla,groq,2,,,,,,
+57b4ad00fdb80867,repeat_dropped,,2,al_monitor|tg_tabzlive,groq,2,,,,,,
+a21c9bce58421983,irrelevant,,1,al_jazeera,bai_deepseek,2,,,,,,

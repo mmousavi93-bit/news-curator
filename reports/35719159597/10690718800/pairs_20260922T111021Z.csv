@@ -1,0 +1,3 @@
+﻿run_at_utc,key_a,key_b,similarity,decision,threshold,n_members_a,n_members_b,independent_count_a,independent_count_b,headline_a,headline_b,novelty
+2026-09-22T11:10:21.727947+00:00,0411e0e0c2fde76d,fe09f858741b17e1,0.5935,kept_below_threshold,0.8,1,1,1,0,رئیس‌جمهور عراق تعهد به حل گروه‌های مسلح وفادار به ایران تا ۲۰۲۷ داد,منابع عراقی: نماینده سپاه پاسداران حضور حوثی‌ها را در عراق سازماندهی می‌کند,development
+2026-09-22T11:10:21.727947+00:00,fe09f858741b17e1,77cf547e1a031673,0.4882,kept_below_threshold,0.8,1,1,0,1,منابع عراقی: نماینده سپاه پاسداران حضور حوثی‌ها را در عراق سازماندهی می‌کند,گزارش از تأمین سلاح و پهپاد برای تیپ البراء توسط ارتش سودان,development

@@ -1,0 +1,41 @@
+﻿cluster_key,fate,reason,n_members,sources,provider,best_tier,category,claim_status,independent_count,score,headline,summary
+7dd3a5cd4b492568,relevance_dropped,,1,maariv,groq,2,politics,unconfirmed,1,9.989,بازارهای پیش‌بینی نشان‌دهنده انتقال مومنتوم از نتانیاهو به ایزنکوت است,داده‌های بازارهای پیش‌بینی حاکی از تغییر روند حمایت‌ها از بنیامین نتانیاهو به یوآو ایزنکوت است.
+19e03491d590c4ce,repeat_dropped,,15,ajar|osint613_a|tg_fighter_radar|tg_irane_azad_news|tg_iranian_militarism|tg_padeshah_fxn|tg_tabzlive|tg_wfwitness,groq,2,,,,,,
+d257e8397f8c6ece,repeat_dropped,,3,aawsat|maariv|tg_geopolitics_prime,groq,2,,,,,,
+a4a8d9b945696527,sent,,1,irna,groq,2,politics,unconfirmed,1,9.973,سخنگوی وزارت خارجه ایران بمباران عروسی در سیریک را نماد جنگ آمریکا و اسرائیل خواند,اسماعیل بقایی تأکید کرد که واقعیت جنگ در حمله به مراسم عروسی در سیریک آشکار است، نه در ویدیوهای ساختگی هوش مصنوعی که مقامات آمریکایی را قهرمان نشان می‌دهند.
+c465375b9c189c68,unparseable,,7,bbc_en_me|france24|mee|mehr|tg_padeshah_fxn|tg_tabzlive,bai_deepseek,2,,,,,,
+0eb43018c0a1fd6a,repeat_dropped,,6,aawsat|bbc_en_me|france24|irna|osint613_a|tg_wfwitness,bai_deepseek,2,,,,,,
+36eecf512c7c3f4a,unparseable,,10,maariv|tg_fighter_radar|tg_irane_azad_news|tg_iranian_militarism|tg_padeshah_fxn|tg_vira_university|walla,bai_deepseek,2,,,,,,
+c937481836928e06,unparseable,,1,al_monitor,bai_deepseek,2,,,,,,
+e2e5d8febec02066,repeat_dropped,,1,irna,groq,2,,,,,,
+1d9467e5a9819888,repeat_dropped,,4,mee|osint613_a|tg_behold_israel|tg_iranian_militarism,groq,2,,,,,,
+9d8a901eea6d3746,sent,,4,al_jazeera|al_monitor|tg_wfwitness,groq,2,politics,likely,2,12.244,شی جین‌پینگ در نخستین سفر دهه‌ای به مصر با سیسی دیدار کرد,طرفین بر گسترش سرمایه‌گذاری چین در منطقه اقتصادی کانال سوئیز توافق کردند. این دیدار در حالی رخ داد که مصر همکاری نظامی خود با پکن را افزایش داده است.
+5ccabf757b78041f,repeat_dropped,,3,haaretz,groq,2,,,,,,
+426640c23d2afbaa,unparseable,,3,bbc_en|tg_padeshah_fxn|tg_tabzlive,bai_deepseek,2,,,,,,
+71e344c723aa095e,fatal,,2,maariv,openrouter,2,,,,,,
+7cf6616e86b96b3b,repeat_dropped,,3,al_manar|walla,groq,2,,,,,,
+43a14db68fdc70ba,irrelevant,,2,bbc_en|sky_news_arabia,groq,2,,,,,,
+7b3e0f91ce3f0a76,sent,,2,al_monitor|sky_news_arabia,groq,2,military,likely,2,14.989,مذاکرات زنان جنگجوی کردی با مقامات جدید سوریه برای حفظ نقش نظامی,واحدهای حفاظت از زنان (YPJ) در حال مذاکره با دولت جدید سوریه هستند تا پس از بازسازی ارتش، جایگاه رزمی خود را حفظ کنند.
+00c75aac55880921,repeat_dropped,,1,maariv,groq,2,,,,,,
+d24d2ac0d9e3d05d,irrelevant,,1,maariv,groq,2,,,,,,
+f06928d73aa22289,sent,,3,ajar|dw|tehran_times,groq,2,economy,likely,3,13.050,تشدید بحران سوخت و گاز در ایران به دلیل جنگ و تحریم‌های آمریکا,صف‌های طولانی در پمپ‌بنزین‌ها گسترش یافته و تولید گاز تحت فشار است؛ اگرچه ایران از ذخایر عظیم نفت و گاز خبر داده، اما تحریم‌ها مانع بازیابی کامل تولید شده‌اند.
+25fe8b87770b2475,unparseable,,2,maariv|walla,bai_deepseek,2,,,,,,
+311f21219718a606,unparseable,,2,al_manar|haaretz,bai_deepseek,2,,,,,,
+e953315ca316f8ab,fatal,,4,al_manar|maariv|sky_news_arabia|tg_padeshah_fxn,openrouter,2,,,,,,
+9fdedd92d7f0c388,irrelevant,,1,sky_news_arabia,groq,2,,,,,,
+e23c0155ffee946a,repeat_dropped,,1,mehr,groq,2,,,,,,
+f9b57bf636b0484f,relevance_dropped,,1,al_jazeera,groq,2,security,unconfirmed,1,10.824,مالکان فلسطینی با دست خالی با بولدوزرها درگیر شدند,گزارش شده است که مالکان اراضی فلسطینی برای جلوگیری از تخریب زمین‌های خود، مستقیماً با ماشین‌آلات سنگین درگیر شده‌اند.
+68270488626bf30c,irrelevant,,1,bbc_en,groq,2,,,,,,
+5f7d7fe8068112af,sent,,1,tehran_times,groq,2,politics,unconfirmed,1,9.814,ترامپ تهدید به ممنوعیت آزمون تافل برای دانشجویان ایرانی کرد,این اقدام به عنوان بخشی از فشارهای اقتصادی آمریکا بر ایران تفسیر می‌شود و دسترسی دانشجویان عادی به فرصت‌های آموزشی بین‌المللی را هدف قرار داده است.
+8363d9c676f5747b,sent,,1,tehran_times,groq,2,economy,unconfirmed,1,8.813,سفیر پاکستان از مرکز تست تصادف ایران به عنوان الگوی موفق بخش خصوصی ستایش کرد,سفیر پاکستان پیشنهاد امضای توافقنامه اولیه برای همکاری در زمینه زیرساخت‌های این مرکز را مطرح کرد.
+f39f62ffe9362a0f,repeat_dropped,,1,aawsat,groq,2,,,,,,
+51b52279721787df,rank_dropped,,3,maariv|tg_tweet_mardomi|walla,groq,2,other,unconfirmed,1,7.008,تغییرات جوی در شمال اسرائیل می‌تواند بحران آب را حل کند,بر اساس گزارش‌ها، انتظار برای وزش باد شمالی به عنوان راهکار عملی برای رفع کمبود آب در منطقه مطرح شده است.
+4f112f34afc20a46,unparseable,,7,aawsat|al_monitor|bbc_persian|iran_international|reuters_gnews|sky_news_arabia|walla,bai_deepseek,2,,,,,,
+fd6c20afb4a3b25d,unparseable,,1,tehran_times,bai_deepseek,2,,,,,,
+abf15c30ba88fb6b,sent,,1,tehran_times,groq,2,economy,unconfirmed,1,8.779,مسئول اتاق بازرگانی ایران: تحریم‌ها تجارت کشور را متوقف نمی‌کند,رئیس کمیته گمرک اتاق بازرگانی، صنایع، معادن و کشاورزی ایران با اشاره به موقعیت جغرافیایی و همسایگی‌های متعدد، اعلام کرد که مسیرهای متنوعی برای ادامه مبادلات خارجی وجود دارد.
+f2d18e30bd54e346,irrelevant,,1,tehran_times,groq,2,,,,,,
+fab780cb9c871219,irrelevant,,1,tehran_times,groq,2,,,,,,
+78d598f2f3eada8f,repeat_dropped,,3,bbc_persian|mee|osint613_a,groq,2,,,,,,
+76aa25234a08d683,irrelevant,,1,tehran_times,groq,2,,,,,,
+53a52014ca5614b4,repeat_dropped,,1,mee,groq,2,,,,,,
+e230b67c5449e2e8,repeat_dropped,,1,tehran_times,groq,2,,,,,,

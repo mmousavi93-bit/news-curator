@@ -1,0 +1,41 @@
+﻿cluster_key,fate,reason,n_members,sources,provider,best_tier,category,claim_status,independent_count,score,headline,summary
+d04e1b094d4cb230,repeat_dropped,,3,ap_gnews|tg_tabzlive|tg_wfwitness,groq,2,,,,,,
+1d90d05816ded683,sent,,4,al_jazeera|al_monitor|ap_gnews|sky_news_arabia,groq,2,politics,likely,4,14.263,ترامپ درگیری با ایران را کوچک و غیرقابل توجه خواند,پresident ترامپ با اشاره به کشته شدن ۱۸ آمریکایی، این درگیری را با جنگ ویتنام مقایسه کرد و ادعا کرد که موفقیت بزرگی کسب شده است. این اظهارات پس از سخنان وایس مبنی بر عدم تعریف این وضعیت به عنوان جنگ صورت گرفت.
+2fa1857338a00b82,repeat_dropped,,2,sky_news_arabia|tg_fighter_radar,groq,2,,,,,,
+0bca0786e43ed51f,irrelevant,,1,bbc_en,groq,2,,,,,,
+d6660372c4b4104b,fatal,,6,ajar|al_jazeera|maariv|mee,bai_deepseek,2,,,,,,
+02cb955d15dff703,fatal,,8,al_jazeera|al_manar|bbc_persian|mee|sky_news_arabia|tg_fighter_radar,bai_deepseek,2,,,,,,
+d45874fca1a33817,repeat_dropped,,17,maariv|tg_fighter_radar|tg_geopwatch|tg_irane_azad_news|tg_iranian_militarism|tg_padeshah_fxn|tg_tabzlive|tg_tweet_mardomi,gemini,2,,,,,,
+4a1342b4b77b6a08,sent,,6,al_manar|al_monitor|tg_fighter_radar|tg_geopwatch|tg_tabzlive|tg_wfwitness,bai,2,military,unconfirmed,1,13.355,آمریکا فروش احتمالی بمب‌های هدایت‌شونده به عربستان را تأیید کرد,تأیید رسمی مربوط به بسته ۵ میلیارد دلاری بمب‌ها و ۷۵۰ میلیون دلاری موتورهای تانک آبرامز برای عربستان است؛ اشاره به عمان و عراق تنها در برخی گزارش‌ها آمده.
+1e429403c889adb3,sent,,4,ajar|maariv,groq,2,military,likely,2,15.154,امضای توافق دفاعی مشترک میان ترکیه، عربستان و پاکستان در مکه,این توافق که در اوت ۲۰۲۶ امضا شد، به عنوان تحولی در دکترین نظامی ترکیه و ایجاد بلوک امنیتی جدید در منطقه تفسیر می‌شود.
+2f22c3a259927b52,sent,,3,ajar|al_manar|tg_tabzlive,groq,2,politics,unconfirmed,1,10.016,برگزاری اولین مذاکرات دوجانبه رسمی آمریکا و چین در زمینه هوش مصنوعی,گفتگوها که در اواسط سپتامبر برگزار می‌شود، بر همکاری در پایش حملات سایبری و تبادل اطلاعات بین آزمایشگاه‌های هوش مصنوعی دو کشور تمرکز دارد.
+215f18b74acfb6bc,irrelevant,,1,maariv,groq,2,,,,,,
+0db90cb90fb1dc9a,irrelevant,,2,al_jazeera|al_monitor,groq,2,,,,,,
+b0b86369edc9d1e0,clickbait,,2,maariv,groq,2,,,,,,
+fa439eb2241b6216,repeat_dropped,,16,ajar|al_manar|maariv|sky_news_arabia|tg_defenderdome|tg_irane_azad_news|tg_iranian_militarism|walla,groq,2,,,,,,
+9cb704c54d6fbe2d,irrelevant,,1,al_jazeera,gemini,2,,,,,,
+38ed9f1b83a28455,irrelevant,,1,sky_news_arabia,gemini,2,,,,,,
+1eb549cf5a263ec5,clickbait,,1,mee,bai,2,,,,,,
+c64cf8bbd82a7322,repeat_dropped,,6,ajar|dw|tg_tabzlive|tg_wfwitness,groq,2,,,,,,
+d754054ff82a8c0a,irrelevant,,1,al_jazeera,groq,2,,,,,,
+3bd95fd6a2a0c99b,irrelevant,,1,sky_news_arabia,groq,2,,,,,,
+dc2ddd836145b355,sent,,3,al_jazeera|tg_geopwatch|tg_padeshah_fxn,groq,2,politics,unconfirmed,1,9.900,ویتکوف و کوشنر برای احیای مذاکرات صلح به مسکو و کی‌یف سفر می‌کنند,دونالد ترامپ اعلام کرد این دو فرستاده آمریکا پیشنهادی برای پایان جنگ ارائه خواهند داد. این سفر در تلاش برای از سرگیری گفتگوهای صلح انجام می‌شود.
+a127058bdfed978d,irrelevant,,1,sky_news_arabia,groq,2,,,,,,
+417889c1e6756492,repeat_dropped,,3,maariv|tg_padeshah_fxn,groq,2,,,,,,
+f23f48e91a4da399,irrelevant,,1,al_jazeera,groq,2,,,,,,
+a970809eec783fa7,irrelevant,,1,al_jazeera,groq,2,,,,,,
+22ced11d28012334,irrelevant,,1,al_jazeera,gemini,2,,,,,,
+8bc7e380238f7b9a,clickbait,,1,al_jazeera,gemini,2,,,,,,
+3c586e6903b4eb1e,repeat_dropped,,4,maariv|tg_geopolitics_prime|tg_tabzlive,gemini,2,,,,,,
+fa84a2bd6833af1e,sent,,2,al_monitor|reuters_gnews,bai,2,military,likely,2,14.665,ترامپ گفت آمریکا ممکن است به‌زودی کوه پیک‌اکس ایران را بزند,این مکان نزدیک نطنز و دارای دو تونل عمیق و مستحکم است؛ سخن ترامپ اقدامی را تایید نمی‌کند.
+4a995176d7364a52,irrelevant,,1,sky_news_arabia,groq,2,,,,,,
+88d685652e1cb629,irrelevant,,1,tehran_times,groq,2,,,,,,
+d113ef07f68263c1,irrelevant,,1,al_jazeera,groq,2,,,,,,
+d61c0adafbb25ed1,irrelevant,,1,al_jazeera,groq,2,,,,,,
+fae712770799cf06,irrelevant,,2,tg_rnintel|walla,gemini,2,,,,,,
+a1400fc71122526c,irrelevant,,2,ap_gnews|reuters_gnews,bai,2,,,,,,
+7e72e04f09f06e18,irrelevant,,2,tg_geopwatch|the_war_zone,groq,2,,,,,,
+e4102606d8171c71,repeat_dropped,,1,sky_news_arabia,groq,2,,,,,,
+22a86d8f814db0e9,sent,,3,ajar|al_monitor|iran_international,groq,2,economy,likely,3,12.563,دپارتمان خزانه‌داری آمریکا بانک طلایی جهانی ترکیه را تحریم کرد,این تحریم‌ها به دلیل ادعای تسهیل معاملات مالی با ایران اعمال شد و بانک ترکیه این اتهامات را رد کرده و قصد طرح دعوای حقوقی دارد.
+402f09f8c9031e91,irrelevant,,1,maariv,groq,2,,,,,,
+bde062935eed2db4,irrelevant,,1,al_jazeera,bai,2,,,,,,

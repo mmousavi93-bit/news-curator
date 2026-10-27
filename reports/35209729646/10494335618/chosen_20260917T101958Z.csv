@@ -1,0 +1,81 @@
+﻿cluster_key,fate,reason,n_members,sources,provider,best_tier,category,claim_status,independent_count,score,headline,summary
+048bce8441070df3,sent_followup,band=mid sim=0.75 score=12.04 kept=above_floor prior=4470c638,2,ajar|bbc_persian,gemini,2,politics,likely,2,12.044,وزیر امور خارجه ایران در سفر به پکن درباره طرح امنیت خاورمیانه گفتگو کرد.,عباس عراقچی، وزیر امور خارجه ایران، در سفر به چین با مقامات این کشور درباره طرح چهار ماده‌ای امنیت خاورمیانه گفتگو کرد. او همچنین در پکن با مقامات پاکستان و وزیر امور خارجه ترکیه دیدار کرد. چین اعلام کرده است که خواهان جلوگیری از گسترش درگیری‌ها به یمن و دریای سرخ است.
+c14db6ca1cdefb26,sent_followup,band=mid sim=0.75 score=13.20 kept=above_floor prior=d753e26c,4,ap_gnews|iran_international|reuters_gnews|tg_wfwitness,gemini,2,security,likely,2,13.197,سازمان ملل گزارشی درباره نقض حقوق بشر و حملات هوایی آمریکا در ایران منتشر کرد.,هیئت حقیقت‌یاب سازمان ملل متحد اعلام کرد حملات هوایی آمریکا در میناب و لامرد مصداق جنایت جنگی است. این گزارش همچنین نیروهای امنیتی ایران را به ارتکاب جنایت علیه بشریت در سرکوب اعتراضات متهم کرد.
+bdca2ab30eb24597,sent_followup,band=mid sim=0.66 score=15.09 kept=above_floor prior=7b64502f,3,al_jazeera|al_monitor|osint613_a,gemini,2,military,likely,2,15.087,نیروهای وابسته به دولت یمن دو خودروی حوثی‌ها را در نزدیکی باب‌المندب منهدم کردند.,نیروهای العمالقه وابسته به دولت یمن دو خودروی متعلق به حوثی‌ها را در جبهه کهبوب منهدم کردند. درگیری‌ها میان دو طرف در این محور همچنان ادامه دارد.
+6510128891cc93dc,sent_followup,band=high sim=0.84 score=13.05 kept=development prior=07fc8a56,3,aawsat|al_monitor|tg_iranian_militarism,gemini,2,security,likely,2,13.048,سازمان ملل از آوارگی بیش از صد هزار نفر در یمن خبر داد.,سازمان ملل متحد اعلام کرد که با تشدید درگیری‌ها در یمن بیش از صد هزار نفر آواره شده‌اند. هم‌زمان گزارش‌هایی از کاهش عبور و مرور کشتی‌ها در تنگه هرمز منتشر شده است. این تحولات خطرات امنیتی برای خطوط دریانوردی منطقه ایجاد کرده است.
+72625c60b309a8e5,repeat_dropped,band=mid sim=0.69 score=10.39 blocked=below_floor prior=2d2736fd,5,ajar|tg_rnintel|tg_wfwitness,gemini,2,politics,unconfirmed,1,10.387,سران فرانسه، لبنان و اردن در پاریس درباره حمایت از ارتش لبنان گفتگو کردند.,امانوئل مکرون، ژوزف عون و ملک عبدالله دوم در پاریس درباره راهکارهای حمایت از ارتش لبنان گفتگو کردند. در این نشست جایگزین‌های احتمالی برای نیروهای یونیفیل نیز بررسی شد.
+4b491f3605ca6ad0,clickbait,,2,al_manar|walla,gemini,2,,,,,,
+812002ed22f12480,sent_followup,band=mid sim=0.70 score=12.16 kept=above_floor prior=33e0d55d,3,al_jazeera|tg_geopolitics_prime,gemini,2,economy,unconfirmed,1,12.164,آغاز بازسازی خط لوله نفت شرق به غرب در عربستان.,تصاویر ماهواره‌ای نشان می‌دهند که شرکت آرامکو بازسازی خط لوله انتقال نفت به بندر ینبع را آغاز کرده است. این تأسیسات بر اثر حملات انصارالله یمن آسیب دیده و جریان نفت در آن متوقف شده بود. این رویداد موجب افزایش قیمت جهانی نفت و تلاش عربستان برای تغییر مسیرهای صادراتی شده است.
+162393e09d1c9375,sent_followup,band=high sim=0.86 score=13.25 kept=development prior=e717df6f,4,mee|osint613_a|tg_behold_israel|tg_wfwitness,gemini,2,military,unconfirmed,1,13.250,ارتش اسرائیل از کشته شدن دو فرمانده حماس در غزه خبر داد.,ارتش اسرائیل اعلام کرد دو تن از فرماندهان یگان نخبه حماس را در حملات هوایی شمال غزه کشته است. به ادعای اسرائیل، این افراد در حملات گذشته دست داشته و در حال بازسازی توان نظامی حماس بودند. هم‌زمان گزارش‌هایی از ضرب‌وشتم و بازداشت دو فلسطینی در جریان یورش به نابلس منتشر شده است.
+75c097e2dfa5ee6e,repeat_dropped,band=mid sim=0.57 score=10.13 blocked=below_floor prior=1bb587ce,3,tg_entekhab|tg_wfwitness|walla,gemini,2,politics,unconfirmed,1,10.133,ایران و سوئد دیپلمات‌های یکدیگر را اخراج کردند.,دولت سوئد یک دیپلمات ایرانی را به اتهام تهدید منافع اسرائیل و جامعه یهودی اخراج کرد. ایران با رد کامل این اتهامات، یک دیپلمات سوئدی را اخراج کرد و مهلتی ۴۸ ساعته برای خروج وی تعیین نمود. سفیر سوئد در تهران نیز برای ابلاغ اعتراض رسمی به وزارت امور خارجه احضار شد.
+307c0208ac456f38,clickbait,,3,maariv|tg_militarywave,gemini,2,,,,,,
+454de3bf730d5b48,repeat_dropped,band=mid sim=0.63 score=9.91 blocked=below_floor prior=e1de5c5d,1,mehr,groq,2,politics,unconfirmed,1,9.911,موسن رضایی با بافل طالبانی در تهران دیدار کرد,موسن رضایی، عالی‌ترین مقام امنیتی ایران، با بافل طالبانی، رئیس اتحادیه ملی اقلیم کردستان عراق، دیدار کرد. موضوعات گفتگو شامل تحولات منطقه‌ای و همکاری دوجانبه بود.
+af629931dd86b316,clickbait,,1,maariv,groq,2,,,,,,
+c1507fb2defe7c81,irrelevant,,5,tg_entekhab|tg_fighter_radar|walla,groq,2,,,,,,
+7febc897043f687a,sent,,1,sky_news_arabia,groq,2,economy,unconfirmed,1,11.806,صندوق‌های سرمایه‌گذاری ترکیه با بحران نقدینگی مواجه شدند,شرکت تیرا پورتفوی اعلام کرد که دو صندوق زیر نظر آن با مجموع دارایی ۷.۵ میلیارد دلار قادر به پاسخ‌گویی به درخواست‌های بازخرید سرمایه‌گذاران نیستند. این دومین شرکت مدیریت دارایی ترکیه‌ای است که این هفته از شکست در پرداخت‌ها خبر داده است.
+c227b547f7c162e9,irrelevant,,1,walla,groq,2,,,,,,
+845a08ae80f07987,irrelevant,,1,sky_news_arabia,groq,2,,,,,,
+6cfd6365adf1597b,sent,,1,sky_news_arabia,groq,2,economy,unconfirmed,1,11.705,سوییس پیش‌بینی رشد اقتصادی ۲۰۲۶ را به ۱.۷ درصد افزایش داد,وزارت اقتصاد سوییس پیش‌بینی رشد اقتصادی سال جاری را به ۱.۷ درصد افزایش داد. این نهاد اعلام کرد که با وجود ریسک‌های ناشی از افزایش هزینه‌های انرژی به دلیل جنگ با ایران، عملکرد اقتصادی قوی‌تر از تخمین‌های قبلی خواهد بود.
+dd0ff1dd954ac0fb,irrelevant,,2,ajar|osint613_a,groq,2,,,,,,
+846bf809437cc830,irrelevant,,1,mee,groq,2,,,,,,
+4dbdf79496f9547c,irrelevant,,2,al_jazeera|tg_minas_tirith,groq,2,,,,,,
+573fd1622b5db369,repeat_dropped,band=mid sim=0.60 score=9.63 blocked=below_floor prior=261d74ff,1,haaretz,groq,2,politics,unconfirmed,1,9.631,دادگاه عراقی حکم اعدام یک اسرائیلی را به دلیل دفاع از خود کاهش داد,یک شهروند ۴۲ ساله اسرائیلی که به قتل یک راننده تاکسی در عراق محکوم شده بود، پس از ۱۱ سال حبس آزاد شد. دادگاه با توجه به شواهد دفاع از خود و آشتی با خانواده مقتول، حکم اعدام او را کاهش داد.
+0756ed879d667ee8,repeat_dropped,band=mid sim=0.67 score=9.62 blocked=below_floor prior=75efa551,1,al_jazeera,groq,2,politics,unconfirmed,1,9.618,نتانیاهو تهدید به لغو تابعیت اسرائیلی فیلمسازان مخالف کرد,نخست‌وزیر اسرائیل اعلام کرد دو لایحه برای مقابله با آنچه «آسیب عظیم» به سربازان اسرائیلی می‌نامد، از جمله لغو تابعیت برخی افراد، را پیش می‌برد. این اقدام در واکنش به فعالیت‌های فیلمسازان گروه NAZA صورت گرفته است.
+1ea24df4e89faffb,clickbait,,1,al_jazeera,groq,2,,,,,,
+b6a835423744400f,clickbait,,3,ajar,groq,2,,,,,,
+04166cbdae245808,clickbait,,1,ajar,groq,2,,,,,,
+e4827e62421c3c5d,repeat_dropped,band=high sim=0.84 score=9.05 blocked=below_floor prior=ac3682f6,1,ajar,groq,2,politics,unconfirmed,1,9.048,انتشار گزارش العفو بین‌الملل درباره ۸۷ مقام ایرانی متهم به جنایت علیه بشریت,سازمان العفو بین‌الملل گزارشی یک‌هزار صفحه‌ای منتشر کرد که در آن ۸۷ مقام ایرانی را به درگیری در سرکوب اعتراضات ۲۰۲۲ متهم می‌کند. این گزارش بر نقض حقوق بشر علیه اقلیت‌های کرد و بلوچ تأکید دارد و خواستار ایجاد سازوکار عدالت بین‌المللی شده است.
+f8d941267a50743c,repeat_dropped,band=mid sim=0.65 score=6.09 blocked=below_floor prior=2d2736fd,2,tg_entekhab|tg_fighter_radar,groq,3,politics,rumour,0,6.091,دیدار رضا پهلوی با رهبران اپوزیسیون استرالیا برای حمایت از ایران,رضا پهلوی در نشست مجازی با رهبران اپوزیسیون استرالیا درباره حمایت از مردم ایران و جامعه ایرانی‌تبار گفت‌وگو کرد. او این مذاکرات را سازنده توصیف کرد و بر آمادگی برای همکاری با ایران دموکراتیک آینده تأکید ورزید.
+fb46096d3a3ff434,repeat_dropped,band=mid sim=0.78 score=6.09 blocked=below_floor prior=c191cec7,2,al_manar|tg_wfwitness,groq,3,politics,rumour,0,6.090,تصویب لایحه تحریم‌های جدید علیه روسیه و ایران در مجلس نمایندگان آمریکا,مجلس نمایندگان آمریکا لایحه‌ای برای اعمال تحریم‌های جدید علیه روسیه و ایران را با اکثریت آرا تصویب کرد. این لایحه پس از عبور از سنات، اکنون به دست رئیس‌جمهور ترامپ رسیده است.
+d16b67f3e8236f1f,repeat_dropped,band=mid sim=0.73 score=6.09 blocked=below_floor prior=c191cec7,2,al_manar|osint613_a,groq,3,politics,rumour,0,6.088,کرملین: لایحه تحریم‌های آمریکا مانع از دستیابی به صلح در اوکراین می‌شود,کرملین تصویب لایحه تحریم‌های سخت‌گیرانه توسط کنگره آمریکا را گامی غیردوستانه و مانعی برای تسویه‌حساب صلح‌آمیز در اوکراین دانست. این واکنش در پی تصویب لایحه در مجلس نمایندگان آمریکا صورت گرفت.
+009548973049efa3,repeat_dropped,band=mid sim=0.71 score=9.09 blocked=below_floor prior=fe081fd2,2,tg_minas_tirith|tg_rnintel,groq,3,military,rumour,0,9.088,فرماندهی انصارالله: تصرف مواضع کلیدی پیش‌شرط حمله به شهر مارب است,فرماندهی انصارالله در یمن اعلام کرد که برای حمله به شهر مارب، ابتدا باید مواضع نظامی خاصی مانند پادگان‌های لبنات و کنایس تحت کنترل سنا قرار گیرد. این مواضع در گزارش‌های پیشین به دست نیروهای انصارالله نیفتاده بودند.
+cb0396a0c9cdc1f8,repeat_dropped,band=mid sim=0.67 score=7.09 blocked=below_floor prior=288676b9,2,tg_entekhab|tg_wfwitness,groq,3,security,rumour,0,7.087,وزیران داخله ترکیه و ایران در آنکارا دیدار کردند,وزیران داخله ترکیه و ایران در آنکارا برای تقویت همکاری‌های امنیتی و مبارزه با تروریسم دیدار کردند. موضوعات مذاکره شامل مقابله با ساختارهای وابسته به پ.ک.ک در سوریه، عراق و ایران و همکاری در زمینه ترانزیت غیرقانونی بود.
+be99a944cd3a39e9,relevance_dropped,,1,tg_iranian_militarism,groq,3,security,rumour,0,6.971,هشدار امنیتی درباره آسیب‌پذیری گواهی SSL منتشر شد,هشدار امنیتی‌ای مبنی بر آسیب‌پذیری گواهی SSL و نیاز به به‌روزرسانی زیرساخت‌های شبکه منتشر شد. این هشدار تأکید بر آماده‌سازی سیستم‌های پشتیبان و شناسایی تهدیدات روز صفر دارد.
+ae850039961aef43,repeat_dropped,band=mid sim=0.78 score=9.13 blocked=below_floor prior=972bf6c1,3,osint613_a|tg_esellco|tg_irane_azad_news,groq,3,military,rumour,0,9.128,عربستان سعودی از چند کشور درخواست کمک پدافندی کرد,عربستان سعودی به دلیل کمبود موشک‌های پدافندی در برابر حملات حوثی‌ها، از فرانسه، بریتانیا، پاکستان و مصر درخواست کمک فوری کرده است. منابع خبری تأکید دارند که اولویت ریاضد تأمین موشک‌های پاتریوت است.
+c27aabc15805ef94,sent,,1,tg_geopwatch,groq,3,military,rumour,0,8.909,نگرانی از انتقال فناوری F-35 به چین مطرح شد,مسئولان اطلاعاتی آمریکا نگرانند که فروش ۴۸ فروند جنگنده F-35 به عربستان سعودی ممکن است منجر به دسترسی چین به فناوری‌های حساس شود. ارزیابی‌ها نشان می‌دهد چین دسترسی به تأسیسات نظامی عربستان و روابط دفاعی گسترده‌ای با ریاض دارد.
+743446a6265c492f,irrelevant,,1,tg_wfwitness,groq,3,,,,,,
+7fb03b807df44fb4,repeat_dropped,band=mid sim=0.67 score=9.15 blocked=below_floor prior=61a33338,4,al_manar,groq,3,military,rumour,0,9.150,کشته‌شدن ۵ فلسطینی در حملات اسرائیل به غزه,وزارت بهداشت غزه اعلام کرد ۵ شهروند کشته و ۲۸ نفر زخمی شده‌اند. همچنین گزارش‌هایی از آوارگی زیر ویرانه‌ها و تیراندازی در خانیونس منتشر شده است.
+aae49ede56c278a0,repeat_dropped,band=mid sim=0.80 score=9.12 blocked=below_floor prior=77e0cae5,4,tg_wfwitness,groq,3,military,rumour,0,9.117,حمله توپخانه‌ای اسرائیل به جنوب لبنان و حضور اونس در پاریس,توپخانه اسرائیل به شهر کفر تنیت در جنوب لبنان حمله کرد. همزمان، میشل اونس در پاریس برای نشست حمایت از ارتش لبنان حضور یافت.
+0fe013a4f8d6f37e,repeat_dropped,band=high sim=0.85 score=8.88 blocked=below_floor prior=c70eb4c5,2,tg_fighter_radar|tg_minas_tirith,groq,3,military,rumour,0,8.884,ادعای سرنگونی جنگنده سعودی توسط پدافند یمن,حساب‌های تلگرامی ادعا می‌کنند یک جنگنده F-15 سعودی توسط پدافند هوایی یمن سرنگون شده است. این ادعا هنوز توسط منابع رسمی یا مستقل تأیید نشده است.
+83ec57429036482f,irrelevant,,1,al_manar,groq,3,,,,,,
+12e53639fff7dc19,clickbait,,2,tg_iranian_militarism,groq,3,,,,,,
+46ee9bb9ad0144be,repeat_dropped,band=mid sim=0.59 score=5.72 blocked=below_floor prior=04f1bd5b,1,al_manar,groq,3,politics,rumour,0,5.724,وزیر خارجه اسپانیا حملات بر غزه و ایران را نقض حقوق بشر خواند,وزیر خارجه اسپانیا در بیانیهای، حملات نظامی بر غزه، ایران، لبنان و یمن را نقض صریح حقوق بین‌الملل و حقوق بشر توصیف کرد. این موضع‌گیری دیپلماتیک بخشی از واکنش‌های اروپایی به درگیری‌های منطقه است.
+af304cfd7d7123fa,clickbait,,1,osint613_a,groq,3,,,,,,
+07792f37eceed48b,irrelevant,,1,maariv,groq,2,,,,,,
+935112f729e957b6,irrelevant,,3,al_manar|tg_minas_tirith|walla,groq,2,,,,,,
+f5387da126003535,irrelevant,,1,al_jazeera,groq,2,,,,,,
+3af4ba37651f15e7,unavailable,,1,aviationist,,2,,,,,,
+5ee537230400d429,unavailable,,1,al_jazeera,,2,,,,,,
+0fa09480d5de7221,unavailable,,1,aawsat,,2,,,,,,
+19eeec90f1b533f6,unavailable,,1,maariv,,2,,,,,,
+a2c3c04f4ef1cf22,unavailable,,1,al_jazeera,,2,,,,,,
+8d6b96d4b5ea8003,unavailable,,1,bbc_en,,2,,,,,,
+c0e0da5980ff516d,unavailable,,1,walla,,2,,,,,,
+3efc1e4e983b14b3,unavailable,,1,maariv,,2,,,,,,
+e8643b19a36cc0f5,unavailable,,1,al_jazeera,,2,,,,,,
+a40d2054b4a2ff80,unavailable,,1,sky_news_arabia,,2,,,,,,
+1249f99d884219bf,irrelevant,,1,maariv,groq,2,,,,,,
+1d3b1101af8802fd,sent,,1,aawsat,groq,2,economy,unconfirmed,1,11.784,افزایش شاخص سهام اروپا به دلیل بهبود میل به ریسک و کاهش قیمت نفت,سهام اروپایی در روز چهارشنبه به دلیل بهبود میل به ریسک و کاهش قیمت نفت خام افزایش یافت. موج فروش اوراق قرضه جهانی نیز متوقف شد.
+81fb9976f275ac55,sent_followup,band=mid sim=0.65 score=12.75 kept=above_floor prior=91bcb75c,1,maariv,groq,2,military,unconfirmed,1,12.747,حذف تروریست حماسی که در ۷ اکتبر به گذرگاه عرز حمله کرد,ارتش اسرائیل اعلام کرد تروریستی از حماس که در حمله ۷ اکتبر به گذرگاه عرز نفوذ کرده بود را حذف کرده است. این عملیات در راستای پاکسازی مناطق مرزی انجام شد.
+cdb333ae7e02a64d,irrelevant,,1,maariv,groq,2,,,,,,
+0448869d24984956,irrelevant,,1,naval_news,groq,2,,,,,,
+fcf9eacf381939f6,unparseable,,1,maariv,groq,2,,,,,,
+0c34785645f27792,unparseable,,1,bbc_en,groq,2,,,,,,
+1a7f2afaccb58fca,unparseable,,1,maariv,groq,2,,,,,,
+0307022d39a47b9f,unparseable,,1,al_jazeera,groq,2,,,,,,
+e33be1b262615607,unparseable,,1,bbc_en,groq,2,,,,,,
+d53db75798d0488a,irrelevant,,1,ajar,groq,2,,,,,,
+1dae183f4dab5647,irrelevant,,1,ajar,groq,2,,,,,,
+a549425179e5939e,irrelevant,,1,ajar,groq,2,,,,,,
+7081e04b9a1d02bf,clickbait,,1,ajar,groq,2,,,,,,
+d5bb7e1144a7ccb7,irrelevant,,1,osint613_a,groq,3,,,,,,
+fc3f2dff1bf15f0f,irrelevant,,3,tg_esellco|tg_fighter_radar|tg_padeshah_fxn,groq,3,,,,,,
+c341b754bebd2550,repeat_dropped,band=mid sim=0.60 score=6.80 blocked=below_floor prior=77e0cae5,1,tg_wfwitness,groq,3,security,rumour,0,6.804,درگیری بین نیروهای امنیتی و معترضان در بیروت رخ داد,درگیری‌هایی بین نیروهای امنیتی لبنان و اعضای انجمن صدای سپرده‌گذاران در مقابل بانک بیروت صورت گرفت. این معترضان از حقوق سپرده‌گذارانی که در بحران اقتصادی ۲۰۱۹ سرمایه خود را از دست داده‌اند دفاع می‌کنند.
+c1d12b384e49c500,irrelevant,,1,osint613_a,groq,3,,,,,,
+e2a086a6129d7671,irrelevant,,1,tg_entekhab,groq,3,,,,,,
+fa3f8e40ab1cb4a9,irrelevant,,1,tg_wfwitness,groq,3,,,,,,
+f9bfb333646d8a50,irrelevant,,1,osint613_a,groq,3,,,,,,
+8800dae1a9333283,lead_only,,1,tg_padeshah_fxn,groq,3,military,unconfirmed,0,9.000,حرکت ۱۶ فروند جنگنده F-16 از پرتغال به سمت خاورمیانه,بر اساس گزارش‌های شبکه‌های اجتماعی، ۱۶ فروند جنگنده F-16 همراه با دو هواپیمای سوخت‌رسان KC-46 از غرب پرتغال به مقصد خاورمیانه حرکت کرده‌اند. جزئیات بیشتر درباره مقصد دقیق یا دستور مأموریت این نیروها در متن ارائه نشده است.
+94e1e32e138d3ca6,lead_only,,1,tg_irane_azad_news,groq,3,economy,unconfirmed,0,7.921,صرافی رمزارز کوینکس فعالیت خود را پس از ۹ سال متوقف کرد,صرافی CoinEx اعلام کرد به دلیل رکود بازار و افزایش هزینه‌های نظارتی، فعالیت خود را متوقف می‌کند. معاملات اسپات از ۲۹ سپتامبر متوقف شده و کاربران تا ۱ دی فرصت برداشت دارایی‌ها را دارند.
+c6649129f4552b26,clickbait,,1,tg_irane_azad_news,groq,3,,,,,,
+bf57c0dc9dc6e255,clickbait,,1,tg_padeshah_fxn,groq,3,,,,,,

@@ -1,0 +1,41 @@
+﻿cluster_key,fate,reason,n_members,sources,provider,best_tier,category,claim_status,independent_count,score,headline,summary
+713a3697b513cc65,repeat_dropped,,3,al_monitor|france24|sky_news_arabia,groq,2,,,,,,
+28f130d2de5b7f86,repeat_dropped,,9,al_manar|france24|mee|osint613_a|tg_fighter_radar,groq,2,,,,,,
+99efac6bcbf3b7a3,sent,,9,maariv|sky_news_arabia|tg_geopolitics_prime|tg_geopwatch|tg_minas_tirith|tg_tabzlive|the_war_zone,groq,2,military,likely,3,17.779,پهپاد روسی به مقر سازمان امنیت اوکراین در کیف حمله کرد,ولودیمیر زلنسکی تأیید کرد که پهپاد هدف دفتر رئیس SBU بوده است، اما او در آن لحظه حضور نداشت و تلفاتی گزارش نشده است.
+5704e66d1f32cc58,fatal,,16,al_manar|maariv|mehr|osint613_a|tg_esellco|tg_geopwatch|tg_irane_azad_news|tg_iranian_militarism|tg_minas_tirith|tg_padeshah_fxn|tg_tabzlive|tg_wfwitness|walla,bai_deepseek,2,,,,,,
+00f5b279ef43301c,fatal,,42,maariv|osint613_a|tg_fighter_radar|tg_geopwatch|tg_irane_azad_news|tg_iranian_militarism|tg_mes|tg_padeshah_fxn|tg_rnintel|tg_tabzlive|tg_vahid_online|tg_vira_university|tg_wfwitness,bai_deepseek,2,,,,,,
+7d6d6f9281227b6c,sent,,6,al_monitor|osint613_a|reuters_gnews|sky_news_arabia|tg_vahid_online|tg_vira_university,gemini,2,politics,likely,3,14.468,چهار کشور غربی خواستار ارجاع پرونده هسته‌ای ایران به شورای امنیت سازمان ملل شدند.,این قطعنامه پیشنهادی به دلیل ادعای نقض تعهدات پادمانی و عدم همکاری تهران با آژانس تدوین شده و مذاکرات درباره متن نهایی ادامه دارد. در صورت تصویب شورای حکام، این اقدام نخستین ارجاع پرونده ایران به شورای امنیت طی ۲۰ سال گذشته خواهد بود.
+2576a2e2e49f1993,sent,,1,al_monitor,gemini,2,military,unconfirmed,1,12.938,کشته شدن بیش از ۱۲۰ نفر در درگیری‌های حوثی‌ها در نزدیکی تنگه باب‌المندب,نیروهای حوثی یمن حملات زمینی، موشکی و پهپادی را برای تسلط بر مناطق ساحلی ورودی دریای سرخ آغاز کرده‌اند.
+8dc194c9e80c2e56,irrelevant,,4,ajar|bbc_en|tg_wfwitness,bai,2,,,,,,
+c1f2514afb307cb0,repeat_dropped,,12,maariv|tg_fighter_radar|tg_geopwatch|tg_iranian_militarism|tg_padeshah_fxn|tg_tabzlive|tg_wfwitness,groq,2,,,,,,
+41a1bea0e5bb7160,sent,,7,al_jazeera|al_manar|ap_gnews|osint613_a|tg_geopwatch|tg_wfwitness,groq,2,politics,likely,2,12.486,اسرائیل پنج زندانی لبنانی را در چارچوب مذاکرات میانجی‌گری‌شده توسط آمریکا آزاد کرد,این آزادسازی در ازای دریافت رفات رهبران یهودی از جنگ داخلی لبنان انجام شد و رئیس‌جمهور لبنان از تلاش‌های آمریکا قدردانی کرد.
+a41f25521c925ac1,sent,,1,aviationist,groq,2,military,unconfirmed,1,12.877,هشت فروند جنگنده F-35A گارد ملی ورمونت از عملیات در خاورمیانه به بریتانیا بازگشتند,این هواپیماها در دو گروه به پایگاه هوایی لیکنیت رسیدند و در حال بازگشت به ایالات متحده هستند.
+2d3122ef17e1bbba,irrelevant,,1,bbc_en,bai,2,,,,,,
+05bdb61b9b79557c,repeat_dropped,,5,bbc_en|sky_news_arabia|tg_geopwatch|tg_wfwitness,groq,2,,,,,,
+20c36841453400d3,sent,,1,aawsat,groq,2,economy,unconfirmed,1,8.863,دولت ایران تأیید کرد که تحریم‌ها و جنگ فشار اقتصادی را افزایش داده‌اند,ریال ایران به رکورد تاریخی سقوط رسیده و دولت اذعان می‌کند که معیشت مردم تحت تأثیر شدید این عوامل قرار دارد.
+b6691382c4095262,clickbait,,1,maariv,groq,2,,,,,,
+6391a7f0bd36e884,repeat_dropped,,2,ajar|tg_fighter_radar,groq,2,,,,,,
+f7691aa6a5333853,sent,,16,ajar|tg_fighter_radar|tg_irane_azad_news|tg_minas_tirith|tg_padeshah_fxn|tg_vahid_online,groq,2,military,unconfirmed,1,13.847,گزارش‌های غیررسمی از شلیک موشک بالستیک از اصفهان و رهگیری در آسمان اردن,کانال‌های تلگرامی از شلیک موشک بالستیک از پادگان ۱۵ خرداد اصفهان و موشک کروز از سیریک خبر دادند؛ همچنین از رهگیری هدفی در آسمان اردن گزارش شده است. این ادعاها تاکنون توسط منابع رسمی تأیید نشده‌اند.
+a493013b0ee41107,fatal,,6,mehr|osint613_a|tg_irane_azad_news|tg_mes|tg_tabzlive|tg_vahid_online,openrouter,2,,,,,,
+29b3eadd3e1fd123,sent,,1,mee,groq,2,economy,unconfirmed,1,8.813,مایکروسافت در سال اول جنگ غزه قرارداد ۱۲۵ میلیون دلاری با اسرائیل امضا کرد,اسناد منتشرشده در وب‌سایت وزارت دارایی اسرائیل نشان می‌دهد که این قرارداد در گزارش اجرای بودجه سال ۲۰۲۴ ثبت شده است.
+036e10039bf83ca6,rank_dropped,,1,walla,groq,2,other,unconfirmed,1,6.812,مدیر اداره آب اسرائیل از آمادگی سیستم در بحران اخیر دفاع کرد,یچزکال لیپشیتز با رد ادعای بی‌آمادگی، به خود نمره ۸ داد و تأکید کرد که عدم احساس عمیق مردم از بحران، نشانه‌ی استحکام زیرساخت‌های آبی است.
+5a25b678f29c3a5e,sent,,11,ajar|al_monitor|ap_gnews|mee|osint613_a|reuters_gnews|sky_news_arabia|tg_irane_azad_news|tg_mes|tg_vahid_online,groq,2,economy,likely,5,13.810,واشنگتن بانک گلدن گلوبال ترکیه را به دلیل ارتباط با سپاه تحریم کرد,وزارت خزانه‌داری آمریکا سه نهاد مالی استانبولی را به تسهیل ده‌ها میلیون دلار تراکنش برای سپاه پاسداران متهم کرد. این اقدام بخشی از عملیات «طرد اقتصادی» برای افزایش فشار بر تهران است.
+ba8c8693bb30f658,sent,,1,haaretz,groq,2,security,unconfirmed,1,10.771,چهار کشته در درگیری‌های انتقامی بین دو خانواده در شهر النزه,ساکنان گزارش می‌دهند که فراخوان‌های انتقام در شبکه‌های اجتماعی بین طرفین اختلاف پخش شده و نگرانی از تشدید خشونت‌ها در شهر وجود دارد.
+a367878a948dacd7,irrelevant,,1,al_jazeera,groq,2,,,,,,
+89d3a45ed3aeedb9,sent,,1,tehran_times,groq,2,politics,unconfirmed,1,9.762,چین از تأیید بیانیه مشترک گروه ۲۰ درباره تنگه هرمز خودداری کرد,کشورهای عضو گروه ۲۰ بر ضرورت ناوبری امن و آزاد در تنگه هرمز تأکید کردند، اما پکن از حمایت از این موضع خودداری کرد که اختلافات ژئوپلیتیکی را آشکار ساخت.
+33922eb3ef9b23fc,clickbait,,1,tehran_times,groq,2,,,,,,
+4792a7483d5bc64b,sent,,3,tehran_times|tg_defenderdome,bai,2,military,unconfirmed,1,12.960,دولت کره جنوبی گزینه‌های نظامی برای تنگه هرمز را بررسی می‌کند,این اقدام هنوز به تصویب پارلمان نیاز دارد. منابع محلی دارایی‌های احتمالی را سامانه‌های مین‌یابی و مین‌روبی، هواپیماهای گشتی و کشتی‌های پشتیبانی می‌دانند.
+e0a7cdf6b2d928d4,repeat_dropped,,6,ajar|iran_international|mee|osint613_a|tehran_times,groq,2,,,,,,
+266e042dc1687e24,repeat_dropped,,2,irna|tehran_times,groq,2,,,,,,
+354395b2bf932a56,sent,,1,tehran_times,groq,2,military,unconfirmed,1,12.746,شش نیروی دریایی ایران در حملات آمریکا به جنوب کشور کشته شدند,خبرگزاری تسنیم اعلام کرد که این حملات دو شب پیش به اهدافی در جنوب ایران انجام شده است.
+29774716e9b52d7d,fatal,,1,tehran_times,openrouter,2,,,,,,
+21b13f6337a02c5a,sent,,1,tehran_times,groq,2,military,unconfirmed,1,12.740,فرمانده پدافند هوای ایران از موفقیت سامانه‌های بومی در نبرد اخیر خبر داد,او اعلام کرد نیروهای ایرانی در حین درگیری، سامانه‌های پدافند هوای داخلی را توسعه و ارتقا دادند و برتری تکنولوژیک دشمن نتوانست از سقوط هواپیماها جلوگیری کند.
+6fc664c181d01e4e,clickbait,,1,tehran_times,groq,2,,,,,,
+edb4bffcf2bf6051,repeat_dropped,,1,tehran_times,groq,2,,,,,,
+adb8f9278b3819f1,sent,,1,tehran_times,groq,2,politics,unconfirmed,1,9.732,بن‌گور طرح هفت‌ساله برای تخلیه نوار غزه را منتشر کرد,وزیر امنیت ملی اسرائیل برنامه‌ای رسمی برای خروج ۱.۸۶ میلیون فلسطینی از غزه ارائه داد که هدف نهایی جنگ را مشخص می‌کند.
+1dca5ecef0f2c29e,irrelevant,,1,tehran_times,groq,2,,,,,,
+6de5a24612b44e8e,repeat_dropped,,1,sky_news_arabia,groq,2,,,,,,
+76bb37e7a99fe5cb,irrelevant,,1,tehran_times,groq,2,,,,,,
+96c98069bdb6d35a,irrelevant,,1,tehran_times,groq,2,,,,,,
+0a843deee01fc46b,irrelevant,,2,tehran_times,groq,2,,,,,,
+4d47cfe77ea9b859,relevance_dropped,,1,al_jazeera,bai,2,economy,unconfirmed,1,8.692,آمریکا در آگوست ۱۶۲ هزار شغل جدید ایجاد کرد,این آمار انتظارات افزایش نرخ بهره فدرال رزرو را بالا برد؛ نرخ بیکاری ثابت ماند و مدارس دولتی و خدمات غذایی بیشترین سهم را داشتند.

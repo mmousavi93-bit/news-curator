@@ -1,0 +1,14 @@
+﻿cluster_key,fate,reason,n_members,sources,best_tier,category,claim_status,independent_count,score,headline,summary
+d355a81c1124f771,repeat_dropped,,2,ap_gnews|tg_geopolitics_prime,2,,,,,,
+704439145fb1e5b3,irrelevant,,1,sky_news_arabia,2,,,,,,
+0a5fca67669c3099,sent,,2,al_manar|walla,2,politics,unconfirmed,1,10.090,اسپانیا اسرائیل و روسیه را به نشر اطلاعات نادرست در بحران سبته متهم کرد.,پدرو سانچز، نخست‌وزیر اسپانیا، مدعی شد شبکه‌های وابسته به این دو کشور برای تضعیف مادرید به بحران مهاجرت دامن زده‌اند. او افزود بیش از ۹۰ درصد مهاجران واردشده به این منطقه به مراکش بازگردانده شده‌اند.
+d49662a166a5de5a,irrelevant,,2,maariv,2,,,,,,
+b30321bd0bce7fe0,irrelevant,,1,walla,2,,,,,,
+87e55d07885e4706,clickbait,,1,ajar,2,,,,,,
+3a260592c1045fa1,irrelevant,,1,ajar,2,,,,,,
+142f2da27f06167f,irrelevant,,1,ap_gnews,2,,,,,,
+49d986b48bbd6fc2,repeat_dropped,,2,osint613_a|tg_wfwitness,3,,,,,,
+5c398730b0f27966,repeat_dropped,,2,al_manar,3,,,,,,
+e4cc7f1365929e8c,relevance_dropped,,1,al_manar,3,politics,rumour,0,5.977,بزشکیان برای شرکت در نشست‌های سازمان شانگهای به قرقیزستان سفر کرد,این سفر دو روزه با هدف شرکت در قمت‌های رؤسا و برگزاری مذاکرات دوجانبه با سایر رهبران انجام می‌شود.
+3e4d1acbc4735a4d,sent,,2,osint613_a|tg_behold_israel,3,military,rumour,0,9.071,اسرائیل و یونان قرارداد دفاعی ۳.۶ میلیارد دلاری امضا کردند,این توافق شامل ساخت سامانه پدافند هوایی چندلایه «تقویر آکلیس» با استفاده از سیستم‌های دیویدز اسلینگ و اسپایدر است که بزرگ‌ترین صادرات دفاعی تاریخ اسرائیل محسوب می‌شود.
+7764ac70e1438872,clickbait,,2,tg_fighter_radar,3,,,,,,

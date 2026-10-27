@@ -1,0 +1,2 @@
+﻿run_at_utc,daily_digest,items,clusters,events,sent,lang_drops,rank_dropped,repeat_dropped,lead_events,llm_failed,messages,deliver,calls_gemini,fails_gemini,calls_groq,fails_groq
+2026-09-16T23:13:30.406638+00:00,0,329,55,19,17,0,2,25,0,0,2,2,2,2,18,8

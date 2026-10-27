@@ -1,0 +1,55 @@
+﻿cluster_key,fate,reason,n_members,sources,provider,best_tier,category,significance,claim_status,independent_count,score,headline,summary
+5345df5a78a99e67,relevance_dropped,band=mid sim=0.70 score=15.29 kept=above_floor prior=6d642455,4,ajar|al_monitor|mee|tg_tabzlive,groq2,2,security,none,likely,3,15.288,هشدار سازمان ملل از آوارگی ۲۳۰ هزار یمنی در صورت ادامه درگیری‌ها,سازمان ملل متحد هشدار داد که تشدید درگیری‌ها در یمن می‌تواند منجر به آوارگی ۲۳۰ هزار نفر شود. تاکنون بیش از ۱۳۰ هزار نفر در اثر حملات هوایی و درگیری‌های اخیر جابه‌جا شده‌اند.
+de6786a0aee814b8,sent_followup,band=mid sim=0.67 score=20.30 kept=above_floor prior=8bcc3fb3,4,al_monitor|osint613_a|sky_news_arabia|tg_tabzlive,groq2,2,politics,escalation,likely,2,20.297,ایران پیشنهاد بازگشایی تنگه هرمز در صورت کاهش فشار نظامی آمریکا,یک مقام ارشد ایرانی اعلام کرد تهران آماده است تنگه هرمز را ظرف هفت روز بازگشایی کند، مشروط به کاهش فشار نظامی و رفع محاصره بنادر توسط آمریکا. این پیشنهاد از طریق میانجی‌ها به واشنگتن ابلاغ شده است.
+9b9553a647b7efc9,sent_followup,band=mid sim=0.60 score=20.79 kept=above_floor prior=97ac1280,9,al_manar|mehr|tg_entekhab|tg_fighter_radar|tg_irane_azad_news|tg_tsepress|walla,groq2,2,politics,escalation,likely,2,20.794,مذاکرات ایران و آمریکا برای پایان درگیری از طریق میانجی‌ها در نیویورک,مقامات ایرانی تأیید کردند که هیئت مذاکره‌کننده با اختیارات کامل در نیویورک حضور دارد تا جزئیات توافق را بررسی کند. این مذاکرات در حاشیه نشست سازمان ملل و از طریق میانجی‌ها انجام می‌شود.
+4e86e20edb8db52b,sent_followup,band=mid sim=0.57 score=17.79 kept=above_floor prior=26f38a7b,9,al_monitor|osint613_a|sky_news_arabia|tg_defenderdome|tg_entekhab|tg_padeshah_fxn|tg_rnintel|tg_tabzlive|tg_wfwitness,groq2,2,economy,economy,likely,2,17.788,ازسرگیری فعالیت خط لوله نفت شرق-غرب عربستان و صادرات از ینبع,عربستان سعودی فعالیت خط لوله نفت شرق-غرب را پس از حملات پهپادی از سر گرفت و صادرات از بندر ینبع را آغاز کرد. این اقدام پس از قطع جریان ۴ تا ۵ میلیون بشکه نفت در روز انجام شده است.
+f917ab2272a7e9f4,repeat_dropped,band=high sim=0.86 score=15.03 blocked=no_development prior=4555708a,2,aawsat|mehr,groq2,2,politics,economy,likely,2,15.032,چین مخالفت خود را با تحریم‌های آمریکا علیه ایرلاین‌های ایران اعلام کرد,پکن اعلام کرد تحریم‌های وزارت خزانه‌داری آمریکا علیه شرکت‌های هواپیمایی ایران غیرقانونی است. این واکنش یک روز پس از تهدید اسکات بسنت، وزیر خزانه‌داری آمریکا، صورت گرفت.
+c33804823a1e3880,lang_dropped,,7,ajar|sky_news_arabia|tg_entekhab|tg_fighter_radar,groq2,2,military,balance,likely,2,20.524,گسترش جبهه‌های نبرد در یمن و هشدارهای متقابل مقامات ایران و اسرائیل,جبهه‌های جنگ در یمن از مأرب تا تعز و صعدة گسترش یافته و درگیری بر سر تنگه باب‌المندب تشدید شده است. همزمان، قالی‌باف بر قدرت بازدارندگی موشکی ایران تأکید کرد و کاتز، وزیر دفاع اسرائیل، در صورت گروگان‌گیری، تخریب کامل غزه را تهدید کرد.
+1db3accb9b322d67,sent_followup,band=mid sim=0.72 score=17.29 kept=above_floor prior=cbac4fc8,5,ajar|al_manar|tg_wfwitness|walla,groq2,2,politics,balance,likely,2,17.285,ورود هیئت ایران به نیویورک با اختیار کامل برای احیای دیپلماسی,هیئت ایرانی به ریاست بزشکیان با محدودیت‌های امنیتی وارد نیویورک شد و مقامات اعلام کردند این هیئت اختیار کامل برای مذاکره و احیای دیپلماسی با آمریکا را دارد. منابع می‌گویند ترامپ تمایل به دیدار با بزشکیان دارد و پیشنهاد ایران برای بازگشایی تنگه هرمز از طریق میانجی‌ها ارائه شده است.
+abc69b95c007b931,sent_followup,band=mid sim=0.77 score=15.19 kept=above_floor prior=2314bba2,3,al_monitor|osint613_a|tg_wfwitness,groq2,2,politics,balance,unconfirmed,1,15.188,چین قصد دارد در دیدار با ترامپ توقف فروش تسلیحات به تایوان را خواستار شود,شی جین‌پینگ در دیدار با ترامپ در واشنگتن، توقف فروش تسلیحات به تایوان بر اساس بیانیه مشترک ۱۹۸۲ را خواستار خواهد شد. پکن همچنین از آمریکا خواسته است تحویل تسلیحات سفارش‌داده‌شده را متوقف کند و در ازای آن پیشنهاد کمک برای فشار بر ایران را داده است.
+f3fbcddb160bcba0,relevance_dropped,,1,al_monitor,groq2,2,politics,none,unconfirmed,1,9.988,کرملین: شورای امنیت باید اعضای دائم جدید داشته باشد و حق وتو باقی بماند,کرملین در پاسخ به پیشنهاد اردوغان برای حذف حق وتو، اعلام کرد که شورای امنیت باید اعضای دائم جدیدی داشته باشد اما سیستم حق وتو فعلی حفظ شود. این موضع روسیه در واکنش به بحث‌های اخیر درباره اصلاح ساختار سازمان ملل بیان شد.
+3ad18ce5a019f86e,repeat_dropped,band=mid sim=0.63 score=10.05 blocked=below_floor prior=57af6491,2,irna|tg_wfwitness,groq2,2,politics,none,unconfirmed,1,10.052,وزیر خارجه ایران: واشنگتن باید از زنجیرهای اسرائیل رها شود,عباس عراقچی در واکنش به مقالات انتقادی از سیاست آمریکا، خواستار رهایی واشنگتن از وابستگی به اسرائیل شد. همزمان، یک نماینده کنگره آمریکا از توقف حملات هوایی اسرائیل به سوریه حمایت کرد و آن را عامل بی‌ثبات‌کننده منطقه دانست.
+a6c42aa7bc90aca7,sent_followup,band=high sim=0.84 score=15.13 kept=development prior=8991c3e9,3,mee|osint613_a|tg_tabzlive,groq,2,economy,economy,unconfirmed,1,15.128,لغو پروازهای ترکیه به ایران و ادامه فعالیت ایرلاین‌های ایرانی,شرکت‌های هواپیمایی ترکیه به دلیل تحریم‌های ثانویه آمریکا پروازهای خود به ایران را لغو کرده‌اند. در مقابل، سازمان هواپیمایی کشوری ایران اعلام کرد پروازهای خارجی ایرلاین‌های ایرانی طبق برنامه ادامه دارد و لغو نشده است.
+3b1247143ea058eb,clickbait,,1,al_jazeera,groq,2,,,,,,,
+447a6583d6f27b13,sent_followup,band=high sim=0.84 score=17.91 kept=development prior=bfceb674,1,mee,groq,2,military,balance,unconfirmed,1,17.910,بریتانیا به عربستان کمک نظامی برای مقابله با هوثیان در یمن می‌دهد,وزیر دفاع بریتانیا، لوک پولارد، اعلام کرد که بریتانیا به عربستان کمک نظامی برای مقابله با پیشروی هوثیان در یمن و حملات آن‌ها به خاک عربستان خواهد داد. این کمک‌ها مطابق با قوانین بین‌المللی حقوق بشری خواهد بود. هیچ اطلاعاتی مبنی بر نوع یا حجم دقیق کمک‌ها منتشر نشده است.
+fd9f9dd52a632844,repeat_dropped,band=mid sim=0.65 score=13.10 blocked=below_floor prior=ade69318,3,al_manar|walla,groq,2,military,none,unconfirmed,1,13.098,تصعيد إسرائيلي في الضفة الغربية ودعوات لتهجير الفلسطينيين,تصاعدت الاعتداءات الإسرائيلية في الضفة الغربية مع دعوات رسمية لتدمير منازل الفلسطينيين وتهجيرهم. في غزة، ألقى جيش الاحتلال قنابل في محيط الشجاعية بالتزامن مع إطلاق نار.
+01db457d10936ec8,irrelevant,,1,walla,groq,2,,,,,,,
+04d5988de6978646,irrelevant,,1,irna,mistral,2,,,,,,,
+d4494a2f23752697,irrelevant,,1,tehran_times,mistral,2,,,,,,,
+1b6694c5c16c7f92,oversized,,2,haaretz,mistral,2,,,,,,,
+70c4805adca2683c,irrelevant,,3,tg_fighter_radar|tg_tweet_mardomi,mistral,3,,,,,,,
+9c109c3a87c2787f,repeat_dropped,band=mid sim=0.71 score=11.08 blocked=below_floor prior=71c1b6d1,2,tg_tsepress,mistral,3,economy,economy,rumour,0,11.078,قیمت نفت برنت به زیر ۹۸ دلار کاهش یافت,قیمت نفت برنت در بازار جهانی به زیر ۹۸ دلار کاهش یافت. این کاهش ممکن است بر قیمت‌های جهانی نفت و هزینه‌های واردات ایران تأثیر بگذارد. این موضوع بر اقتصاد ایران و قیمت‌های داخلی سوخت و کالاها تأثیر می‌گذارد.
+2e8a02af4b9d1354,repeat_dropped,band=mid sim=0.56 score=10.94 blocked=below_floor prior=36676aeb,1,tg_tsepress,mistral,3,economy,economy,rumour,0,10.944,مبلغ معاملات خرد بازار امروز به ۳۷۸۸۹ میلیارد تومان رسید.,ارزش معاملات خرد در بازار بورس تهران امروز به ۳۷۸۸۹ میلیارد تومان رسید. این داده توسط پارسین گزارش شده است و هیچ اختلافی در منابع موجود نیست. این رقم نشان‌دهنده فعالیت بازار در روزهای اخیر است که ممکن است بر قیمت‌ها و روانه بازار تأثیر بگذارد.
+452c88f4ce8a916d,irrelevant,,1,al_manar,mistral,3,,,,,,,
+1b5c59213b2b07c1,relevance_dropped,,2,tg_iranian_militarism,mistral,3,military,none,rumour,0,8.949,ف-۳۵ از رادار SAR برای شناسایی سامانه‌های پدافندی استفاده می‌کند.,رادار APG-81 ف-۳۵ با استفاده از تکنولوژی SAR می‌تواند تصاویر با تفکیک بالا از سامانه‌های پدافندی تولید کند. این روش به شناسایی دقیق مختصات رادارها و تجهیزات همراه با آن کمک می‌کند، به‌ویژه در شرایط محدودیت‌های اپتیکی. این قابلیت بخشی از سیستم‌های حسگری متکامل ف-۳۵ است که از داده‌های مختلف برای افزایش دقت استفاده می‌کند.
+f37c25087a196bff,oversized,,1,tg_wfwitness,mistral,3,,,,,,,
+2549cd48d18421fc,irrelevant,,2,tg_tabzlive|tg_wfwitness,mistral,3,,,,,,,
+dbc6d191659df1a8,irrelevant,,1,osint613_a,mistral,3,,,,,,,
+744637a74f4282ce,sent,,1,tg_fighter_radar,mistral,3,military,balance,rumour,0,13.743,رژیم اسرائیل پیشنهاد بازکردن تنگه هرمز را با کاهش فشار آمریکا مرتبط کرد.,یک مسئول رژیم اسرائیل به خبرگزاری کیودو ژاپن گفت که در صورت کاهش فشار آمریکا، تنگه هرمز را در هفت روز باز خواهد کرد. این اظهارنظر بدون تأیید رسمی و با توجه به اختلافات پیشین، باید با احتیاط بررسی شود. این موضوع ممکن است بر امنیت کشتی‌های تجاری و نفت‌کش‌ها در منطقه تأثیر بگذارد.
+b2a8ea54aeb6d778,oversized,,1,maariv,mistral,2,,,,,,,
+f0494eb96c9e13a2,oversized,,1,maariv,mistral,2,,,,,,,
+d86eb165debaa551,oversized,,1,bbc_en,mistral,2,,,,,,,
+24d71c2dae980281,irrelevant,,1,bbc_en,groq,2,,,,,,,
+9f4323b208aa0e72,irrelevant,,1,maariv,groq,2,,,,,,,
+efc3e965b0631cad,irrelevant,,1,maariv,groq,2,,,,,,,
+ee9d5c7d92ea54d8,irrelevant,,1,sky_news_arabia,groq,2,,,,,,,
+ecf82d933e28e2d0,clickbait,,1,maariv,groq,2,,,,,,,
+6c7f7c560ec25564,irrelevant,,1,maariv,groq,2,,,,,,,
+438eb4dffa0d7760,irrelevant,,1,maariv,groq,2,,,,,,,
+b82ff6649bb98814,irrelevant,,1,bbc_en,groq,2,,,,,,,
+55f31c4526639852,clickbait,,1,ajar,groq,2,,,,,,,
+c6abdade93ee9b4d,irrelevant,,1,ajar,groq,2,,,,,,,
+6bf3e1dd3e88d68a,irrelevant,,1,ajar,mistral,2,,,,,,,
+44be798dcbf0d3c8,irrelevant,,1,ajar,mistral,2,,,,,,,
+3f2c18898c5e4148,irrelevant,,1,bbc_en,mistral,2,,,,,,,
+86519f20985581d8,lang_dropped,,2,al_manar,mistral,3,military,balance,rumour,0,14.071,قصف مدافعی و حرائق در منطقه مرج الخيام در غزه گزارش شد.,منبع المنار گزارش داد که در منطقه المنصوری و صربین در غزه، قصف مدافعی و حرائق رخ داده است. این گزارش شامل عملیات تمشیت و حرائق در مرج الخيام است. این موضوع ممکن است به افزایش تنش در غزه منجر شود.
+4d4815ef7bb9e790,sent,,1,tg_wfwitness,mistral,3,security,balance,rumour,0,11.963,وزیر داخلی لهستان از آماده‌سازی سریع مرزها پس از حمله درون‌ها خبر داد.,وزیر داخلی لهستان گفت که پس از حمله‌های درون، شش گذرگاه مرزی در کمتر از ۲۴ ساعت آماده‌سازی شد و نیروهای نظامی در آن‌ها مستقر شدند. این اقدام در همکاری با مرزبانی انجام شده است. این موضوع به امنیت مرزهای لهستان و احتمالاً به همکاری‌های نظامی منطقه‌ای مربوط می‌شود.
+9dbacce1d2637925,oversized,,1,tg_rnintel,mistral,3,,,,,,,
+ac361f3e1caeaf09,relevance_dropped,,1,al_manar,mistral,3,military,none,rumour,0,8.938,حرکت تانک‌های مرکاوا به سمت منطقه الحامام در حومه خیام,تانک‌های اسرائیلی به سمت منطقه الحامام در اطراف شهر خیام حرکت کرده‌اند. این حرکت همزمان با عملیات جستجو و پاکسازی در آن منطقه صورت گرفته است.
+d1d6ce01ca28e8d0,clickbait,,1,tg_wfwitness,mistral,3,,,,,,,
+8e15fbc97b2d01d1,relevance_dropped,,1,tg_wfwitness,mistral,3,economy,none,rumour,0,7.878,تورکیه و آمریکا توافقنامه‌ای برای توسعه رآکتورهای هسته‌ای کوچک امضا کردند.,شرکت انرژی هسته‌ای ترکیه و آژانس توسعه تجارت آمریکا توافقنامه‌ای برای همکاری در زمینه رآکتورهای هسته‌ای کوچک و نسل چهارم امضا کردند. این توافقنامه به ترکیه امکان ارزیابی امکانات تجاری برای نصب این رآکتورها را می‌دهد، اما هیچ اطلاعاتی در مورد تأثیرات امنیتی یا نظامی منطقه‌ای ارائه نمی‌دهد.
+72727232ff1c6960,irrelevant,,2,tg_tabzlive|tg_wfwitness,mistral,3,,,,,,,
+28ee3769b8359a21,irrelevant,,1,osint613_a,groq2,3,,,,,,,
+91921a868d7af249,irrelevant,,1,tg_militarywave,groq2,3,,,,,,,
+d71af21665582bf5,irrelevant,,1,tg_wfwitness,groq2,3,,,,,,,
+a7aed811377651d6,clickbait,,1,tg_padeshah_fxn,groq2,3,,,,,,,

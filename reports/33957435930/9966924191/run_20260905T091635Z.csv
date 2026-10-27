@@ -1,0 +1,2 @@
+﻿run_at_utc,daily_digest,items,clusters,events,sent,lang_drops,rank_dropped,repeat_dropped,lead_events,llm_failed,messages,deliver,calls_bai,fails_bai,calls_bai_deepseek,fails_bai_deepseek,calls_gemini,fails_gemini,calls_groq,fails_groq,calls_openrouter,fails_openrouter
+2026-09-05T09:16:35.939699+00:00,1,355,40,10,8,1,0,8,0,0,1,1,2,2,2,2,2,2,62,31,2,2

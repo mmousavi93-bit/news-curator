@@ -1,0 +1,20 @@
+﻿cluster_key,fate,reason,n_members,sources,provider,best_tier,category,claim_status,independent_count,score,headline,summary
+efe8738d5bafc951,irrelevant,,1,haaretz,groq,2,,,,,,
+c0dea809d392526a,repeat_dropped,band=mid sim=0.78 score=9.96 blocked=below_floor prior=73506c77,1,mehr,groq,2,politics,unconfirmed,1,9.965,پزشکیان: ایران در صورت قصد ساخت سلاح هسته‌ای به NPT نمی‌پیوست,مسعود پزشکیان، رئیس‌جمهور ایران، ادعاهای ایالات متحده مبنی بر تلاش ایران برای توسعه سلاح هسته‌ای را رد کرد. او بر تعهد جمهوری اسلامی به معاهده عدم گسترش سلاح‌های هسته‌ای (NPT) تأکید ورزید.
+66ab2b96cda8ffa4,sent_followup,band=mid sim=0.65 score=12.96 kept=above_floor prior=655669f5,1,aawsat,groq,2,military,unconfirmed,1,12.959,کوشش رهبری یمن برای جبران شکست در ساحل غربی,رهبری یمن در تلاش است تا با سازماندهی مجدد نیروها و بازیابی ابتکار عمل، از شوک شکست در ساحل غربی عبور کند. همچنین بر ادامه فعالیت نهادهای دولتی و مدیریت موج مهاجرت تأکید شده است.
+fc63eb16a6905be0,irrelevant,,1,irna,groq,2,,,,,,
+3f338d1d03e139a6,sent_followup,band=mid sim=0.72 score=12.94 kept=above_floor prior=e2a101e7,1,sky_news_arabia,groq,2,military,unconfirmed,1,12.938,تقویت مواضع حوثی‌ها در باب‌المندب با حمایت ایران و حزب‌الله,حوثی‌ها اقدام به استحکام‌سازی مواضع نظامی در تپه‌های منتهی به باب‌المندب و المخا کرده‌اند. گزارش‌ها حاکی از حضور کارشناسان سپاه پاسداران و عناصر حزب‌الله در حمله و بهره‌برداری از موشک‌ها و پهپادهاست.
+dc6cfd101c3fa4e5,irrelevant,,1,sky_news_arabia,groq,2,,,,,,
+a4794ab1a4337c16,sent_followup,band=mid sim=0.71 score=12.88 kept=above_floor prior=2e90880a,1,al_jazeera,groq,2,military,unconfirmed,1,12.876,حمله هوایی اسرائیل به غزه دو فلسطینی را کشت,حمله هوایی اسرائیل به نوار غزه منجر به کشته شدن دو فلسطینی شد. این حملات علیرغم آتش‌بس میانجی‌گری‌شده توسط ایالات متحده ادامه دارد.
+dc6c102be0b2c30a,repeat_dropped,band=mid sim=0.71 score=9.29 blocked=below_floor prior=e2a101e7,4,tg_padeshah_fxn|tg_wfwitness,groq,3,military,rumour,0,9.290,گزارش‌های تأییدنشده از حملات هوایی اسرائیل به جنوب سوریه,گزارش‌های اولیه و تأییدنشده‌ای مبنی بر حملات هوایی اسرائیل به جنوب سوریه و پرواز جنگنده‌ها بر فراز دمشق منتشر شده است. همزمان، ویدیویی از ناو جرج واشنگتن و جنگنده‌های آمریکایی در منطقه منتشر شده که ادعای دریافت سیگنال تهدید از سوی ایران را مطرح می‌کند.
+83967560e0719ea1,repeat_dropped,band=mid sim=0.66 score=6.29 blocked=below_floor prior=2ddb887e,4,al_manar|tg_esellco|tg_fighter_radar|tg_padeshah_fxn,groq,3,politics,rumour,0,6.287,عراقچی: توافق با عمان به معنای بازگشایی تنگه هرمز نیست,عباس عراقچی، معاون سیاسی وزارت خارجه ایران، اعلام کرد که توافق اخیر با سلطنت عمان به هیچ وجه به معنای بازگشایی تنگه هرمز نیست. وی شرط بازگشایی تنگه را بازگشت آمریکا به تعهدات خود در تفاهم‌نامه اسلام‌آباد عنوان کرد.
+1a7e5eb5ac6c4a22,irrelevant,,1,tg_wfwitness,groq,3,,,,,,
+50797733ea4effe6,repeat_dropped,band=high sim=0.82 score=8.94 blocked=both prior=1554b26a,1,tg_minas_tirith,groq,3,military,rumour,0,8.942,اسرائیل تاسیسات زیرزمینی حزب‌الله در لبنان را با مواد منفجره تخریب کرد,نیروهای اسرائیلی تاسیساتی با طول تقریبی ۵.۴ کیلومتر متعلق به حزب‌الله را با استفاده از حدود ۱۱۰۰ تن مواد منفجره منهدم کردند. منابع اسرائیلی ابعاد دقیق‌تری نسبت به گزارش‌های اولیه اعلام کرده‌اند و تأکید دارند این تاسیسات دیگر قابل استفاده نیستند.
+9f910549a65d79b7,relevance_dropped,,1,walla,groq,2,politics,unconfirmed,1,9.897,کانادا و اتحادیه اروپا در حال بررسی همکاری‌های امنیتی و انرژی هستند,بر اساس گزارش وال‌استریت ژورنال، کانادا و اتحادیه اروپا در حال بررسی همکاری‌های پیشرفته در حوزه‌های انرژی، امنیت و فناوری هستند. این مذاکرات در پاسخ به تنش‌های اخیر با ایالات متحده و سیاست‌های ترامپ صورت می‌گیرد.
+a0059a51c9aa18e5,irrelevant,,1,al_jazeera,groq,2,,,,,,
+99a898ffc4f61880,irrelevant,,1,ajar,groq,2,,,,,,
+a83125d4262a24c2,irrelevant,,1,ajar,groq,2,,,,,,
+e7c4b62243f36d04,irrelevant,,8,tg_rnintel|tg_tabzlive|tg_wfwitness,groq,3,,,,,,
+f4b7802b00daae14,irrelevant,,1,tg_militarywave,groq,3,,,,,,
+26683cad55212327,clickbait,,1,tg_exciton_missile,groq,3,,,,,,
+4e0017f94f429e2d,clickbait,,1,tg_exciton_missile,groq,3,,,,,,

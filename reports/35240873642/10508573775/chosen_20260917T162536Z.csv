@@ -1,0 +1,53 @@
+﻿cluster_key,fate,reason,n_members,sources,provider,best_tier,category,claim_status,independent_count,score,headline,summary
+c26018f424d292a9,unavailable,,4,al_jazeera|ap_gnews|dw|france24,,2,,,,,,
+6058a81327988d55,unavailable,,3,maariv|mee,,2,,,,,,
+39acc46b018ce3fb,unavailable,,8,ajar|al_manar|france24|tg_entekhab|tg_fighter_radar|tg_minas_tirith|tg_tabzlive,,2,,,,,,
+c24ab9dd41e3302e,unavailable,,3,ajar|al_jazeera|al_monitor,,2,,,,,,
+03ba08c4ac7286e5,unavailable,,1,aawsat,,2,,,,,,
+943d5ffda99a9e23,repeat_dropped,band=mid sim=0.66 score=10.79 blocked=below_floor prior=49932820,9,ajar|tg_entekhab|tg_fighter_radar|tg_irane_azad_news|tg_iranian_militarism|tg_tweet_mardomi,groq,2,politics,unconfirmed,1,10.788,احضار سفیر آلمان در تهران به دلیل اعتراض به مواضع برلین,وزارت خارجه ایران سفیر آلمان را احضار کرد و مراتب اعتراض شدید خود را به مواضع مقامات آلمانی ابلاغ نمود. این اقدام در پی موضع‌گیری‌های اخیر برلین علیه ایران صورت گرفته است.
+ef1fbcc7a7bac300,sent,,4,mee|osint613_a|tg_defenderdome|tg_wfwitness,groq,2,security,unconfirmed,1,11.267,تلاش قایقی برای متوقف کردن تانکر در شرق عدن,یک تانکر در حال حرکت به سمت غرب، ۷۵ مایل دریایی شرق عدن یمن، گزارش داد که یک قایق کوچک آن را تعقیب و تلاش برای متوقف کردنش کرده است. مرکز عملیات تجاری دریایی بریتانیا (UKMTO) اعلام کرد که مقامات محلی در حال بررسی این حادثه هستند و کشتی‌ها را به احتیاط در ترانزیت توصیه کرده است.
+0b50ce0ba3836f28,clickbait,,1,aawsat,groq,2,,,,,,
+8478cd3c8f2cca8b,repeat_dropped,band=mid sim=0.72 score=9.93 blocked=below_floor prior=2d2736fd,1,mee,groq,2,politics,unconfirmed,1,9.933,بریتانیا حمایت خود از لبنان را در تماس تلفنی تأیید کرد,وزیر خارجه بریتانیا در تماسی با وزیر خارجه لبنان، حمایت «لرزان‌ناپذیر» خود را از این کشور اعلام کرد. وزیر خارجه لبنان از بریتانیا خواست برای توقف حملات اسرائیل به جنوب لبنان فشار بیاورد.
+7a14d48f0886b047,irrelevant,,1,maariv,groq,2,,,,,,
+c4519aad087a8373,sent_followup,band=mid sim=0.61 score=12.91 kept=above_floor prior=e706af16,1,walla,groq,2,military,unconfirmed,1,12.906,ارتش اسرائیل فرمانده اطلاعاتی لشکر غزه را در پی شکست‌های ۷ اکتبر برکنار کرد,رئیس اداره اطلاعات ارتش اسرائیل تصمیم به برکناری سرهنگ «الف» گرفت که در روز ۷ اکتبر به عنوان افسر اطلاعاتی لشکر غزه خدمت می‌کرد. این تصمیم به دلیل شکست‌های عملکردی او در دوره‌ای قبل از حمله اتخاذ شد و تلاش افسر برای توقف این فرآیند در دادگاه ناکام ماند.
+ed22f3ec8e7f986e,repeat_dropped,band=mid sim=0.56 score=9.90 blocked=below_floor prior=31d4e700,1,france24,groq,2,politics,unconfirmed,1,9.905,دادستان دادگاه کیفری بین‌المللی می‌گوید تحریم‌ها مانع از انجام وظیفه او نمی‌شوند,مامه مانی‌دیای نیانگ، دادستان فعلی دادگاه کیفری بین‌المللی، در گفت‌وگو با فرانس ۲۴ تأکید کرد که تحریم‌های آمریکا علیه این نهاد، که پس از صدور دستورات بازداشت برای نتانیاهو و گالانت اعمال شد، مانع از ادامه کار دادگاه نخواهد شد. او اعلام کرد که دادگاه برای پر کردن خلأ عدالت در صورت شکست سیستم‌های قضایی داخلی ضروری است.
+81fc9e7af8e206c4,sent_followup,band=mid sim=0.61 score=11.00 kept=above_floor prior=ac3682f6,2,france24|tg_irane_azad_news,groq,2,security,unconfirmed,1,11.001,امnesty ایران را به ارتکاب جنایت علیه بشریت در اعتراضات ۱۴۰۱ متهم کرد,سازمان عفو بین‌الملل ادعا می‌کند که بیش از ۵۰۰ نفر از جمله ۷۱ کودک در جریان سرکوب اعتراضات «زن، زندگی، آزادی» کشته شدند و این خشونت‌ها عمدتاً به جوامع کرد و بلوچ هدف گرفته شد. هیئت حقیقت‌یاب سازمان ملل نیز اعلام کرده که این سرکوب بزرگ‌ترین رویداد از سال ۱۳۵۸ بوده و آمار رسمی تلفات احتمالاً کمتر از واقعیت است.
+57a428c37fd15e4f,irrelevant,,1,walla,groq,2,,,,,,
+3f620d2c623e3ab8,sent_followup,band=high sim=0.85 score=12.98 kept=development prior=4b235907,2,mee|osint613_a,groq,2,military,unconfirmed,1,12.981,نیروهای یمنی مواضع و مسیرهای تأمین هouthi‌ها در تائیز و موکا را هدف قرار دادند,ارتش دولت یمن اعلام کرد که حملات هوایی به مواضع نظامی و مسیرهای تأمین هouthi‌ها در شهرهای تائیز و موکا انجام شده است. رشاد العليمی، رئیس شورای رهبری یمن، نیز تأکید کرد که نیروهای هouthi در جبهه‌های مختلف از جمله تائیز و ماریب ضربه‌های سنگینی متحمل شده‌اند.
+2e090702a786db3b,unavailable,,1,maariv,,2,,,,,,
+a770672b8c4e04c6,unavailable,,1,aviationist,,2,,,,,,
+b4ea496766d3eb09,unavailable,,1,maariv,,2,,,,,,
+eb1aaa19288cc44c,unavailable,,1,irna,,2,,,,,,
+f69b997418c7ac89,unavailable,,1,mee,,2,,,,,,
+c99b6c38243c5df5,repeat_dropped,band=mid sim=0.74 score=9.59 blocked=below_floor prior=51ec9335,1,france24,groq,2,politics,unconfirmed,1,9.585,جوزف عون در پاریس با مکرون درباره توافق امنیتی لبنان گفتگو کرد,رئیس‌جمهور لبنان در پاریس با امانوئل مکرون دیدار کرد تا حمایت بین‌المللی برای پایدارسازی کشور را جلب کند. گزارش‌ها از امیدواری کم مردم لبنان پس از ماه‌ها جنگ و اشغال بخش‌هایی از جنوب خبر می‌دهند.
+9805f246cef18fa4,sent_followup,band=mid sim=0.72 score=11.24 kept=above_floor prior=812002ed,1,al_monitor,groq,2,economy,unconfirmed,1,11.237,آرامکو در حال تلاش برای راه‌اندازی مجدد بخشی از لوله‌چین نفتی شرق-غرب است,شرکت سعودی آرامکو در حال کار برای دور زدن بخش آسیب‌دیده لوله‌چین نفتی شرق-غرب است تا ظرفیت انتقال را به‌طور جزئی بازیابی کند. جزئیات دقیق زمان‌بندی بازگشایی کامل هنوز اعلام نشده است.
+1c54e577baa3694c,repeat_dropped,band=mid sim=0.59 score=10.06 blocked=below_floor prior=92784788,1,ajar,groq,2,security,unconfirmed,1,10.061,اسرائیل تعداد مجازات غزه برای درمان در مصر را به کمتر از نصف کاهش داد,وزارت بهداشت غزه اعلام کرد که اسرائیل تعداد مجازات برای خروج به مصر جهت درمان را از ۱۳۶ به ۶۱ نفر کاهش داده است. این محدودیت‌ها دسترسی بیماران به خدمات درمانی را تحت تأثیر قرار می‌دهد.
+4a276f2607e2690e,irrelevant,,1,ap_gnews,groq,2,,,,,,
+444c4fcb863eef2d,clickbait,,1,tg_iranian_militarism,groq,3,,,,,,
+3d6d3dbed26da310,repeat_dropped,band=high sim=0.80 score=6.09 blocked=below_floor prior=a1353f9e,2,tg_tabzlive,groq,3,politics,rumour,0,6.095,امضای توافقنامه دیپلماتیک و اقتصادی بین اسرائیل و مراکش,سفیر اسرائیل در سازمان ملل از دستیابی به توافق‌های مهم با مراکش برای تقویت روابط دیپلماتیک خبر داد. این توافق شامل تأسیس سفارتخانه‌ها در هر دو کشور، تسهیل همکاری‌های اقتصادی و افزایش پروازهای مستقیم است.
+8cf1f6d6875a5175,repeat_dropped,band=high sim=0.81 score=9.19 blocked=below_floor prior=e9c05a5d,3,al_manar|tg_wfwitness,groq,3,military,rumour,0,9.194,انفجار بمب صوتی پهپاد اسرائیلی در نزدیکی ارتش لبنان,یک پهپاد اسرائیلی بمب صوتی را در نزدیکی چک‌پوینت ارتش لبنان در زوطر غربی رها کرد. این رویداد در مرز شمالی لبنان و در نزدیکی دیوار خاکی جداکننده رخ داد.
+e730472c4bf887ff,repeat_dropped,band=high sim=0.94 score=9.28 blocked=both prior=162393e0,4,al_manar|tg_fighter_radar|tg_militarywave,groq,3,military,rumour,0,9.283,کشته شدن دو فرمانده یگان ویژه حماس در حملات اسرائیل,ارتش اسرائیل اعلام کرد دو عضو ارشد یگان ویژه حماس را در حملات جداگانه در شمال غزه کشته است. همزمان، گزارش‌هایی از فروپاشی ساختمان‌های آسیب‌دیده و کشته شدن غیرنظامیان در غزه منتشر شده است.
+6af6c2d78db8c4f2,repeat_dropped,band=mid sim=0.76 score=9.18 blocked=below_floor prior=36eed5ed,3,tg_fighter_radar|tg_iranian_militarism|tg_minas_tirith,groq,3,military,rumour,0,9.177,انفجارهای گسترده در منطقه المنصوری جنوب لبنان,گزارش‌هایی از مجموعه حملات سنگین و انفجارهای گسترده در منطقه المنصوری در جنوب لبنان منتشر شده است. جزئیات دقیق‌تر درباره نوع سلاح‌های به کار رفته در دسترس نیست.
+4727d42f75c082e3,irrelevant,,1,osint613_a,groq,3,,,,,,
+632045575d9f9eb3,rank_dropped,,1,tg_fighter_radar,groq,3,security,rumour,0,6.935,کشته شدن چهار شبه‌نظامی فاطمیون در تیراندازی زاهدان,منابع محلی از کشته شدن دست‌کم چهار تن از شبه‌نظامیان فاطمیون در پی تیراندازی افراد مسلح در منطقه رودماهی زاهدان خبر دادند. خودروی این نیروها نیز به آتش کشیده شده است.
+c61675c046c976c3,repeat_dropped,band=mid sim=0.60 score=6.11 blocked=below_floor prior=4470c638,3,tg_defenderdome|tg_entekhab|tg_tabzlive,groq,3,politics,rumour,0,6.114,گفتگوی تلفنی روبیو و وانگ یی درباره دیدار ترامپ و شی,وزیران خارجه آمریکا و چین درباره مراحل بعدی تعاملات سطح بالا گفتگو کردند. این تماس در آستانه دیدار احتمالی رؤسای دو کشور در ۲۴ سپتامبر انجام شد.
+53b793dca1307b9e,repeat_dropped,band=mid sim=0.63 score=9.31 blocked=below_floor prior=87a1ec74,5,tg_fighter_radar|tg_iranian_militarism|tg_minas_tirith,groq,3,military,rumour,0,9.306,اعزام اسکادران جنگنده‌های ارتش به جنوب ایران,ارتش ایران در پی مشاهده تحرکات در جنوب، اسکادران جنگنده اعزام کرد. پهپادهای سپاه نیز در حال رصد بودند که با رسیدن جنگنده‌ها بازگشتند.
+030a37021113dcba,repeat_dropped,band=mid sim=0.64 score=8.81 blocked=below_floor prior=818452a3,1,osint613_a,groq,3,military,rumour,0,8.814,ادعای نقض توافق جداسازی توسط اسرائیل در سوریه,معاون فرستاده ویژه سازمان ملل در سوریه، فعالیت‌های نظامی اسرائیل در جنوب سوریه را نقض توافق جداسازی خواند. این ادعا بر اساس گزارش‌های میدانی ارائه شده است.
+5529bc5a8fbb72ae,relevance_dropped,,1,the_war_zone,groq,2,military,unconfirmed,1,12.951,قطع قرارداد تولید موشک هوایی AIM-260 توسط پنتاگون,پنتاگون قرارداد جدید تولید موشک AIM-260 را قطع کرد. این موشک برای مقابله با موشک‌های هوایی چین طراحی شده بود.
+efb4e2c330a4d933,repeat_dropped,band=mid sim=0.64 score=10.94 blocked=below_floor prior=e32d9336,1,maariv,groq,2,security,unconfirmed,1,10.937,آتش‌سوزی در پناهگاه ساختمانی مسکونی در اورشلیم,آتش‌سوزی در پناهگاه یک ساختمان مسکونی در اورشلیم رخ داد. نُه نفر که در آنجا محبوس شده بودند، تخلیه شدند.
+14b71e1c4c4b5711,irrelevant,,1,al_jazeera,groq,2,,,,,,
+16c6e8ec0dfb8cb4,irrelevant,,1,walla,groq,2,,,,,,
+bf10df2293cac655,irrelevant,,1,al_jazeera,groq,2,,,,,,
+6ee38a6008ba2787,irrelevant,,1,ajar,groq,2,,,,,,
+5969cb5f6db78bd4,clickbait,,1,ajar,groq,2,,,,,,
+093a7c90b67778fe,irrelevant,,1,ajar,groq,2,,,,,,
+d25308ecd4701fd0,irrelevant,,1,bbc_en,groq,2,,,,,,
+71694c5c893e9725,irrelevant,,1,ajar,groq,2,,,,,,
+967bdb6694967745,irrelevant,,1,ajar,groq,2,,,,,,
+3e0a91fdc8fc3d53,irrelevant,,1,ajar,groq,2,,,,,,
+4e1411ccfea608ad,clickbait,,1,ajar,groq,2,,,,,,
+af061e0dab5afecd,rank_dropped,,1,al_manar,groq,3,security,rumour,0,6.980,گزارش حادثه دریایی در ۷۵ مایلی شرق عدن,هیئت عملیات تجارت دریایی بریتانیا از وقوع یک حادثه در ۷۵ مایلی شرق عدن گزارش داد. جزئیات دقیق‌تر درباره ماهیت حادثه در این خبر ذکر نشده است.
+bd3a330efa1b2bfc,irrelevant,,1,osint613_a,groq,3,,,,,,
+d1c53f6a4b4f25af,irrelevant,,1,osint613_a,groq,3,,,,,,
+bc0abb8293df1619,rank_dropped,,1,al_manar,groq,3,politics,rumour,0,5.863,شروع بررسی بودجه ۲۰۲۷ در مجلس و تأخیر در بحث مأموریت اروپا,مجلس شورای ملی لبنان بحث لایحه بودجه سال ۲۰۲۷ را از سر گرفت. بند مربوط به مأموریت اروپا به دلیل اختلافات به تعویق افتاد.
+3561cba44ca15cc0,lead_only,,1,tg_irane_azad_news,groq,3,security,unconfirmed,0,6.894,هیأت سازمان ملل: شواهدی از مسئولیت آمریکا در کشتار مدرسه میناب وجود دارد,هیأت حقیقت‌یاب سازمان ملل متحد اعلام کرد دلایل معقولی مبنی بر مسئولیت نیروهای آمریکایی در حمله به دبستان شجره طیبه میناب وجود دارد. این حمله که منجر به کشته شدن بیش از ۱۵۰ نفر شد، می‌تواند مصداق جنایت جنگی تلقی شود.

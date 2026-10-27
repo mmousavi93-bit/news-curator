@@ -1,0 +1,16 @@
+﻿cluster_key,fate,reason,n_members,sources,provider,best_tier,category,significance,claim_status,independent_count,score,headline,summary
+fbcafcd8a339d6c5,irrelevant,,2,tg_irane_azad_news|walla,groq2,2,,,,,,,
+531ca531489a395d,irrelevant,,1,aawsat,groq2,2,,,,,,,
+6fb72d3b361e09de,sent_followup,band=mid sim=0.74 score=17.93 kept=above_floor prior=bfceb674,1,al_monitor,groq2,2,military,balance,unconfirmed,1,17.935,بریتانیا به درخواست عربستان برای سوخت‌رسانی دفاعی به هواپیماها پاسخ مثبت داد,آندی برنهام، نخست‌وزیر بریتانیا، موافقت با درخواست عربستان برای سوخت‌رسانی هوایی دفاعی موقت را اعلام کرد. این اقدام پس از تشدید حملات حوثی‌ها بر عربستان و به عنوان بخشی از تلاش برای ثبات منطقه انجام شد.
+921ef0eab88a524a,repeat_dropped,band=mid sim=0.63 score=11.00 blocked=below_floor prior=71c1b6d1,1,tg_geopwatch,groq2,3,economy,economy,rumour,0,10.997,قیمت نفت برنت برای نخستین بار از ۹ سپتامبر زیر ۱۰۰ دلار افت کرد,قیمت نفت برنت به زیر ۱۰۰ دلار در هر بشکه کاهش یافت. این افت پس از هفته‌هایی از ثبات نسبی در تنگه‌های باب‌المندب و هرمز رخ داد.
+5a7468c877fa35c5,repeat_dropped,band=mid sim=0.69 score=9.19 blocked=below_floor prior=35c80a50,3,al_manar,groq2,3,military,none,rumour,0,9.189,نیروهای اسرائیلی طوباس و سلواد را با شلیک گلوله و بمب صوتی تحت فشار قرار دادند,نیروهای اسرائیلی به شهر طوباس و شهرک سلواد در رام الله حمله کردند و از گلوله زنده و بمب صوتی استفاده کردند. همچنین عملیات تخریبی در شمال شرق غزه انجام شد.
+9e8bb90d46c81396,relevance_dropped,,1,al_manar,groq2,3,politics,none,rumour,0,5.955,وفد از حزب الله و حزب آمال به وزارت آموزش و پرورش لبنان مراجعه کرد,نمایندگان پارلمانی حزب الله و حزب آمال به وزارت آموزش و پرورش لبنان مراجعه کردند. آن‌ها یادداشتی درباره وضعیت معلمان و دانش‌آموزان، به ویژه آوارگان جنوب، به وزیر آموزش و پرورش تحویل دادند.
+d737d220a9b6a076,clickbait,,2,tg_fighter_radar|tg_padeshah_fxn,groq2,3,,,,,,,
+8325774f1f236822,irrelevant,,1,al_monitor,groq2,2,,,,,,,
+9bc7c1a935ec6446,irrelevant,,1,al_manar,groq2,3,,,,,,,
+ebd4cd8279e13cd5,irrelevant,,1,tg_defenderdome,groq2,3,,,,,,,
+f391340ca0a224fd,irrelevant,,1,tg_rnintel,groq2,3,,,,,,,
+8280d80d8cfdc3c4,lead_only,,2,tg_padeshah_fxn,groq2,3,politics,escalation,unconfirmed,0,14.100,ترامپ: ایران هرگز سلاح هسته‌ای نخواهد داشت و وضعیت آن‌ها نامناسب است,دونالد ترامپ در اظهاراتی اعلام کرد که ایران هرگز به سلاح هسته‌ای دست نخواهد یافت و وضعیت فعلی آن‌ها بسیار نامناسب است. او همچنین از برگزاری جلسات متعدد برای تصمیم‌گیری در مورد ایران خبر داد.
+bf4742dd5c670a34,lead_only,,1,tg_padeshah_fxn,groq2,3,security,none,unconfirmed,0,6.988,رئیس سازمان سیا به صورت اضطراری وارد اروپا شد,رئیس سازمان اطلاعات مرکزی آمریکا (سیا) ساعاتی پیش به صورت اضطراری وارد اروپا شد. جزئیات بیشتر درباره دلیل این سفر یا مقصد دقیق در این گزارش ذکر نشده است.
+e42bb37b4b3ae529,lead_only,,1,tg_padeshah_fxn,groq2,3,military,balance,unconfirmed,0,13.985,تخریب مخازن سوخت فرودگاه ریاض در تصاویر ماهواره‌ای,تصاویر ماهواره‌ای نشان می‌دهند که مخازن سوخت در فرودگاه ریاض ویران شده‌اند. این گزارش منبع رسمی تأیید نشده و جزئیات بیشتری درباره زمان یا عامل تخریب ارائه نشده است.
+2fe7548947004b68,clickbait,,1,tg_irane_azad_news,groq2,3,,,,,,,

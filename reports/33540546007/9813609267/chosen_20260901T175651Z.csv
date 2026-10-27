@@ -1,0 +1,41 @@
+﻿cluster_key,fate,reason,n_members,sources,provider,best_tier,category,claim_status,independent_count,score,headline,summary
+3f4905c4d9884e9a,fatal,,64,al_jazeera|al_manar|al_monitor|ap_gnews|irna|maariv|mee|osint613_a|reuters_gnews|sky_news_arabia|tehran_times|tg_defenderdome|tg_esellco|tg_exciton_missile|tg_fighter_radar|tg_geopwatch|tg_irane_azad_news|tg_iranian_militarism|tg_mes|tg_minas_tirith|tg_padeshah_fxn|tg_rnintel|tg_tabzlive|tg_vahid_online|tg_vira_university|tg_wfwitness|walla,groq,2,,,,,,
+8fa86f59b004be74,repeat_dropped,,13,al_manar|maariv|mee|osint613_a|tg_fighter_radar|tg_irane_azad_news|tg_iranian_militarism|tg_mes|tg_minas_tirith|tg_wfwitness,groq,2,,,,,,
+26baaf73f2d12fda,sent,,6,osint613_a|tg_geopwatch|tg_militarywave|tg_tabzlive|tg_wfwitness|walla,groq,2,military,unconfirmed,1,13.487,هشدار زلنسکی به شرکت‌های هواپیمایی درباره خطر پهپادها در آسمان روسیه,رئیس‌جمهور اوکراین اعلام کرد که حضور پهپادها در آسمان روسیه باعث شده این فضا برای پروازهای تجاری کاملاً ناامن شود و از شرکت‌ها خواست از استفاده از آن خودداری کنند.
+9470a5d98fdd164d,repeat_dropped,,3,ajar|tg_wfwitness,groq,2,,,,,,
+cc9d7704fc7892e0,unparseable,,13,aawsat|al_manar|mee|osint613_a|tg_esellco|tg_iranian_militarism|tg_minas_tirith|tg_vahid_online,bai_deepseek,2,,,,,,
+fae9a6be55567791,repeat_dropped,,46,al_manar|maariv|mee|mehr|tg_defenderdome|tg_exciton_missile|tg_geopwatch|tg_irane_azad_news|tg_mes|tg_minas_tirith|tg_padeshah_fxn|tg_rnintel|tg_tabzlive|tg_tweet_mardomi|tg_vahid_online|tg_vira_university|tg_wfwitness,bai_deepseek,2,,,,,,
+3de80f28d01ae1e4,unparseable,,7,al_jazeera|al_monitor|osint613_a|tg_tabzlive,bai_deepseek,2,,,,,,
+f4ac3cfd73bd62ab,unparseable,,2,aawsat|al_monitor,bai_deepseek,2,,,,,,
+affd0030717287b7,repeat_dropped,,1,al_monitor,groq,2,,,,,,
+ce13ca425b45bae7,repeat_dropped,,1,tehran_times,groq,2,,,,,,
+1d906fa0bf35a1a6,clickbait,,3,tehran_times,groq,2,,,,,,
+011da32e9b7d582f,clickbait,,1,tehran_times,groq,2,,,,,,
+1143c16e543472b5,irrelevant,,1,maariv,groq,2,,,,,,
+547089c3c7b63d4b,sent,,2,ajar|mee,bai_deepseek,2,politics,likely,2,12.041,وزیر ارتش آمریکا دن دریسکول پس از تنش با پیت هگزت استعفا داد,کاخ سفید استعفای دریسکول را تأیید کرد. گزارش‌ها حاکی از اختلاف او با وزیر جنگ هگزت و نگرانی پنتاگون درباره جنگ با ایران است.
+3281a14e2a40df57,unparseable,,10,irna|mee|mehr|osint613_a|tehran_times|tg_behold_israel|tg_tabzlive,bai_deepseek,2,,,,,,
+f7c45e7d82da5243,unparseable,,6,ajar|al_manar|sky_news_arabia|tg_tweet_mardomi,bai_deepseek,2,,,,,,
+cdd6194a7972dd8e,repeat_dropped,,4,irna|sky_news_arabia|tehran_times,groq,2,,,,,,
+5b50f14053d138af,repeat_dropped,,17,maariv|mee|tg_defenderdome|tg_fighter_radar|tg_geopwatch|tg_irane_azad_news|tg_minas_tirith|tg_padeshah_fxn|tg_rnintel|tg_vira_university,groq,2,,,,,,
+87d3a85a6eee67d3,repeat_dropped,,3,al_jazeera|haaretz|mee,bai_deepseek,2,,,,,,
+a4654867f176c12b,sent,,3,irna|mehr|tehran_times,bai_deepseek,2,politics,unconfirmed,1,10.125,اعضای شانگهای در بیانیه مشترک حملات آمریکا و اسرائیل به ایران را محکوم کردند,بیانیه نهایی نشست بیشکک ضمن محکومیت حملات و تحریم‌ها علیه ایران، بر همکاری برای حل چالش‌های منطقه‌ای تأکید دارد. سخنگوی وزارت خارجه ایران نیز تحریم هر عضو شانگهای را فشار بر کل بلوک خواند.
+d24ec2bcf7244596,irrelevant,,1,al_jazeera,bai_deepseek,2,,,,,,
+eeb908309890d12e,irrelevant,,1,walla,bai_deepseek,2,,,,,,
+15a6d190e0511733,unparseable,,1,aviationist,bai_deepseek,2,,,,,,
+079e2dcf468a730e,repeat_dropped,,1,haaretz,groq,2,,,,,,
+0e9c60a9f153ccbd,repeat_dropped,,1,tehran_times,groq,2,,,,,,
+88f681d08c391871,irrelevant,,1,maariv,groq,2,,,,,,
+4133a6bac190032b,irrelevant,,1,al_jazeera,groq,2,,,,,,
+557a647963510ad8,repeat_dropped,,31,al_monitor|tg_fighter_radar|tg_geopwatch|tg_irane_azad_news|tg_iranian_militarism|tg_mes|tg_padeshah_fxn|tg_rnintel|tg_tabzlive|tg_vira_university|tg_wfwitness,bai_deepseek,2,,,,,,
+b07eb4929d00dc62,sent,,1,haaretz,bai_deepseek,2,politics,unconfirmed,1,9.867,اسموتریچ با قانونگذار سابق حاشیه‌ای ائتلاف کرد تا بلوک نتانیاهو تقویت شود,فایگلین جایگاه دوم فهرست صهیونیسم مذهبی را گرفت؛ این حزب پیش از ادغام نزدیک آستانه انتخابات بود و بن‌گویر تهدید کرد مستقل می‌ماند.
+6661a630947355ce,irrelevant,,5,al_jazeera|bbc_en|osint613_a|tg_rnintel,bai_deepseek,2,,,,,,
+ccca67587ccc5892,fatal,,1,haaretz,bai_deepseek,2,,,,,,
+2aaba7bee9fc7854,repeat_dropped,,3,mee|tg_fighter_radar|tg_vira_university,groq,2,,,,,,
+a8043ad8051bca67,irrelevant,,1,sky_news_arabia,groq,2,,,,,,
+63e652d1353067f0,repeat_dropped,,1,reuters_gnews,groq,2,,,,,,
+753bcf1dae9e6b4a,repeat_dropped,,2,al_jazeera|tg_iranian_militarism,groq,2,,,,,,
+66d7c08e1f2cd32a,sent,,7,aawsat|al_monitor|haaretz|maariv|mee|osint613_a,groq,2,politics,likely,4,14.377,بریتانیا اعلام کرد در هفته‌های آینده بسته‌ای از اقدامات علیه شهرک‌سازی اسرائیل ارائه می‌کند,وزیر خارجه بریتانیا این اقدامات را بازنگری جامع سیاست لندن توصیف کرد و وزیر خارجه اسرائیل در پاسخ هشدار به تلافی در صورت اعمال تحریم‌ها داد.
+18efb456e838f36f,relevance_dropped,,2,al_jazeera|mee,groq,2,other,likely,2,8.873,تخریب تأسیسات تصفیه آب و افزایش آلودگی میکروبی در غزه,سازمان بهداشت جهانی گزارش داد که آلودگی میکروبی آب آشامیدنی در غزه سه برابر شده و با تخریب یک پلنت تصفیه آب جدید، دسترسی خانواده‌های آواره به آب سالم به شدت محدود شده است.
+4d81f286878307d5,sent,,1,irna,groq,2,politics,unconfirmed,1,9.767,پزشکیان خواستار نقش مؤثرتر سازمان ملل در بحران‌های بین‌المللی شد,رئیس‌جمهور ایران تأکید کرد نهادهای بین‌المللی نباید به قدرت‌های بزرگ اجازه دهند بدون پاسخگویی عمل کنند.
+54a2466a6e6d2d2c,irrelevant,,1,the_war_zone,bai_deepseek,2,,,,,,
+8500507e9693961e,sent,,3,tg_fighter_radar|walla,bai_deepseek,2,military,unconfirmed,1,12.957,زیردریایی ششم اسرائیل از آلمان به سوی اسرائیل حرکت کرد,این زیردریایی از کلاس دلفین AIP است و به فناوری‌های پیشرفته مجهز شده. خروج آن با یک عملیات امنیتی گسترده همراه بود.

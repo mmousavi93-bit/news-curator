@@ -1,0 +1,148 @@
+﻿cluster_key,fate,reason,n_members,sources,provider,best_tier,category,significance,claim_status,independent_count,score,prellm_score,on_mission,headline,summary
+7ca9ec82be92f08b,sent_followup,band=mid sim=0.58 score=19.69 kept=above_floor prior=fc72e9ce,8,al_jazeera|al_manar|al_monitor|mee|osint613_a|tg_tabzlive|tg_wfwitness,groq2,2,politics,balance,likely,3,19.690,0.5391,1,نتانیاهو در سفری کوتاه به نیویورک برای سخنرانی در سازمان ملل,بنیامین نتانیاهو برای کمتر از هشت ساعت به نیویورک سفر کرد تا در مجمع عمومی سازمان ملل سخنرانی کند. برخلاف سال گذشته، این بار دیداری با دونالد ترامپ در برنامه او وجود ندارد و این سفر کوتاه، تنش‌های اخیر در روابط اسرائیل و آمریکا را نشان می‌دهد.
+b07a2c5a44dd8626,relevance_dropped,,3,bbc_en_me|maariv|mee,groq2,2,security,none,likely,3,14.874,0.6626,1,تخریب ۲۴ خانه در روستای جنبه و آوارگی ۱۷۶ فلسطینی در کرانه باختری,نیروهای اسرائیلی در ۲۳ سپتامبر ۲۴ خانه در روستای جنبه در ماصفر یاتا را تخریب کردند و ۱۷۶ نفر از جمله ۸۵ کودک را بی‌خانمان ساختند. این اقدام بخشی از موج گسترده‌ای از تخریب‌ها در کرانه باختری اشغالی است که منجر به جابه‌جایی صدها فلسطینی شده است.
+96d2589b92aa23d3,relevance_dropped,band=mid sim=0.75 score=15.38 kept=above_floor prior=0b13c489,7,ajar|al_manar|sky_news_arabia|tg_tabzlive|tg_wfwitness,groq2,2,military,none,likely,2,15.383,0.7130,1,حمله‌های موشکی و پهپادی اسرائیل به جنوب لبنان و غزه,نیروهای اسرائیلی به شهرک‌های جنوب لبنان و یک خودرو در غزه حمله کردند. گزارش‌ها از کشته شدن یک نفر در غزه و ورود پهپادها به فضای هوایی بیروت حکایت دارد.
+03e5b13d60471f82,irrelevant,,4,ajar|al_jazeera|sky_news_arabia,groq2,2,,,,,,0.5012,1,,
+dcc5d2e294108436,irrelevant,,2,al_jazeera|bbc_persian,groq2,2,,,,,,0.0603,1,,
+35e3a397ca1d2ee0,unparseable,,2,al_monitor|reuters_gnews,mistral,2,,,,,,0.4194,1,,
+4d3fa7c96703997a,unparseable,,2,haaretz|mee,mistral,2,,,,,,0.4509,1,,
+0e5b41e37bf6ddad,unparseable,,2,iran_international|irna,mistral,2,,,,,,0.6169,1,,
+4837ba239cd28661,unparseable,,3,ajar|mee,mistral,2,,,,,,0.6832,1,,
+40732b0fd1fda4cc,unparseable,,2,ajar|maariv,mistral,2,,,,,,0.6800,1,,
+a313931aed7943c3,unparseable,,4,ajar|al_jazeera|tg_entekhab,mistral,2,,,,,,0.4021,1,,
+b3c89d7428221d59,unparseable,,13,al_jazeera|tg_entekhab|tg_esellco|tg_iranian_militarism|tg_mes|tg_minas_tirith|tg_padeshah_fxn|tg_tabzlive|tg_vahid_online|tg_wfwitness,mistral,2,,,,,,0.5621,1,,
+875a8bc0f30c19fc,unparseable,,4,al_jazeera|al_manar|osint613_a|tg_tabzlive,mistral,2,,,,,,0.4926,1,,
+d7f43164af53a141,unparseable,,7,al_manar|sky_news_arabia|tg_minas_tirith|tg_tabzlive|tg_vahid_online|tg_wfwitness,mistral,2,,,,,,0.6177,1,,
+c148022126b92f45,unparseable,,5,al_jazeera|osint613_a|tg_entekhab|tg_irane_azad_news|tg_mes,mistral,2,,,,,,0.1962,1,,
+7c4c4da5fdf14656,sent_followup,band=mid sim=0.72 score=15.08 kept=above_floor prior=f9d0548b,3,ajar|al_manar,mistral,2,politics,balance,unconfirmed,1,15.079,0.5097,1,تجمع علمای مسلمان لبنان از خروج از توافقنامه چارچوبی با اسرائیل خبر داد,تجمع علمای مسلمان لبنان در بیانیه‌ای اعلام کرد که به دلیل عدم پایبندی اسرائیل به توافقنامه چارچوبی، از آن خارج می‌شود. این گروه معتقد است که ادامه حملات نشان می‌دهد که این توافق نتوانسته آتش‌بس را تضمین کند. این تصمیم می‌تواند منجر به افزایش تنش‌های امنیتی در منطقه شود.
+81761c8d148ba4ef,irrelevant,,1,al_jazeera,mistral,2,,,,,,0.3135,1,,
+573913e2490e7a70,sent_followup,band=mid sim=0.57 score=16.08 kept=above_floor prior=64ff77d4,4,osint613_a|sky_news_arabia|tg_tabzlive|tg_vira_university,mistral,2,security,balance,unconfirmed,1,16.076,0.4047,1,سیا هشدار می‌دهد روسیه ممکن است با پهپادهای «ژربرا» به اسپانیا، فرانسه یا ایتالیا حمله کند,سازمان اطلاعات مرکزی آمریکا (سیا) به چند دولت اروپایی هشدار داده است که روسیه ممکن است با استفاده از پهپادهای «ژربرا» که در کشتی‌های تجاری پنهان شده‌اند، به اسپانیا، فرانسه یا ایتالیا حمله کند. این گزارش‌ها از منابع دبلوماسی و امنیتی تأیید شده‌اند.
+04a44616d83a7f0a,sent_followup,band=mid sim=0.71 score=14.77 kept=above_floor prior=adc19751,1,mehr,mistral,2,politics,balance,unconfirmed,1,14.765,0.4997,1,چین از آمریکا و ایران می‌خواهد با دیپلماسی اختلافات خود را حل کنند,وزارت امور خارجه چین در بیانیه‌ای از ایران و آمریکا خواسته است که با انتخاب صلح و حل اختلافات از طریق دیپلماسی، به جای تنش‌ها، اقدام کنند. این بیانیه به عنوان یک تلاش برای کاهش تنش‌های منطقه‌ای و حمایت از راه‌حل‌های دیپلماتیک در میان دو کشور مطرح شده است. این موضوع به‌طور مستقیم بر سیاست‌های ایران و آمریکا تأثیر می‌گذارد.
+4d6171692d6392ca,sent_followup,band=mid sim=0.76 score=18.15 kept=above_floor prior=69b52cbe,5,dw|tg_entekhab|tg_fighter_radar|tg_tweet_mardomi,mistral,2,military,balance,unconfirmed,1,18.147,0.7640,1,اسرائیل به نیروهای حماس در خان یونس غزه حمله کرده و وزیر دفاع اسرائیل به اردوغان حمله لفظی می‌کند,اسرائیل به نیروهای حماس در خان یونس غزه حمله کرده است. وزیر دفاع اسرائیل، یسرائیل کاتز، به اردوغان حمله لفظی کرد و او را «سلطان کاغذی» نامید و به او توصیه کرد از درگیری با اسرائیل خودداری کند. این حمله لفظی در حالی صورت گرفته که ترکیه به توافق «مکه» برای دفاع از عربستان امضا کرده است.
+d4a081ea7c4000f0,repeat_dropped,band=mid sim=0.59 score=10.82 blocked=below_floor prior=68f0ecbb,2,mee,groq2,2,security,none,unconfirmed,1,10.816,0.3834,1,فرار بیش از ۳۰۰۰ یمنی به جیبوتی به دلیل تشدید درگیری‌ها,تشدید درگیری‌ها در یمن باعث شده است بیش از ۳۰۰۰ پناهنده یمنی به جیبوتی فرار کنند. در همین حال، مهاجران آفریقایی همچنان به سمت یمن حرکت می‌کنند. این جابه‌جایی‌ها نشان‌دهنده بحران امنیتی و انسانی مداوم در منطقه است.
+7086894210540d04,sent_followup,band=mid sim=0.61 score=14.80 kept=above_floor prior=b9c5cded,2,sky_news_arabia|tg_entekhab,groq2,2,politics,balance,unconfirmed,1,14.797,0.6532,1,واشنگتن تمديد مأموریت یونفیل در لبنان را رد می‌کند,مسئول آمریکایی اعلام کرد واشنگتن از تمدید مأموریت یونفیل پس از پایان آن در پایان سال حمایت نمی‌کند. این مقام ادعا می‌کند که یونفیل در انجام وظیفه خود شکست خورده و «چارچوب سه‌جانبه» جایگزین خواهد شد. این تصمیم می‌تواند بر امنیت جنوب لبنان و موازنه منطقه‌ای تأثیر بگذارد.
+f5714fb9243446e0,clickbait,,1,mee,groq2,2,,,,,,0.3147,1,,
+974c51235a74473e,irrelevant,,1,irna,groq2,2,,,,,,0.4632,1,,
+040079e3da16e048,sent_followup,band=mid sim=0.73 score=20.54 kept=above_floor prior=aac4a534,1,mee,groq2,2,military,escalation,unconfirmed,1,20.538,0.2666,1,بلومبرگ: زنجیره کشتار هوش مصنوعی در بمباران میناب نقش داشت,بر اساس تحقیقات بلومبرگ، زنجیره کشتار مبتنی بر هوش مصنوعی در حملات موشکی آمریکا به مدرسه میناب نقش داشت. این حملات منجر به کشته شدن بیش از ۱۵۰ نفر، از جمله ۱۲۳ کودک، شد. پنتاگون می‌داند که اتکای بیش از حد به هوش مصنوعی با داده‌های قدیمی و بدون نظارت انسانی عامل این فاجعه بوده است.
+9e67a94cf5a8440c,repeat_dropped,same_run_dup sim=1.00,1,mehr,groq2,2,politics,none,unconfirmed,1,9.508,0.4630,1,پزشکیان و راحمان بر گسترش همکاری‌های اقتصادی ایران و بنگلادش تأکید کردند,رئیس‌جمهور ایران و نخست‌وزیر بنگلادش خواستار تعمیق روابط دوجانبه و تشکیل ششمین کمیسیون مشترک اقتصادی شدند. این توافق‌ها بر توسعه همکاری‌های تجاری و اقتصادی دو کشور متمرکز است.
+3662b4f22da06fa1,sent,,1,bbc_persian,groq2,2,security,balance,unconfirmed,1,15.495,0.3864,1,کشته شدن دو فرمانده ارشد سپاه در درگیری مسلحانه در سراوان,سپاه پاسداران تأیید کرد که سرتیپ حسین ظریفی و سرگرد احمد هراتی زراعتی در یک درگیری مسلحانه در سراوان کشته شدند. بر اساس بیانیه رسمی، این درگیری پس از کشته شدن پنج عضو گروه‌های تروریستی-تکفیری رخ داد.
+1a342eae24a398c1,relevance_dropped,,1,haaretz,groq2,2,security,none,unconfirmed,1,10.462,0.3502,1,رئیس شین‌بت از نظارت بر عملیات تأثیرگذاری در انتخابات اسرائیل خودداری کرد,دیوید زینی، رئیس شین‌بت، اعلام کرد که این نهاد نیازی به نظارت بر بازیگران داخلی در زمینه تأثیرگذاری بر انتخابات ندارد. در پی این تصمیم، پلیس اسرائیل مسئولیت نظارت بر این فرآیند را بر عهده گرفت، هرچند ابزارهای فناوری لازم را ندارد.
+2a4741b7c9ae619f,sent,,2,mee,groq2,2,economy,economy,unconfirmed,1,14.541,0.6737,1,رئیس‌جمهور ایران و نخست‌وزیر بنگلادش بر گسترش همکاری‌های اقتصادی تأکید کردند,رئیس‌جمهور ایران و نخست‌وزیر بنگلادش خواستار تعمیق روابط دوجانبه و تشکیل ششمین کمیسیون مشترک اقتصادی شدند. این توافق‌ها بر توسعه همکاری‌های تجاری و اقتصادی دو کشور متمرکز است.
+253d836670342f1a,irrelevant,,1,al_monitor,groq2,2,,,,,,0.3124,1,,
+0d6f2aa7e8ef3871,repeat_dropped,band=mid sim=0.59 score=10.44 blocked=below_floor prior=069a0293,1,al_monitor,mistral,2,security,none,unconfirmed,1,10.438,0.4620,1,یک سرباز اسرائیلی در یک تصادف در چک‌پست غرب رودان در غزه زخمی شد و پسر سفیر اسرائیل در آمریکا در بیمارستان بستری است,یک حمله با خودرو به یک چک‌پست در غزه انجام شد که در آن یک سرباز اسرائیلی زخمی شد. سفیر اسرائیل در آمریکا اعلام کرد پسرش که در این حمله زخمی شده، حال حاضر در بیمارستان است و در وضعیت خطرناک است. هیچ گزارش رسمی از طرف سازمان‌های امنیتی غزه یا اسرائیل مبنی بر مسئولیت این حمله وجود ندارد.
+300659d13e989242,irrelevant,,1,mee,mistral,2,,,,,,0.3907,1,,
+141dd2ff3b2fe13d,irrelevant,,1,al_jazeera,mistral,2,,,,,,0.0596,1,,
+a7f0d8ada1c9e154,irrelevant,,3,haaretz|maariv|walla,mistral,2,,,,,,0.3534,1,,
+56951daa121d7b8a,irrelevant,,1,ajar,mistral,2,,,,,,0.0985,1,,
+bf627a996cdaa5f7,unparseable,,1,walla,mistral,2,,,,,,0.2013,1,,
+73536843573a2a92,unparseable,,1,ajar,mistral,2,,,,,,0.6250,1,,
+559ef51517c09155,unparseable,,1,ap_gnews,mistral,2,,,,,,0.5085,1,,
+96c1ecbad70e6a30,unparseable,,1,ap_gnews,mistral,2,,,,,,0.3457,1,,
+7addb374e0ee997a,unparseable,,1,reuters_gnews,mistral,2,,,,,,0.4227,1,,
+2bb69f7317b61996,unparseable,,1,ajar,mistral,2,,,,,,0.3271,1,,
+6a00e7650d4f2ce5,unparseable,,1,ap_gnews,mistral,2,,,,,,0.2943,1,,
+129a6f51b0325dc7,unparseable,,1,ap_gnews,mistral,2,,,,,,0.5381,1,,
+9f5c5d0922f5f06c,unparseable,,2,reuters_gnews,mistral,2,,,,,,0.4931,1,,
+2b92c71a6f874d89,unparseable,,1,reuters_gnews,mistral,2,,,,,,0.2351,1,,
+a0ebcc866ae21a5e,irrelevant,,1,reuters_gnews,groq2,2,,,,,,0.3747,1,,
+93b68cb5d3df81af,repeat_dropped,band=mid sim=0.70 score=12.00 blocked=below_floor prior=8bcc3fb3,1,reuters_gnews,groq2,2,politics,balance,unconfirmed,1,12.000,0.4317,1,گفت‌وگوی وزیر خارجه اوکراین و ایران درباره کاهش تنش,وزیر خارجه اوکراین گفت که با همتای ایرانی خود درباره حفظ تنش‌ها در سطح پایین گفت‌وگو کرده است. این خبر بر اساس اظهارات یک‌طرفه وزیر خارجه اوکراین است و تأیید رسمی از سوی ایران در متن ذکر نشده است.
+098609d1f758e771,clickbait,,1,reuters_gnews,groq2,2,,,,,,0.3695,1,,
+5e334f729bbface6,relevance_dropped,,1,bbc_en_me,groq2,2,other,none,unconfirmed,1,4.000,0.2972,1,وقف فعالیت پنج نیروگاه نمک‌زدایی اسرائیل به دلیل جلبک,یک لایه از جلبک‌های میکروسکوپی باعث توقف فعالیت پنج از شش نیروگاه نمک‌زدایی اسرائیل شد. این رویداد نگرانی‌هایی را در مورد امنیت آبی منطقه ایجاد کرده است.
+26ad95399e7138ab,relevance_dropped,,1,bbc_en_me,groq2,2,security,none,unconfirmed,1,8.000,0.2458,1,تأیید نقش رژیم اسد در گروگان‌گیری روزنامه‌نگار آمریکایی,بی‌بی‌سی گزارش داد که رژیم اسد برنامه‌ریزی چند هفته‌ای برای گروگان‌گیری آستین تیس را انجام داده بود. یک منبع ادعا می‌کند که این عملیات توسط بشار اسد تأیید شده است.
+493b2f2eb1cd0af4,repeat_dropped,band=mid sim=0.60 score=11.30 blocked=below_floor prior=9f399842,4,osint613_a|tg_geopolitics_prime|tg_vahid_online|tg_wfwitness,groq2,3,economy,economy,rumour,0,11.299,0.4789,1,حمل ۶ میلیون بشکه نفت توقیف‌شده ایران به مقصد آمریکا در حال عبور از اقیانوس اطلس است,شرکت تانکر ترکرز گزارش داد که حدود ۶ میلیون بشکه نفت خام ایران که در ماه مه توسط آمریکا توقیف شده بود، به ارزش تقریبی ۶۰۰ میلیون دلار در حال انتقال به ایالات متحده است. این گزارش‌ها در حالی منتشر می‌شود که ایران با بحران سوخت و افزایش قیمت‌ها دست‌وپنجه نرم می‌کند.
+7e1029e149311191,irrelevant,,1,tg_wfwitness,groq2,3,,,,,,0.4504,1,,
+bbb57f85095a46af,repeat_dropped,band=mid sim=0.68 score=11.06 blocked=below_floor prior=680d04e2,2,al_manar|osint613_a,groq2,3,politics,balance,rumour,0,11.056,0.7262,1,فرمانده سپاه پاسداران: ایران از جنگ نمی‌ترسد,احمد واهدی، فرمانده سپاه پاسداران، در بیانی‌ای اعلام کرد که ایران از جنگ نمی‌ترسد. این اظهارنظر در حالی صورت می‌گیرد که تنش‌های منطقه‌ای بالا است.
+451626709f6e6a98,irrelevant,,3,osint613_a|tg_minas_tirith|tg_wfwitness,groq2,3,,,,,,0.4554,1,,
+d875b4d6d46d90e1,irrelevant,,1,osint613_a,groq2,3,,,,,,0.2904,1,,
+abe6f26224332096,sent_followup,band=mid sim=0.64 score=14.94 kept=above_floor prior=2c368fe6,19,tg_entekhab|tg_fighter_radar|tg_irane_azad_news|tg_iranian_militarism|tg_minas_tirith|tg_tweet_mardomi|tg_vahid_online,groq2,3,military,balance,rumour,0,14.938,0.6142,1,صفوی: نیروهای مسلح برای بدترین سناریوها آماده‌اند,رحیم صفوی، مشاور عالی فرمانده کل قوا، اعلام کرد که نیروهای مسلح برای بدترین سناریوها آماده هستند و سایه جنگ را از سر کشور دور می‌کنند. او همچنین به احتمال گسترش جبهه درگیری تا اقیانوس هند اشاره کرد. این اظهارات در حالی مطرح می‌شود که مقامات غربی از فشارهای اقتصادی و نظامی برای تغییر رفتار ایران سخن می‌گویند.
+a4c903dd3466bbd9,repeat_dropped,band=mid sim=0.61 score=12.54 blocked=below_floor prior=ade69318,7,tg_iranian_militarism,groq2,3,security,balance,rumour,0,12.535,0.7761,1,گزارش‌های داخلی درباره آمادگی‌های امنیتی پس از حملات,یگان‌های ویژه پلیس و سپاه در استان مرکزی جلسه‌ای برای تمهیدات پس از حملات هوایی به اماکن انرژی اتمی برگزار کردند. همچنین گزارش‌هایی از تمرینات شبیه‌سازی عملیات ربایش توسط نیروهای اسرائیلی در بئرالسبع منتشر شده است. این موارد نشان‌دهنده افزایش سطح هوشیاری امنیتی در ایران است.
+e73a3ea9e404c956,irrelevant,,3,tg_rnintel|tg_tabzlive,groq2,3,,,,,,0.4578,1,,
+a5b053a1f3bcbdc8,irrelevant,,5,osint613_a|tg_tabzlive,groq2,3,,,,,,0.4129,1,,
+cd904270b39fe30f,repeat_dropped,band=mid sim=0.64 score=11.21 blocked=below_floor prior=189ad7c4,4,tg_entekhab|tg_irane_azad_news,groq2,3,economy,economy,rumour,0,11.211,0.4890,1,ممنوعیت صدور چک رمزدار از ۷ مهر توسط بانک مرکزی,بانک مرکزی ایران اعلام کرد که صدور چک‌های رمزدار از ۷ مهر و تبادل آن‌ها از اول دی ماه ممنوع می‌شود تا جایگزینی با چک‌های تضمین‌شده انجام شود. این تصمیم بخشی از اصلاحات نظام بانکی کشور است. همزمان، مدیرعامل آرامکو از توانایی برطرف کردن اختلالات تأمین ظرف چند روز خبر داد.
+dc9febdf0e9c747d,sent_followup,band=mid sim=0.69 score=14.21 kept=above_floor prior=5754f448,4,al_manar|tg_iranian_militarism,groq2,3,military,balance,rumour,0,14.206,0.6577,1,انتشار آمار پس از پایان جنگ ۴۰ روزه ایران و اسرائیل,بر اساس گزارش‌های منتشرشده پس از پایان درگیری، ایران حدود ۶۵۰ موشک بالستیک شلیک کرد که منجر به کشته شدن ۲۴ نفر و آسیب به هزاران ساختمان شد. این ارقام شامل نرخ اصابت و خسارات وارده به زیرساخت‌های اسرائیل است.
+cfd8a02fa077a8f7,repeat_dropped,band=mid sim=0.56 score=6.88 blocked=below_floor prior=1e9ddf82,1,osint613_a,groq2,3,security,none,rumour,0,6.881,0.4775,1,کشف تونل و بازداشت ۴ فلسطینی در قلیلیه,نیروهای اسرائیلی یک تونل ۲۵ متری و یک شفت دوم را در قلیلیه کشف کردند. چهار فلسطینی همراه با سلاح و مواد انفجاری دستگیر شدند.
+ea5256db05594b90,repeat_dropped,band=mid sim=0.58 score=10.86 blocked=below_floor prior=f782efef,1,osint613_a,groq2,3,politics,balance,rumour,0,10.860,0.5339,1,فشار اسرائیل بر امارات برای لغو خرید سامانه S-400,گزارش‌ها حاکی از آن است که اسرائیل بر امارات فشار آورده تا از خرید سامانه‌های S-400 روسی از ترکیب خودداری کند. این اقدام می‌تواند بر بازگشت آنکارا به برنامه F-35 و رفع تحریم‌های CAATSA تأثیر بگذارد.
+0037c3c194b0d03a,irrelevant,,1,osint613_a,groq2,3,,,,,,0.3166,1,,
+fac49d51aca0b29c,relevance_dropped,,1,osint613_a,groq2,3,military,none,rumour,0,8.823,0.3668,1,مهاجمه به یک خودرو در جنوب غربی غزه,یک خودرو در جنوب غربی شهر غزه هدف حمله قرار گرفت و خساراتی به آن وارد شد. گزارش‌ها از وجود تلفات انسانی در این حادثه حکایت دارند.
+46f3eaa911cd5e40,unparseable,,1,tg_wfwitness,mistral,3,,,,,,0.5120,1,,
+4ccecf1b8cd7fb35,unparseable,,1,al_manar,mistral,3,,,,,,0.3513,1,,
+7f24a50ba9fc43c4,unparseable,,1,tg_iranian_militarism,mistral,3,,,,,,0.5398,1,,
+2166a6378cde5a58,unparseable,,1,tg_iranian_militarism,mistral,3,,,,,,0.5439,1,,
+b71f2c9cf4c003eb,unparseable,,1,tg_fighter_radar,mistral,3,,,,,,0.2672,1,,
+032c52f8187e2399,irrelevant,,1,tg_wfwitness,mistral,3,,,,,,0.2795,1,,
+25f53b0be870a269,rank_dropped,,3,tg_entekhab|tg_irane_azad_news,mistral,3,economy,economy,rumour,0,10.775,0.7515,1,مخازن سدهای تهران از ۵ تا ۷۸ درصد پر شده و سد امیرکبیر به ۷۸ درصد آب رسیده است.,مخازن سدهای تهران با درصد پرشدگی متغیر از ۵ تا ۷۸ درصد گزارش شده است، که سد امیرکبیر با ۷۸ درصد پرشدگی بیشترین میزان آب را دارد. این داده‌ها توسط شرکت مدیریت منابع آب ایران منتشر شده است و هیچ منبعی آن را زیر سؤال نبرده است.
+24758d186e7eb941,repeat_dropped,band=mid sim=0.75 score=10.71 blocked=below_floor prior=4e86e20e,3,tg_fighter_radar|tg_geopolitics_prime|tg_tanker_trackers,mistral,3,economy,economy,rumour,0,10.711,0.5628,1,عربستان سعودی ۱۰۰ میلیون بشکه نفت به بازارهای آسیایی تحویل داده و نفتکش‌ها در تنگه هرمز از ردیابی خارج می‌شوند.,عربستان سعودی با تحویل ۱۰۰ میلیون بشکه نفت به بازارهای آسیایی، از بحران عرضه نفت در کشورهایی مانند چین، هند، ژاپن و کره جنوبی جلوگیری کرده است. این تحویل معادل یک روز از تقاضای جهانی نفت است و به دلیل خرابی لوله‌کشی شرق-غرب عربستان صورت گرفته است.
+e6d05f6ffd5ee12f,repeat_dropped,band=high sim=0.88 score=13.50 blocked=below_floor prior=a877ad81,1,osint613_a,mistral,3,military,balance,rumour,0,13.501,0.4258,1,داده‌های گمرک ایران نشان می‌دهد چین ۱۳۰۰ بارگیری قطعات دوتعمده به وزارت دفاع ایران در نیمه اول سال ۲۰۲۶ ارسال کرده است.,داده‌های گمرک ایران که توسط دیلی وول استریت بررسی شده، نشان می‌دهد چین در شش ماهه اول سال ۲۰۲۶ حدود ۱۳۰۰ بارگیری قطعات دوتعمده، از جمله الکترونیک برای استفاده در درون‌ها و سیستم‌های هدایت موشک، به وزارت دفاع ایران ارسال کرده است. این ارسال‌ها در حالی صورت گرفته که چین نقش خود را در کاهش تنش‌های منطقه‌ای تبلیغ می‌کند.
+d95423b1045ae6cf,repeat_dropped,band=mid sim=0.65 score=10.79 blocked=below_floor prior=0777c9f1,4,tg_wfwitness,mistral,3,politics,balance,rumour,0,10.787,0.6073,1,رئیس‌جمهور لبنان و رئیس‌جمهور ایران در نیویورک در مورد مسائل سیاسی و امنیتی با یکدیگر دیدار خواهند کرد.,نواب Salam نخست‌وزیر لبنان و رئیس‌جمهور ایران در نیویورک در مورد مسائل سیاسی و امنیتی، از جمله کاهش تنش‌ها و گسترش حاکمیت لبنان بر قلمرو خود، دیدار خواهند کرد. این دیدار در حالی است که لبنان در حال آماده‌سازی برای پایان مأموریت UNIFIL است و از حضور یک نیروی بین‌المللی تحت نظارت سازمان ملل متحد حمایت می‌کند.
+07226795fbe8ab23,repeat_dropped,band=mid sim=0.74 score=11.72 blocked=below_floor prior=9ae4abf7,4,tg_geopwatch|tg_minas_tirith|tg_wfwitness,mistral,3,security,balance,rumour,0,11.717,0.5479,1,هشدار از حملات موشکی و پهپادی در شهرهای سعودی جده، طائف، مکه، تبوک و ینبع فعال شد,سازمان‌های نظارتی هشدار دادند که حملات احتمالی موشکی و پهپادی در پنج شهر سعودی فعال شده است. هیچ گزارش تأیید شده‌ای از وقوع حمله یا هدف مشخص وجود ندارد. این هشدارها ممکن است ناشی از افزایش تنش‌های منطقه‌ای و احتمال حمله احتمالی به اهداف سعودی یا آمریکایی در منطقه باشد.
+bcc1ca580e40e48c,repeat_dropped,band=mid sim=0.65 score=10.47 blocked=below_floor prior=ab703e30,2,tg_fighter_radar|tg_padeshah_fxn,mistral,3,politics,balance,rumour,0,10.473,0.6121,1,کارشناس صداوسیما در مورد جزیره خارک و بحرین اظهار نظر کرد,یک کارشناس در مصاحبه با صداوسیما گفت که در صورت اشغال جزیره خارک توسط آمریکا، ایران ممکن است خاک بحرین را «پس بگیرد». این اظهار نظر به عنوان یک تهدید احتمالی سیاسی و استراتژیک در مورد جزیره خارک مطرح شد، اما هیچ اقدام عملی یا تأیید رسمی از سوی دولت ایران وجود ندارد.
+bd12d6b60d6e4d24,sent_followup,band=mid sim=0.67 score=16.28 kept=above_floor prior=ca2d0936,1,tg_mornovosti,mistral,3,military,escalation,rumour,0,16.279,0.3621,1,کشتی تجاری در نزدیکی سواحل امارات دچار آتش‌سوزی پس از اصابت شلیک شد,کشتی تجاری «کپ داو» متعلق به امارات در ۹۳ کیلومتری شمال غربی دوبی، پس از اصابت شلیک، دچار آتش‌سوزی شد و دچار مشکل حرکت گردید. یک عضو از خدمه کشته شد و علت دقیق حادثه مشخص نشده است. این حمله ممکن است به تنش‌های منطقه‌ای مرتبط باشد، اما هیچ گروه یا مسئولیت مشخصی اعلام نشده است.
+005592226eee494d,repeat_dropped,band=mid sim=0.67 score=8.10 blocked=below_floor prior=4e86e20e,2,tg_tanker_trackers,mistral,3,economy,economy,rumour,0,8.100,0.4699,1,انتشار آمار جدید صادرات نفت خام از تنگه هرمز در ماه گذشته,در ۲۸ روز گذشته، میانگین روزانه ۷٫۵۴ میلیون بشکه نفت خام از خط بلوک آمریکا و تنگه هرمز صادر شد که شامل ۵٫۰۴ میلیون بشکه از تنگه هرمز و ۲٫۴۹ میلیون بشکه از ترمینال‌های خلیج عمان است. این آمار نشان از کاهش قابل توجهی در مقایسه با قبل از آغاز تنش‌ها دارد.
+71294aecc52f827a,irrelevant,,4,ajar|al_jazeera|al_monitor|sky_news_arabia,mistral,2,,,,,,0.3726,0,,
+2671f9d82a140d95,repeat_dropped,band=mid sim=0.76 score=13.06 blocked=below_floor prior=8a5f27d3,2,al_jazeera|aviationist,groq2,2,security,none,likely,2,13.063,0.2726,0,ارسال اشتباهی قطعات F-35 به هنگ‌کنگ و نگرانی از نشت اطلاعات,قطعاتی از جمله کاپوت یک جنگنده F-35 به اشتباه از طریق هنگ‌کنگ به مقصد چین ارسال شدند. استرالیا و آمریکا در حال بررسی این حادثه هستند تا از نشت فناوری‌های حساس جلوگیری کنند.
+833ab32e867fb96d,relevance_dropped,,1,mee,groq2,2,politics,none,unconfirmed,1,9.994,0.3991,0,کشف ارتباط خیریه‌های بریتانیایی با طرح‌های سکونتگاه‌سازی در شیک‌جارا,تحقیقات نشان می‌دهد سه خیریه ثبت‌شده در بریتانیا به یشیواهای شرق قدس که قصد گسترش در شیک‌جارا را دارند، کمک مالی کرده‌اند. مجموع کمک‌های دو خیریه بریتانیایی به این نهاد بیش از ۱.۳ میلیون دلار بوده است.
+7ac318ba578f7e33,irrelevant,,1,maariv,groq2,2,,,,,,0.3603,0,,
+125b5f547bd80fc0,irrelevant,,1,sky_news_arabia,groq2,2,,,,,,0.2416,0,,
+5711628cb7408447,irrelevant,,1,maariv,groq2,2,,,,,,0.1423,0,,
+4581dd438f35f66e,repeat_dropped,band=mid sim=0.62 score=9.88 blocked=below_floor prior=1af146c9,1,maariv,groq2,2,politics,none,unconfirmed,1,9.880,0.2272,0,نخست‌وزیر اسرائیل و همسرش برای سخنرانی در سازمان ملل به نیویورک رسیدند,نخست‌وزیر اسرائیل و همسرش برای شرکت در مجمع عمومی سازمان ملل متحد به نیویورک سفر کردند. این سفر در آستانه ارائه سخنرانی رسمی او در این forum بین‌المللی انجام شد.
+f85645c31d8d0dce,irrelevant,,2,al_jazeera|tg_geopolitics_prime,groq2,2,,,,,,0.0757,0,,
+a2483b36470d5923,irrelevant,,7,al_manar|bbc_en|osint613_a|tg_defenderdome|tg_tabzlive,groq2,2,,,,,,0.2354,0,,
+af8e12f43b608137,irrelevant,,2,maariv,groq2,2,,,,,,0.1214,0,,
+42c4d6ffa0e8772e,irrelevant,,1,al_jazeera,groq2,2,,,,,,0.0329,0,,
+49da0af1ad64a1bd,repeat_dropped,band=mid sim=0.63 score=12.81 blocked=below_floor prior=f8d12bab,1,al_jazeera,groq2,2,military,none,unconfirmed,1,12.811,0.1409,0,مرگ ۹ سرباز قزاقی در حادثه آموزشی دریایی در دریای خزر,۹ سرباز قزاقی در جریان یک مانور آموزشی دریایی در منطقه منگستائو غربی جان خود را از دست دادند. ۱۹ سرباز در این حادثه به دریا کشیده شدند و مرگ ۹ نفر از آن‌ها تأیید شده است.
+5d6ec5dc81a88ab3,irrelevant,,1,sky_news_arabia,groq2,2,,,,,,0.0876,0,,
+fa893863fb2f5443,irrelevant,,1,bbc_en,groq2,2,,,,,,0.2973,0,,
+714b3a34df0b4d1a,irrelevant,,1,al_jazeera,groq2,2,,,,,,0.1743,0,,
+e2f6490044613d18,irrelevant,,1,al_jazeera,groq2,2,,,,,,-0.0997,0,,
+7a07536ff78efbab,repeat_dropped,band=mid sim=0.56 score=10.70 blocked=below_floor prior=1e9ddf82,1,maariv,groq2,2,security,none,unconfirmed,1,10.704,0.2519,0,کشف دو تونل و بازداشت چهار مظنون در قلقلیه,ارتش اسرائیل دو تونل را در قلقلیه شناسایی کرد و چهار مظنون را بازداشت نمود. همچنین تجهیزات نظامی در این عملیات کشف شد.
+06e3b1c600231faf,irrelevant,,1,sky_news_arabia,groq2,2,,,,,,0.1401,0,,
+a5ceb79ad8ca568b,irrelevant,,1,maariv,groq2,2,,,,,,0.0414,0,,
+a53ed1866f8110ea,irrelevant,,4,ajar|tg_fighter_radar,groq2,2,,,,,,0.3380,0,,
+2923d8a431a6bd9f,irrelevant,,1,bbc_en,groq2,2,,,,,,0.1687,0,,
+9348804985a3033b,clickbait,,2,al_jazeera|tg_fighter_radar,groq2,2,,,,,,0.2861,0,,
+8fe29e8f25a6ccd8,repeat_dropped,band=mid sim=0.65 score=10.50 blocked=below_floor prior=b1fc5bf9,1,al_jazeera,groq2,2,security,none,unconfirmed,1,10.496,0.0910,0,کشته شدن یک خدمه در حمله به کشتی باربری هندی در عمان,یک خدمه کشتی باربری هندی در حمله‌ای در سواحل عمان کشته شد. جزئیات بیشتری درباره عاملان یا نوع حمله در منابع ارائه‌شده ذکر نشده است.
+20f3eaa070b6da2a,irrelevant,,1,al_jazeera,groq2,2,,,,,,0.2827,0,,
+a99cd4ea3b2ace80,irrelevant,,1,maariv,groq2,2,,,,,,0.0565,0,,
+0018918dc6809208,irrelevant,,1,al_jazeera,groq2,2,,,,,,0.1221,0,,
+e559109d93b80967,relevance_dropped,,1,maariv,groq2,2,security,none,unconfirmed,1,10.391,0.3150,0,اعتقال و بازجویی از پسر رئیس یک سازمان امنیتی در اسرائیل,پسر رئیس یک سازمان امنیتی در اسرائیل توسط واحد ضد فساد (ماحش) دستگیر و مورد بازجویی قرار گرفت. جزئیات دقیق اتهامات یا هویت فرد در خبر ذکر نشده است.
+8731db3c9c121790,relevance_dropped,,1,maariv,groq2,2,politics,none,unconfirmed,1,9.359,0.2714,0,پیشنهاد اخراج یائیر گولان از کابینه با رأی ۱۴ به ۲ رد شد,در رأی‌گیری کابینه اسرائیل، پیشنهاد اخراج یائیر گولان با ۱۴ رأی مخالف در مقابل ۲ رأی موافق رد شد. این تصمیم نشان‌دهنده حمایت اکثریت کابینه از حضور او در دولت است.
+cd1e69c1f460a8a1,irrelevant,,1,sky_news_arabia,groq2,2,,,,,,0.1640,0,,
+39004f3cb25f4227,irrelevant,,1,aviationist,groq2,2,,,,,,0.2672,0,,
+46023b28820e3b2f,irrelevant,,1,maariv,groq2,2,,,,,,0.2888,0,,
+56c1464c67a398b6,sent,,1,maariv,groq2,2,politics,balance,unconfirmed,1,14.227,0.4642,0,نشر گزارش محرمانه فایبر که نگرانی نتانیاهو را برانگیخت,گزارش محرمانه‌ای از فایبر منتشر شده که به گفته منابع، نگرانی جدی بنیامین نتانیاهو را برانگیخته است. این گزارش حاوی توصیه‌ای برای توقف عملیات‌ها یا تغییر رویکرد است که در حال بررسی است.
+cca25afed49ef527,irrelevant,,1,maariv,groq2,2,,,,,,0.2046,0,,
+1272080b9858d2f9,relevance_dropped,,1,maariv,groq2,2,security,none,unconfirmed,1,10.215,0.1387,0,مردی حدود ۳۰ ساله در نزدیکی چک‌پوینت جیب در فلسطین اشغالی به شدت زخمی شد,یک مرد جوان در نزدیکی چک‌پوینت جیب در کرانه باختری توسط خودروی سواران زخمی شد. وضعیت او به عنوان بحرانی گزارش شده است.
+26a37f05caec4890,irrelevant,,1,maariv,groq2,2,,,,,,0.1460,0,,
+8c486f7647643711,irrelevant,,1,ajar,groq2,2,,,,,,0.3039,0,,
+2d7965556c8d5a96,irrelevant,,1,ajar,groq2,2,,,,,,0.1374,0,,
+de0eb66148ca6337,irrelevant,,1,ajar,groq2,2,,,,,,0.0294,0,,
+34dceaeeecebdaed,sent,,1,ajar,groq2,2,economy,economy,unconfirmed,1,14.096,0.4556,0,وزارت کار سوریه به کمیته تعیین قیمت سوخت‌ها پیوست,وزیر انرژی سوریه وزارت امور اجتماعی و کار را به کمیته دائمی تعیین قیمت مواد نفتی و معدنی اضافه کرد. این اقدام پس از پیشنهادی از سوی یک عضو مجلس نمایندگان سوریه در جلسه اخیر صورت گرفت.
+86991bdb8f8460ea,irrelevant,,1,ajar,groq2,2,,,,,,0.2246,0,,
+2d028e0e0523d313,relevance_dropped,,1,ajar,groq2,2,security,none,unconfirmed,1,9.907,0.1647,0,گوگل بدافزاری با قابلیت خودبازنویسی توسط هوش مصنوعی کشف کرد,گروه امنیتی گوگل بدافزاری کشف کرد که می‌تواند کد خود را به‌طور خودکار با استفاده از هوش مصنوعی بازنویسی کند. این فرآیند بدون دخالت انسان انجام می‌شود و نگرانی‌های جدیدی در حوزه امنیت سایبری ایجاد کرده است.
+ea0f41915a957e41,unparseable,,1,bbc_en,mistral,2,,,,,,0.1554,0,,
+d43a587cff4f9aa0,unparseable,,1,bbc_en,mistral,2,,,,,,0.0797,0,,
+c0fc55177981e727,unparseable,,2,tg_esellco|tg_wfwitness,mistral,3,,,,,,0.3152,0,,
+4334bb1986c61897,unparseable,,1,osint613_a,mistral,3,,,,,,0.0621,0,,
+8dff033d91194b66,unparseable,,2,tg_geopolitics_prime|tg_minas_tirith,mistral,3,,,,,,0.4229,0,,
+79036971469e9b24,irrelevant,,6,osint613_a|tg_defenderdome|tg_entekhab|tg_tabzlive|tg_wfwitness,mistral,3,,,,,,0.2896,0,,
+6964636e1bf8c387,irrelevant,,1,tg_tabzlive,mistral,3,,,,,,0.2462,0,,
+35c2854ddbdc6890,irrelevant,,1,tg_militarywave,mistral,3,,,,,,0.2750,0,,
+33b25c4375ef8500,irrelevant,,1,tg_tabzlive,mistral,3,,,,,,0.1986,0,,
+5c1977c11c6dff0c,irrelevant,,2,tg_mornovosti,mistral,3,,,,,,0.3255,0,,
+898cf334ec03638d,irrelevant,,1,tg_tabzlive,groq2,3,,,,,,0.1414,0,,
+3de8b6cece961da5,irrelevant,,2,osint613_a|tg_defenderdome,groq2,3,,,,,,0.1171,0,,
+ac604882a946c730,irrelevant,,1,tg_wfwitness,groq2,3,,,,,,0.3858,0,,
+daee27be11ecc24b,irrelevant,,1,osint613_a,groq2,3,,,,,,0.3199,0,,
+e8794103f9006ae6,irrelevant,,1,tg_militarywave,groq2,3,,,,,,0.4043,0,,
+59e351b8a79c2015,irrelevant,,1,tg_entekhab,groq2,3,,,,,,0.2389,0,,
+27c2db0c49ea63ec,irrelevant,,1,tg_mornovosti,groq2,3,,,,,,0.1454,0,,
+0333f8f21062aa36,rank_dropped,,1,tg_fighter_radar,groq2,3,economy,economy,rumour,0,10.307,0.2642,0,افزایش شدید هزینه‌های معیشتی کارگران در ابتدای سال تحصیلی,رئیس اتحادیه پیشکسوتان جامعه کارگری اعلام کرد که افزایش دستمزد در ابتدای سال تنها برای ۲۳ روز پاسخگوی نیازها بود. اکنون این بازه زمانی به کمتر از ۱۰ روز کاهش یافته و بازنگری در دستمزدها ضروری است.
+7b40946ea9174242,clickbait,,1,tg_militarywave,groq2,3,,,,,,0.4709,0,,
+cf7de04471c63d61,lead_only,,1,tg_vahid_online,groq2,3,security,none,unconfirmed,0,6.981,0.3069,0,محکومیت ۹ وکیل گیلانی به مجموع ۱۴ سال حبس,شعبه دوم دادگاه انقلاب رشت ۹ وکیل دادگستری در استان گیلان را به مجموع ۱۴ سال و ۷ ماه حبس محکوم کرد. اتهامات شامل تبلیغ علیه نظام و توهین به رهبری و بنیان‌گذار جمهوری اسلامی است.
+30aa2967be8e0305,lead_only,,1,tg_vahid_online,groq2,3,economy,economy,unconfirmed,0,10.976,0.5566,0,بنک مرکزی امارات فعالیت بانک ملی ایران در این کشور را متوقف کرد,بنک مرکزی امارات متحده عربی فعالیت بانک ملی ایران را به دلیل تخلفات در قوانین مبارزه با پولشویی و تأمین مالی تروریسم ممنوع اعلام کرد. این تصمیم شامل توقف تمامی تراکنش‌های مالی به مقصد ایران و از ایران از طریق شعب این بانک در امارات است.
+51b098b6da09e6b1,lead_only,,1,tg_vahid_online,groq2,3,economy,economy,unconfirmed,0,10.973,0.5496,0,ارزش ریال پس از سخنان رئیس‌جمهور درباره برنامه هسته‌ای کاهش یافت,پس از تأکید رئیس‌جمهور ایران بر ادامه برنامه هسته‌ای و عدم تسلیم در برابر فشارهای آمریکا، نرخ دلار در بازار آزاد با افزایش ۱.۴ درصدی به ۲۳۵ هزار و ۴۰۰ تومان رسید. قیمت سکه‌های طلا نیز در همین بازه زمانی افزایش یافت.
+4675f27ac752787a,lead_only,,1,tg_vahid_online,groq2,3,politics,none,unconfirmed,0,5.943,0.3591,0,حکم اعدام ارغوان فلاحی پس از پذیرش اعاده دادرسی متوقف شد,حکم اعدام ارغوان فلاحی، زندانی سیاسی در زندان اوین، پس از پذیرش درخواست اعاده دادرسی متوقف شد. پرونده او برای رسیدگی مجدد به شعبه هم‌عرض ارجاع داده خواهد شد.
+f8178fe76f2cef38,lead_only,,2,tg_behold_israel,groq2,3,military,balance,unconfirmed,0,14.036,0.6480,0,ارتش اسرائیل فرمانده مالی حماس را در جنوب غزه کشت,ارتش اسرائیل و موسس امنیت ملی (ISA) محمد ابوالوان، رئیس بخش مالی حماس را در منطقه خانیونس غزه هدف قرار دادند و کشتند. مقامات اسرائیلی اعلام کردند که ابوالوان مسئول انتقال بیش از یک میلیارد شیکل برای تأمین مالی فعالیت‌های تروریستی حماس بوده است.
+ebb7855e40d604ad,clickbait,,2,tg_irane_azad_news|tg_tweet_mardomi,groq2,3,,,,,,0.3176,0,,
+99c500a11afd0560,irrelevant,,1,tg_vira_university,mistral,3,,,,,,-0.0554,0,,
+6b8dd2012295d81a,clickbait,,1,tg_padeshah_fxn,mistral,3,,,,,,0.3147,0,,

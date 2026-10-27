@@ -1,0 +1,131 @@
+﻿cluster_key,fate,reason,n_members,sources,provider,best_tier,category,significance,claim_status,independent_count,score,headline,summary
+e7db0c9201cee87a,sent_followup,band=high sim=0.82 score=19.92 kept=development prior=1db3accb,26,ajar|al_jazeera|al_monitor|iran_international|irna|sky_news_arabia|tg_entekhab|tg_fighter_radar|tg_geopolitics_prime|tg_irane_azad_news|tg_tsepress|tg_tweet_mardomi|tg_vahid_online,mistral,2,politics,balance,likely,5,19.917,ترامپ و دو مبعوث آمریکایی با هیئت ایرانی در نیویورک سه ساعت مذاکره کردند و جلسه دیگر را در آینده نزدیک اعلام کردند,ترامپ و مبعوثان آمریکا (استیو ویتکاف و جرد کوشنر) در نیویورک با هیئت ایرانی دیدار کردند و گفتند مذاکرات «خیلی خوب» پیش رفت. ایران نیز از طریق وزیر خارجی، شرایط خود را برای بازکردن تنگه هرمز به آمریکا منتقل کرد. ترامپ گفت «شتاب زیادی» برای رسیدن به توافق وجود دارد، اما هیچ جزئیتی از شرایط ایران منتشر نشد.
+ef8b8c0cbd0dc458,sent_followup,band=mid sim=0.70 score=19.48 kept=above_floor prior=3503fb8a,7,al_manar|al_monitor|mee|reuters_gnews|sky_news_arabia|tg_defenderdome,mistral,2,politics,balance,likely,4,19.485,ایران شرایط بازکردن تنگه هرمز را به مبعوث آمریکا اعلام کرد: رفع بلوکاد دریایی، پرداخت دارایی‌های مسدودشده و پایان جنگ در همه جبهه‌های مقاومت,وزیر خارجی ایران، عباس عراقجی، در دیدار با استیو ویتکاف، مبعوث آمریکا، سه شرط اصلی برای بازکردن تنگه هرمز را اعلام کرد: «رفع بلوکاد دریایی آمریکا، پرداخت فوری دارایی‌های مسدود ایران و پایان جنگ در همه جبهه‌های مقاومت». این شرایط در رسانه‌های رسمی ایران تکرار شد، اما آمریکا تاکنون تأیید یا رد رسمی نکرد.
+c805db3c1f4e29d9,oversized,,13,ajar|al_manar|iran_international|mee|sky_news_arabia|tg_entekhab|tg_irane_azad_news|tg_padeshah_fxn|tg_vira_university|tg_wfwitness,mistral,2,,,,,,,
+7c5e8911f2e71483,irrelevant,,4,ajar|bbc_en|sky_news_arabia,mistral,2,,,,,,,
+7f604bf798b2767f,sent_followup,band=mid sim=0.75 score=18.83 kept=above_floor prior=b3f1a8bd,4,al_monitor|dw|mee|osint613_a,mistral,2,politics,balance,likely,3,18.830,ترامپ در نشست با رهبران منطقه در نیویورک از پیشرفت مذاکرات با ایران سخن گفت، اما هیچ اعلامیه رسمی جدیدی منتشر نشد,ترامپ در نشستی با رهبران کشورهای خلیج فارس، ترکیه و کشورهای عربی منطقه در نیویورک، از «شتاب در مذاکرات با ایران» سخن گفت، اما هیچ جزئیتی از توافق یا پیشرفت جدیدی ارائه نکرد. این نشست در حاشیه مجمع عمومی سازمان ملل برگزار شد و هیچ اعلامیه رسمی منتشر نشد.
+819471ccaa60204d,oversized,,4,al_monitor|maariv|mee|osint613_a,mistral,2,,,,,,,
+51ede8f604bebb16,oversized,,3,al_jazeera|al_monitor|mee,mistral,2,,,,,,,
+5dbb220a9c16aaaa,relevance_dropped,band=mid sim=0.72 score=15.66 kept=above_floor prior=34e285ad,8,maariv|mee|tg_behold_israel|tg_irane_azad_news|tg_padeshah_fxn,mistral,2,military,none,likely,2,15.660,صدای انفجار در نزدیکی جزیره قشم و تنگه هرمز شنیده شد.,مصاحبه‌های مختلف خبری از صدای انفجار در نزدیکی جزیره قشم و تنگه هرمز گزارش دادند، اما علت و تأثیر آن مشخص نیست. هیچ منبعی به حمله یا هدف مشخصی اشاره نکرد و گزارش‌ها به جز صدا، جزئیات دیگری ارائه ندادند. این گزارش‌ها ممکن است ناشی از فعالیت‌های دریایی عادی یا حادثه‌ای غیرمستقیم باشد.
+a3d3a132e7a03a89,oversized,,29,aawsat|al_jazeera|al_manar|tg_entekhab|tg_esellco|tg_fighter_radar|tg_irane_azad_news|tg_iranian_militarism|tg_minas_tirith|tg_padeshah_fxn|tg_tsepress,mistral,2,,,,,,,
+f8e1868eda8248a1,oversized,,2,bbc_en|mee,mistral,2,,,,,,,
+65c5809a0d24149d,oversized,,12,bbc_en|mee|osint613_a|tg_fighter_radar|tg_irane_azad_news|tg_padeshah_fxn|tg_tsepress|tg_tweet_mardomi,mistral,2,,,,,,,
+0e4d8e2d59447c65,oversized,,6,haaretz|maariv|mee|osint613_a|tg_wfwitness,mistral,2,,,,,,,
+5ba05640957a6eac,oversized,,6,irna|mee|osint613_a|tg_rnintel|tg_wfwitness,mistral,2,,,,,,,
+cfee47aa3eef43fe,irrelevant,,2,bbc_en|dw,mistral,2,,,,,,,
+5c8aad620e95e0da,oversized,,1,mee,mistral,2,,,,,,,
+d3adc1f8a93c0f61,oversized,,4,ajar|tg_padeshah_fxn|tg_tabzlive,mistral,2,,,,,,,
+7aeee688762632bc,relevance_dropped,,1,aawsat,mistral,2,security,none,unconfirmed,1,10.895,دورهٔ دوم از ساختمان‌های آسیب‌دیده در غزه بدون جایگزین امن باقی مانده است,مسؤولان غزه تخمین می‌زنند که حدود ۲۰۰۰ ساختمان آسیب‌دیده و قابل سکونت در منطقه وجود دارد، اما هیچ جایگزینی برای ساکنان آن‌ها در دسترس نیست. این وضعیت به دلیل ادامه جنگ و عدم دسترسی به کمک‌های انسانی تشدید شده است. هیچ اثر مستقیم بر امنیت منطقه‌ای یا اقتصاد ایران گزارش نشده است.
+5e528b8249d61a13,oversized,,4,ajar|tg_minas_tirith|tg_padeshah_fxn,mistral,2,,,,,,,
+1c8e48e7d71aa3fa,oversized,,4,al_monitor|tg_geopwatch|tg_rnintel|tg_tabzlive,mistral,2,,,,,,,
+322af4bcf0d37a30,irrelevant,,3,bbc_persian|tg_geopolitics_prime,mistral,2,,,,,,,
+60c4da6a717e9ad5,repeat_dropped,band=mid sim=0.68 score=13.05 blocked=below_floor prior=4d119f60,5,al_manar|mee|osint613_a|tg_wfwitness,groq2,2,military,none,unconfirmed,1,13.049,حمله‌های هوایی و توپخانه‌ای اسرائیل به جنوب لبنان و غزه,نیروهای اسرائیلی به مناطق جنوب لبنان و شهر غزه حمله کردند. گزارش‌ها از کشته شدن سه فلسطینی در غزه و بمباران چندین شهرک در لبنان خبر می‌دهند.
+b7400e89748eb03a,sent_followup,band=mid sim=0.71 score=17.80 kept=above_floor prior=be078447,3,tg_fighter_radar|tg_iranian_militarism|the_war_zone,groq2,2,military,balance,unconfirmed,1,17.805,اعزام تانکر هوایی بریتانیا برای حمایت از عربستان,بریتانیا یک تانکر هوایی A330 MRTT را برای حمایت از دفاع هوایی عربستان علیه حوثی‌ها اعزام کرد. منابع غیررسمی از اختلال فنی در سیستم سوخت‌رسانی این هواپیما خبر داده‌اند.
+6d4ee95c0080d5a9,relevance_dropped,,2,haaretz,groq2,2,politics,none,unconfirmed,1,9.681,دعوت به رأی‌گیری برای محرومیت رهبر حزب بالاد از انتخابات,دادستان کل اسرائیل از درخواست محرومیت سامی ابوشهده از انتخابات کنگره حمایت کرد. نظرسنجی جدید نشان می‌دهد ائتلاف آیزنکوت از نتانیاهو پیشی گرفته است.
+ec16bd5fcd3e8283,sent_followup,band=mid sim=0.74 score=17.77 kept=above_floor prior=1f557fc3,3,al_manar|the_war_zone,groq2,2,politics,escalation,unconfirmed,1,17.771,ایران شرط رفع تحریم‌ها را پایان جنگ در همه جبهه‌ها اعلام کرد,رسانه‌های ایرانی گزارش دادند ایران برای بازگشایی تنگه هرمز، پایان جنگ در تمام جبهه‌های مقاومت را شرط کرده است. همزمان گزارش‌های جدیدی از خسارات وارده به نیروی هوایی آمریکا منتشر شده است.
+231eb2af2050fa76,repeat_dropped,band=mid sim=0.60 score=9.57 blocked=below_floor prior=d00ca27b,1,al_jazeera,groq2,2,politics,none,unconfirmed,1,9.569,دعوت به رأی‌گیری برای محرومیت رهبر حزب بالاد از انتخابات,بیش از ۳۰۰ شهروند آمریکایی-فلسطینی با نمایندگان کنگره دیدار کردند تا از تغییر سیاست آمریکا در قبال اسرائیل بخواهند. این دیدارها در حالی است که ترامپ درخواست بودجه ۲.۸ میلیارد دلاری برای اسرائیل را مطرح کرده است.
+3a646606d7e108cf,oversized,,1,mee,mistral,2,,,,,,,
+4d73d102fc8c74e2,oversized,,1,irna,mistral,2,,,,,,,
+b497fc6b725f8568,oversized,,1,al_jazeera,mistral,2,,,,,,,
+d09b027432024309,irrelevant,,1,al_jazeera,mistral,2,,,,,,,
+bf150857a8456792,oversized,,1,walla,mistral,2,,,,,,,
+fdd8566dd7c788aa,oversized,,1,mee,mistral,2,,,,,,,
+c7358f314c5abc32,oversized,,2,sky_news_arabia|tg_geopolitics_prime,mistral,2,,,,,,,
+d65ac2da32f13e5a,irrelevant,,4,ajar|tg_irane_azad_news|tg_iranian_militarism,mistral,2,,,,,,,
+cf5378ce79d8bb2b,irrelevant,,1,reuters_gnews,mistral,2,,,,,,,
+9ae4abf790b965c2,sent_followup,band=mid sim=0.77 score=15.31 kept=above_floor prior=d242af97,1,al_jazeera,mistral,2,security,balance,unconfirmed,1,15.306,کینگ سلمان عربستان حمله به مکه توسط هوثی‌ها را تروریستی خواند,کینگ سلمان عربستان در بیانیه‌ای نادر، حمله‌های هوثی‌ها به مناطق مقدس را تروریستی توصیف کرد و از افزایش حملات از سوی یمن هشدار داد. این بیانیه نشان‌دهنده حس اضطراری در عربستان است، اما هیچ اطلاعاتی دربارهٔ اقدامات عملی یا تأثیرات امنیتی ارائه نشده است. این موضوع بر روی بحران امنیتی یمن و تأثیر آن بر عربستان تأکید دارد.
+06c1914158d74366,repeat_dropped,band=mid sim=0.61 score=9.36 blocked=below_floor prior=1c7ba7f2,2,irna|tg_fighter_radar,mistral,2,politics,none,unconfirmed,1,9.360,رهبر انقلاب به فرمانده نیروی هوافضای سپاه دستورهای خطی داد.,رهبر انقلاب در یک یادداشت خطی به فرمانده نیروی هوافضای سپاه دستورهای مربوط به تحولات امنیتی و دفاعی داده است. این یادداشت در پی تحولات اخیر و در ارتباط با هفته دفاع مقدس منتشر شده است. هیچ اشاره‌ای به تأثیر عملی بر جنگ یا سیاست خارجی ایران نشده است.
+ac797766d2e7f5b4,irrelevant,,1,naval_news,mistral,2,,,,,,,
+91ee1d27812e1476,irrelevant,,1,al_jazeera,mistral,2,,,,,,,
+d37fc902e2fd77c1,irrelevant,,1,haaretz,mistral,2,,,,,,,
+4903314769a949f7,repeat_dropped,band=high sim=0.81 score=9.06 blocked=below_floor prior=f852541c,1,al_jazeera,mistral,2,politics,none,unconfirmed,1,9.062,امیر قطر حمله اسرائیل در منطقه را محکوم کرد.,امیر قطر در بیانیه‌ای حمله اسرائیل به کشورهای همسایه را محکوم کرد. این بیانیه به طور مستقیم با منافع امنیتی ایران یا جنگ ایران-اسرائیل مرتبط نیست و جزئیات عملیاتی یا نظامی ندارد.
+ece4dce35dc53836,irrelevant,,1,mehr,mistral,2,,,,,,,
+38d2af87157a98d5,irrelevant,,1,aviationist,mistral,2,,,,,,,
+ce2476d6f695857d,irrelevant,,1,al_jazeera,mistral,2,,,,,,,
+dbec20407d5902bf,irrelevant,,1,ajar,mistral,2,,,,,,,
+3591bab7d052e38b,oversized,,1,iran_international,mistral,2,,,,,,,
+ad3f7098ca0ab9ba,irrelevant,,1,ajar,mistral,2,,,,,,,
+37ff552f7f9319dc,irrelevant,,1,al_monitor,mistral,2,,,,,,,
+10144e09da91197a,irrelevant,,1,ajar,mistral,2,,,,,,,
+35ca154f1425aa9c,sent_followup,band=mid sim=0.74 score=14.56 kept=above_floor prior=063f5e0e,1,reuters_gnews,mistral,2,economy,balance,unconfirmed,1,14.558,بورس‌های خلیج فارس با احتمال مذاکرات آمریکا و ایران در سازمان ملل متغیر است.,بورس‌های منطقه با احتمال برگزاری مذاکرات آمریکا و ایران در سازمان ملل نوسان دارند. هیچ اطلاعاتی مبنی بر نتیجه یا زمان دقیق مذاکرات ارائه نشده است. این موضوع می‌تواند بر قیمت نفت و بازارهای مالی منطقه تأثیر بگذارد.
+460a9ddf44b9a73f,sent_followup,band=mid sim=0.57 score=15.00 kept=above_floor prior=13e56cd0,1,bbc_en_me,mistral,2,military,balance,unconfirmed,1,15.000,دو ناوگان کشتی در تنگه هرمز پس از حمله به یک کشتی نفت‌کش غایب شدند.,امارات ادعا می‌کند دو ناوگان کشتی پس از حمله به یک نفت‌کش در تنگه هرمز ناپدید شده‌اند. ایران ادعا می‌کند کشتی با بمب‌های دریایی برخورد کرد، در حالی که آمریکا ادعا می‌کند از یک موشک و سپس یک درون استفاده شده است. این موضوع می‌تواند به افزایش خطرات امنیتی در تنگه هرمز و مسیرهای تجاری نفت منجر شود.
+06b0ad7d577f8c31,irrelevant,,2,osint613_a|tg_tabzlive,mistral,3,,,,,,,
+f5fb3c664bf38ffe,irrelevant,,2,tg_tabzlive,mistral,3,,,,,,,
+1ef1f3d1fb2ba952,irrelevant,,3,tg_geopolitics_prime|tg_tabzlive,mistral,3,,,,,,,
+111fbb5414a9c500,repeat_dropped,band=mid sim=0.59 score=10.94 blocked=below_floor prior=b689cd34,1,tg_rnintel,mistral,3,economy,economy,rumour,0,10.939,جمهوری‌خواهان در آمریکا برای کاهش قیمت بنزین، صادرات دیزل به خارج را موقتاً متوقف کنند,جمهوری‌خواهان و دونالد ترامپ از کنگره خواستند تا صادرات دیزل به خارج را موقتاً متوقف کند تا قیمت بنزین در انتخابات میانه‌رو کاهش یابد. این اقدام صرفاً سیاسی است و هیچ اثری بر بازار جهانی نفت یا اقتصاد ایران ندارد.
+efb3dfa65c178cee,oversized,,3,osint613_a|tg_geopwatch|tg_padeshah_fxn,mistral,3,,,,,,,
+320b850bfc526bfe,repeat_dropped,band=mid sim=0.76 score=10.97 blocked=below_floor prior=cbac4fc8,2,osint613_a|tg_defenderdome,groq2,3,politics,balance,rumour,0,10.966,پزشکیان برای شرکت در مجمع عمومی سازمان ملل در نیویورک فرود آمد,رئیس‌جمهور ایران در نیویورک فرود آمد تا در نشست‌های مجمع عمومی شرکت کند. این سفر در حالی رخ می‌دهد که گزارش‌های اولیه از پرتاب موشک به سمت تنگه هرمز وجود دارد.
+97937ac115e094e1,repeat_dropped,band=mid sim=0.71 score=6.06 blocked=below_floor prior=3503fb8a,4,tg_fighter_radar|tg_tabzlive,groq2,3,politics,none,rumour,0,6.061,روبیو بر عدم امکان دارا شدن سلاح هسته‌ای توسط ایران تأکید کرد,وزیر خارجه آمریکا در سخنانی تأکید کرد که رژیم ایران هرگز نباید به سلاح هسته‌ای دست یابد. او همچنین به پیامدهای اقتصادی و امنیتی چنین سناریویی برای منطقه اشاره کرد.
+9f883f6cf7bb805c,sent_followup,band=mid sim=0.66 score=16.90 kept=above_floor prior=3f5c5e91,3,tg_fighter_radar|tg_padeshah_fxn,groq2,3,military,escalation,rumour,0,16.900,گزارش از درگیری شدید و پرتاب موشک در تنگه هرمز,خبرگزاری‌ها از وقوع درگیری شدید و پرتاب موشک‌های ضدکشتی سپاه به سمت یک کشتی در تنگه هرمز خبر دادند. این گزارش‌ها در حالی منتشر شد که فضای مذاکرات بین ایران و آمریکا بحث‌برانگیز است.
+e1f54a25f99137c3,sent_followup,band=high sim=0.86 score=17.68 kept=development prior=ab535239,12,osint613_a|tg_entekhab|tg_geopwatch|tg_tabzlive|tg_wfwitness,groq2,3,military,escalation,rumour,0,17.678,صدای انفجار در نزدیکی جزیره قشم و تنگه هرمز شنیده شد,گزارش‌های اولیه از شنیده شدن صدای انفجار در نزدیکی جزیره قشم و پرتاب موشک‌های ضدکشتی از جنوب ایران به سمت تنگه هرمز حکایت دارد. منابع محلی تاکنون در این زمینه اظهارنظر نکرده‌اند و جزئیات دقیق مورد تأیید رسمی نیست.
+3ab4f5be3b535eb8,clickbait,,1,osint613_a,groq2,3,,,,,,,
+00fcc26e5747cc7f,relevance_dropped,,1,osint613_a,mistral,3,security,none,rumour,0,6.643,هاماس در تولکرام (نوار غزه) تجمع برگزار کرد در حالی که فرانسه ادعا کرد هیچ حضور رسمی هاماس در آن منطقه نیست,تجمعی از طرفداران هاماس در تولکرام (نوار غزه) برگزار شد، اما فرانسه ادعا کرد هیچ سازمان رسمی هاماس در آن منطقه وجود ندارد. این ادعا با گزارش‌های محلی و حضور فعالان سیاسی هاماس در تجمع در تضاد است. هیچ اثری از تأثیر مستقیم بر امنیت منطقه یا ایران در این گزارش‌ها دیده نمی‌شود.
+17cf034de50f143c,relevance_dropped,,1,al_manar,mistral,3,security,none,rumour,0,6.633,قوات اشغالگر در قریوت (نابلس) گاز اشک‌آور پرتاب کرد که منجر به آسیب‌های تنفسی شد,قوات اشغالگر در حمله به روستای قریوت (جنوب نابلس) گاز اشک‌آور پرتاب کردند که باعث آسیب‌های تنفسی در بین ساکنان شد. هیچ ادعای رسمی از طرف هیچ یک از طرفین در مورد مسئولیت یا مقصود این حمله وجود ندارد. این اقدام به احتمال زیاد بخشی از عملیات‌های روزانه امنیتی در مناطق تحت اشغال است و تأثیر مستقیمی بر ایران ندارد.
+5d4b9a7ca311bcc8,irrelevant,,4,tg_entekhab|tg_padeshah_fxn|tg_vahid_online|tg_wfwitness,mistral,3,,,,,,,
+25c6f77f7296682a,irrelevant,,1,tg_minas_tirith,mistral,3,,,,,,,
+0075ae43675ad288,oversized,,12,tg_entekhab|tg_fighter_radar|tg_irane_azad_news|tg_iranian_militarism|tg_tweet_mardomi,mistral,3,,,,,,,
+3b83f76f331178ea,repeat_dropped,band=mid sim=0.72 score=5.72 blocked=below_floor prior=8bcc3fb3,3,tg_entekhab|tg_irane_azad_news,mistral,3,politics,none,rumour,0,5.718,سرلشکر رحیم صفوی از حمایت‌های روسیه و چین به ایران در زمینه‌های غیر سیاسی سخن گفت.,سرلشکر رحیم صفوی، دستیار خامنه‌ای، در گفتگوهای خصوصی اشاره کرد که روسیه و چین علاوه بر حمایت‌های سیاسی، به ایران در زمینه‌های دیگر نیز کمک می‌کنند. این اظهارات در یک گفتگوی غیررسمی و بدون تأیید رسمی منتشر شده‌اند. هیچ اشاره‌ای به تأثیر عملی این حمایت‌ها بر سیاست خارجی یا امنیت ملی ایران نشده است.
+6106dbe5d91eab01,irrelevant,,1,tg_wfwitness,mistral,3,,,,,,,
+68f665c51d716db3,repeat_dropped,band=mid sim=0.58 score=6.37 blocked=below_floor prior=ade69318,1,osint613_a,mistral,3,security,none,rumour,0,6.370,نیروی دفاعی اسرائیل در نزدیکی قصر الیهود به جستجوی فعالیت‌های مشکوک پرداخت.,نیروی دفاعی اسرائیل و پلیس در نزدیکی قصر الیهود در مرز اردن به جستجوی فعالیت‌های مشکوک پرداختند. این فعالیت‌ها به احتمال زیاد به یک تلاش برای قاچاق کالا مربوط است. هیچ اطلاعاتی مبنی بر دستگیری یا کشف بار مهمی منتشر نشده است.
+c22f25fd3928f99c,repeat_dropped,band=mid sim=0.56 score=10.38 blocked=below_floor prior=37db76f8,3,tg_fighter_radar|tg_wfwitness,mistral,3,economy,economy,rumour,0,10.383,ترامپ از افزایش قابل توجه حجم نفت عبورکننده از تنگه هرمز پس از آغاز درگیری خبر داد.,ترامپ در یک نشست با کشورهای شورای همکاری خلیج فارس اعلام کرد که حجم نفت عبورکننده از تنگه هرمز به حداکثر میزان خود پس از آغاز درگیری رسیده است. او همچنین از عملیات روزانه و شبانه برای خارج کردن کشتی‌ها از منطقه با عنوان «دیوار فولادی» سخن گفت. این موضوع بر جریان نفت و اقتصاد منطقه تأثیر مستقیم دارد.
+307646edbac0bf1b,irrelevant,,2,osint613_a|tg_fighter_radar,mistral,3,,,,,,,
+2d6fca266d1fe885,clickbait,,1,tg_tsepress,mistral,3,,,,,,,
+ea9e4030b97e4cba,relevance_dropped,,1,tg_geopwatch,mistral,3,economy,none,rumour,0,6.969,ترامپ پیشنهاد ممنوعیت صادرات دیزل آمریکا را مطرح کرد.,ترامپ در کنفرانس مطبوعاتی با زلنسکی در کنار مجمع عمومی سازمان ملل متحد، ممنوعیت صادرات دیزل آمریکا را پیشنهاد داد. این اقدام ممکن است بر قیمت‌های داخلی دیزل در آمریکا تأثیر مثبت بگذارد، اما می‌تواند بر بازار جهانی نفت و قیمت‌های جهانی تأثیر منفی بگذارد. این پیشنهاد هنوز به تصویب نرسیده است.
+f73463010fcc7ca0,repeat_dropped,band=mid sim=0.69 score=11.00 blocked=below_floor prior=4e86e20e,1,tg_tanker_trackers,mistral,3,military,balance,rumour,0,11.000,کشورهای عربی روزانه ۶٫۹۲ میلیون بشکه نفت خام را از طریق خط بلوک‌نشینی نیروی دریایی آمریکا صادر کردند.,در ۲۸ روز گذشته، ۲٫۵۳ میلیون بشکه نفت از ترمینال‌های خلیج عمان و ۴٫۳۹ میلیون بشکه از تنگه هرمز صادر شد. این حجم از نفت به کشتی‌های منتظر در خلیج عمان منتقل می‌شود. این گزارش از سوی «تانکر تریکرز» منتشر شد و نشان‌دهنده ادامه جریان نفت در منطقه است.
+644ea0657923a8fb,sent,,4,al_jazeera|bbc_en|sky_news_arabia,mistral,2,military,balance,likely,3,21.895,آمریکا با دانمارک و گرینلند توافق امنیتی برای گسترش حضور نظامی در قطب شمال را امضا کرد.,ترامپ، دانمارک و گرینلاند توافق امنیتی جدیدی را امضا کردند که به آمریکا اجازه می‌دهد حضور نظامی خود در گرینلند را گسترش دهد. این توافق پس از ماه‌ها اختلافات با اروپا و تهدید ترامپ برای کنترل گرینلند به امضا رسید. این توافق شامل ساخت دو پایگاه نظامی جدید در گرینلند است.
+7b70b617a1a51d00,irrelevant,,2,ajar|sky_news_arabia,mistral,2,,,,,,,
+49f0d9d33832f4b9,irrelevant,,2,bbc_en|mee,mistral,2,,,,,,,
+64fb0dfa5f2c0d1d,irrelevant,,2,sky_news_arabia|tg_tabzlive,mistral,2,,,,,,,
+806c201b6515558d,irrelevant,,1,al_jazeera,mistral,2,,,,,,,
+5526283ac7f404b0,irrelevant,,1,al_jazeera,mistral,2,,,,,,,
+1fb9268bf3f6707a,irrelevant,,1,maariv,mistral,2,,,,,,,
+371954b7eb71231c,irrelevant,,1,bbc_en,mistral,2,,,,,,,
+74f5ca2131efd3ba,oversized,,1,walla,mistral,2,,,,,,,
+bdd1ffd6fea01de9,oversized,,1,mee,mistral,2,,,,,,,
+9524ddae013a305f,irrelevant,,1,al_jazeera,mistral,2,,,,,,,
+43a0b427e865ae8d,oversized,,1,al_jazeera,mistral,2,,,,,,,
+a6752072afbb19e3,irrelevant,,1,ajar,mistral,2,,,,,,,
+caf04cf58aa990a2,irrelevant,,1,al_jazeera,mistral,2,,,,,,,
+2395bc5364aa7628,irrelevant,,1,maariv,mistral,2,,,,,,,
+f4a2c10a77f3851f,relevance_dropped,,2,naval_news|the_war_zone,mistral,2,military,none,unconfirmed,1,12.052,سیستم دفاع نزدیک جدید فرانسه، رامپارت، در کشتی‌های کلاس میسترال دریایی فرانسه نصب شد,سیستم رامپارت، که می‌تواند موشک‌های هدایت‌شده با لیزر و موشک‌های کوچک را شلیک کند، در کشتی‌های کلاس میسترال دریایی فرانسه نصب شده و برای آزمایش‌های دریایی آماده شده است. این سیستم در تمرین WildFire آزمایش خواهد شد. این توسعه در زمینه دفاع دریایی اروپا اهمیت دارد اما تأثیر مستقیم بر ایران ندارد.
+ac54dc4ae417afb8,irrelevant,,1,ajar,mistral,2,,,,,,,
+c57de035f22486b2,irrelevant,,1,sky_news_arabia,mistral,2,,,,,,,
+5a79f85c0c1b87a4,irrelevant,,1,al_jazeera,mistral,2,,,,,,,
+97a1ecaf3c76d62c,irrelevant,,1,al_jazeera,mistral,2,,,,,,,
+8c227b268b9b0cc4,irrelevant,,1,the_war_zone,mistral,2,,,,,,,
+b24f0801c17ef5ec,irrelevant,,1,ajar,mistral,2,,,,,,,
+224291b380d158c6,irrelevant,,1,ajar,groq,2,,,,,,,
+9d5c94f238e02da2,irrelevant,,1,maariv,groq,2,,,,,,,
+3881e0a752251638,irrelevant,,1,ajar,groq,2,,,,,,,
+a55a6695fefd9e30,repeat_dropped,band=high sim=0.81 score=8.54 blocked=below_floor prior=35278439,1,al_monitor,groq,2,politics,none,unconfirmed,1,8.540,وزیران دفاع مصر، یونان و قبرس در قاهره دیدار کردند,وزیران دفاع مصر، یونان و قبرس در قاهره دیدار کردند تا همکاری‌های امنیتی و انرژی را در شرق مدیترانه افزایش دهند. این دیدار بخشی از تلاش‌های دیپلماتیک برای تقویت روابط منطقه‌ای است.
+ea606822a7a66b1e,irrelevant,,1,ajar,groq,2,,,,,,,
+b91b05cd24499779,clickbait,,1,ajar,groq,2,,,,,,,
+a7e35bf84ccfb7fb,irrelevant,,1,naval_news,groq,2,,,,,,,
+354af0d8d12d7fd4,irrelevant,,1,tg_wfwitness,groq,3,,,,,,,
+626734fca6823b05,irrelevant,,2,tg_tabzlive|tg_wfwitness,groq,3,,,,,,,
+21f4fd7b530ca7f3,irrelevant,,1,tg_tabzlive,groq,3,,,,,,,
+3c1b0f128e5e7fbb,repeat_dropped,band=mid sim=0.63 score=6.77 blocked=below_floor prior=ade69318,1,al_manar,groq,3,security,none,rumour,0,6.772,دستگاه‌های امنیتی اسرائیل به خانه‌ای در عقابا شمال طوباس یورش بردند,نیروهای اسرائیلی در جریان درگیری‌های اخیر به یک خانه در شهرک عقابا یورش بردند. جزئیات بیشتر درباره خسارات یا دستگیری‌ها در این گزارش ذکر نشده است.
+23768a9163c186e1,relevance_dropped,,1,tg_tabzlive,groq,3,politics,none,rumour,0,5.772,مارکو رابو تأکید کرد ایالات متحده هرگز شهروندان را هدف قرار نمی‌دهد,وزیر خارجه آمریکا در واکنش به انتقادات، تأکید کرد که هدف‌گیری غیرنظامیان سیاست واشنگتن نیست. او اعتراف کرد که در جنگ‌ها گاهی غیرنظامیان در میان آتش متقابل آسیب می‌بینند.
+653842eb48bf6c28,irrelevant,,4,tg_tabzlive,groq,3,,,,,,,
+a14943f68f4c0ae0,irrelevant,,2,tg_mornovosti,groq,3,,,,,,,
+d3eb1c919b0fbf18,irrelevant,,2,osint613_a|tg_geopolitics_prime,groq,3,,,,,,,
+dcd5dc2f9cc65804,irrelevant,,1,tg_wfwitness,groq,3,,,,,,,
+c96ce9acb2584513,irrelevant,,1,osint613_a,groq,3,,,,,,,
+7c28994bf6ecc68f,irrelevant,,1,osint613_a,groq,3,,,,,,,
+1f80fb28890a835e,irrelevant,,1,tg_entekhab,groq,3,,,,,,,
+292080b8c260df8d,irrelevant,,1,osint613_a,groq,3,,,,,,,
+d8e086773fffc6b3,clickbait,,1,tg_fighter_radar,groq,3,,,,,,,
+b6b868bee63315a2,repeat_dropped,band=mid sim=0.64 score=13.22 blocked=below_floor prior=fba9fa59,1,osint613_a,groq,3,politics,escalation,rumour,0,13.222,اشاره ترامپ به احتمال تخریب کوه پیک‌اکس در ایران,دونالد ترامپ اشاره کرد که ممکن است لازم باشد کوه پیک‌اکس (Pickaxe Mountain) را منفجر کنند. این اظهارنظر در زمینه برنامه هسته‌ای ایران مطرح شده و نشان‌دهنده فشارهای احتمالی بر زیرساخت‌های هسته‌ای است.
+0c2fa275331268b2,irrelevant,,2,tg_rnintel|tg_wfwitness,groq,3,,,,,,,
+1d79c78cb554922c,irrelevant,,1,tg_entekhab,groq,3,,,,,,,
+a9b7f065712eb741,clickbait,,1,tg_irane_azad_news,groq,3,,,,,,,
+3b4e44f030488989,clickbait,,1,tg_behold_israel,groq,3,,,,,,,
+5592771f743317c2,clickbait,,1,tg_irane_azad_news,groq,3,,,,,,,
+a8f3ae8159dee61e,irrelevant,,1,tg_vira_university,groq,3,,,,,,,
+104b8bdc8fd1f827,clickbait,,6,tg_padeshah_fxn,groq,3,,,,,,,
+7c641e57482ddbc2,irrelevant,,1,tg_irane_azad_news,groq,3,,,,,,,
+bf8cedab3fe7734c,irrelevant,,1,tg_behold_israel,groq2,3,,,,,,,
+689d6f929ad44a2b,lead_only,,1,tg_geopolitics_prime,groq2,3,economy,economy,unconfirmed,0,10.195,نتایج سیاسی و مالی اجلاس بریکس در هند,اجلاس بریکس در دهلی نو با صدور بیانیه مشترک و افزایش انسجام سیاسی به پایان رسید. تحلیل‌گران بر گسترش استفاده از ارزهای ملی و تقویت زیرساخت‌های مالی برای مقابله با تحریم‌ها تأکید دارند.
+7ebe683d82e6ce39,lead_only,,1,tg_behold_israel,groq2,3,politics,none,unconfirmed,0,4.906,خروج کلمبیا از پرونده دیوان بین‌المللی دادگستری علیه اسرائیل,کلمبیا اعلام کرد از پرونده حقوقی خود در دیوان بین‌المللی دادگستری علیه اسرائیل عقب‌نشینی می‌کند. این تصمیم نشان‌دهنده تغییر در رویکرد دیپلماتیک این کشور در قبال این پرونده است.
+3bc01d8ef43c64e6,lead_only,,1,tg_geopolitics_prime,groq2,3,military,balance,unconfirmed,0,12.859,انتشار ویدیوی جدید از پیشروی حوثی‌ها در یمن,حوثی‌ها ویدیویی از آنچه پیروزی بر نیروهای سعودی می‌نامند منتشر کردند. در این فیلم صحنه‌هایی از درگیری و پیشروی به سمت بندر استراتژیک الموکا نشان داده شده است.
+d63c0b89c5a3adf6,irrelevant,,1,tg_behold_israel,groq2,3,,,,,,,

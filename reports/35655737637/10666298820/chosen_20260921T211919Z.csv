@@ -1,0 +1,58 @@
+﻿cluster_key,fate,reason,n_members,sources,provider,best_tier,category,significance,claim_status,independent_count,score,headline,summary
+11fbdc1f7cf25e62,unavailable,,8,al_manar|irna|maariv|tg_entekhab|tg_fighter_radar|tg_padeshah_fxn|tg_tabzlive|tg_wfwitness,,2,,,,,,,
+eb229d75903825ed,unavailable,,2,aawsat|mee,,2,,,,,,,
+bbc63345b4b70f82,unavailable,,1,irna,,2,,,,,,,
+c22a348d51876317,unavailable,,4,maariv|tg_fighter_radar|tg_tabzlive|tg_wfwitness,,2,,,,,,,
+56a4253036c4a103,unavailable,,2,mee|tg_iranian_militarism,,2,,,,,,,
+9dfb80b7dd87b452,unavailable,,15,maariv|tg_defenderdome|tg_fighter_radar|tg_geopwatch|tg_padeshah_fxn|tg_rnintel|tg_tabzlive|tg_wfwitness,,2,,,,,,,
+4dc8e70f2aaffc9c,unavailable,,6,sky_news_arabia|tg_fighter_radar|tg_irane_azad_news|tg_wfwitness,,2,,,,,,,
+8e6c6069b5251b56,unavailable,,4,sky_news_arabia|tg_padeshah_fxn|tg_wfwitness,,2,,,,,,,
+a51b232d9a6916cd,unavailable,,1,haaretz,,2,,,,,,,
+8bdc462214f4847a,unavailable,,1,al_jazeera,,2,,,,,,,
+389a9530ac0ab0f2,irrelevant,,3,tg_entekhab|tg_tweet_mardomi|walla,groq2,2,,,,,,,
+e919d54246d11e57,irrelevant,,4,al_monitor|tg_rnintel|tg_tabzlive|tg_wfwitness,groq2,2,,,,,,,
+6ab68fd75a253b62,irrelevant,,1,al_jazeera,groq2,2,,,,,,,
+53e75566558002d7,relevance_dropped,,1,irna,groq2,2,politics,none,unconfirmed,1,9.716,پزشکیان: ایران و پاکستان می‌توانند از ظرفیت‌های منطقه‌ای بهره ببرند,مسعود پزشکیان، رئیس‌جمهور ایران، ایران و پاکستان را دو کشور قدرتمند با ظرفیت‌های انسانی و منابع غنی توصیف کرد. او بر استفاده از پتانسیل‌های منطقه‌ای برای برآورده کردن نیازهای هر دو کشور تأکید کرد.
+28eab84d8e76a95c,relevance_dropped,,1,irna,groq2,2,politics,none,unconfirmed,1,9.657,خارجیه ایران: ادعای فرانسه درباره تعطیلی مرکز زبان نادرست است,وزارت خارجه ایران ادعای وزارت خارجه فرانسه مبنی بر تعطیلی مرکز زبان وابسته به سفارت فرانسه را قویاً رد کرد. مقامات ایرانی تأکید کردند که این مرکز پس از هشدارهای متعدد بسته شده است.
+e2c80ac3ff3fd80f,sent,,1,al_monitor,groq2,2,security,economy,unconfirmed,1,13.226,تعطیل جشنواره فیلم دریای سرخ به دلیل حملات حوثی بر عربستان,عربستان سعودی جشنواره فیلم دریای سرخ را به دلیل افزایش حملات گروهی حوثی یمن به تعویق انداخت. این رویداد در حالی رخ می‌دهد که گزارش‌ها از اختلالات اقتصادی ناشی از این حملات حکایت دارند.
+69d06b7205c37675,irrelevant,,1,ajar,groq2,2,,,,,,,
+fff4b1dd44a65cc9,irrelevant,,1,ajar,groq2,2,,,,,,,
+b517c79a34e47d28,irrelevant,,1,ajar,groq2,2,,,,,,,
+7a7cd3d75765ee3b,repeat_dropped,band=mid sim=0.73 score=10.02 blocked=below_floor prior=6d642455,1,ajar,groq2,2,security,none,unconfirmed,1,10.024,افزایش شدید آمار آوارگان در یمن به دلیل تشدید درگیری‌های نظامی,با تشدید درگیری‌ها میان نیروهای دولتی و گروهی حوثی، تعداد آوارگان در یمن به‌طور قابل توجهی افزایش یافته است. این وضعیت منجر به بدتر شدن شرایط معیشتی مردم در این کشور شده است.
+a16082b7b0473f3d,irrelevant,,1,ajar,groq,2,,,,,,,
+8bca49c23ea8e93d,repeat_dropped,band=mid sim=0.59 score=11.98 blocked=below_floor prior=6d642455,1,ajar,groq,2,military,none,unconfirmed,1,11.980,عدم تسلط حوثی‌ها بر سه استان یمن,حوثی‌ها پس از کنترل صنعای در سال ۲۰۱۴، نتوانسته‌اند بر سه استان یمن که حدود نصف مساحت کشور را تشکیل می‌دهند، تسلط کامل پیدا کنند. این گزارش وضعیت فعلی گستره جغرافیایی کنترل‌شده توسط این گروه را توصیف می‌کند.
+b3313f8b498d84a3,repeat_dropped,band=mid sim=0.61 score=13.84 blocked=below_floor prior=f1c26103,1,irna,groq,2,politics,balance,unconfirmed,1,13.838,ارغچی: واشنگتن باید از چنگال لابی اسرائیل رها شود,عباس عراقچی، وزیر خارجه ایران، در واکنش به گزارش‌های رسانه‌های اسرائیلی، خواستار رهایی واشنگتن از تحت‌تأثیر قرار گرفتن توسط لابی‌های اسرائیلی شد. این بیانیه بخشی از دیپلماسی کلامی ایران در قبال سیاست‌های آمریکا است.
+a3ba7c2f212da840,irrelevant,,1,irna,groq,2,,,,,,,
+73d441fb4769c86a,repeat_dropped,band=mid sim=0.73 score=8.86 blocked=below_floor prior=ade69318,1,reuters_gnews,groq,2,security,none,unconfirmed,1,8.861,انفجار انبار مهمات در سوریه,یک انبار مهمات در سوریه منفجر شد که چهارمین انفجار از این نوع در ماه جاری است. جزئیات دقیق‌تری درباره علت انفجار یا خسارات در این خبر کوتاه ارائه نشده است.
+ddc4309a53df3b09,sent,,1,tg_wfwitness,groq2,3,military,escalation,rumour,0,16.957,مرکز فرماندهی مرکزی آمریکا ۱۱۰ کشتی را در تنگه هرمز بازگرداند,CENTCOM اعلام کرد که از تاریخ ۲۱ سپتامبر، ۱۱۰ کشتی را در راستای اجرای محاصره تغییر مسیر داده است. این اقدام نشان‌دهنده فعال‌سازی عملیاتی محدودیت‌های دریایی در منطقه است.
+a3ba3b1b24a6286a,repeat_dropped,band=high sim=0.90 score=13.95 blocked=below_floor prior=8f053a39,1,tg_tsepress,groq2,3,military,balance,rumour,0,13.950,حضور ۲۵ هواپیمای سوخت‌رسان آمریکا در پایگاه العدید قطر ثبت شد,تصاویر ماهواره‌ای نشان می‌دهد دست‌کم ۲۵ هواپیمای سوخت‌رسان نیروی هوایی آمریکا در پایگاه العدید مستقر هستند. این بالاترین میزان حضور این ناوگان در پایگاه مذکور از زمان آغاز درگیری‌ها در فوریه است.
+94c475276552ffa8,repeat_dropped,band=mid sim=0.63 score=11.15 blocked=below_floor prior=f2461a47,3,al_manar|tg_iranian_militarism,groq2,3,economy,economy,rumour,0,11.147,آسیب به ۷ مخزن نفتی ریاض در پی حملات یمنی گزارش شد,تصاویر ماهواره‌ای نشان از آسیب دیدن دست‌کم ۷ مخزن نفتی در نزدیکی فرودگاه بین‌المللی ملک خالید ریاض دارد. مقامات سعودی تاکنون در خصوص این خسارات سکوت کرده‌اند.
+155b8a4eb5fa0d6e,clickbait,,2,tg_iranian_militarism,groq2,3,,,,,,,
+75db4178e051b613,irrelevant,,5,tg_fighter_radar|tg_padeshah_fxn,groq2,3,,,,,,,
+090c78011b85c8c2,repeat_dropped,band=mid sim=0.64 score=9.21 blocked=below_floor prior=91b93756,4,al_manar,groq2,3,military,none,rumour,0,9.208,حمله‌های نظامی اسرائیل به مناطق مختلف کرانه باختری و غزه,نیروهای اسرائیلی به شهرک تقوع، روستای مرقه و منطقه جنین در کرانه باختری حمله کردند و در غزه به شرق مخیم البریج شلیح کردند. این گزارش‌ها از منابع خبری یک‌طرفه هستند و جزئیات مستقلی از سوی دیگر ارائه نشده است.
+50c6033ddf1d6491,irrelevant,,6,tg_fighter_radar|tg_rnintel|tg_tweet_mardomi|tg_wfwitness,groq2,3,,,,,,,
+2b19c707c0485e99,irrelevant,,2,tg_wfwitness,groq2,3,,,,,,,
+631957a21b0e4e03,irrelevant,,2,al_jazeera|bbc_persian,groq2,2,,,,,,,
+f261a7abca9992bb,clickbait,,1,maariv,groq2,2,,,,,,,
+92e41570794da9d4,unavailable,,1,walla,,2,,,,,,,
+6919c249b2bdccf3,unavailable,,1,walla,,2,,,,,,,
+180c9e24390a7cf7,unavailable,,1,sky_news_arabia,,2,,,,,,,
+6421e1671adf536a,unavailable,,1,aawsat,,2,,,,,,,
+e986c6dec865086e,unavailable,,1,al_jazeera,,2,,,,,,,
+597a88e7d9228ceb,irrelevant,,1,tehran_times,groq2,2,,,,,,,
+9377db4c73d371f9,relevance_dropped,,1,maariv,groq2,2,politics,none,unconfirmed,1,9.774,خانواده‌های گم‌شده‌ها در مصر به وزیر خارجه نامه نوشتند,خانواده‌های سه گم‌شده در مصر نامه‌ای به وزیر خارجه ارسال کردند. جزئیات بیشتری در متن ارائه‌شده ذکر نشده است.
+9d6add2ab4e85820,relevance_dropped,,1,al_jazeera,groq2,2,politics,none,unconfirmed,1,9.700,گوترس خواستار ممنوعیت ربات‌های کشتارگر شد,آنتونیو گوترس، دبیرکل سازمان ملل، در مصاحبه‌ای خواستار ممنوعیت ربات‌های خودکار کشتارگر شد. این موضع‌گیری بخشی از تلاش‌های دیپلماتیک برای کنترل سلاح‌های خودکار است.
+2e0098f6b30d40d3,irrelevant,,1,al_jazeera,groq2,2,,,,,,,
+66509de20455bfb2,irrelevant,,1,al_jazeera,groq2,2,,,,,,,
+e081297183a8fca1,irrelevant,,1,al_jazeera,groq2,2,,,,,,,
+13f8a8add5d3f0d4,clickbait,,1,ajar,groq2,2,,,,,,,
+089356f8841bd2b9,sent_followup,band=mid sim=0.77 score=14.01 kept=above_floor prior=1301fd9c,1,ajar,groq2,2,economy,economy,unconfirmed,1,14.006,قیمت گندم اروپا به دلیل اختلال صادرات دریای سیاه افزایش یافت,قیمت جهانی گندم به دلیل توقف صادرات روسیه و اوکراین از دریای سیاه و کاهش برداشت در تولیدکنندگان اصلی بالا رفت. این وضعیت فشار بر تأمین مواد غذایی و افزایش هزینه‌های جایگزین را در پی دارد.
+2c2b95b8772248da,irrelevant,,1,ajar,groq2,2,,,,,,,
+cf0dd782ca21eb5d,irrelevant,,1,tg_tabzlive,groq2,3,,,,,,,
+4f110a78c2cb017a,irrelevant,,1,tg_defenderdome,groq2,3,,,,,,,
+d7a85ca77ee09d10,irrelevant,,1,tg_geopwatch,groq2,3,,,,,,,
+7e94422809806866,irrelevant,,2,tg_rnintel|tg_wfwitness,groq2,3,,,,,,,
+b4b9ff002d51f3ec,clickbait,,1,tg_behold_israel,groq2,3,,,,,,,
+a9ccab6628108df6,lead_only,,1,tg_geopolitics_prime,groq2,3,economy,economy,unconfirmed,0,10.874,پیشنهاد صندوق ۵ میلیارد دلاری آمریکا برای بازسازی زیرساخت‌های انرژی خلیج فارس,اداره ترامپ پیشنهاد ایجاد صندوقی ۵ میلیارد دلاری برای ترمیم زیرساخت‌های انرژی خاورمیانه آسیب‌دیده از جنگ ایران را مطرح کرد. هدف کاهش وابستگی منطقه به تنگه هرمز است و از کشورهای عضو خواسته شده سهم مساوی بپردازند.
+b90cb22e31ca6a6f,clickbait,,1,tg_padeshah_fxn,groq2,3,,,,,,,
+42b71d645578b88f,irrelevant,,1,tg_irane_azad_news,groq2,3,,,,,,,

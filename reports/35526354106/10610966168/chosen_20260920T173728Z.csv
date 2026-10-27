@@ -1,0 +1,133 @@
+﻿cluster_key,fate,reason,n_members,sources,provider,best_tier,category,significance,claim_status,independent_count,score,headline,summary
+b10e576681a5ea27,oversized,,5,aawsat|irna|mee|reuters_gnews|tehran_times,groq,2,,,,,,,
+1da560997c363258,relevance_dropped,,6,bbc_persian|france24|mehr|reuters_gnews|tg_fighter_radar|tg_tweet_mardomi,groq,2,politics,none,likely,4,14.446,قوه قضاییه ایران مرکز آموزش زبان فرانسه در تهران را پلمب کرد,قوه قضاییه ایران مرکز آموزش زبان و فرهنگ فرانسه (CLF) وابسته به سفارت فرانسه در تهران را به دلیل ارتکاب اقدامات غیرقانونی و نقض موازین دیپلماتیک پلمب کرد. مقامات ایرانی مدعی‌اند این مرکز از عنوان آموزشی برای تسهیل خروج نخبگان و انجام پروژه‌های ضد امنیت ملی سوءاستفاده می‌کرده است. این اقدام نشان‌دهنده تشدید تنش‌های دیپلماتیک بین تهران و پاریس است.
+20c46dd2d8b63406,oversized,,24,al_monitor|irna|maariv|mee|sky_news_arabia|tg_behold_israel|tg_entekhab|tg_esellco|tg_fighter_radar|tg_irane_azad_news|tg_minas_tirith|tg_tsepress|tg_vahid_online|tg_vira_university|walla,groq,2,,,,,,,
+7a423480ac428964,oversized,,5,ap_gnews|france24|mee|reuters_gnews,groq,2,,,,,,,
+8f68959a274cccca,irrelevant,,9,ajar|sky_news_arabia|tg_entekhab|tg_padeshah_fxn|tg_tweet_mardomi,groq,2,,,,,,,
+da2c6bd076192931,clickbait,,3,al_jazeera|tehran_times,groq2,2,,,,,,,
+e18f6dc08f21745e,irrelevant,,2,al_jazeera|sky_news_arabia,groq2,2,,,,,,,
+bef20afd7e9ee74e,irrelevant,,3,al_jazeera|bbc_en|tg_defenderdome,groq2,2,,,,,,,
+0348ad31031b1104,irrelevant,,2,al_jazeera|irna,groq2,2,,,,,,,
+f852541cb9952b73,sent_followup,band=mid sim=0.72 score=19.24 kept=above_floor prior=caede068,2,mee|mehr,groq2,2,military,balance,likely,2,19.243,محکومیت حملات حوثی به ریاض و بمباران رادارهای یمن توسط عربستان,قطر حملات موشکی حوثی به ریاض و زیرساخت‌های مدنی یمن را محکوم کرد. همزمان، جنگنده‌های عربستان رادارها و برج‌های مخابراتی در جوف و شهرهای دیگر یمن را هدف قرار دادند.
+8b7c0e6d20899427,clickbait,,2,al_jazeera|walla,groq2,2,,,,,,,
+84181a7d497b15b3,clickbait,,3,ajar|walla,groq2,2,,,,,,,
+d8ee9917c679291b,irrelevant,,2,al_jazeera|tehran_times,groq2,2,,,,,,,
+35e9e83bc3efdf57,sent_followup,band=mid sim=0.76 score=21.28 kept=above_floor prior=d242af97,4,al_manar|tehran_times|tg_irane_azad_news,groq2,2,military,escalation,unconfirmed,1,21.280,حمله موشکی به دو کشتی تجاری عربستان و قطر و کنترل جزیره استراتژیک توسط یمن,موشک‌هایی به دو کشتی تجاری عربستان و قطر شلیک شد و نیروهای یمنی کنترل یک جزیره استراتژیک در دریای سرخ را به دست گرفتند. مقامات یمنی این اقدامات را برای حفظ حاکمیت و امنیت دریایی توصیف کردند، در حالی که گزارش‌ها از نبود برنامه مشخص ریاض و واشنگتن برای پاسخ‌گویی خبر می‌دهند.
+50b2ec01ec5d2370,sent_followup,band=mid sim=0.70 score=18.08 kept=above_floor prior=3d635bfd,2,al_manar|bbc_persian,groq2,2,politics,escalation,unconfirmed,1,18.077,ادعای قرارگاه خاتم‌الانبیا درباره نشست محرمانه آمریکا و اسرائیل در آلمان,قرارگاه مرکزی خاتم‌الانبیا اعلام کرد که آمریکا با چراغ سبز برخی کشورهای منطقه، در نشست مشترکی در اروپا اقداماتی علیه ایران را از سر گرفته است. خبرگزاری تسنیم این نشست را جلسه‌ای محرمانه با حضور فرماندهان نظامی آمریکا، اسرائیل و چند کشور عرب در آلمان توصیف کرد که پیش‌تر توسط اکسیوس فاش شده بود.
+97ac1280a7b51bd2,sent_followup,band=mid sim=0.65 score=15.06 kept=above_floor prior=3be197d9,2,mehr|tg_tsepress,groq,2,politics,balance,unconfirmed,1,15.058,قطر اعلام کرد واشنگتن خواهان دستیابی به توافق با ایران است,سخنگوی وزارت خارجه قطر گفت که این کشور میان پایتخت‌های مختلف می‌رود تا به توافقی میان ایران و آمریکا دست یابد. وی تأیید مقامات آمریکایی مبنی بر تمایل واشنگتن به توافق را اعلام کرد، اما جزئیات مذاکرات فاش نشده است.
+4c0b60d2c5630dea,sent_followup,band=mid sim=0.58 score=15.56 kept=above_floor prior=d0654710,7,sky_news_arabia|tg_esellco|tg_iranian_militarism|tg_rnintel,groq,2,economy,economy,unconfirmed,1,15.557,نشت سند روسی برای تعمیق همکاری‌های اقتصادی و هسته‌ای با ایران,سندی ۴۴ صفحه‌ای از دولت روسیه نشت کرده که برنامه‌ای برای همکاری‌های مالی، هسته‌ای و انرژی با ایران تا سال ۲۰۲۶ را تشریح می‌کند. این سند شامل ایجاد کانال‌های بانکی مستقل و همکاری در پروژه‌های انرژی است، اما جزئیات اجرایی آن هنوز تأیید رسمی نشده است.
+ee54c2158a81c5fa,sent_followup,band=mid sim=0.72 score=21.51 kept=above_floor prior=ed7beed0,7,mehr|tg_entekhab|tg_geopwatch|tg_iranian_militarism|tg_tabzlive|tg_wfwitness,groq,2,military,escalation,unconfirmed,1,21.512,ارتش ایران پهپاد شناسایی اوربیتور را در تنگه هرمز منهدم کرد,ارتش جمهوری اسلامی ایران اعلام کرد یک پهپاد پیشرفته شناسایی اوربیتور را با سامانه‌های پدافند هوایی در تنگه هرمز سرنگون کرد. اگرچه ایران عامل را «دشمن» نامید، اما هویت دقیق عملگر پهپاد فاش نشده و گزارش‌ها درباره مالکیت آن متناقض است.
+9dbb418a2fbc821c,repeat_dropped,band=mid sim=0.57 score=11.70 blocked=below_floor prior=3f5c5e91,9,sky_news_arabia|tg_entekhab|tg_iranian_militarism|tg_minas_tirith|tg_padeshah_fxn|tg_vahid_online|tg_vira_university,groq,2,security,none,unconfirmed,1,11.699,انفجار در نزدیکی فرودگاه اربیل ناشی از تمرینات نظامی اعلام شد,صدای انفجاری در نزدیکی فرودگاه بین‌المللی اربیل که میزبان نیروهای ائتلاف به رهبری آمریکا است، شنیده شد. مقامات محلی و منابع امنیتی تأیید کردند که این صدا ناشی از تمرینات نظامی و انفجار کنترل‌شده بوده و هیچ حمله‌ای رخ نداده است.
+b64907dbb30b8614,sent_followup,band=mid sim=0.69 score=14.96 kept=above_floor prior=8718c4bf,2,tehran_times|tg_esellco,groq,2,politics,balance,unconfirmed,1,14.960,نتانیاهو سفر خود به آمریکا را پس از سخنرانی در سازمان ملل لغو کرد,بنا بر گزارش‌ها، بنیامین نتانیاهو برنامه سفر خود به آمریکا را تغییر داده و بلافاصله پس از سخنرانی در مجمع عمومی سازمان ملل به اسرائیل بازمی‌گردد. این تغییر برنامه به معنای لغو دیدار احتمالی با دونالد ترامپ است، هرچند جزئیات بیشتر در دسترس نیست.
+20b700da4dfc2148,unavailable,,1,tehran_times,,2,,,,,,,
+73096c8f33c1fb96,unavailable,,1,tehran_times,,2,,,,,,,
+0460b3b664e0cb6d,unavailable,,1,tehran_times,,2,,,,,,,
+3f4dea924753b4df,unavailable,,1,tehran_times,,2,,,,,,,
+4ababb89450afa50,unavailable,,1,tehran_times,,2,,,,,,,
+eb71c600cedd5eb5,sent_followup,band=mid sim=0.65 score=17.84 kept=above_floor prior=7bf4da70,1,tehran_times,groq,2,politics,escalation,unconfirmed,1,17.841,نماینده مجلس ایران حملات آمریکا به لامرد و میناب را جنایت خواند,حمیدرضا حاجی بابایی، معاون رئیس مجلس، حملات مرگبار آمریکا به اهداف غیرنظامی در لامرد و میناب را محکوم کرد. او این اقدامات را مشابه بمباران اتمی هیروشیما و ناگاساکی توصیف کرد.
+64f7a65c2ea44be9,sent_followup,band=mid sim=0.65 score=14.84 kept=above_floor prior=e60ddad3,1,tehran_times,groq,2,politics,balance,unconfirmed,1,14.837,آمریکا محدودیت‌های ویزای سختگیرانه‌ای برای هیئت ایران در مجمع عمومی اعمال کرد,پیش از سفر مسعود پزشکیان به نیویورک برای شرکت در مجمع عمومی سازمان ملل، آمریکا محدودیت‌های ویزای بی‌سابقه‌ای را اعمال کرده است. این اقدامات در حالی رخ می‌دهد که واشنگتن از میزبانی خود برای فشار دیپلماتیک استفاده می‌کند.
+22b57ac3ba19e47a,sent_followup,band=mid sim=0.66 score=15.84 kept=above_floor prior=d0145f33,1,tehran_times,groq,2,security,balance,unconfirmed,1,15.836,وزارت اطلاعات ایران سه سلول تروریستی وابسته به جاسوسان خارجی را منحل کرد,وزارت اطلاعات ایران اعلام کرد سه سلول عملیاتی وابسته به گروه‌های تروریستی و سرویس‌های جاسوسی آمریکا و اسرائیل را منحل کرده است. این اقدام مانع از وقوع توطئه‌های خرابکاری و ترور در سه استان شد.
+c5961fbd9020cf91,sent_followup,band=mid sim=0.75 score=17.83 kept=above_floor prior=3503fb8a,1,tehran_times,groq,2,military,balance,unconfirmed,1,17.833,سخنگوی ارتش ایران ادعاهای آمریکا درباره تنگه هرمز را رد کرد,ابوالفضل شکرجی، سخنگوی نیروهای مسلح ایران، ادعاهای اخیر آمریکا درباره عملیات در تنگه هرمز را رد کرد. او تأکید کرد که ایران همچنان در این آبراه راهبردی ابتکار عمل را در دست دارد.
+679f69637d8e807a,clickbait,,1,tehran_times,groq,2,,,,,,,
+3eb6381f08225aa9,irrelevant,,1,al_jazeera,groq,2,,,,,,,
+ec581b97fcf15057,sent,,3,mee|tg_wfwitness,groq,2,economy,economy,unconfirmed,1,14.989,مدیرعامل قطر انرژی تأخیر پروژه‌های توسعه‌ای را به بحران تنگه هرمز نسبت داد,سعید کاابی اعلام کرد بحران تنگه هرمز باعث تأخیر در پروژه‌های توسعه‌ای قطر انرژی شده است زیرا تجهیزات حیاتی نمی‌توانند به قطر برسند. او همچنین ادعای وزیر خزانه‌داری آمریکا مبنی بر بی‌ارزش شدن تنگه هرمز را رد کرد و گفت قطر لوله‌های جایگزین نمی‌سازد.
+fd137a913e9de8ab,irrelevant,,3,ajar|tg_tabzlive,groq,2,,,,,,,
+76956586ee06da58,repeat_dropped,band=mid sim=0.73 score=9.70 blocked=below_floor prior=a5235585,1,irna,groq,2,politics,none,unconfirmed,1,9.702,عراقتی از گسترش روابط با عراق و قزاقستان خواست,عباس عراقتی در دیدار با نمایندگان جدید ایران در قزاقستان و عراق، بر استفاده از ظرفیت‌های موجود برای گسترش همکاری‌ها تأکید کرد. این دیدارها در تهران برگزار شد.
+44e1dffa5e043784,relevance_dropped,,1,irna,groq,2,politics,none,unconfirmed,1,9.681,کمیسیون مجلس تصویب استفاده اجباری از نام کامل خلیج فارس را کرد,کمیسیون امنیت ملی و سیاست خارجی مجلس، بند الزام‌آور استفاده از نام کامل «خلیج فارس» در تمام مذاکرات، معاهدات و اسناد را تصویب کرد. این مصوبه شامل ارتباطات مربوط به کشتی‌ها و ناوگان‌ها نیز می‌شود.
+32b7477ad0b97662,relevance_dropped,,1,mee,groq,2,politics,none,unconfirmed,1,9.674,اردن ورود بن‌گور به مسجد الاقصی را محکوم کرد,وزارت خارجه اردن ورود ایتامار بن‌گور، وزیر اسرائیلی، به حیاط مسجد الاقصی را تحریک‌آمیز و غیرقابل قبول خواند. این کشور از اقدامات بین‌المللی برای جلوگیری از تکرار این رویدادها خواست.
+b4fb931c50e68e61,relevance_dropped,,1,iran_international,groq,2,security,none,unconfirmed,1,10.617,شبکه‌های فرهنگی وابسته به بسیج در شناسایی معتربان نقش داشتند,منابع می‌گویند شبکه‌ای وابسته به گروه‌های فرهنگی و رسانه‌ای دولتی در شناسایی معتربان در جریان سرکوب‌های ژانویه نقش داشته‌اند. تصاویر مربوطه به اطلاعات سپاه پاسداران منتقل شده است.
+09d2c883caaeddda,repeat_dropped,band=mid sim=0.62 score=9.70 blocked=below_floor prior=7ea66263,2,ajar|tg_padeshah_fxn,groq,2,politics,none,unconfirmed,1,9.698,اجرای فاز عملیاتی طرح استیضاحی E1 در کرانه باختری آغاز شد,اسرائیل طرح استیضاحی E1 را وارد مرحله اجرای پیشرفته کرده و مناقصه‌ای برای ۳۴۰۱ واحد مسکونی برگزار کرد. این اقدام باعث هشدارهای بین‌المللی درباره قطع پیوستگی جغرافیایی فلسطینی‌ها شده است.
+186a30a3df8b26ff,relevance_dropped,,1,al_jazeera,groq,2,economy,none,unconfirmed,1,11.585,دادستان‌های آمریکا هواوی را یک سازمان جنایی معرفی کردند,شرکت هواوی با یک دادگاه تاریخی در آمریکا مواجه است که در آن به سرقت، کلاهبرداری و نقض تحریم‌ها متهم شده است. این پرونده یک نبرد حقوقی پرتنش و با اهمیت بالا است.
+74bec44fefe37ee4,repeat_dropped,band=mid sim=0.56 score=10.40 blocked=below_floor prior=32419ae7,1,mehr,groq,2,security,none,unconfirmed,1,10.401,صدای انفجارهای شدید در اربیل شنیده شد,رسانه‌های محلی در منطقه کردستان عراق از شنیده شدن صدای انفجارهای شدید در شهر اربیل خبر دادند. جزئیات بیشتری درباره علت این انفجارها در گزارش‌ها ذکر نشده است.
+a5a7b9cf7289ed1a,repeat_dropped,band=mid sim=0.60 score=10.25 blocked=below_floor prior=84ba46d7,1,al_jazeera,groq,2,security,none,unconfirmed,1,10.252,صدای اعتراض در تونس برای آزادی فعالان شناور غزه,صدها تن در تونس اعتراضی را برای آزادی چهار فعال شناور جهانی غزه برگزار کردند. این اعتراضات در پی بازداشت این افراد توسط مقامات تونس صورت گرفت.
+abd0ddbf5dda3277,clickbait,,2,ajar|tg_entekhab,groq,2,,,,,,,
+b716f4649b3afdae,irrelevant,,1,ajar,groq,2,,,,,,,
+4eea599a162490ab,repeat_dropped,band=mid sim=0.67 score=9.21 blocked=below_floor prior=e9961432,1,mee,groq,2,politics,none,unconfirmed,1,9.208,رئیس‌جمهور اسرائیل سرباز محکوم به قتل فلسطینی را عفو کرد,ایساک هرتسوغ، رئیس‌جمهور اسرائیل، الور آزاریا را که به قتل عمدی یک فلسطینی زخمی در الخلیل محکوم شده بود، عفو کرد. این تصمیم پس از محکومیت او در سال ۲۰۱۶ و آزادسازی او در سال ۲۰۱۸ اتخاذ شد.
+c9ea7186c45c8db9,irrelevant,,1,walla,groq,2,,,,,,,
+7fcc832f1053f4c2,sent_followup,band=high sim=0.85 score=20.33 kept=development prior=a2bca5c4,3,al_jazeera|tg_esellco|tg_fighter_radar,groq,2,military,escalation,unconfirmed,1,20.328,کارشناسان سپاه برای نظارت بر تونل‌ها و رادارها به یمن سفر کردند,منابع حوثی مدعی شدند که کارشناسان سپاه پاسداران به منطقه باب‌المندب رفته‌اند تا بر احداث تونل‌ها و نصب سامانه‌های راداری نظارت کنند. این گزارش‌ها توسط رسانه‌های مختلف نقل شده اما تأیید رسمی مستقلی در دسترس نیست. این اقدام می‌تواند به تقویت زیرساخت‌های نظامی در تنگه باب‌المندب منجر شود.
+34a82f938920b4f1,relevance_dropped,,1,mee,groq,2,politics,none,unconfirmed,1,9.120,بن‌گور به محوطه مسجدالاقصا در اورشلیم شرقی وارد شد,ایتامار بن‌گور، وزیر امنیت ملی اسرائیل، با همراهی نیروهای امنیتی به محوطه مسجدالاقصا در اورشلیم شرقی وارد شد. این دومین ورود او در هفته‌های اخیر است که با تنش‌های مذهبی و سیاسی همراه بوده است.
+09d687c27ba0fd5b,clickbait,,1,al_jazeera,groq,2,,,,,,,
+aa07afa7b002a3ea,sent,,1,ajar,groq,2,economy,economy,unconfirmed,1,14.017,وزیر مالی قطر: کاهش درآمدها موقتی و اقتصاد پایدار است,وزیر مالی قطر اعلام کرد که کاهش درآمدهای انرژی موقتی است و کشور از طریق تنوع‌بخشی به اقتصاد و سرمایه‌گذاری در هوش مصنوعی توانایی بازیابی دارد. این اظهارات در راستای مدیریت بحران‌های اقتصادی منطقه‌ای صورت گرفته است.
+6cb0a85a8b016804,irrelevant,,1,ajar,groq,2,,,,,,,
+6b38d0c2de4e70de,clickbait,,1,tehran_times,groq,2,,,,,,,
+04773d11ce0309df,repeat_dropped,band=mid sim=0.58 score=11.92 blocked=below_floor prior=748e9a81,1,mehr,groq,2,military,none,unconfirmed,1,11.921,افزایش تلفات جنگ غزه به ۷۳ هزار و ۹۱۳ کشته,"وزارت بهداشت غزه اعلام کرد تلفات جنگ از اکتبر ۲۰۲۳ به ۷۳,۹۱۳ کشته و ۱۷۴,۹۳۵ زخمی رسیده است. این ارقام رسمی‌ترین آمار موجود از سوی مقامات فلسطینی است. این خبر وضعیت جاری درگیری را نشان می‌دهد اما تغییر استراتژیک جدیدی ایجاد نمی‌کند."
+567e1019707b62c6,repeat_dropped,band=mid sim=0.61 score=13.82 blocked=below_floor prior=d433920e,1,ajar,groq,2,economy,economy,unconfirmed,1,13.819,بازگشت تولید گاز قطر به سطح عادی طی چند هفته,وزیر انرژی قطر اعلام کرد تولید گاز کشور به دلیل پیامدهای بحران تنگه هرمز کاهش یافته است. او پیش‌بینی کرد تولید طی چند هفته به حالت عادی برمی‌گردد. این موضوع می‌تواند بر عرضه جهانی انرژی و قیمت‌ها تأثیر بگذارد.
+a276cf752f886ddf,repeat_dropped,band=high sim=0.83 score=8.58 blocked=both prior=6712dbe3,1,reuters_gnews,groq,2,politics,none,unconfirmed,1,8.577,گفتگوی مسئول اتحادیه اروپا با وزیر اسرائیل درباره غزه,یک کمیسر اتحادیه اروپا با یک وزیر اسرائیلی درباره روابط دوجانبه و وضعیت غزه گفتگو کرد. جزئیات دقیق این مذاکرات در خبر کوتاه ارائه نشده است. این دیدار بخشی از دیپلماسی جاری در منطقه است.
+a6ff648d8b451379,clickbait,,2,tg_tabzlive|tg_wfwitness,groq,3,,,,,,,
+a3037a389c6966c5,sent_followup,band=mid sim=0.72 score=15.00 kept=above_floor prior=5d692a63,11,tg_irane_azad_news|tg_iranian_militarism|tg_mornovosti|tg_padeshah_fxn|tg_tabzlive|tg_wfwitness,groq2,3,military,balance,rumour,0,14.996,حضور هفت تانکر هوایی آمریکا در تنگه هرمز و دریای عمان,هفت فروند هواپیمای سوخت‌رسان نیروی هوایی آمریکا (KC-135 و KC-46) در حال پرواز در جنوب فضای هوایی ایران و دریای عمان هستند. گزارش‌ها از شناسایی پهپاد MQ-4C و پر بودن پایگاه العید در قطر از این تانکرها نیز حکایت دارد.
+ec3c085534b092e2,clickbait,,1,tg_entekhab,groq2,3,,,,,,,
+eaa2f596377bb074,repeat_dropped,band=mid sim=0.68 score=9.79 blocked=below_floor prior=cc35f186,9,al_manar|tg_iranian_militarism,groq2,3,military,none,rumour,0,9.785,گزارش بمباران نبطیه و گشت‌زنی جنگنده‌ها در لبنان,گزارش‌های اولیه از بمباران شهر نبطیه در لبنان و گشت‌زنی جنگنده‌های اسرائیلی در شمال فلسطین و جنوب لبنان منتشر شده است. همچنین حضور پهپادهای هرون و MQ-9 در عراق گزارش شده، اما جزئیات دقیق و تأییدشده‌ای از این رویدادها در دسترس نیست.
+eadcd3aa4c2cead4,irrelevant,,3,tg_entekhab|tg_rnintel|tg_wfwitness,groq2,3,,,,,,,
+bffca7d8abf74cec,irrelevant,,1,al_manar,groq2,3,,,,,,,
+a6b78250e56dc601,sent_followup,band=mid sim=0.61 score=15.26 kept=above_floor prior=1637ef52,4,tg_defenderdome|tg_tabzlive|tg_wfwitness,groq2,3,security,escalation,rumour,0,15.255,سفارت آمریکا سفر کارکنان به یانبو و طائف را مشروط به مجوز ویژه کرد,سفارت آمریکا در عربستان سعودی اعلام کرد کارکنان دولتی برای سفر به شهرهای یانبو و طائف نیاز به مجوز ویژه دارند. این اقدام در پی حملات موشکی و پهپادی انصارالله به زیرساخت‌های آرامکو و پایگاه پادشاه فهد صورت گرفته است.
+c49d7ed7b5b9474c,clickbait,,5,tg_fighter_radar|tg_padeshah_fxn,groq2,3,,,,,,,
+bd257efa599c7a33,clickbait,,4,tg_irane_azad_news|tg_minas_tirith|tg_tweet_mardomi,groq2,3,,,,,,,
+f4781fa9e85f70f3,repeat_dropped,band=mid sim=0.69 score=11.91 blocked=below_floor prior=16bb065a,15,tg_entekhab|tg_esellco|tg_geopwatch|tg_irane_azad_news|tg_iranian_militarism|tg_minas_tirith|tg_padeshah_fxn|tg_rnintel|tg_tsepress|tg_wfwitness,groq2,3,politics,balance,rumour,0,11.907,عباس عراقچی وارد دوحه شد و القادری از میانجی‌گری قطر خبر داد,وزیر امور خارجه ایران به دوحه سفر کرد و همزمان رئیس‌جمهور مصر با مدیر سیا دیدار کرد. مقامات قطر اعلام کردند در حال میانجی‌گری برای توافق میان آمریکا و ایران هستند و واشنگتن به دنبال توافق است.
+a8bbad495faf3fab,irrelevant,,2,tg_defenderdome|tg_tabzlive,groq2,3,,,,,,,
+602308f691aa000b,repeat_dropped,band=high sim=0.87 score=12.14 blocked=below_floor prior=fba7ba3a,4,tg_entekhab|tg_irane_azad_news|tg_wfwitness,groq,3,military,economy,rumour,0,12.138,حملات پهپادی اوکراین به مسکو با کشته شدن ۳ نفر و آسیب به پالایشگاه نفت,اوکراین در بزرگ‌ترین حمله پهپادی خود به مسکو، از موشک‌های بالستیک نیز استفاده کرد. این حملات منجر به کشته شدن ۳ نفر و آسیب دیدن بخشی از پالایشگاه نفت مسکو شد. در پی این رویدادها، کمبود فرآورده‌های نفتی و افزایش قیمت سوخت در روسیه گزارش شده است.
+30cbd67ffd491b55,clickbait,,1,tg_exciton_missile,groq,3,,,,,,,
+8c56ae85b84c61cd,repeat_dropped,band=mid sim=0.63 score=9.32 blocked=below_floor prior=caede068,6,tg_tabzlive|tg_wfwitness,groq,3,military,none,rumour,0,9.316,حملات هوایی اسرائیل به نقاط مختلف جنوب لبنان و اعتراضات در طرابلس,نیروی هوایی اسرائیل به ارتفاعات علی‌التحریر، المنصوریه و یوهمور در جنوب لبنان حمله کرد. همزمان، اعتراضاتی در شهر طرابلس شمال لبنان در پی تعلیق قانون عفو عمومی شکل گرفته است. جزئیات دقیق‌تری درباره خسارات یا هدف‌های خاص این حملات در منابع ارائه‌شده ذکر نشده است.
+4843fdeda48dd2e1,sent_followup,band=high sim=0.83 score=17.57 kept=development prior=8bac482b,9,tg_entekhab|tg_esellco|tg_fighter_radar|tg_irane_azad_news|tg_iranian_militarism|tg_tweet_mardomi,groq,3,military,escalation,rumour,0,17.569,مستقر شدن یگان‌های واکنش سریع ارتش ایران در مرزها و هشدار به کشورهای منطقه,فرمانده نیروی زمینی ارتش ایران اعلام کرد یگان‌های واکنش سریع در مرزهای غربی، شمال‌غربی و جنوبی مستقر شده‌اند. ایران به کشورهای منطقه هشدار داد که در صورت مشارکت در هرگونه حمله آمریکا، از مجازات نیروهای ایرانی مصون نخواهند ماند. همچنین دودی از نزدیکی کنسولگری آمریکا در اربیل مشاهده شده است.
+240eab10016ad20a,clickbait,,1,tg_iranian_militarism,groq,3,,,,,,,
+3bd34a44b2d2a49a,repeat_dropped,band=mid sim=0.71 score=10.85 blocked=below_floor prior=e2f1d0db,4,tg_entekhab|tg_vira_university,groq2,3,politics,balance,rumour,0,10.849,ترامپ ادعا کرد حوثی‌ها توافق کرده‌اند با آمریکا وارد جنگ نشوند,دونالد ترامپ اعلام کرد که آمریکا به‌طور مستمر با حوثی‌ها در ارتباط است و آن‌ها توافق کرده‌اند که با واشنگتن وارد جنگ نشوند. این ادعا در حالی مطرح می‌شود که گزارش‌ها از جلسه‌ای در کمپ دیوید برای بررسی گزینه‌های حمله به یمن حکایت دارند.
+7d6cb70a396b8975,repeat_dropped,band=mid sim=0.59 score=5.65 blocked=below_floor prior=1ffb8515,3,tg_behold_israel|tg_exciton_missile|tg_padeshah_fxn,groq2,3,politics,none,rumour,0,5.648,ترامپ مقامات ایرانی را به پنهان‌کاری مانند موش‌ها متهم کرد,دونالد ترامپ در گفت‌وگو با فاکس نیوز، برخی مقامات جمهوری اسلامی را به پنهان‌کاری تشبیه کرد. او همچنین از تقسیم‌بندی میان صداهای میانه‌رو مانند پزشکیان و عراقچی و تندروهای سپاه پاسداران در داخل ایران سخن گفت.
+56c350c2e859e494,repeat_dropped,band=mid sim=0.57 score=13.32 blocked=below_floor prior=1a93b80a,1,tg_iranian_militarism,groq2,3,military,balance,rumour,0,13.316,برآورد جدید از آرایش ۱۹۵ تانکر سوخت‌رسان آمریکا در منطقه,یک تحلیلگر نظامی برآورد کرد که ۱۹۵ تانکر سوخت‌رسان آمریکایی در حوزه‌های عملیاتی سنتکام و اروپا مستقر هستند. این آمار بر اساس رصد و تطبیق تصاویر به دست آمده است و نشان‌دهنده آمادگی لجستیکی نیروهای آمریکایی در منطقه است.
+89cb935fbf03232a,irrelevant,,2,aviationist|tg_padeshah_fxn,groq2,2,,,,,,,
+31bdde90d12f9b56,irrelevant,,1,bbc_en,groq2,2,,,,,,,
+9a0a56f17896cfd3,unavailable,,1,al_jazeera,,2,,,,,,,
+2e71c249429b533e,unavailable,,1,sky_news_arabia,,2,,,,,,,
+705ce41313fa660e,unavailable,,1,sky_news_arabia,,2,,,,,,,
+22aa2d365946451e,unavailable,,1,al_jazeera,,2,,,,,,,
+e51bd828ba53a78a,unavailable,,1,aviationist,,2,,,,,,,
+b8177303f2ef1c53,irrelevant,,1,al_jazeera,groq2,2,,,,,,,
+f92fec23811f7491,irrelevant,,1,ajar,groq2,2,,,,,,,
+df327304fe2dbb3e,irrelevant,,1,al_jazeera,groq2,2,,,,,,,
+6f22c81190d507c4,irrelevant,,1,haaretz,groq2,2,,,,,,,
+ad188769d089c615,irrelevant,,1,ajar,groq2,2,,,,,,,
+fa51a15ef4e14803,clickbait,,1,tehran_times,groq2,2,,,,,,,
+19bd19d3b30f9b3b,irrelevant,,1,ajar,groq2,2,,,,,,,
+69f72e76fcec9356,clickbait,,1,tehran_times,groq2,2,,,,,,,
+52b8b93302d2e1f4,clickbait,,1,ajar,groq2,2,,,,,,,
+ed330f60ae802de3,clickbait,,1,ajar,groq2,2,,,,,,,
+1b554aa460f9edda,unavailable,,1,ajar,,2,,,,,,,
+b4856427ea5cdc93,unavailable,,1,ajar,,2,,,,,,,
+f5d1b62e06b02ae1,unavailable,,1,ajar,,2,,,,,,,
+c3acd0067b150a84,unavailable,,1,ajar,,2,,,,,,,
+88540f2ee979fa8a,unavailable,,1,tg_tabzlive,,3,,,,,,,
+134871b6f6c5b89d,sent_followup,band=mid sim=0.66 score=17.28 kept=above_floor prior=03c9a8a6,4,al_manar,groq2,3,military,escalation,rumour,0,17.276,رئیس یمن تهدید به تشدید عملیات نظامی علیه عربستان کرد,رئیس یمن اعلام کرد که در پاسخ به فشارهای مردمی، از مرحله مطالبات به مرحله اقدام عملی گذار کرده است. او تهدید کرد که گزینه‌های نظامی آینده شدیدتر خواهند بود تا فشار بر عربستان برای پایان دادن به محاصره افزایش یابد.
+33d69220c54dd1e6,irrelevant,,1,al_manar,groq2,3,,,,,,,
+488e72fe8220a16c,repeat_dropped,band=mid sim=0.63 score=11.06 blocked=below_floor prior=e2f1d0db,2,tg_fighter_radar|tg_padeshah_fxn,groq2,3,politics,balance,rumour,0,11.056,تغییر موضع ترامپ درباره تهدیدهای اخیر و فعالیت در شبکه‌های اجتماعی,بر اساس گزارش‌ها، ترامپ هفته جاری را با وجود هشدارهای امنیتی اخیر، عادی توصیف کرده است. همچنین او پستی در پاسخ به رسانه‌هایی منتشر کرده که از ورود به کاخ سفید محروم شده‌اند. این موارد بیانگر تغییر لحن سیاسی و دیپلماتیک است.
+4dadda24f469f9f0,repeat_dropped,band=mid sim=0.58 score=11.13 blocked=below_floor prior=4a78337c,3,tg_wfwitness,groq2,3,economy,economy,rumour,0,11.130,شروع مذاکرات تجاری بین وزیر خزانه‌داری آمریکا و معاون نخست‌وزیر چین,مذاکرات تجاری بین اسکات بسنت، وزیر خزانه‌داری آمریکا، و لی فن، معاون نخست‌وزیر چین، در نیویورک آغاز شد. این گفتگوها با حضور هیئت‌های کامل هر دو کشور و در قالب جلسات یک‌به‌یک برگزار می‌شود.
+29f2d36443162871,irrelevant,,2,tg_geopwatch|tg_minas_tirith,groq2,3,,,,,,,
+827c0b96b01e2069,irrelevant,,1,tg_militarywave,groq,3,,,,,,,
+0f931ca36f275386,irrelevant,,1,tg_mornovosti,groq,3,,,,,,,
+b29e77a5ce032328,irrelevant,,1,tg_tabzlive,groq,3,,,,,,,
+2a6bada17dbaefa4,irrelevant,,1,tg_mornovosti,groq,3,,,,,,,
+24acaca779b367c8,irrelevant,,3,tg_defenderdome|tg_tabzlive|tg_wfwitness,groq,3,,,,,,,
+8fa48b72982c9a54,repeat_dropped,band=mid sim=0.58 score=8.79 blocked=below_floor prior=135dc2e2,1,tg_fighter_radar,groq2,3,military,none,rumour,0,8.794,سنت‌کام: تغییر مسیر ۱۰۹ کشتی تجاری در منطقه عملیاتی,فرماندهی مرکزی ایالات متحده اعلام کرد مسیر ۱۰۹ کشتی تجاری را برای رعایت مقررات تغییر داده است. این گزارش در حالی منتشر شده که ملوانی از ناو USS John Paul Jones در حال انجام وظیفه است. جزئیات بیشتری درباره دلیل دقیق تغییر مسیرها در متن ارائه نشده است.
+080cfba2f7813439,irrelevant,,1,tg_minas_tirith,groq2,3,,,,,,,
+c551ec55fc337dff,irrelevant,,3,tg_tabzlive|tg_wfwitness,groq2,3,,,,,,,
+fcfe3624ae2ee292,irrelevant,,1,tg_tabzlive,groq2,3,,,,,,,
+c00bca59959f2363,clickbait,,1,tg_entekhab,groq2,3,,,,,,,
+1f93394140cfd677,irrelevant,,2,tg_defenderdome,groq2,3,,,,,,,
+d2b0f3ad557ca0a9,irrelevant,,1,tg_militarywave,groq2,3,,,,,,,
+a68e32b492a7c5e6,clickbait,,1,tg_geopwatch,groq2,3,,,,,,,
+9656ff3839a93814,irrelevant,,1,tg_mornovosti,groq2,3,,,,,,,
+583f3b5c47bbff05,irrelevant,,1,tg_defenderdome,groq2,3,,,,,,,
+c7344eec36933d24,relevance_dropped,,1,tg_entekhab,groq2,3,economy,none,rumour,0,7.366,تولید بیش از ۶ هزار دستگاه خودروی ایگل در کرمان موتور,فعالیت خط تولید خودروی بومی ایگل در کرمان موتور ادامه دارد. در پنج ماه نخست سال ۱۴۰۵، بیش از ۶ هزار دستگاه از این خودرو تولید شده است که حدود ۶۳ درصد از مجموع تولید این شرکت و خودروسازان بم را تشکیل می‌دهد.
+7d3e2276969746b5,irrelevant,,1,tg_militarywave,groq2,3,,,,,,,
+6ac2b29e9558ca01,clickbait,,1,tg_minas_tirith,groq2,3,,,,,,,
+6a9fdc7abc442771,irrelevant,,1,tg_geopolitics_prime,groq2,3,,,,,,,
+0e8c94218b4f0406,irrelevant,,1,tg_tweet_mardomi,groq2,3,,,,,,,
+f93c8bcec0442f76,irrelevant,,1,tg_vira_university,groq2,3,,,,,,,
+5d16c378045fcf26,lead_only,,1,tg_behold_israel,groq2,3,security,none,unconfirmed,0,6.710,بستن کامل مرزها و فضای هوایی اسرائیل برای ۲۵ ساعت,تمامی گذرگاه‌های مرزی و فضای هوایی اسرائیل تا پایان یوم کپور بسته شده است. این اقدام به مناسبت تعطیلات مذهبی انجام شده و جزئیات امنیتی خاصی در گزارش‌ها ذکر نشده است.
+f280723ae3c04678,lead_only,,2,tg_padeshah_fxn,groq2,3,politics,balance,unconfirmed,0,10.802,اعلام تمایل ترامپ به دیدار با پزشکیان در سازمان ملل,دونالد ترامپ در گفت‌وگو با فاکس‌نیوز اعلام کرد که مایل به دیدار با مسعود پزشکیان در حاشیه اجلاس سازمان ملل است. این اظهارنظر صرفاً بیان تمایل بوده و زمان یا جزئیات دقیق دیدار هنوز تأیید نشده است.
+b7c90a0cd4c9aa29,lead_only,,1,tg_padeshah_fxn,groq2,3,military,balance,unconfirmed,0,13.670,خروج هواپیمای ترابری C-5M از پایگاه بحرین,یک فروند هواپیمای ترابری سنگین C-5M سوپر گالکسی با کد سیگنال خاص از منطقه بحرین خارج شد. جزئیات بار این هواپیما یا مقصد دقیق آن در گزارش‌ها ذکر نشده است.
+82ec921567a1ad0c,clickbait,,1,tg_geopolitics_prime,groq2,3,,,,,,,
+13641bdd532743d5,lead_only,,1,tg_vira_university,groq2,3,economy,none,unconfirmed,0,7.574,صدور مجوز بین‌المللی خدمات موبایلی استارلینک توسط کمیسیون ارتباطات فدرال آمریکا,کمیسیون ارتباطات فدرال آمریکا مجوز بین‌المللی بخش ۲۱۴ را برای اسپیس‌ایکس صادر کرد. این اقدام مسیر توسعه و ارائه بین‌المللی خدمات موبایلی استارلینک و اتصال مستقیم گوشی‌های معمولی به ماهواره را هموار می‌کند.
+8ba33d231ff72669,irrelevant,,1,tg_geopolitics_prime,groq2,3,,,,,,,
+5be590222930624b,irrelevant,,1,tg_tweet_mardomi,groq2,3,,,,,,,
+f845e86d7a8f0a80,lead_only,,1,tg_esellco,groq2,3,security,escalation,unconfirmed,0,14.331,اعلام وضعیت اضطراری در بیمارستان‌های سراسر اسرائیل,شبکه وای‌نت اعلام کرد بیمارستان‌های سراسر اسرائیل به حالت اضطراری درآمده‌اند. جزئیات بیشتر یا تأیید رسمی این خبر در متن ارائه نشده است.
+9b505ff5d4e426d2,clickbait,,1,tg_tweet_mardomi,groq2,3,,,,,,,
+96f6cc4f6f0213ca,irrelevant,,1,tg_geopolitics_prime,groq2,3,,,,,,,
+e526795e17a1086b,lead_only,,1,tg_esellco,groq2,3,economy,economy,unconfirmed,0,10.183,کاهش قیمت صندوق‌های طلا پس از خبر دیدار ترامپ و پزشکیان,قیمت صندوق‌های طلا پس از انتشار خبر احتمالی دیدار ترامپ با پزشکیان کاهش یافت. این واکنش بازار در پی سخنان ترامپ مبنی بر برگزاری این دیدار رخ داده است.

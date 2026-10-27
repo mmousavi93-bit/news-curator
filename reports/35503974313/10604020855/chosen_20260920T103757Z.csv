@@ -1,0 +1,23 @@
+﻿cluster_key,fate,reason,n_members,sources,provider,best_tier,category,significance,claim_status,independent_count,score,headline,summary
+0e8cbc9b0cb9106e,repeat_dropped,band=mid sim=0.72 score=11.10 blocked=below_floor prior=74de8478,2,ajar|al_manar,groq,2,security,none,unconfirmed,1,11.100,حماس تأیید می‌کند که شلیک به حومه رام‌الله واکنشی به تهاجم‌های نتانیاهو است,حماس عملیات شلیک به نزدیکی شهرک حومیش را تأیید و آن را پاسخی مشروع به تهاجم‌های نتانیاهو به تونل‌های اطراف مسجدالاقصی خواند. مقاله دیگر صرفاً تحلیل سیاسی درباره احتمال جانشینی آیزنکوت است و رویداد جدیدی گزارش نمی‌کند.
+8ac161e1496184c2,sent_followup,band=mid sim=0.74 score=18.50 kept=above_floor prior=c6ad70f3,6,mee|tg_iranian_militarism|tg_wfwitness,groq,2,politics,escalation,unconfirmed,1,18.497,ایران طرح فوری خروج از NPT را به هیئت‌رئیسه مجلس ارائه کرد,نماینده‌ای از مجلس اعلام کرد طرح دوفوریتی خروج از پیمان منع گسترش سلاح‌های هسته‌ای (NPT) به هیئت‌رئیسه ارائه شده است. همزمان، مقامات نظامی ایران هشدار دادند هرگونه حمله آمریکا به ایران با پاسخ دردناک و مستمر مواجه خواهد شد.
+ec27e6b43ac1b15e,repeat_dropped,band=mid sim=0.65 score=10.99 blocked=below_floor prior=9b0f4a6c,1,mehr,groq,2,security,none,unconfirmed,1,10.988,وزارت اطلاعات ایران سه کانون تروریستی وابسته به آمریکا و اسرائیل را منهدم کرد,وزارت اطلاعات ایران اعلام کرد سه کانون عملیاتی که هدفشان ترور و تخریب زیرساخت‌های اقتصادی بود، منهدم شد. این کانون‌ها به گروه‌های تروریستی وابسته به آمریکا و اسرائیل متصل بودند.
+dd9e3333fa86b56b,irrelevant,,7,sky_news_arabia|tg_entekhab|tg_padeshah_fxn,groq,2,,,,,,,
+cb924bd4bb9e9feb,repeat_dropped,band=mid sim=0.74 score=8.99 blocked=below_floor prior=cc35f186,1,tg_wfwitness,groq,3,military,none,rumour,0,8.991,نیروهای اسرائیلی با شلیک فسفر سفید باغ‌های زیتون جنوب لبنان را آتش زده‌اند,نیروهای اسرائیلی در نزدیکی مجدل زون و بایوت‌السیاد در جنوب لبنان از گلوله‌های فسفر سفید استفاده کردند. این عملیات منجر به آتش‌سوزی باغ‌های زیتون و مرکبات شد.
+cae755a254b2481b,sent_followup,band=mid sim=0.73 score=17.18 kept=above_floor prior=1637ef52,3,al_manar|tg_padeshah_fxn,groq,3,military,escalation,rumour,0,17.183,گزارش‌های تاییدنشده از اعزام نیروهای پاکستانی به عربستان و تهدید یمن به بستن فرودگاه‌ها,گزارش‌های اولیه حاکی از ورود گسترده نیروهای پاکستانی به عربستان سعودی برای مقابله با حوثی‌ها است، هرچند این ادعا هنوز تایید رسمی نشده است. همزمان، مقامات یمنی تهدید کرده‌اند که در صورت ادامه تحریم‌ها، فرودگاه‌ها را نیز می‌بندند. این تحولات می‌تواند به افزایش تنش نظامی در منطقه منجر شود.
+7a63958218d91bc0,repeat_dropped,band=mid sim=0.63 score=11.14 blocked=below_floor prior=3503fb8a,3,tg_entekhab|tg_geopolitics_prime|tg_tsepress,groq,3,politics,balance,rumour,0,11.144,انتقاد شدید مسئولان ایرانی از سیاست ترامپ و تأثیر آن بر حزب جمهوری‌خواه,محمود رضایی، دبیر شورای عالی امنیت ملی، سیاست‌های آمریکا علیه ایران را غیرمنطقی و ناشی از بی‌اطلاعی خواند و اسرائیل را عامل اصلی درگیری معرفی کرد. منابع خبری همچنین گزارش داده‌اند که ترامپ در گفتگوهای خصوصی نگران تأثیر منفی تصمیمات جنگی خود بر وضعیت حزب جمهوری‌خواه است. این اظهارات نشان‌دهنده تنش دیپلماتیک و سیاسی بین دو کشور است.
+aeab7875277074c6,irrelevant,,1,tg_iranian_militarism,groq,3,,,,,,,
+cbda36b0e4b60131,irrelevant,,1,aawsat,groq,2,,,,,,,
+87c9807a84280c95,irrelevant,,1,maariv,groq,2,,,,,,,
+84f312525686e1a7,sent_followup,band=mid sim=0.60 score=19.06 kept=above_floor prior=5d73f643,2,maariv|tg_vira_university,groq,2,security,escalation,unconfirmed,1,19.062,تأیید مرگ زخمی در حمله به نوئه تسوف و هشدار ایران به آمریکا,یک زخمی در حمله به نوئه تسوف جان خود را از دست داد. همزمان، ستاد خاتم‌الانبیا به آمریکا و کشورهای منطقه هشدار داد که در صورت خطا، هدف حملات دردناک قرار خواهند گرفت.
+83d17b27ef4605e8,relevance_dropped,,1,maariv,groq,2,security,none,unconfirmed,1,10.934,زخمی شدن مردی ۶۰ ساله در خشونت در اوم ال‌فحم,مردی حدود ۶۰ ساله در جریان یک رویداد خشونت‌آمیز در اوم ال‌فحم زخمی شد. جزئیات بیشتر در مورد علت دقیق این حادثه در منابع ارائه نشده است.
+64fc9d4be5d049fe,irrelevant,,1,ajar,groq,2,,,,,,,
+cc0a7682d4d04d1c,irrelevant,,1,ajar,groq,2,,,,,,,
+32391084e5d60a6c,irrelevant,,1,ajar,groq,2,,,,,,,
+e8c90e70f73c433e,irrelevant,,1,ajar,groq,2,,,,,,,
+b75cc1c8f0b1eb56,irrelevant,,1,tg_wfwitness,groq,3,,,,,,,
+2c7946a43000912c,irrelevant,,1,tg_geopwatch,groq,3,,,,,,,
+1d7620c551738152,irrelevant,,1,tg_wfwitness,groq,3,,,,,,,
+17c471bf9eb8c9f6,clickbait,,1,tg_militarywave,groq,3,,,,,,,
+45ff649fe5b23ac1,irrelevant,,2,tg_esellco|tg_padeshah_fxn,groq,3,,,,,,,
+30ef142a05baaa7b,lead_only,,1,tg_padeshah_fxn,groq,3,politics,none,unconfirmed,0,5.951,تعطیل شدن مدارس ایرانی در کویت به دستور دولت این کشور,دولت کویت مدارس ایرانی فعال در این کشور را تعطیل کرد و مانع ادامه فعالیت‌های آموزشی آن‌ها شد. مقامات وزارت آموزش و پرورش ایران این اقدام را غیرقانونی خوانده‌اند.

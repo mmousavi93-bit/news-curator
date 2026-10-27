@@ -1,0 +1,24 @@
+﻿cluster_key,fate,reason,n_members,sources,best_tier,category,claim_status,independent_count,score,headline,summary
+59caba7106f3affa,irrelevant,,1,maariv,2,,,,,,
+ce041ba1d860d961,relevance_dropped,,1,sky_news_arabia,2,economy,unconfirmed,1,8.970,کاهش نرخ انقباض بخش صنعت چین در ماه جاری,داده‌های رسمی نشان می‌دهد که سرعت کاهش فعالیت تولیدی در چین کند شده است.
+7ee5922619415b59,irrelevant,,3,sky_news_arabia|tg_geopwatch|tg_wfwitness,2,,,,,,
+3207ecaff9d477b5,irrelevant,,1,al_jazeera,2,,,,,,
+6c87e4c7b799a8bc,repeat_dropped,,2,maariv|walla,2,,,,,,
+996caf42f74c9037,repeat_dropped,,2,reuters_gnews|tg_fighter_radar,2,,,,,,
+87cbf52599071c39,clickbait,,1,sky_news_arabia,2,,,,,,
+d8ccaea632ba1c53,irrelevant,,1,al_jazeera,2,,,,,,
+85f7cda0d5df2fee,sent,,1,sky_news_arabia,2,economy,unconfirmed,1,8.913,افتتاحیه قیمت طلا به پایین‌ترین سطح دو هفته اخیر رسید,این کاهش پس از اظهارات کِوین وارش، رئیس فدرال رزرو، مبنی بر احتمال افزایش نرخ بهره برای مهار تورم رخ داد؛ در حالی که تنش‌های خاورمیانه نگرانی‌های تورمی را تشدید کرده است.
+d3f8d2a439c702e4,clickbait,,1,bbc_persian,2,,,,,,
+9fdcd326c8ddfd22,repeat_dropped,,2,mehr|tg_tabzlive,2,,,,,,
+b496c77348990bc6,repeat_dropped,,1,mee,2,,,,,,
+c5d19b022264d94e,irrelevant,,1,walla,2,,,,,,
+93cfdb67ef53ecc6,repeat_dropped,,1,ajar,2,,,,,,
+78bc0362e4f80d5b,rank_dropped,,1,walla,2,politics,unconfirmed,1,7.000,مسئولان وزارت خزانه‌داری اسرائیل ارتش را به هدررفت بودجه متهم کردند,رئیس‌جمهور اسرائیل از افزایش بودجه نظامی به‌طور چشمگیر خبر داد و مسئولان مالی، ارتش را به مدیریت غیرقانونی و خودسرانه در هزینه‌کرد متهم کردند.
+e78b77c39723cb17,irrelevant,,1,tg_geopwatch,3,,,,,,
+81d13d9bd812573c,repeat_dropped,,1,tg_fighter_radar,3,,,,,,
+64c96904f6a585a2,sent,,1,tg_minas_tirith,3,military,rumour,0,8.969,سپاه پاسداران موشک و پهپاد به سمت پایگاه‌های آمریکایی پرتاب کرد,این ادعا در ویدئویی منتشر شده است و جزئیات بیشتری درباره مقادیر یا خسارات در متن ارائه نشده است.
+bde43245f4bead69,repeat_dropped,,1,tg_minas_tirith,3,,,,,,
+0521a8dbd2e3f7eb,fatal,,2,tg_tabzlive,3,,,,,,
+09b9e9e3ea227ac3,relevance_dropped,,1,tg_wfwitness,3,politics,rumour,0,5.948,دیدار شی جین‌پینگ و پوتین در حاشیه اجلاس شانگهای در بیشکک,این دیدار در ۳۱ اوت در قرقیزستان برگزار می‌شود و جزئیات بیشتری درباره دستور جلسه یا نتایج آن در متن ارائه نشده است.
+4c1f33b95d235333,irrelevant,,1,osint613_a,3,,,,,,
+4c94e79f3a17c2c6,repeat_dropped,,1,tg_wfwitness,3,,,,,,

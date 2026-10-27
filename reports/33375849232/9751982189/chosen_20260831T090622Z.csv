@@ -1,0 +1,25 @@
+﻿cluster_key,fate,reason,n_members,sources,best_tier,category,claim_status,independent_count,score,headline,summary
+00a2b2b4b05087ab,irrelevant,,1,haaretz,2,,,,,,
+f3380ba6a2b44978,repeat_dropped,,1,mee,2,,,,,,
+250a4695f114a0ff,irrelevant,,1,maariv,2,,,,,,
+7801c85e2720a249,repeat_dropped,,1,aawsat,2,,,,,,
+2b8941e4685fbfae,repeat_dropped,,1,mee,2,,,,,,
+a5cae7b4ab4ad8b5,fatal,,1,haaretz,2,,,,,,
+d409578b75435a09,repeat_dropped,,2,mehr|tg_irane_azad_news,2,,,,,,
+3d07cbfd4d2436d2,irrelevant,,1,sky_news_arabia,2,,,,,,
+91fbd3e6ccb6aea8,irrelevant,,1,maariv,2,,,,,,
+678acfac1a0271f9,irrelevant,,1,sky_news_arabia,2,,,,,,
+a1995c75457b5216,relevance_dropped,,1,maariv,2,other,unconfirmed,1,6.942,افزایش ۹ درصدی تعداد دانش‌آموزان در منطقه تقوما پس از ۷ اکتبر,تعداد دانش‌آموزان در سال تحصیلی جدید در منطقه تقوما نسبت به وضعیت قبل از ۷ اکتبر حدود ۹ درصد افزایش یافته است.
+2e76fc127dbf75b5,sent,,1,maariv,2,security,unconfirmed,1,10.938,پلیس اسرائیل از یافتن پسر گمشده در شهر دیگری خبر داد,پسر ناپدیدشده در پتاح‌تقوا در شهر دیگری پیدا شد و مظنون به ربودن او شناسایی شده است.
+77d6acebc94e4106,sent,,1,walla,2,politics,unconfirmed,1,9.823,پیشنهاد طرح تشویقی برای معلمان بازگشت به شهرک‌های شمالی,طرحی برای ارائه مشوق‌های ویژه به معلمان در سال تحصیلی آینده مطرح شده است؛ برخی از معلمان این بازگشت را فراتر از انگیزه‌های مالی، یک تصمیم ایدئولوژیک برای حمایت از کودکان آسیب‌دیده می‌دانند.
+22befecb30e37604,irrelevant,,1,bbc_en,2,,,,,,
+f48a433d58c62841,irrelevant,,1,ajar,2,,,,,,
+1b402c1cfe26df0a,irrelevant,,1,ajar,2,,,,,,
+9936313202cb1d6e,repeat_dropped,,4,al_manar|tg_padeshah_fxn,3,,,,,,
+748021a2cd962c9d,fatal,,1,al_manar,3,,,,,,
+16911f4f1b4fbc69,rank_dropped,,4,al_manar|tg_padeshah_fxn|tg_tweet_mardomi,3,politics,rumour,0,6.287,ترامپ با انتشار تصویر هوش مصنوعی از بمباران خارک، تهدید به تخریب جزیره کرد,ترامپ تصویری ساختگی از انفجار جزیره خارک منتشر کرد و ادعا کرد آن در حال تخریب است؛ این ادعا هنوز توسط منابع مستقل تأیید نشده است.
+d717450b7cb909d3,irrelevant,,2,osint613_a|tg_padeshah_fxn,3,,,,,,
+3992d97af186ad7a,repeat_dropped,,2,al_manar|tg_fighter_radar,3,,,,,,
+775908a269f49bab,rank_dropped,,1,al_manar,3,politics,rumour,0,5.937,حکومت اسرائیل ورود فلسطینیان به شرق قدس را ممنوع کرد,این اقدام با ادعای بین‌المللی بودن آن مناطق انجام شده است.
+45aa7145cab5557a,lead_only,,1,tg_tweet_mardomi,3,,,,,,
+342c242d848cc81e,repeat_dropped,,1,tg_padeshah_fxn,3,,,,,,

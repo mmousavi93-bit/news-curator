@@ -1,0 +1,41 @@
+﻿cluster_key,fate,reason,n_members,sources,best_tier,category,claim_status,independent_count,score,headline,summary
+9e2d006f8ee40724,irrelevant,,1,walla,2,,,,,,
+90857a94eb39f1ad,sent,,3,al_manar|bbc_en_me|tg_padeshah_fxn,2,politics,unconfirmed,1,10.193,نتنیاو طرح ۱۵ ماده‌ای ترامپ برای غزه را رد کرد,اداره ترامپ این رد شدن را به عنوان رhetoric انتخاباتی تلقی می‌کند و نگران آن نیست. تحلیل‌ها نشان می‌دهد نتنیاو با رد طرح، سعی در حفظ جایگاه خود در برابر فشارهای داخلی و خارجی دارد.
+6d13f0069f9c4595,irrelevant,,2,sky_news_arabia,2,,,,,,
+40e6fbb61ebeac09,repeat_dropped,,1,maariv,2,,,,,,
+de55d178c6415c8a,irrelevant,,1,naval_news,2,,,,,,
+02231ee938ca409a,repeat_dropped,,5,mee|tg_esellco|tg_fighter_radar|tg_irane_azad_news|tg_padeshah_fxn,2,,,,,,
+0682736b19d65bf4,repeat_dropped,,8,bbc_persian|irna|maariv|mee|mehr|osint613_a|tg_irane_azad_news|tg_iranian_militarism,2,,,,,,
+8a1e5ca0f1cf2012,irrelevant,,2,maariv|walla,2,,,,,,
+7498d39d400065b7,irrelevant,,1,maariv,2,,,,,,
+5e4823b03a208369,repeat_dropped,,9,al_monitor|irna|maariv|mee|mehr|reuters_gnews|tg_wfwitness,2,,,,,,
+79baa72e824b1ea4,repeat_dropped,,7,ajar|al_manar|tg_fighter_radar|tg_tweet_mardomi|walla,2,,,,,,
+52a04b511395e346,sent,,2,maariv,2,politics,unconfirmed,1,10.058,پدره سانتس مسئولیت بحران مهاجران در سوتو را از مغرب برمی‌دارد,وزیر کشور اسپانیا اعلام کرد هیچ مدرکی مبنی بر دخالت مستقیم مغرب در این بحران وجود ندارد و ادعاهای اسرائیل را کذب خواند.
+518c8ce4bd4bc8b2,sent,,1,bbc_persian,2,politics,unconfirmed,1,9.949,برگزاری نشست سالانه سازمان همکاری شانگهای با حضور رهبران ایران، روسیه و چین در بیشکک,این نشست دو روزه به مناسبت بیست‌وپنجمین سالگرد تاسیس سازمان برگزار می‌شود و رهبران حاضر بر ترویج جهان چندقطبی و نمایش همبستگی در برابر غرب تأکید دارند.
+f9210c91fd52abf0,sent,,1,bbc_en_me,2,politics,unconfirmed,1,9.942,بریتانیا پرونده بازداشت فعال خود در کرانه باختری را با اسرائیل مطرح کرد,فین جوگین، دانشجوی ۲۲ ساله، در روستای اوم‌الخیر توسط مستعمره‌نشینان بازداشت شد و لندن این موضوع را با مقامات اسرائیلی پیگیری می‌کند.
+4d279e3bdbf1209b,sent,,4,mee|osint613_a|sky_news_arabia|tg_iranian_militarism,2,military,likely,2,15.218,وزارت دفاع امارات گزارش‌های موشک‌باران پایگاه هوایی المنهاد را تکذیب کرد,مسئولان امارات ادعا کردند که شایعات مربوط به حمله موشکی به این پایگاه بی‌اساس است و از مردم خواستند از منابع رسمی پیروی کنند.
+19592266f6436699,clickbait,,1,maariv,2,,,,,,
+fffa09bb5181f9e9,clickbait,,1,maariv,2,,,,,,
+029d22094b53eefd,sent,,1,maariv,2,security,unconfirmed,1,10.902,مردم تل‌آویو از شرایط سخت زندگی در زیر پناهگاه‌ها شکایت کردند,ساکنان محله‌ای نمادین در تل‌آویو گزارش کردند که به دلیل حملات موشکی مداوم، دو سال است در شرایط اضطراری و پناهگاه‌ها زندگی می‌کنند و از وضعیت فعلی خود گلایه دارند.
+cf175a7833489907,irrelevant,,1,bbc_en,2,,,,,,
+cfd96cb8bc1d296a,irrelevant,,1,al_jazeera,2,,,,,,
+9fcbcd93921b8208,clickbait,,1,sky_news_arabia,2,,,,,,
+ecad148478786f5e,repeat_dropped,,1,sky_news_arabia,2,,,,,,
+d0a37e6647844a58,repeat_dropped,,18,aawsat|ajar|ap_gnews|irna|mee|mehr|osint613_a|tg_fighter_radar|tg_iranian_militarism|tg_minas_tirith|tg_padeshah_fxn|tg_tabzlive|tg_wfwitness,2,,,,,,
+4dd4002645892945,clickbait,,1,al_jazeera,2,,,,,,
+55064cb8501c7330,repeat_dropped,,2,maariv|tg_behold_israel,2,,,,,,
+a5547408f0034cc4,irrelevant,,1,al_jazeera,2,,,,,,
+9ba0b8b8427fa0db,irrelevant,,1,al_jazeera,2,,,,,,
+fa998569ba9503f4,lang_dropped,,1,sky_news_arabia,2,military,unconfirmed,1,12.841,تقرير يكشف عن توسع الشبكة العسكرية الإيرانية في السودان عبر ميناء بورتسودان,يشير تقرير بحثي إلى أن الحرب الأهلية في السودان سمحت لإيران بتعزيز وجودها اللوجستي والعسكري على ساحل البحر الأحمر، مما يربطها بشكل مباشر بجماعة الحوثي.
+a79e71090d39f710,sent,,1,iran_international,2,economy,unconfirmed,1,8.824,۴۴ درصد شرکت‌کنندگان در نظرسنجی از خرید خانه در ایران خودداری می‌کنند,این نظرسنجی که در اینستاگرام انجام شد، نشان می‌دهد نگرانی‌های اقتصادی و برنامه‌های مهاجرتی از دلایل اصلی عدم تمایل به سرمایه‌گذاری در املاک است.
+9af0a7e6ae0deebe,sent,,2,maariv|walla,2,security,unconfirmed,1,10.914,۱۶ مأمور امنیتی در آستانه سال تحصیلی در اسرائیل دستگیر شدند,این دستگیری‌ها در پی گزارش‌هایی از درگیری‌های مسلحانه و استفاده از سلاح غیرقانونی در ورودی مدارس صورت گرفت.
+e5e39f5d883173fb,sent,,2,ajar|al_manar,2,security,unconfirmed,1,10.905,افزایش خشونت‌های مستعمره‌نشینان و شلیک گلوله به ساکنان غزه,گزارش‌ها از افزایش تجاوزات در کرانه باختری و زخمی شدن دو نفر از جمله یک دختر در غزه خبر می‌دهد.
+5f1007a5d1f965af,clickbait,,1,sky_news_arabia,2,,,,,,
+b0286ece52b63ddd,repeat_dropped,,8,maariv|tg_fighter_radar|tg_irane_azad_news|tg_iranian_militarism|tg_tweet_mardomi,2,,,,,,
+8d8865f0090fd0ff,irrelevant,,1,walla,2,,,,,,
+0832c06eedab56c8,irrelevant,,1,sky_news_arabia,2,,,,,,
+74679ddd2137609e,repeat_dropped,,2,ajar|al_manar,2,,,,,,
+8292de7fadbfc307,repeat_dropped,,3,ajar|mehr|tg_fighter_radar,2,,,,,,
+0d7f9ce70a9a7391,clickbait,,2,osint613_a|sky_news_arabia,2,,,,,,
+c1aa7fd23cf3bb17,cap_refused,,1,sky_news_arabia,2,,,,,,
+172e9e492af62edd,cap_refused,,1,maariv,2,,,,,,

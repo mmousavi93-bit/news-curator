@@ -1,0 +1,41 @@
+﻿cluster_key,fate,reason,n_members,sources,provider,best_tier,category,claim_status,independent_count,score,headline,summary
+5bdf3d44f1259b90,irrelevant,,1,walla,groq,2,,,,,,
+4fdd4c5d50c1e71e,irrelevant,,1,maariv,groq,2,,,,,,
+2bcddda8391bb39a,sent,,4,ajar|al_manar|mee|sky_news_arabia,groq,2,military,likely,3,17.283,ناقله نفتی در تنگه هرمز با سه مقذوف هدف قرار گرفت,این حادثه در ۱۷ مایل دریایی شرق خصب رخ داد و تاکنون گزارشی از تلفات جانی یا خسارت محیط زیستی ارائه نشده است.
+8d1e61e854af6c12,relevance_dropped,,1,walla,groq,2,politics,unconfirmed,1,9.977,یائیر گولان اعلام کرد که علیه ساره نتانیاهو شکایت خواهد کرد,این اظهارات در پی اختلافات حقوقی یا سیاسی اخیر مطرح شده است و جزئیات دقیق‌تر پرونده در متن اصلی ذکر نشده است.
+eed5768e195ce447,unparseable,,6,irna|tg_fighter_radar|tg_irane_azad_news|tg_iranian_militarism|tg_padeshah_fxn,bai_deepseek,2,,,,,,
+8b6f214167d1e0a3,unparseable,,3,sky_news_arabia|walla,bai_deepseek,2,,,,,,
+b99c07f4168e09e8,repeat_dropped,,3,al_jazeera|mee|tg_wfwitness,bai_deepseek,2,,,,,,
+565c3d4613e6de0c,sent,,2,al_manar|mee,bai_deepseek,2,politics,unconfirmed,1,10.053,سخنگوی وزارت خارجه ایران، اتحادیه اروپا را به نقض حقوق بین‌الملل متهم کرد,اسماعیل بقایی در پیامی در شبکه ایکس گفت موضع اتحادیه اروپا در حمایت از تحریم‌های آمریکا علیه ایران، نشانه «انحطاط اخلاقی و ناتوانی سیاسی» این اتحادیه است و با قوانین خود اروپا نیز مغایرت دارد.
+103ebbb455d3a7ce,irrelevant,,4,ajar|al_jazeera|al_manar|osint613_a,groq,2,,,,,,
+b6650cb52ae9b8f1,repeat_dropped,,6,ajar|iran_international|sky_news_arabia|walla,groq,2,,,,,,
+19342e0375126476,irrelevant,,5,al_manar|sky_news_arabia|tg_geopwatch,groq,2,,,,,,
+1bb1c54a60945d73,unparseable,,1,walla,bai_deepseek,2,,,,,,
+3303e066f6091957,unparseable,,1,sky_news_arabia,bai_deepseek,2,,,,,,
+e0791ed1280000b7,unparseable,,1,walla,bai_deepseek,2,,,,,,
+d308283ea428986f,repeat_dropped,,1,bbc_persian,groq,2,,,,,,
+213796e6c2abf684,irrelevant,,1,bbc_en,groq,2,,,,,,
+58785b07c535c8b3,clickbait,,1,aawsat,groq,2,,,,,,
+5885763abfc0dc3a,lang_dropped,,2,ajar|sky_news_arabia,groq,2,economy,likely,2,10.935,محافظ بنك إنجلترا يحذر من مخاطر الذكاء الاصطناعي على استقرار الأسواق المالية,أشار أندرو بيلي إلى أن التطور السريع في نماذج الذكاء الاصطناعي قد يؤدي إلى تصحيح حاد وغير منظم في الأسواق العالمية، مؤكداً أن المخاطر السيبرانية المرتبطة بهذه التقنيات أصبحت تهديداً رئيسياً للاستقرار المالي.
+5ca4e9c447d2ea7f,unparseable,,4,irna|mehr|tg_geopolitics_prime|tg_geopwatch,bai_deepseek,2,,,,,,
+b7e81e6cee0f8e76,repeat_dropped,,2,aawsat|mee,bai_deepseek,2,,,,,,
+f091902f0d47023a,sent,,1,bbc_en,bai_deepseek,2,politics,unconfirmed,1,9.821,بازگشت اجباری یک میلیون افغان از پاکستان و ایران در سال جاری,بر اساس گزارش بی‌بی‌سی، شمار کل اخراج‌شدگان از پاکستان و ایران به شش میلیون نفر رسیده که زیر حکومت طالبان مجبور به شروع دوباره زندگی شده‌اند. آمار یک میلیون نفر مربوط به بازگشت‌های امسال تا ماه اوت است.
+d480a2d34da8f64d,sent,,3,al_manar|ap_gnews|sky_news_arabia,groq,2,politics,likely,2,12.007,امم‌متحده از خطر آغاز سباق تسلیحات هسته‌ای در پی احتمال آزمایش‌های جدید هشدار داد,رئیس دفتر نزع سلاح سازمان ملل در نشست روز جهانی مخالفت با آزمایش‌های هسته‌ای، از بی‌اعتمادی فزاینده و تنش‌های ژئوپلیتیک به عنوان عواملی که می‌توانند منجر به موجی از آزمایش‌های متقابل شود، ابراز نگرانی کرد.
+ff55742b502909ae,repeat_dropped,,4,osint613_a|tg_fighter_radar|tg_tabzlive|walla,groq,2,,,,,,
+14a562b04a65e2cf,irrelevant,,2,ajar|sky_news_arabia,groq,2,,,,,,
+d369e3c355ef9be3,unparseable,,17,ajar|al_jazeera|al_manar|bbc_en|mee|osint613_a|tg_defenderdome|tg_fighter_radar|tg_geopolitics_prime|tg_irane_azad_news|tg_iranian_militarism|tg_rnintel|tg_tabzlive|tg_tweet_mardomi,bai_deepseek,2,,,,,,
+c8bf42e9806bda7e,unparseable,,3,al_monitor|mee|tg_geopwatch,bai_deepseek,2,,,,,,
+b4dc86e24f742fec,repeat_dropped,,3,al_manar|mee|tg_geopwatch,bai_deepseek,2,,,,,,
+438c69f4e1fbc333,rank_dropped,,1,walla,groq,2,other,unconfirmed,1,6.740,بیشتر تأسیسات تصفیه آب در اسرائیل به دلیل افزایش شوری آب دریا تعطیل شدند,این اختلال منجر به بحران آب در منطقه پیتاح‌نی‌تسا و تهدید حدود ۲۰ هزار دونم کشتزار سبزیجات شده است؛ مقامات دستور کاهش آبیاری عمومی و کشاورزی را صادر کرده‌اند.
+06cb6cb94e6a1214,repeat_dropped,,5,al_jazeera|al_manar|mee|tg_padeshah_fxn|tg_wfwitness,groq,2,,,,,,
+88c9c14928520cf5,irrelevant,,6,al_jazeera|bbc_en|dw|osint613_a|tg_tabzlive,groq,2,,,,,,
+94ac6096db04cb34,irrelevant,,1,sky_news_arabia,groq,2,,,,,,
+260f40adc3b3337d,irrelevant,,1,al_jazeera,groq,2,,,,,,
+cddcdf599b867f53,repeat_dropped,,2,mee|mehr,groq,2,,,,,,
+225413de9928e32d,irrelevant,,1,bbc_en,bai_deepseek,2,,,,,,
+aa5ff944a4d8b8cf,unparseable,,4,ajar|mee|osint613_a|sky_news_arabia,bai_deepseek,2,,,,,,
+44c2e3cf79f73495,sent,,1,bbc_persian,bai_deepseek,2,politics,unconfirmed,1,9.620,آمریکا دسترسی ایرانیان به آزمون‌های تافل و دولینگو را محدود کرد,این محدودیت با تعلیق یک مجوز آموزشی در چارچوب تحریم‌های تازه اعمال شده است. تاثیر آن بر امکان تحصیل در خارج از کشور است.
+8fe3c44629848992,repeat_dropped,,1,mee,bai_deepseek,2,,,,,,
+a4764bb45d8c6ead,repeat_dropped,,2,ajar|france24,groq,2,,,,,,
+f2e909ab206022ba,clickbait,,1,bbc_persian,groq,2,,,,,,
+74e9a9e778b7edcd,sent,,4,ajar|mee|sky_news_arabia|tg_geopolitics_prime,groq,2,politics,likely,3,13.706,فانس اعلام کرد هدف اصلی آمریکا تضمین آزادی تجارت در تنگه هرمز است,نایب‌الرییس آمریکا در مصاحبه با فاکس نیوز تأکید کرد که عملیات نظامی اخیر در جزیره لارک برای جلوگیری از مین‌گذاری بود و اکنون تمرکز واشنگتن بر بازگشایی مسیرهای تجاری است. منابع مختلف بر این نکته توافق دارند که هدف فعلی تضمین جریان آزاد کالاست، هرچند برخی تحلیل‌ها از شکست نظامی آمریکا در کنترل کامل تنگه سخن می‌گویند.

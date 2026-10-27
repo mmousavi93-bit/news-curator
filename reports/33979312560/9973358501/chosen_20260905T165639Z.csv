@@ -1,0 +1,37 @@
+﻿cluster_key,fate,reason,n_members,sources,provider,best_tier,category,claim_status,independent_count,score,headline,summary
+5e2544949f0c7768,sent,,1,maariv,groq,2,politics,unconfirmed,1,9.972,یائیر لپید فهرست نامزدهای حزب خود را برای انتخابات کنست اعلام کرد,این اقدام پس از اعلام بازنشستگی سیاسی لپید صورت گرفت و جزئیات ترکیب نهایی لیست هنوز در دسترس نیست.
+3f96c98d35a964cc,irrelevant,,1,sky_news_arabia,groq,2,,,,,,
+4ab463213e84dd3f,sent,,2,al_manar|walla,groq,2,military,unconfirmed,1,13.057,حمله‌های هوایی اسرائیل به جنوب لبنان با کشته شدن ۴ نفر ادامه یافت,منابع خبری از شنیدن صدای انفجارها در مناطق مختلف جنوب لبنان و کشته شدن ۴ نفر و زخمی شدن ۳۲ نفر در ۲۴ ساعت گذشته خبر دادند.
+2178232772ecde73,sent,,1,maariv,groq,2,security,unconfirmed,1,10.941,گسترش اعتراضات علیه دولت در شمال اسرائیل,پروپاگاندای اعتراضات در ده‌ها نقطه از شمال کشور گزارش شده است.
+74081d632cea66b9,repeat_dropped,,4,al_manar|maariv|walla,groq,2,,,,,,
+f12bde5ff98fc1ac,clickbait,,2,al_manar|walla,groq,2,,,,,,
+121492af61e48a15,sent,,1,aawsat,groq,2,politics,unconfirmed,1,9.903,اسرائیل اعلام حمایت از اتیوپی در بحران آبی نیل کرد,این اقدام در پی هفته‌ها از تشدید لحن مصر علیه آدیس آبابا و نگرانی از کاهش سهم مصر از آب نیل صورت گرفته است.
+631439777369cd74,fatal,,1,walla,bai_deepseek,2,,,,,,
+a064a3ea7409274f,fatal,,1,aawsat,bai_deepseek,2,,,,,,
+a8b7817f14b46d6d,fatal,,3,mehr|tg_fighter_radar|tg_padeshah_fxn,openrouter,2,,,,,,
+d5e024b693bc0981,irrelevant,,2,maariv|walla,groq,2,,,,,,
+cad6c056838046dd,sent,,1,al_jazeera,groq,2,military,unconfirmed,1,12.838,بازیابی اجساد ۵۵ نفر از یک خانواده فلسطینی در غزه پس از سه سال,این افراد هنگام پناه گرفتن در خانه خانوادگی خود در جریان حمله هوایی اسرائیل کشته شده بودند.
+57aa644a4d693746,sent,,1,tg_iranian_militarism,groq,3,military,rumour,0,8.997,حرکت بالگردهای شینوک به سمت جنوب اردن,تصویری از آسمان عمان پایتخت اردن منتشر شده که حرکت این بالگردها را به سمت جنوب نشان می‌دهد.
+3f9c73e421d459ab,repeat_dropped,,10,tg_esellco|tg_fighter_radar|tg_irane_azad_news|tg_iranian_militarism,groq,3,,,,,,
+1ea86c3fa491ec77,relevance_dropped,,2,tg_esellco|tg_iranian_militarism,groq,3,security,rumour,0,7.090,غیرفعال‌سازی ردیاب‌های تبلیغاتی در تجهیزات ارتش آمریکا به دلیل نگرانی امنیتی,ارتش آمریکا ردیاب‌های تبلیغاتی را در دستگاه‌های خود غیرفعال کرد تا از سوءاستفاده از داده‌های مکانی برای هدف‌گیری جلوگیری شود؛ سناتور وایدن این اقدام را ناکافی خواند.
+7d6f68d7db6163fb,relevance_dropped,,1,tg_geopwatch,groq,3,military,rumour,0,8.960,تأیید نشدن غرق شدن کشتی کیلو در هشدار دریایی,هشدار سازمان همکاری دریایی جنوب شرق آسیا (UKMTO) غرق شدن کشتی M/T Kylo را تأیید نکرده و آمار تلفات را اعلام نکرده است.
+cc5f3b915081820a,sent,,2,tg_rnintel,groq,3,military,rumour,0,9.044,نیروهای شورای انتقالی یمن در حال پیشروی به سمت شهر الجراحی هستند,گزارش‌های اولیه حاکی از شکست خطوط دفاعی انصارالله در حومه جنوبی این شهر است، اما این ادعا هنوز تأیید قطعی نشده است.
+af474688582ff503,clickbait,,2,tg_exciton_missile|tg_minas_tirith,gemini,3,,,,,,
+96407b3e1621e232,repeat_dropped,,2,tg_geopwatch|tg_rnintel,gemini,3,,,,,,
+5be508b519801741,irrelevant,,1,tg_tabzlive,bai,3,,,,,,
+f286db3616543ea2,repeat_dropped,,1,al_manar,groq,3,,,,,,
+b92e21ecfb5dcb23,repeat_dropped,,2,tg_fighter_radar|tg_padeshah_fxn,groq,3,,,,,,
+066c0b149a3f88d2,clickbait,,2,tg_iranian_militarism,groq,3,,,,,,
+66b28ddcb38eccd6,irrelevant,,1,tg_tabzlive,groq,3,,,,,,
+779a0f7862d84b1c,clickbait,,1,tg_iranian_militarism,groq,3,,,,,,
+08cb8cfdbda0e820,relevance_dropped,,1,tg_minas_tirith,groq,3,military,rumour,0,8.894,ثبت تصاویر پرواز هواپیمای سوخترسان و دو جنگنده آمریکایی در نزدیکی جزیره کیش,این تصاویر که زمان دقیق ثبت آن‌ها نامشخص است، توسط یک حساب کاربری در شبکه اجتماعی منتشر شده و تاکنون تأیید رسمی از سوی منابع دولتی یا نظامی ارائه نشده است.
+a62e1aefa73e375e,fatal,,2,al_manar,openrouter,3,,,,,,
+47c4c0246d75c772,irrelevant,,1,tg_tabzlive,groq,3,,,,,,
+5a9a2cc10d2607a3,clickbait,,1,al_manar,groq,3,,,,,,
+5aa00892a574b61e,clickbait,,1,tg_iranian_militarism,groq,3,,,,,,
+18b4bb0a14598c0b,relevance_dropped,,2,tg_tabzlive|tg_wfwitness,groq,3,politics,rumour,0,5.970,وی‌تکاف و کوشنر برای مذاکرات صلح به مسکو رسیدند,فرستاده ویژه آمریکا و مشاور سابق ترامپ با نماینده ویژه روسیه در فرودگاه مسکو دیدار کردند تا گفتگوهای صلح را آغاز کنند.
+356ca9fd1fa45150,irrelevant,,1,tg_tabzlive,groq,3,,,,,,
+75fc62893a8c0622,irrelevant,,1,tg_vahid_online,groq,3,,,,,,
+aa23dd96bc448498,irrelevant,,2,tg_irane_azad_news,groq,3,,,,,,
+71461c75dba1b262,irrelevant,,1,tg_vira_university,groq,3,,,,,,
+f5b1551ee9f0f959,irrelevant,,1,tg_vira_university,bai,3,,,,,,

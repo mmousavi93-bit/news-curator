@@ -1,0 +1,41 @@
+﻿cluster_key,fate,reason,n_members,sources,provider,best_tier,category,claim_status,independent_count,score,headline,summary
+85a15d41bc3c6da5,sent,,9,maariv|osint613_a|tg_behold_israel|tg_fighter_radar|tg_geopwatch|tg_iranian_militarism|tg_minas_tirith|walla,groq,2,military,unconfirmed,1,13.796,ارتش اسرائیل شبکه تونل‌های حزب‌الله در جنوب لبنان را پاکسازی کرد,نیروهای تیپ ۳۶ کنترل عملیاتی منطقه علی الطاهر را به دست آوردند و در حال خنثی‌سازی زیرساخت‌های زیرزمینی شامل مراکز فرماندهی و انبارهای مهمات هستند. ارتش اسرائیل اعلام کرد برخی از نیروهای حزب‌الله کشته شده و بقیه فرار کرده‌اند.
+5a8b1c289a77429e,repeat_dropped,,21,al_manar|al_monitor|osint613_a|tg_behold_israel|tg_fighter_radar|tg_irane_azad_news|tg_iranian_militarism|tg_mes|tg_padeshah_fxn|tg_rnintel|tg_tabzlive|tg_wfwitness,groq,2,,,,,,
+c60cbf4d5f74dd86,relevance_dropped,,3,mee|tg_wfwitness,groq,2,politics,unconfirmed,1,10.180,ادعای درخواست تونی بلیر برای حذف واژه فلسطین از کتاب‌های درسی,جریمی گرین‌استاک، سفیر سابق بریتانیا در سازمان ملل، مدعی شد که بلیر از مقامات فلسطین خواسته واژه فلسطین را از برنامه درسی حذف کنند؛ این گزارش در حالی مطرح می‌شود که بلیر آن را تکذیب کرده است.
+b0376ceec88fcdd7,fatal,,5,aawsat|al_monitor|reuters_gnews|tg_irane_azad_news|tg_tabzlive,bai_deepseek,2,,,,,,
+7ae02370eddc2671,fatal,,1,al_jazeera,bai_deepseek,2,,,,,,
+2c14bb09a93475c2,sent,,5,al_monitor|haaretz|mee,bai,2,politics,likely,3,14.356,مجلس نمایندگان آمریکا لایحه محدود کردن تحریم دانشگاهی اسرائیل را تصویب کرد,لایحه با ۲۳۷ رای موافق و ۱۶۹ مخالف تصویب شد و باید در سنا بررسی شود. همزمان ده‌ها گروه حقوق‌مدار خواستار حذف بند تقویت همکاری نظامی و فناوری آمریکا و اسرائیل شدند.
+3d13d701649bbb6e,clickbait,,1,haaretz,groq,2,,,,,,
+2d04b510352865fb,repeat_dropped,,7,bbc_persian|maariv|tg_iranian_militarism|tg_tabzlive,groq,2,,,,,,
+0d3b86f105afad7c,clickbait,,1,the_war_zone,groq,2,,,,,,
+e8dec0220de429c5,repeat_dropped,,3,dw|irna|tg_geopolitics_prime,groq,2,,,,,,
+3d60619edf3b74c1,sent,,10,ajar|maariv|tg_fighter_radar|tg_irane_azad_news|tg_padeshah_fxn|tg_vahid_online,groq,2,military,likely,2,15.833,سپاه اعلام کرد سردار جعفر کهریزی در حمله آمریکا به کرمانشاه کشته شد,این ادعا از سوی کانال‌های تلگرامی منتشر شده و تاکنون تأیید رسمی یا شواهد مستقلی برای آن ارائه نشده است.
+f2b154a97c2cefcc,sent,,3,maariv|walla,groq,2,politics,unconfirmed,1,10.126,دیوان عالی اسرائیل بخش‌هایی از اصلاح قانون اداره تحقیقات پلیس را معلق کرد,این تصمیم با رأی دو به یک صادر شد و به دلیل تأثیرات فوری بر فعالیت‌های اداره و دوره انتخابات اتخاذ گردید؛ وزیر دادگستری اسرائیل از این حکم انتقاد کرد.
+caba2e85886aa262,repeat_dropped,,1,al_jazeera,groq,2,,,,,,
+969ef4c7931e6fc8,sent,,3,al_jazeera|al_monitor|sky_news_arabia,bai,2,security,likely,3,15.119,سوریه تخریب باقی‌مانده‌های سلاح‌های شیمیایی دوران اسد را آغاز کرد,فرستاده سوریه و نماینده سازمان ملل این اقدام را تأیید کردند. نخستین تخریب از این نوع در بیش از یک دهه است و به مواد کشف‌شده در ماه مه مربوط می‌شود.
+8c85eda432a62b4a,sent,,4,aawsat|al_monitor|tg_behold_israel|tg_wfwitness,groq,2,politics,likely,2,12.211,کنگو دموکراتیک سفارت خود در اسرائیل را به اورشلیم منتقل می‌کند,این کشور قرار است به عنوان یازدهمین کشور، سفارتش را به اورشلیم منتقل کند و همزمان اسرائیل سفارتی در کینشاسا افتتاح خواهد کرد.
+e3d873b152005c81,irrelevant,,1,al_jazeera,groq,2,,,,,,
+61205994b60ee2d5,irrelevant,,2,maariv|tg_iranian_militarism,groq,2,,,,,,
+199c8438168f4f6c,repeat_dropped,,2,maariv|walla,groq,2,,,,,,
+2c95309837fbb5da,sent,,2,aawsat|al_monitor,groq,2,politics,likely,2,11.976,آسیب به روابط اسرائیل با غرب بر سر خشونت در کرانه باختری,گسترش شهرک‌سازی و افزایش حملات مستعمره‌نشینان بر فلسطینیان پیش از انتخابات اکتبر، تنش‌های دیپلماتیک با متحدان غربی را تشدید کرده است.
+9e2577d23d5bf976,repeat_dropped,,1,al_jazeera,groq,2,,,,,,
+5cabf641370be650,sent,,1,walla,groq,2,security,unconfirmed,1,10.844,انجام اعتراضات فلسطین‌پسند در محلهٔ آلمانی حیف با حضور پلیس,مظاهران علیه فعالیت‌های نظامی اسرائیل در غزه، کرانه باختری، لبنان و سوریه شعار دادند و پلیس در محل تجمع حضور یافت.
+a80354bda652e014,sent,,4,mee|osint613_a|tg_tabzlive|tg_wfwitness,bai,2,security,unconfirmed,1,11.137,سپاه هفت نفر را در ایلام بازداشت کرد,سپاه و وزارت اطلاعات این افراد را به پیوستگی به گروه‌های کرد و برنامه‌ریزی برای عملیات مسلحانه متهم کردند. در بازرسی، سلاح‌های کلاشینکف، کلت و شکاری و مهمات کشف شد.
+b6301556921c7c5c,fatal,,3,tg_iranian_militarism|tg_tabzlive|walla,openrouter,2,,,,,,
+98f574227685b794,relevance_dropped,,2,maariv|walla,groq,2,security,unconfirmed,1,10.932,پنج نفر به اتهام خشونت در کرانه باختری در فرودگاه بن‌گورین دستگیر شدند,دو نفر از متهمان در آستانه پرواز به اومانی دستگیر شدند و یکی از آن‌ها سرباز وظیفه است. این دستگیری‌ها در پی خشونتهای اخیر در جنوب کرانه باختری انجام شده است.
+48e28a12e89fc93e,irrelevant,,1,al_jazeera,groq,2,,,,,,
+0df5c00fe7a408d2,irrelevant,,1,al_jazeera,groq,2,,,,,,
+8deecd66a3cb2f26,irrelevant,,1,maariv,groq,2,,,,,,
+d367e9bf86272ad4,sent,,1,haaretz,groq,2,security,unconfirmed,1,10.767,دستگیری ۱۶ نفر از جامعه حسید در شمال اسرائیل به اتهام ازدواج با کودکان,پلیس اسرائیل در پی درگیری‌های اخیر، ۱۶ نفر را به دلیل شک در ازدواج غیرقانونی با افراد زیر سن قانونی بازداشت کرد. این اقدام پس از بازداشت ۲۰ نفر در ماه ژوئن در همین جامعه صورت گرفت.
+d09678497c76205d,sent,,5,ajar|mee|sky_news_arabia|tg_geopolitics_prime,groq,2,politics,likely,3,14.150,بن‌غفر طرح طرحی برای اخراج ۲ میلیون فلسطینی از غزه در هفت سال,این طرح که به عنوان شرط پیوستن به دولت آینده مطرح شده، شامل هزینه‌ای ۲۰ میلیارد دلاری است. ادعای وزیر دفاع اسرائیل مبنی بر تمایل ۸۰ درصد ساکنان به مهاجرت با نظرسنجی‌های مستقل که این رقم را ۴۳ تا ۴۹ درصد تخمین می‌زنند، در تناقض است.
+c97edda14e255f0c,relevance_dropped,,2,haaretz|walla,groq,2,politics,unconfirmed,1,9.840,توافق لیکود وگوتلیب برای حضور او در فهرست حزب قدرت یهودی,توافق حاصل شده اجازه می‌دهد گوتلیب بدون اعلام رسمی ترک حزب، در فهرست ایتامار بن‌گبیر کاندیدا شود و تا تشکیل کنگره بعدی همچنان تابع انضباط کابینه لیکود باقی بماند.
+9199abca69bf5934,sent,,1,maariv,groq,2,politics,unconfirmed,1,9.738,حزب لیکود پیام رسمی خداحافظی به تالی پیسرا ارسال کرد,این حزب در بیانیه‌ای آرزوی موفقیت برای پیسرا را بیان کرد که نشان‌دهنده پایان همکاری سیاسی دو طرف است.
+41cd91cfa118cde0,fatal,,5,al_jazeera|bbc_persian|maariv|mee,openrouter,2,,,,,,
+f951b363a767ca90,repeat_dropped,,3,irna|tg_tabzlive|tg_vahid_online,groq,2,,,,,,
+55eb3eca474c418b,irrelevant,,1,maariv,groq,2,,,,,,
+19eb64b87afb825f,relevance_dropped,,1,al_jazeera,groq,2,other,unconfirmed,1,6.687,دندانپزشکان غزه به دلیل کمبود امکانات در خیابان‌ها عمل می‌کنند,کمبود شدید منابع و فضای کاری باعث شده است که خدمات دندانپزشکی برای اکثر مردم غزه غیرقابل دسترس باشد و این متخصصان مجبور به کار در فضای باز شوند.
+9150ebb3edfbdbd3,relevance_dropped,,2,sky_news_arabia|tg_rnintel,groq,2,politics,unconfirmed,1,9.770,اختلاف بر سر صلاحیت‌ها در لیبی تهدید توافق ۴+۴ را افزایش می‌دهد,خلاف میان شورای ریاستی و دولت وحدت ملی در طرابلس بر سر مرزهای قدرت، پایداری توافق اتحاد را به خطر می‌اندازد.
+81d7ad213d8d7c39,sent,,1,maariv,groq,2,politics,unconfirmed,1,9.663,نتانیاهو برنامه زمانی شخصی خود را برای ۷ اکتبر منتشر کرد,او انتشار گزارش‌های نادرست درباره حضورش در آن روز را رد کرد.
+9f930bef5cf8a87d,repeat_dropped,,10,al_monitor|ap_gnews|haaretz|mee|osint613_a|sky_news_arabia|tg_geopwatch|tg_wfwitness,groq,2,,,,,,
+dd8ea1b777460466,irrelevant,,2,maariv,groq,2,,,,,,
+76e52c0e59d8d80d,irrelevant,,1,al_jazeera,groq,2,,,,,,

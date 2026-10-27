@@ -1,0 +1,41 @@
+﻿cluster_key,fate,reason,n_members,sources,provider,best_tier,category,claim_status,independent_count,score,headline,summary
+8db30157848be36a,sent,,1,al_monitor,groq,2,military,unconfirmed,1,12.998,کره جنوبی در حال آماده‌سازی استقرار نظامی در تنگه هرمز است,بر اساس گزارش‌های رسانه‌ای، این کشور قصد دارد تا پایان سال امسال نیروهای خود را برای حمایت از آزادی ناوبری اعزام کند و در حال طی مراحل کسب تصویب پارلمان برای این اقدام است.
+8f08b15d00a5fb0c,lang_dropped,,5,al_jazeera|tg_geopolitics_prime|tg_rnintel|tg_tabzlive|tg_wfwitness,groq,2,military,unconfirmed,1,13.390,مراسم تشییع پیکر کودکان کشته‌شده در حمله هوایی آمریکا به عروسی در کوhestak برگزار شد,بررسی رويترز نشان می‌دهد انفجار در مراسم عروسی در ۱ سپتامبر احتمالاً ناشی از اصابت مستقیم موشک آمریکایی بوده است. مقامات ایالات متحده اعلام کرده‌اند که در حال بررسی علت دقیق تلفات انسانی هستند.
+03f7a0d200994acb,repeat_dropped,,4,mee|sky_news_arabia|tg_vahid_online|walla,groq,2,,,,,,
+a6618d26a6e5f89f,repeat_dropped,,6,aawsat|al_manar|dw|mee|walla,groq,2,,,,,,
+7ad26f32517ec65a,fatal,,23,ajar|al_manar|france24|haaretz|sky_news_arabia|tg_esellco|tg_exciton_missile|tg_fighter_radar|tg_geopolitics_prime|tg_irane_azad_news|tg_mes|tg_padeshah_fxn|tg_tweet_mardomi|tg_wfwitness,bai_deepseek,2,,,,,,
+5fc74eb25cc581ba,fatal,,3,tg_rnintel|walla,bai_deepseek,2,,,,,,
+d2029857c74f2a54,irrelevant,,1,bbc_persian,bai,2,,,,,,
+0505fd9a0b09147a,sent,,2,al_jazeera|reuters_gnews,groq,2,politics,likely,2,11.947,وانس از ارائه زمان‌بندی برای پایان درگیری با ایران خودداری کرد,نایب‌الرئیس ایالات متحده در نشست مطبوعاتی کاخ سفید، درگیری اخیر را جنگ توصیف نکرد و از پیش‌بینی زمان پایان آن امتناع ورزید.
+badd99ff7121bca1,clickbait,,1,al_jazeera,groq,2,,,,,,
+cc4c06ba450140da,repeat_dropped,,1,sky_news_arabia,groq,2,,,,,,
+c201dc5378cdd5d6,repeat_dropped,,4,maariv|tg_fighter_radar,groq,2,,,,,,
+1468ba3d72c5fc51,sent,,1,haaretz,groq,2,politics,unconfirmed,1,9.786,تامیر دورتال لابی سیاسی جدیدی برای تأثیرگذاری بر کنست اسرائیل راه‌اندازی کرد,این پادکستر راست‌گرا با هدف شکل‌دهی به قوانین و مبارزه با آنچه «ادارات رسمی» می‌نامند، بازوی سیاسی خود را فعال می‌کند.
+c3f5a467bd1ef5c5,irrelevant,,1,sky_news_arabia,groq,2,,,,,,
+4e2cdc320b565253,irrelevant,,2,tg_geopwatch|the_war_zone,bai,2,,,,,,
+12abd792960d55c6,repeat_dropped,,1,iran_international,groq,2,,,,,,
+f79f3281adeb5c1f,irrelevant,,1,al_jazeera,groq,2,,,,,,
+3c517ec5cf92d07e,irrelevant,,1,sky_news_arabia,groq,2,,,,,,
+33cb44b646d0bcb4,irrelevant,,1,al_jazeera,groq,2,,,,,,
+2ed02fc090f15ad8,repeat_dropped,,6,ajar|maariv|tg_irane_azad_news|tg_iranian_militarism|tg_tweet_mardomi,groq,2,,,,,,
+daba4bffbfc28be7,irrelevant,,2,sky_news_arabia|tg_padeshah_fxn,groq,2,,,,,,
+8ba8c8edcddd4636,fatal,,17,maariv|sky_news_arabia|tg_fighter_radar|tg_geopolitics_prime|tg_irane_azad_news|tg_iranian_militarism|tg_mes,openrouter,2,,,,,,
+e15fe3e1b91dc8d0,irrelevant,,1,walla,groq,2,,,,,,
+4dd9c907f1d5552d,repeat_dropped,,9,al_monitor|mee|osint613_a|reuters_gnews|tg_iranian_militarism,groq,2,,,,,,
+0e6efca3dceddbda,irrelevant,,1,al_jazeera,groq,2,,,,,,
+95245113e2b50d1b,irrelevant,,1,al_jazeera,groq,2,,,,,,
+a069049c6717b1f7,clickbait,,5,ajar|maariv|tg_iranian_militarism|tg_padeshah_fxn,groq,2,,,,,,
+1b8326435ce09ab0,sent,,1,the_war_zone,groq,2,military,unconfirmed,1,12.564,نیروی دریایی آمریکا سه طراحی فریگت خارجی را برای خرید بررسی می‌کند,طرح‌های فریگت‌های مدرن ژاپن، کره جنوبی و ترکیه به عنوان گزینه‌های احتمالی برای پاسخ به نیازهای فوری نیروی دریایی آمریکا شناسایی شده‌اند.
+6257fbb841e81284,irrelevant,,1,al_jazeera,groq,2,,,,,,
+ce893f1c300b6173,irrelevant,,1,walla,bai,2,,,,,,
+0599056ee7937a8b,irrelevant,,1,al_jazeera,bai,2,,,,,,
+7e69802a1da5d226,irrelevant,,2,al_jazeera|bbc_en,bai,2,,,,,,
+70f3a3c38cc147e3,irrelevant,,1,irna,groq,2,,,,,,
+1053c4fe8a5c6172,repeat_dropped,,4,mee|osint613_a|tg_tabzlive,groq,2,,,,,,
+28e6f9376a2b5b3b,irrelevant,,1,al_jazeera,groq,2,,,,,,
+e3aa5e09f8cb8415,irrelevant,,1,al_jazeera,groq,2,,,,,,
+d0df425ad346184a,irrelevant,,2,maariv,groq,2,,,,,,
+5055557b6969a38f,repeat_dropped,,3,al_jazeera|mee|osint613_a,groq,2,,,,,,
+9699104bcc1a650c,irrelevant,,2,bbc_en|bbc_persian,groq,2,,,,,,
+52a0ccc8b8f21710,sent,,2,haaretz|maariv,groq,2,politics,unconfirmed,1,9.508,دیوان عالی اسرائیل قانون معافیت از سربازی حaredim را غیرقانونی اعلام کرد,هیئت ناعضویه دیوان عالی با استناد به نقض حقوق اساسی برابری و ایرادات فرآیند قانون‌گذاری، این طرح را باطل کرد. حزب شاس در واکنش، قاضیان را متهم به ایجاد آشوب کرد.
+df818cf214d8434f,fatal,,2,maariv,openrouter,2,,,,,,

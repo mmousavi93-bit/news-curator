@@ -1,0 +1,41 @@
+﻿cluster_key,fate,reason,n_members,sources,provider,best_tier,category,claim_status,independent_count,score,headline,summary
+453a870c59e9b308,repeat_dropped,,20,aawsat|ajar|haaretz|osint613_a|tg_esellco|tg_fighter_radar|tg_geopolitics_prime|tg_geopwatch|tg_irane_azad_news|tg_iranian_militarism|tg_mes|tg_minas_tirith|tg_padeshah_fxn|tg_vahid_online|tg_wfwitness|walla,groq,2,,,,,,
+ddeb3f5912d6229c,irrelevant,,3,al_jazeera|bbc_en,groq,2,,,,,,
+d29d28ce0b8e036e,sent,,1,sky_news_arabia,groq,2,military,unconfirmed,1,12.980,امارات متحده عربی حمله موشکی و پهپادی ایران به کویت را محکوم کرد,دبی اعلام کرد که این حمله هدف از آن آسیب به زیرساخت‌های حیاتی کویت بوده است.
+299862857da3f7cb,repeat_dropped,,3,ajar|tg_geopolitics_prime|tg_iranian_militarism,groq,2,,,,,,
+062656ae4aa38138,fatal,,9,ajar|al_manar|maariv|tg_fighter_radar|tg_iranian_militarism|tg_padeshah_fxn|tg_tweet_mardomi|walla,bai_deepseek,2,,,,,,
+a287eeeb60ab5fbc,fatal,,6,osint613_a|sky_news_arabia|tg_fighter_radar|tg_tabzlive|tg_vahid_online|tg_wfwitness,bai_deepseek,2,,,,,,
+54803bc2ffd9297d,irrelevant,,2,maariv,bai,2,,,,,,
+6c530f8965815f34,irrelevant,,1,aawsat,bai,2,,,,,,
+7fa96f41c81afa7c,sent,,6,aawsat|ajar|maariv|mee|osint613_a|tg_iranian_militarism,groq,2,politics,likely,4,14.448,نتانیاهو دستور بازگرداندن اجساد رهبران یهودی لبنان را صادر کرد,ادعای اولمرت درباره ترور محمد سلیمان در سال ۲۰۰۸ نیز مطرح شد، اما دستور عملیاتی جدید بر آزادسازی پنج شهروند لبنانی پس از بررسی‌های امنیتی تمرکز دارد.
+ff17638791031ce2,repeat_dropped,,3,al_jazeera|maariv|sky_news_arabia,groq,2,,,,,,
+b126506f17a9c12c,irrelevant,,1,naval_news,groq,2,,,,,,
+4a6cb9164241f1ac,repeat_dropped,,1,sky_news_arabia,groq,2,,,,,,
+b9bbc7ea6bdb6a23,repeat_dropped,,1,maariv,groq,2,,,,,,
+10ad2fe641b36b8b,clickbait,,1,maariv,groq,2,,,,,,
+cf13207de632a3a9,fatal,,11,mee|osint613_a|sky_news_arabia|tg_fighter_radar|tg_mes|tg_minas_tirith|tg_vahid_online,openrouter,2,,,,,,
+49a78e1da14db6e2,repeat_dropped,,3,al_manar|haaretz|sky_news_arabia,groq,2,,,,,,
+0bbb5553b478cdc8,irrelevant,,1,al_jazeera,groq,2,,,,,,
+4caef232dfb1c31f,clickbait,,3,maariv,groq,2,,,,,,
+8b0b06ccfd303d00,irrelevant,,1,haaretz,groq,2,,,,,,
+3241fcd0fda95fdc,irrelevant,,2,osint613_a|walla,groq,2,,,,,,
+53967e3a91b3c236,repeat_dropped,,1,sky_news_arabia,groq,2,,,,,,
+3eace307d1efbc98,irrelevant,,1,al_jazeera,groq,2,,,,,,
+582846b078a0c979,sent,,2,maariv|walla,groq,2,politics,unconfirmed,1,9.929,کارین الراهان از فهرست یش عتید برای انتخابات کنست بعدی کناره‌گیری کرد,این نماینده پس از ۱۴ سال فعالیت سیاسی اعلام کرد که در انتخابات آینده شرکت نخواهد کرد اما همچنان در کمپین حزب باقی می‌ماند.
+b8914dca4c1ef904,irrelevant,,1,sky_news_arabia,bai,2,,,,,,
+9f376f0d847a8040,fatal,,7,al_manar|osint613_a|tg_wfwitness|walla,openrouter,2,,,,,,
+360396852ad5c7e9,repeat_dropped,,1,mee,groq,2,,,,,,
+febeccad45034052,sent,,1,irna,groq,2,politics,unconfirmed,1,9.804,رئیس قوه قضائیه ایران برای شرکت در نشست بریکس به هند سفر کرد,غلامحسین محسنی اژهای به همراه هیئت قضایی و حقوقی به دهلی نو رفت تا در نشست رهبران قضایی بریکس شرکت کند.
+1e0f117f7369c0b6,relevance_dropped,,1,haaretz,groq,2,security,unconfirmed,1,10.780,کافه‌ای در مرکز اورشلیم به دلیل اعتراضات حaredi تعطیل شد,این کافه که توسط گروه «یهودیان برای مسیح» اداره می‌شود، به دلیل تجمع معتردها در روز شنبه بسته شد؛ این رویداد تنش‌های قدیمی بر سر رعایت شنبه در اورشلیم را دوباره برانگیخته است.
+879d6150966e13e9,irrelevant,,2,maariv,groq,2,,,,,,
+afb5ad7a47ee1f37,repeat_dropped,,1,iran_international,groq,2,,,,,,
+95af796146bd1278,repeat_dropped,,1,maariv,groq,2,,,,,,
+30d744b858f4160a,repeat_dropped,,1,dw,groq,2,,,,,,
+24d32ac95ab53f5b,irrelevant,,1,al_jazeera,groq,2,,,,,,
+13db362143fdba3c,irrelevant,,1,al_jazeera,groq,2,,,,,,
+097f058d8fba9d50,irrelevant,,1,walla,bai,2,,,,,,
+c5a414ec76430453,sent,,1,walla,groq,2,security,unconfirmed,1,10.731,برگزاری مانور مشترک پلیس و ارتش در ایلات با سناریوی نفوذ تروریست,این مانور برای سنجش هماهنگی نهادهای اضطراری در شرایط مختلف طراحی شده است. مقامات از تهدیدات امنیتی در این شهر هشدار داده‌اند اما اعلام کرده‌اند که در حال حاضر هیچ هشدار مشخصی وجود ندارد.
+b1d15cd00026dfda,repeat_dropped,,2,tg_vahid_online|walla,groq,2,,,,,,
+dc2ff623b3024168,repeat_dropped,,1,walla,groq,2,,,,,,
+3c05d7af27dcfb8f,irrelevant,,1,al_jazeera,groq,2,,,,,,
+b1f1c9c02e9f6a3f,repeat_dropped,,1,mee,groq,2,,,,,,

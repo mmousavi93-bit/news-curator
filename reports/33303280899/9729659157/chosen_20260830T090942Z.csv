@@ -1,0 +1,14 @@
+﻿cluster_key,fate,reason,n_members,sources,best_tier,category,claim_status,independent_count,score
+93b3eaec199c49f4,sent,,2,tg_iranian_militarism|walla,2,security,unconfirmed,1,11.100
+4ce978013d0c1839,irrelevant,,2,al_jazeera|sky_news_arabia,2,,,,
+9c0989d456b41c67,irrelevant,,1,maariv,2,,,,
+b331c1ffc4cb5744,rank_dropped,,1,walla,2,other,unconfirmed,1,6.893
+73579a61b9de3ef1,sent,,1,tg_fighter_radar,3,military,rumour,0,9.000
+d7a618ba19d6daa1,sent,,1,tg_militarywave,3,military,rumour,0,8.999
+6cc44ab64bc4e5b8,rank_dropped,,1,tg_iranian_militarism,3,security,rumour,0,6.996
+cf62755695eee487,clickbait,,2,tg_iranian_militarism,3,,,,
+cab9dcd9b5a0c881,sent,,5,al_manar|tg_wfwitness,3,military,rumour,0,9.375
+6353f8e57d04b233,irrelevant,,1,osint613_a,3,,,,
+1eae2af11f79a615,repeat_dropped,,4,al_manar|tg_fighter_radar|tg_iranian_militarism,3,,,,
+d39c778fb16f1d22,unavailable,,1,tg_iranian_militarism,3,,,,
+9d5686bbb307d2d8,unavailable,,1,tg_geopolitics_prime,3,,,,

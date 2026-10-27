@@ -1,0 +1,14 @@
+﻿cluster_key,fate,reason,n_members,sources,best_tier,category,claim_status,independent_count,score
+2fd9866eb8af9d60,irrelevant,,1,sky_news_arabia,2,,,,
+34923ea1f92a322c,irrelevant,,1,bbc_en,2,,,,
+e2c59e4ef9f44c96,lang_dropped,,1,ajar,2,politics,unconfirmed,1,9.140
+f07b8ba298cf4f35,sent,,1,tg_wfwitness,3,military,rumour,0,8.999
+00f799aee8a8f6a2,rank_dropped,,1,al_manar,3,politics,rumour,0,5.988
+48c824e878b8b7d0,rank_dropped,,2,tg_tabzlive,3,politics,rumour,0,6.087
+e6f8cb33ccaa174e,sent,,2,osint613_a|tg_tabzlive,3,military,rumour,0,9.079
+bbf1e4d98a3af629,sent,,1,tg_iranian_militarism,3,military,rumour,0,8.974
+c58e54c96a8582f7,irrelevant,,1,tg_geopwatch,3,,,,
+32d63444083a1821,clickbait,,2,tg_tabzlive,3,,,,
+49d496ae6d23ba94,repeat_dropped,,2,al_manar|tg_tweet_mardomi,3,,,,
+23bf1679357f0a17,rank_dropped,,1,tg_tabzlive,3,security,rumour,0,6.946
+6ee10a52c76be15a,clickbait,,1,tg_geopolitics_prime,3,,,,

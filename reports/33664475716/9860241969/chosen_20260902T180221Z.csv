@@ -1,0 +1,41 @@
+﻿cluster_key,fate,reason,n_members,sources,provider,best_tier,category,claim_status,independent_count,score,headline,summary
+6c2e2db737c7240b,sent,,5,mee|sky_news_arabia|tg_fighter_radar|tg_padeshah_fxn|walla,groq,2,security,likely,3,15.397,آژانس بین‌المللی انرژی اتمی از عدم دسترسی به تأسیسات هسته‌ای ایران خبر داد,گزارش‌ها حاکی از آن است که بازرسان از ژوئن ۲۰۲۵ به تأسیسات اصلی دسترسی نداشته‌اند و نمی‌توانند تأیید کنند که اورانیوم غنی‌شده به اهداف نظامی تبدیل نشده است.
+c3ff1ce6bdeb7e78,unparseable,,25,ajar|sky_news_arabia|tg_fighter_radar|tg_irane_azad_news|tg_iranian_militarism|tg_padeshah_fxn|tg_tweet_mardomi|tg_vira_university|walla,bai_deepseek,2,,,,,,
+fb18e04ff568e2d4,repeat_dropped,,2,tehran_times|tg_defenderdome,bai_deepseek,2,,,,,,
+46a7598d51e8c8a0,unparseable,,1,maariv,bai_deepseek,2,,,,,,
+b631531de8a578e9,clickbait,,1,the_war_zone,bai_deepseek,2,,,,,,
+d8d8ba0ea551ff70,repeat_dropped,,2,maariv|walla,groq,2,,,,,,
+b313eb598638d0d1,unparseable,,27,france24|iran_international|irna|mehr|osint613_a|tg_esellco|tg_fighter_radar|tg_irane_azad_news|tg_iranian_militarism|tg_padeshah_fxn|tg_vahid_online|tg_vira_university,bai_deepseek,2,,,,,,
+c56c17161e7fcd60,irrelevant,,2,aawsat,bai_deepseek,2,,,,,,
+5c2aeaee7340859e,repeat_dropped,,2,irna|tehran_times,bai_deepseek,2,,,,,,
+35094faab61eae61,irrelevant,,1,maariv,bai_deepseek,2,,,,,,
+1c96806b7fb0095f,irrelevant,,1,al_jazeera,groq,2,,,,,,
+e10c74cb776c44b8,sent,,1,tehran_times,groq,2,politics,unconfirmed,1,9.917,پورمحمدی از اقدامات پیشگیرانه دولت در انتظار تحریم‌ها و جنگ سخن گفت,معاون رییس‌جمهور در مصاحبه تلویزیونی از تدابیر اجرایی برای مقابله با بازگشت تحریم‌ها و احتمال درگیری پس از بازگشت ترامپ به قدرت خبر داد.
+b23ea818a51b1bbf,lang_dropped,,1,sky_news_arabia,groq,2,politics,unconfirmed,1,9.904,توسيع نطاق المساعدات النقدية لعودة اللاجئين السوريين من الأردن,أعلنت المفوضية السامية لشؤون اللاجئين عن توسيع برنامج الدعم ليشمل جميع اللاجئين المقيمين في المخيمات وخارجها، رغم وجود نقص في التمويل.
+0e99167a89ab6e59,irrelevant,,1,tehran_times,groq,2,,,,,,
+340e1baf76bd4460,irrelevant,,1,al_jazeera,groq,2,,,,,,
+2f2745467c668ee9,irrelevant,,1,tehran_times,groq,2,,,,,,
+d06eb648bc53fe9d,unparseable,,1,tehran_times,bai_deepseek,2,,,,,,
+ba3b92bd1f280d6d,unparseable,,1,al_jazeera,bai_deepseek,2,,,,,,
+5aada43f659a037c,unparseable,,2,mee,bai_deepseek,2,,,,,,
+7551e7ad8feeb449,unparseable,,1,tehran_times,bai_deepseek,2,,,,,,
+abdc59e7946493b6,sent,,1,bbc_en_me,groq,2,military,unconfirmed,1,12.881,حمله به تانکر سعودی در تنگه هرمز دو ملوان فیلیپینی را کشت,عربستان سعودی از هدف قرار دادن کشتی سیدر با پرتابه‌های ناشناس در روز دوشنبه ابراز نگرانی کرد و این رویداد را محکوم نمود.
+977e387029ca5135,sent,,3,france24|mee|tehran_times,groq,2,military,likely,3,17.070,حملات موشکی آمریکا به جنوب ایران ۱۸ کشته و ۱۰۸ زخمی بر جای گذاشت,وزارت بهداشت ایران اعلام کرد حملات سه‌شنبه شب ۱۸ نفر را کشت و ۱۰۸ نفر را زخمی کرد. گزارش‌ها حاکی از آن است که یک مراسم عروسی در سیریک نیز هدف قرار گرفته و ۵ نفر از جمله یک کودک در آن کشته شدند.
+1392e9b4165a7a12,repeat_dropped,,6,ap_gnews|bbc_persian|tehran_times|tg_geopolitics_prime|tg_vahid_online,groq,2,,,,,,
+32568d73e25fda00,clickbait,,1,tehran_times,groq,2,,,,,,
+1d62a167b259d39f,unparseable,,4,sky_news_arabia|tg_defenderdome|tg_mes|the_war_zone,bai_deepseek,2,,,,,,
+611ce7f269712895,unparseable,,1,tehran_times,bai_deepseek,2,,,,,,
+ef3bed5310678b6f,unparseable,,6,osint613_a|tehran_times|tg_fighter_radar|tg_mes|tg_minas_tirith,bai_deepseek,2,,,,,,
+27bf57d3d02c5d6e,irrelevant,,1,the_war_zone,groq,2,,,,,,
+b14e38f4fda2981c,repeat_dropped,,17,ajar|al_jazeera|france24|mee|sky_news_arabia|tg_fighter_radar|tg_tabzlive|walla,groq,2,,,,,,
+1c51c530509afb0a,repeat_dropped,,3,maariv|walla,groq,2,,,,,,
+28a8df2d90953e73,unparseable,,1,al_jazeera,bai_deepseek,2,,,,,,
+67b655a1f3ad5ade,unparseable,,2,al_jazeera|tg_geopwatch,bai_deepseek,2,,,,,,
+de7b5001c08fdd98,sent,,12,mee|osint613_a|sky_news_arabia|tg_behold_israel|tg_defenderdome|tg_geopwatch|tg_irane_azad_news|tg_mes|tg_padeshah_fxn|tg_rnintel|tg_vahid_online,bai_deepseek,2,military,likely,2,15.765,ترامپ مدعی کنترل تنگه هرمز و پیشنهاد تغییر نام آن شد,او گفت ۲۸ کشتی را منهدم کرده و کنترل تنگه در دست آمریکاست. سپس پیشنهاد تغییر نام به «تنگه ترامپ» را مطرح کرد.
+1871047b8d76f837,irrelevant,,1,bbc_en,bai_deepseek,2,,,,,,
+5dfd5cad153f6a86,unparseable,,1,bbc_en,bai_deepseek,2,,,,,,
+8f5fcacdb3f67a05,sent,,1,al_jazeera,groq,2,economy,unconfirmed,1,8.729,شرکت شرون قصد دارد تولید نفت خود در ونزوئلا را دو برابر کند,این شرکت تنها شرکت آمریکایی با حضور بزرگ در ونزوئلا است که پس از دریافت مساحت‌های جدید، برنامه‌ریزی برای افزایش ظرفیت تولید را اعلام کرده است.
+1c151eb639814e21,sent,,2,al_jazeera|haaretz,groq,2,economy,likely,2,10.823,پای‌پل و اوبر برنامه‌های تعدیل نیروی گسترده را اعلام کردند,پای‌پل حدود یک‌چهارم کارکنان خود در اسرائیل را به دلیل استفاده از هوش مصنوعی تعدیل می‌کند و اوبر نیز ۳۳۰۰ نفر را برای ساده‌سازی ساختار سازمانی اخراج می‌نماید.
+0fa3886d485eeb78,sent,,2,ajar|walla,groq,2,security,likely,2,12.819,پلیس اسرائیل مرد ۲۷ ساله را به اتهام تحریک به خشونت علیه اوحنه بازجویی کرد,این بازجویی پس از مشاهده برچسب‌های تهدیدآمیز در مسیر مدرسه فرزندانش صورت گرفت و متهم پس از اتمام فرآیند با شرایط محدودکننده آزاد شد.
+05bb8d26fe8b51ec,irrelevant,,2,al_jazeera|al_monitor,groq,2,,,,,,
+3a13fa1104e56624,sent,,1,iran_international,groq,2,economy,unconfirmed,1,8.697,بررسی ایران اینترنشنال: شبکه بانکی سایه ایران فراتر از تحریم‌های اخیر آمریکا است,تحقیق نشان می‌دهد که تهران از طریق بیش از یک دهه بانک در چین و امارات به سیستم مالی جهانی دسترسی دارد و بخش عمده‌ای از این شبکه هدف تحریم‌های ماه گذشته قرار نگرفته است.

@@ -1,0 +1,92 @@
+﻿cluster_key,fate,reason,n_members,sources,provider,best_tier,category,significance,claim_status,independent_count,score,headline,summary
+1691edc70384e38e,repeat_dropped,band=mid sim=0.69 score=13.20 blocked=below_floor prior=748a8a2e,3,aawsat|mee|tg_tweet_mardomi,groq,2,security,none,likely,2,13.197,وزیر سابق فلسطینی ادعای هشدار به اسرائیل پیش از ۷ اکتبر را مطرح کرد,سوفیان ابوزیده، وزیر سابق فلسطین، مدعی شد که هفته‌ها پیش از حمله ۷ اکتبر، هشدار یحیی سنوار را به اطلاعات اسرائیل منتقل کرده است. این ادعا که در ویدیویی منتشر شده، هنوز توسط منابع رسمی اسرائیل یا حماس تأیید نشده است.
+4302cd0dc75fd369,clickbait,,8,ajar|tg_entekhab|tg_fighter_radar|tg_irane_azad_news|walla,groq,2,,,,,,,
+c691f0759e839b63,relevance_dropped,,4,al_jazeera|bbc_persian|tg_rnintel,groq,2,security,none,likely,2,13.076,حمله خودروی بمب‌گذاری‌شده به مسجد در پاکستان ۱۶ کشته برجا گذاشت,خودرویی حامل مواد منفجره در زمان نماز جمعه به مسجدی در محوطه مقر قدیمی پلیس شهر کوهات در ایالت خیبر پختونخوا برخورد کرد. دست‌کم ۱۶ نفر از جمله پنج مأمور پلیس کشته و بیش از ۳۰ نفر زخمی شدند؛ هنوز گروهی مسئولیت این حمله را بر عهده نگرفته است.
+cd543c41100b0ecd,repeat_dropped,band=mid sim=0.79 score=10.95 blocked=below_floor prior=84ba46d7,1,iran_international,groq,2,security,none,unconfirmed,1,10.950,گارد ملی ایران دو روز پس از سالگرد اعتراضات در تهران رژه گرفت,نیروهای گارد ملی، بسیج و کودکان در تهران رژه رفتند تا دو روز پس از سالگرد اعتراضات ۲۰۲۲، نمایشی از قدرت برگزار کنند. این اقدام یک رویداد نمایشی دولتی بود و جزئیات عملیاتی جدیدی در آن ذکر نشده است.
+dc6a3fff781347d6,sent_followup,band=mid sim=0.64 score=17.94 kept=above_floor prior=14321bd1,1,aviationist,groq,2,military,balance,unconfirmed,1,17.937,هواپیمای یوروفا이터 ایتالیا در پایگاه هوایی عربستان آسیب دید,وزارت دفاع ایتالیا اعلام کرد یک فروند یوروفا이터 تایفون مستقر در پایگاه هوایی ملک فهد (التائف) در عربستان سعودی در حمله‌ای آسیب دیده است. این هواپیما در چارچوب عملیات «عزم راسخ» در منطقه مستقر بود.
+9c4b040f1646e542,irrelevant,,1,tehran_times,groq,2,,,,,,,
+e257a23ebefb25bf,sent_followup,band=high sim=0.93 score=18.33 kept=development prior=1bdb73f4,5,osint613_a|sky_news_arabia|tg_rnintel|tg_tabzlive,groq,2,military,balance,unconfirmed,1,18.328,آمریکا فروش ۴۸ فروند اف-۳۵ به عربستان را به اسرائیل اطلاع داد,وزارت خارجه آمریکا فروش ۴۸ فروند جنگنده اف-۳۵ به ارزش ۲۴.۳ میلیارد دلار به عربستان سعودی را تأیید کرد. مقامات اسرائیلی اعلام کردند که برای حفظ برتری نظامی کیفیتی، از واشنگتن درخواست جبران با سیستم‌های پیشرفته‌تر خواهند کرد. این معامله می‌تواند تعادل نظامی منطقه را تغییر دهد.
+84573182191a079e,irrelevant,,1,tehran_times,groq,2,,,,,,,
+0025bed493eb77da,irrelevant,,1,tehran_times,groq,2,,,,,,,
+1f5f7faed688a835,irrelevant,,2,ajar|tg_tabzlive,groq,2,,,,,,,
+aec5071af5550ec2,irrelevant,,1,tehran_times,groq,2,,,,,,,
+5cdb0bae669bb0d7,irrelevant,,1,tehran_times,groq,2,,,,,,,
+d9bbf4f7d96cf252,relevance_dropped,,1,sky_news_arabia,groq,2,politics,none,unconfirmed,1,9.770,عراق آسمان غربی خود را پس از ده سال برای پروازهای مدنی بازگشایی کرد,عراق اعلام کرد فضاهای هوایی غربی کشور که حدود ۱۰ سال بود برای پروازهای مدنی ممنوع شده بود، دوباره باز شده است. این تصمیم به بازگشت ترافیک هوایی عادی در آن منطقه کمک می‌کند.
+43c412cef5b95576,sent,,1,mee,groq,2,economy,economy,unconfirmed,1,14.724,ترکیه پروازهای ماهان ایر ایران را به دلیل ریسک تحریم‌های آمریکا متوقف می‌کند,ترکیه از ۲۱ سپتامبر پروازهای شرکت ماهان ایر را متوقف می‌کند. مقامات ترکیه می‌گویند این اقدام به دلیل تحریم‌های گزینشی وزارت خزانه‌داری آمریکا علیه شرکت‌های مرتبط است و شامل همه ایرلاین‌های ایرانی نیست.
+18c2d841927427a9,repeat_dropped,band=mid sim=0.69 score=12.82 blocked=below_floor prior=97a7039a,2,al_jazeera|al_manar,groq,2,military,none,unconfirmed,1,12.821,تشدید حملات پهپادی اسرائیل در غزه و کشته شدن سه نفر در مخیم البرج,پهپاد کوادکپتر اسرائیلی سه نفر را در شرق مخیم البرج در غزه زخمی کرد. این در حالی است که تحلیل‌ها از حذف تدریجی چهره‌های کلیدی مذاکره در منطقه خبر می‌دهند.
+9f80566e8891971c,sent_followup,band=mid sim=0.71 score=17.81 kept=above_floor prior=0b7e66f8,2,al_jazeera|tg_tweet_mardomi,groq,2,politics,escalation,unconfirmed,1,17.814,گزارش سازمان ملل: آمریکا در حمله به مدرسه ایران جنایت جنگی مرتکب شده است,بررسی‌کنندگان سازمان ملل متحد اعلام کردند که ایالات متحده به‌طور غیرقانونی یک مدرسه و مرکز ورزشی در ایران را هدف قرار داده و منجر به کشته شدن کودکان شده است. کاخ سفید این یافته‌ها را رد کرده و آمریکا رسماً از شورای حقوق بشر خارج شده است.
+199a423dbd875648,relevance_dropped,,1,haaretz,groq,2,economy,none,unconfirmed,1,11.700,گزارش جدید: کالاهای مستعمرات اسرائیل با برچسب جعلی به اروپا صادر می‌شوند,گزارشی جدید کشف کرد که صادرکنندگان مستعمرات اسرائیل به‌طور سیستماتیک مبدأ کالاهای ارسال‌شده به اروپا را پنهان می‌کنند. با حرکت ۱۲ کشور برای محدودسازی این واردات، کسب‌وکارهای اسرائیلی در داخل خط سبز نیز ممکن است تحت تأثیر قرار گیرند.
+a7cf2c3ce3ecb8e1,irrelevant,,1,mee,groq,2,,,,,,,
+35687e9dfe346843,repeat_dropped,band=high sim=0.90 score=10.69 blocked=below_floor prior=f6427f95,1,sky_news_arabia,groq,2,security,none,unconfirmed,1,10.693,بیش از ۱۱۲ هزار یمنی در دو هفته اخیر آواره شدند,سازمان بین‌المللی مهاجرت اعلام کرد که به دلیل تجدید درگیری‌ها در ساحل غربی یمن، دست‌کم ۱۱۲ هزار نفر در داخل کشور آواره شده‌اند. حدود ۳ هزار نفر دیگر نیز از طریق دریا به جیبوتی فرار کرده‌اند.
+2949db5189ff21f9,repeat_dropped,band=mid sim=0.66 score=9.67 blocked=below_floor prior=3599af0e,1,mee,groq,2,politics,none,unconfirmed,1,9.674,سموتریچ خواستار گسترش سیاست‌های استیلا به گیلان و نقب شد,بزیل سموتریچ، وزیر دارایی اسرائیل، وعده داد سیاست‌های «انقلاب استیلا» در کرانه باختری را به گیلان شمالی و نقب جنوبی اسرائیل گسترش دهد. او این اقدام را برای نجات اسرائیل از یک «۷ اکتبر» دیگر ضروری دانست.
+d433920ed3cb77b7,sent_followup,band=mid sim=0.64 score=14.67 kept=above_floor prior=b15fb717,1,iran_international,groq,2,economy,economy,unconfirmed,1,14.667,ایران با از دست دادن یک‌سوم ظرفیت گاز در آستانه زمستان مواجه است,ایران پس از جنگ حدود یک‌سوم ظرفیت تولید گاز خود را از دست داده و اکنون برای بازسازی زیرساخت‌ها پیش از فصل سرما تلاش می‌کند. این وضعیت تهران را با چالش‌های سختی در تأمین انرژی برای خانه‌ها، نیروگاه‌ها و صنایع مواجه کرده است.
+717f5e419cd2f619,irrelevant,,1,walla,groq,2,,,,,,,
+d9c8fdc47ed54099,sent,,1,al_jazeera,groq,2,economy,economy,unconfirmed,1,14.599,یک‌چهارم جمعیت جهان با بحران هزینه‌های معیشت ناشی از جنگ‌های خاورمیانه مواجه است,بر اساس گزارش‌ها، یک‌چهارم جمعیت جهان، از جمله ۲ میلیارد ساکنان جنوب آسیا، با افزایش شدید هزینه‌های معیشت به دلیل جنگ‌های خاورمیانه دست‌وپنجه نرم می‌کنند. این گزارش تأثیرات اقتصادی جنگ‌های منطقه را بر جوامع دور از میدان نبرد برجسته می‌کند.
+01d9708fef8166b7,sent_followup,band=mid sim=0.56 score=14.29 kept=above_floor prior=27268512,1,reuters_gnews,groq,2,economy,economy,unconfirmed,1,14.295,سرمایه‌گذاران صنعت هواپیما نگران افزایش هزینه‌های سوخت و وام‌ها هستند,سرمایه‌گذاران بخش هواپیما نگرانی خود را از افزایش هزینه‌های سوخت و وام‌ها به دلیل جنگ ایران ابراز کرده‌اند. این افزایش هزینه‌ها فشار مالی مستقیمی بر صنعت هوانوردی وارد کرده است.
+1fbe12735f76cc35,irrelevant,,1,ajar,groq,2,,,,,,,
+027ea18b2e540a91,irrelevant,,1,ajar,groq,2,,,,,,,
+c7c3329a48ec6ea3,repeat_dropped,band=mid sim=0.74 score=13.84 blocked=below_floor prior=27268512,1,ajar,groq,2,economy,economy,unconfirmed,1,13.837,افزایش قیمت‌ها و سوخت در آمریکا به دلیل جنگ با ایران,شهروندان آمریکایی از افزایش هزینه‌های زندگی و تورم ناشی از جنگ با ایران شکایت دارند. قیمت‌های سوخت به سطوح رکوردشکنی رسیده است و این وضعیت فشار اقتصادی را بر جامعه افزایش داده است.
+5072868ce7781bad,repeat_dropped,band=mid sim=0.56 score=10.93 blocked=below_floor prior=4817d104,2,ajar,groq,2,economy,none,unconfirmed,1,10.934,افزایش قیمت کالاها در تعز به دلیل درگیری‌های نظامی,تغییرات نظامی و تغییر نقشه کنترل در استان تعز یمن باعث افزایش بی‌سابقه قیمت کالاها در بازارها شده است. درگیری‌های شدید بین نیروهای دولتی و حوثی‌ها در استان‌های تعز، لحج و مأرب ادامه دارد و حملات هوایی به مواضع حوثی‌ها گزارش شده است.
+012d19217e43ae1a,relevance_dropped,,1,ajar,groq,2,other,none,unconfirmed,1,5.833,اختلال در عملکرد بیمارستان‌های غزه به دلیل کمبود سوخت,بیمارستان‌های قطاع غزه با بحران‌های فزاینده‌ای در تأمین سوخت، روغن و قطعات یدکی مواجه هستند. این کمبودها چالش‌های بزرگی برای ادامه خدمات بهداشتی ایجاد کرده و عملکرد مراکز درمانی را مختل کرده است.
+39891e0ba044b5d1,repeat_dropped,band=high sim=0.91 score=13.77 blocked=below_floor prior=09a19a41,1,bbc_en,groq,2,economy,economy,unconfirmed,1,13.772,افزایش نرخ بهره در ژاپن به بالاترین سطح ۳۱ ساله,بانک مرکزی ژاپن نرخ بهره را به بالاترین سطح در ۳۱ سال گذشته افزایش داد تا با افزایش قیمت‌ها مقابله کند. این اقدام در حالی صورت می‌گیرد که بانک‌های مرکزی سراسر جهان به دلیل افزایش قیمت انرژی، نرخ‌های بهره را بالا برده‌اند.
+d4d507fbb84340cd,unavailable,,2,al_manar|tg_wfwitness,,3,,,,,,,
+c1b4a86b07a99796,unavailable,,5,tg_entekhab|tg_fighter_radar|tg_irane_azad_news,,3,,,,,,,
+1e3a166a693cdf7f,unavailable,,12,al_manar|tg_fighter_radar|tg_geopolitics_prime|tg_irane_azad_news|tg_iranian_militarism|tg_tabzlive,,3,,,,,,,
+1f54e65836797b94,unavailable,,2,tg_fighter_radar|tg_rnintel,,3,,,,,,,
+8a5535dbf889f039,unavailable,,1,al_manar,,3,,,,,,,
+5ca2bc002cff8b6a,unavailable,,2,al_manar,,3,,,,,,,
+6d9ef52c0b26fd78,unavailable,,2,tg_entekhab|tg_fighter_radar,,3,,,,,,,
+f36b6d7dd2e273fd,unavailable,,1,tg_tabzlive,,3,,,,,,,
+be855428e2b2c874,unavailable,,2,tg_fighter_radar|tg_tabzlive,,3,,,,,,,
+a1f0d018eda8c657,unavailable,,2,tg_fighter_radar|tg_tabzlive,,3,,,,,,,
+60ba6f01c9b7d408,unavailable,,4,tg_entekhab|tg_fighter_radar|tg_padeshah_fxn,,3,,,,,,,
+9efa8b2bee9cf6fb,unavailable,,2,osint613_a|tg_tabzlive,,3,,,,,,,
+6018433545be0802,unavailable,,2,tg_iranian_militarism,,3,,,,,,,
+f3873550adc78630,unavailable,,1,tg_tabzlive,,3,,,,,,,
+57758bea6f0e9b18,unavailable,,1,osint613_a,,3,,,,,,,
+fca5ce0fcae15a9a,irrelevant,,1,tg_iranian_militarism,gemini,3,,,,,,,
+95258ef66bad7c8d,irrelevant,,1,osint613_a,gemini,3,,,,,,,
+f09cc517c73337d5,irrelevant,,1,bbc_persian,gemini,2,,,,,,,
+a8bbde05d4a71340,irrelevant,,1,aviationist,gemini,2,,,,,,,
+c681f6d317c8887c,irrelevant,,1,bbc_en,gemini,2,,,,,,,
+4360e345462b3075,unavailable,,1,bbc_en,,2,,,,,,,
+916cf04dfe99fa87,unavailable,,1,bbc_en,,2,,,,,,,
+eab4f6d9d6c57aa4,unavailable,,1,sky_news_arabia,,2,,,,,,,
+c5103a2dbe377b4c,unavailable,,1,maariv,,2,,,,,,,
+c60680bb91d0b395,unavailable,,1,walla,,2,,,,,,,
+f7da3dad011b9382,irrelevant,,1,aviationist,gemini,2,,,,,,,
+2b636522b02c9fcb,clickbait,,1,walla,gemini,2,,,,,,,
+7c0704892cabf9c8,clickbait,,1,maariv,gemini,2,,,,,,,
+989142b3a702a863,clickbait,,1,maariv,gemini,2,,,,,,,
+f7be87eadaee10d9,clickbait,,1,maariv,gemini,2,,,,,,,
+4da3a5c16c8211ed,clickbait,,1,al_jazeera,groq,2,,,,,,,
+bcdf2ebac623ac22,irrelevant,,1,al_jazeera,groq,2,,,,,,,
+9daa152a160fe68f,irrelevant,,1,maariv,groq,2,,,,,,,
+2b4c1d13e90d47ac,irrelevant,,1,al_jazeera,groq,2,,,,,,,
+bf512470e430513e,clickbait,,1,sky_news_arabia,groq,2,,,,,,,
+4dc0bc0185d5912c,unavailable,,1,al_jazeera,,2,,,,,,,
+df68ad6348fadb38,unavailable,,1,walla,,2,,,,,,,
+90723acf35b8224c,unavailable,,1,ajar,,2,,,,,,,
+fad414c14aa863cd,unavailable,,1,ajar,,2,,,,,,,
+d6ef2324f0acef0c,unavailable,,1,ajar,,2,,,,,,,
+94218e522ff781bd,unavailable,,1,ajar,,2,,,,,,,
+42017d062a0f2a98,unavailable,,1,ajar,,2,,,,,,,
+98274b23f6fa0bf0,unavailable,,1,ajar,,2,,,,,,,
+fc847d1ae63ea5a5,unavailable,,1,ajar,,2,,,,,,,
+84b48b29b4df5dd7,unavailable,,1,ajar,,2,,,,,,,
+40f230d8d6d5cd1b,unavailable,,1,ajar,,2,,,,,,,
+51c329d1b8784f20,unavailable,,1,bbc_en,,2,,,,,,,
+913852f808fd3cde,unavailable,,1,tg_tabzlive,,3,,,,,,,
+9d2f526c6c1b035b,unavailable,,2,tg_mornovosti,,3,,,,,,,
+9a21aab16e582d1c,unavailable,,3,tg_rnintel,,3,,,,,,,
+6bac856fef5ffc88,repeat_dropped,band=mid sim=0.67 score=8.92 blocked=below_floor prior=e22d8fdc,1,al_manar,groq,3,military,none,rumour,0,8.919,مصدومیت‌ها پس از حمله به وادی شقراء در لبنان,حمله‌ای به منطقه وادی شقراء در لبنان منجر به مصدومیت چندین نفر شد. منابع خبری از وقوع این حمله و تلفات انسانی گزارش داده‌اند.
+68b81a192707311c,irrelevant,,1,tg_rnintel,groq,3,,,,,,,
+6508291d701b2d33,irrelevant,,1,tg_tabzlive,groq,3,,,,,,,
+a4933a7bd533538f,irrelevant,,1,tg_tabzlive,groq,3,,,,,,,
+cf971b730a411d30,clickbait,,1,tg_wfwitness,groq,3,,,,,,,
+18020abadc5abaf9,unavailable,,1,tg_militarywave,,3,,,,,,,
+7e871f208957658d,unavailable,,2,tg_padeshah_fxn,,3,,,,,,,
+b841af03d11dc48e,unavailable,,1,tg_irane_azad_news,,3,,,,,,,
+53e3f362a743beec,unavailable,,1,tg_padeshah_fxn,,3,,,,,,,
+84bbc6099022cb18,unavailable,,1,tg_geopolitics_prime,,3,,,,,,,
+53e4157d946d063a,cap_dropped,over max_clusters_per_run; no LLM call. on_mission=0 corroborating_count=0,1,tg_padeshah_fxn,,3,,,,0,,⭕️ برای اولین‌بار؛ تماس ماهواره‌ای استارلینک با یک گوشی معمولی برقرار شد فناوری Direct to Cell Starlink (استارلینک) نخستین تماس ماهواره‌ای خود را با یک گوشی هوشمند معمولی در کوه‌های ایتالیا برقرار کرد. این ارتباط از طریق ماهواره‌های مستقر در ارتفاع ۳۶۰ کیلومتری زمین انجام شد. 🔺 سرویس Starlink Mobile,

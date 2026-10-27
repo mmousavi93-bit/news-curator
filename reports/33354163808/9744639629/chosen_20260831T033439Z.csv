@@ -1,0 +1,11 @@
+﻿cluster_key,fate,reason,n_members,sources,best_tier,category,claim_status,independent_count,score
+e7b5410f1afe4400,clickbait,,2,maariv,2,,,,
+96463a29a358834e,repeat_dropped,,2,al_jazeera|al_monitor,2,,,,
+d63c08d5bf7d9411,sent,,1,maariv,2,military,unconfirmed,1,12.981
+e2df06961504ba61,repeat_dropped,,1,maariv,2,,,,
+fa36fd5c47935f9f,sent,,1,aawsat,2,military,unconfirmed,1,12.914
+9d8934137dac518b,repeat_dropped,,1,aawsat,2,,,,
+3c9ef29837c3de9f,irrelevant,,1,al_jazeera,2,,,,
+47d17cf2effad55b,irrelevant,,1,maariv,2,,,,
+e7a90ceecc238b34,sent,,1,al_jazeera,2,security,unconfirmed,1,10.891
+52a4d6d7891b4d9f,irrelevant,,2,tg_geopwatch|tg_wfwitness,3,,,,

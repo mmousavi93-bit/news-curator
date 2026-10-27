@@ -1,0 +1,41 @@
+﻿cluster_key,fate,reason,n_members,sources,provider,best_tier,category,claim_status,independent_count,score,headline,summary
+adca597a85472308,sent,,7,al_jazeera|al_manar|al_monitor|haaretz|mee,groq,2,security,likely,4,15.589,کشته شدن دو نوجوان فلسطینی در حمله نظامیان و مستعمره‌نشینان به روستای المغیر,دو نوجوان فلسطینی در جریان درگیری با نیروهای اسرائیلی و مستعمره‌نشینان در شمال رام الله کشته شدند. گزارش‌ها حاکی از افزایش خشونت‌های مستعمره‌نشینان در این منطقه است.
+574ad9d3885d4884,repeat_dropped,,5,ajar|osint613_a|tg_padeshah_fxn|tg_vahid_online|tg_wfwitness,groq,2,,,,,,
+c8e3af0adc83ab8f,repeat_dropped,,1,the_war_zone,groq,2,,,,,,
+ddfd4ae24c799528,sent,,19,al_manar|irna|mee|tg_iranian_militarism|tg_wfwitness,groq,2,military,likely,2,15.899,ارتش اسرائیل ۷۳ حمله هوایی و توپخانه‌ای در جنوب لبنان انجام داد,این حملات در مناطق متعددی از جمله کفر رمان و وادی الحیجر رخ داد و با وجود توافق آتش‌بس، شدت آن‌ها افزایش یافته است.
+45ea81027ac12dac,irrelevant,,2,bbc_en|sky_news_arabia,groq,2,,,,,,
+992d0447fa4763c5,unparseable,,10,al_jazeera|maariv|mee|tg_fighter_radar|tg_geopolitics_prime|tg_padeshah_fxn|tg_tabzlive,bai_deepseek,2,,,,,,
+ab1fc43cf209b58e,unparseable,,4,mee|tg_padeshah_fxn|tg_tabzlive,bai_deepseek,2,,,,,,
+ca7ba4f86c97dbcf,irrelevant,,1,al_jazeera,bai_deepseek,2,,,,,,
+9373c904f3e8d689,unparseable,,1,mee,bai_deepseek,2,,,,,,
+227062480c392636,repeat_dropped,,10,mee|tg_fighter_radar|tg_irane_azad_news|tg_minas_tirith|tg_padeshah_fxn|tg_tweet_mardomi,groq,2,,,,,,
+9e11c464ed834709,irrelevant,,3,bbc_en|tg_wfwitness,groq,2,,,,,,
+7c76603eada12d7f,irrelevant,,2,ajar|tg_tabzlive,groq,2,,,,,,
+34f51e52a4e3b027,irrelevant,,1,sky_news_arabia,groq,2,,,,,,
+d62261c42e4e3528,irrelevant,,1,tehran_times,groq,2,,,,,,
+c96dcf2f54fbd438,sent,,1,al_jazeera,bai_deepseek,2,politics,unconfirmed,1,9.702,سناتور جمهوری‌خواه خواستار برکناری وزیر دفاع آمریکا به‌دلیل مدیریت جنگ با ایران شد,سناتور تام تیلیس، پنتاگون را به «مدیریت نادرست» متهم کرده و گفته است ارتش آمریکا در جنگ با ایران تحت فشار است. این درخواست تأیید نشده و موضع رسمی کاخ سفید اعلام نشده است.
+779a387949e259af,unparseable,,1,sky_news_arabia,bai_deepseek,2,,,,,,
+c09dfa48e7d3056e,unparseable,,2,bbc_persian|tg_tabzlive,bai_deepseek,2,,,,,,
+7143d35986915fa6,unparseable,,3,ajar|al_manar|sky_news_arabia,bai_deepseek,2,,,,,,
+372748afc02b6a10,sent,,1,mee,groq,2,economy,unconfirmed,1,8.650,ترکیه واردات نفت و دیزل خود را از روسیه به آمریکا تغییر داد,داده‌های گمرکی نشان می‌دهد آمریکا در ژوئن با ارسال ۵۷۰ هزار تن نفت خام، جایگزین روسیه به عنوان تأمین‌کننده اصلی نفت ترکیه شد. این تغییر در الگوی واردات در پی افزایش حملات اوکراین به زیرساخت‌های انرژی روسیه رخ داده است.
+a3134c6aad7d1f70,irrelevant,,1,al_jazeera,groq,2,,,,,,
+1b6d0c11c01bf03b,sent,,1,mee,groq,2,military,unconfirmed,1,12.628,ارتش اسرائیل مانور نظامی در شمال کرانه باختری اعلام کرد,این تمرین در مناطق جنین، طوباس و طولکرم از صبح تا ظهر برگزار می‌شود و ارتش اسرائیل از حرکت فعال نیروهای امنیتی در این مناطق خبر داده است.
+3a8f05f7510574fe,sent,,3,al_jazeera|haaretz|tg_geopwatch,groq,2,security,likely,2,12.827,اسرائیل تأمین آب به غزه را به دلیل بحران تصفیه آب متوقف کرد,یونیسف اعلام کرد حدود یک میلیون فلسطینی با کمبود آب مواجه هستند؛ این بحران ناشی از گل‌آلود شدن مدیترانه به دلیل آسیب به زیرساخت‌های فاضلاب غزه است. وزیر دفاع اسرائیل نیز خواستار تخلیه غزه شد.
+1a1cddee5f458836,irrelevant,,1,mee,groq,2,,,,,,
+4b6625ef46370fd3,repeat_dropped,,3,mee|reuters_gnews|tg_mornovosti,bai_deepseek,2,,,,,,
+a28651a5ab6d2293,irrelevant,,1,walla,bai_deepseek,2,,,,,,
+bc47c68652c37299,unparseable,,3,ajar|al_jazeera|sky_news_arabia,bai_deepseek,2,,,,,,
+1897c544a71926d0,irrelevant,,1,walla,bai_deepseek,2,,,,,,
+e29deba639322f43,repeat_dropped,,1,france24,groq,2,,,,,,
+12d018011d4b4c28,repeat_dropped,,9,ajar|maariv|tg_fighter_radar|tg_irane_azad_news|tg_tweet_mardomi,groq,2,,,,,,
+b3cc314407ca6a86,unparseable,,6,ajar|al_monitor|osint613_a|tg_rnintel|tg_tabzlive,bai_deepseek,2,,,,,,
+78cb7dca1081d222,unparseable,,1,haaretz,bai_deepseek,2,,,,,,
+6e7c4dc39a8c16ef,unparseable,,1,al_jazeera,bai_deepseek,2,,,,,,
+ca22999055f1c588,repeat_dropped,,1,the_war_zone,bai_deepseek,2,,,,,,
+233ac30ddf98cb1f,irrelevant,,1,maariv,groq,2,,,,,,
+1efe8534c763ec56,irrelevant,,1,tehran_times,groq,2,,,,,,
+e81e1edd67432960,irrelevant,,1,al_jazeera,groq,2,,,,,,
+e9b874767335129f,repeat_dropped,,1,irna,groq,2,,,,,,
+eaa1b0f4ab5d36a3,sent,,2,mee|tg_behold_israel,groq,2,politics,unconfirmed,1,9.507,بن‌گور ویدیوی هوش مصنوعی از گرسنگی اسیران فلسطینی را پس از واکنش‌ها حذف کرد,وزیر امنیت ملی اسرائیل این ویدیو را پس از مقایسه‌های گسترده با اردوگاه‌های کار اجباری نازی‌ها از شبکه‌های اجتماعی برداشت. این اقدام در پی اعتراضات شدید و انتقادات عمومی صورت گرفت.
+494ddb7a2bc56d97,irrelevant,,4,ap_gnews|bbc_en|tg_rnintel,groq,2,,,,,,
+a7022b6d55e7ca8f,unparseable,,3,al_jazeera|al_monitor|tg_defenderdome,bai_deepseek,2,,,,,,

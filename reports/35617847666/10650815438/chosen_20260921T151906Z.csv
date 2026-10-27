@@ -1,0 +1,139 @@
+﻿cluster_key,fate,reason,n_members,sources,provider,best_tier,category,significance,claim_status,independent_count,score,headline,summary
+e3cdd444420c9a4a,sent,,15,ajar|iran_international|sky_news_arabia|tg_entekhab|tg_esellco|tg_fighter_radar|tg_geopolitics_prime|tg_mes|tg_minas_tirith|tg_padeshah_fxn|tg_tsepress|tg_tweet_mardomi|tg_vahid_online|tg_vira_university,groq,2,economy,economy,likely,3,19.970,وزیر خزانه‌داری آمریکا: توقف کامل فعالیت خطوط هوایی ایران از ۲۳ سپتامبر,اسکات بسنت اعلام کرد از ۲۳ سپتامبر، ارائه سوخت، خدمات فرودگاهی و فروش بلیت به هواپیماهای ایرانی در سراسر جهان ممنوع می‌شود. او هشدار داد هر نهادی که این مقررات را نقض کند، از سیستم مالی دلاری خارج خواهد شد. این اقدام بخشی از فشارهای اقتصادی گسترده‌تر علیه ایران است.
+427188992ffac8cf,sent_followup,band=mid sim=0.73 score=22.61 kept=above_floor prior=e2f1d0db,8,ajar|al_manar|al_monitor|france24|mee|tg_tabzlive,groq,2,military,balance,likely,4,22.611,پیشروی نیروهای حوثی در یمن پس از لغو حملات هوایی آمریکا,نیروهای حوثی برای قطع ارتباط ساحل دریای سرخ با مناطق تحت کنترل نیروهای سعودی، به ارتفاعات راهبرتی یمن پیشروی کردند. این پیشروی پس از گزارش‌هایی رخ داد که می‌گوید ترامپ در آخرین لحظه از حملات هوایی علیه حوثی‌ها منصرف شد. این گسترش جبهه جنگ، تهدید جدیدی برای تأمین انرژی جهانی ایجاد کرده است.
+31862721bf6d0e84,relevance_dropped,,3,al_jazeera|mee|mehr,groq,2,military,none,likely,3,16.507,افزایش تلفات کشته‌شدگان غزه به ۷۳ هزار و ۹۱۴ نفر,"وزارت بهداشت غزه اعلام کرد در ۲۴ ساعت گذشته، دست‌کم ۴ فلسطینی در حملات اسرائیل کشته و ۱۷ نفر زخمی شده‌اند. این آمار، مجموع کشته‌شدگان از اکتبر ۲۰۲۳ را به ۷۳,۹۱۴ نفر می‌رساند. این حملات علیرغم آتش‌بس اکتبر گذشته ادامه دارد."
+2267e711f22eac26,sent_followup,band=mid sim=0.67 score=17.76 kept=above_floor prior=e2f1d0db,10,al_monitor|sky_news_arabia|tg_entekhab|tg_fighter_radar|tg_irane_azad_news|tg_tsepress|tg_wfwitness,groq,2,politics,balance,likely,2,17.764,ترامپ در تماس با رئیس یمن، تعهدی برای حمایت نظامی نداد,دونالد ترامپ در تماس تلفنی با رشاد العلیمی، رئیس شورای رهبری یمن، درباره پیشروی حوثی‌ها در تنگه باب‌المندب گفتگو کرد. العلیمی درخواست کمک نظامی کرد، اما منابع می‌گویند ترامپ تعهد مستقیمی برای ارائه حمایت نظامی نداد. پیش‌تر گزارش شده بود ترامپ از حملات هوایی علیه حوثی‌ها منصرف شده است.
+05c25255f4b7b9f6,irrelevant,,4,ajar|mehr|tg_mes|tg_tabzlive,groq,2,,,,,,,
+e905b03556b52ccb,sent_followup,band=high sim=0.87 score=17.31 kept=development prior=bb004a96,6,irna|mee|tg_tsepress|tg_vahid_online,groq,2,politics,balance,likely,2,17.308,وزیر کشور پاکستان برای گفتگوهای دوجانبه وارد تهران شد,محسن نقوی، وزیر کشور پاکستان، با اسکندر مومنی، همتای ایرانی خود، در تهران دیدار کرد. منابع رسمی ایران تأکید می‌کنند که هدف سفر بررسی همکاری‌های دوجانبه است، در حالی که گزارش‌های رسانه‌ای از تلاش برای میانجی‌گری میان ایران و آمریکا خبر داده‌اند.
+680d04e200d85c7b,sent_followup,band=mid sim=0.76 score=22.87 kept=above_floor prior=3503fb8a,3,al_jazeera|mee,groq,2,military,escalation,likely,2,22.871,سپاه پاسداران اعلام کرد جنگ با آمریکا تمام نشده است,سخنگوی سپاه پاسداران اعلام کرد که جنگ با ایالات متحده پایان نیافته و ایران برای درگیری طولانی‌مدت آمادگی دارد. همچنین ادعا شد که یک پهپاد آمریکایی در تنگه هرمز سرنگون شده است، هرچند جزئیات فنی این ادعا هنوز تأیید نشده است.
+f6979be5286cba9c,relevance_dropped,,2,al_monitor|tehran_times,groq,2,other,none,likely,2,8.481,دانش‌آموزان غزه پس از سه سال به کلاس‌های حضوری بازگشتند,صدها هزار دانش‌آموز در غزه برای نخستین بار در سه سال اخیر به تحصیل حضوری در مدارس آسیب‌دیده یا چادرهای موقت بازگشتند. این بازگشت در شرایطی رخ داده که بسیاری از خانواده‌ها توان خرید لوازم‌التحریر را ندارند.
+4d8b850472f94121,irrelevant,,1,tehran_times,groq,2,,,,,,,
+a87b2d87c63667dc,clickbait,,2,mee|tg_wfwitness,groq,2,,,,,,,
+aaa4924cf59a66a4,relevance_dropped,,1,mee,groq,2,other,none,unconfirmed,1,6.957,لغو نهمین دوره جشنواره فیلم دریاخاک به دلیل جنگ اسرائیل و آمریکا با ایران,جشنواره فیلم دریاخاک در عربستان سعودی نهمین دوره خود را لغو کرد. این تصمیم در پی تشدید جنگ اسرائیل و آمریکا با ایران و اختلال در برنامه‌های گردشگری ریاض اتخاذ شده است.
+3e3e906299857cd1,sent,,17,ajar|al_manar|tg_entekhab|tg_fighter_radar|tg_irane_azad_news|tg_padeshah_fxn|tg_tweet_mardomi|tg_vahid_online,groq,2,other,balance,unconfirmed,1,12.936,مجموعه اخبار پراکنده شامل نرخ دلار، تعطیلی مدارس هرمزگان و هشدار در شمال اسرائیل,"این خوشه شامل گزارش‌های متفرقه است: نرخ دلار فردایی تهران ۲۳۱,۳۰۰ تومان اعلام شد. مدارس استان هرمزگان تا دو ماه آینده غیرحضوری شدند و آژیر خطر در شمال اسرائیل به صدا درآمد. همچنین سخنانی درباره توقف فعالیت شرکت‌های هواپیمایی ایران توسط وزیر خزانه‌داری آمریکا منتشر شده است."
+3e5e960d407cb5ca,repeat_dropped,band=mid sim=0.57 score=9.93 blocked=below_floor prior=324c67f0,1,sky_news_arabia,groq,2,politics,none,unconfirmed,1,9.933,رئیس‌جمهور عراق ترویج یکپارچگی نیروهای پشمیرگا را گام مهمی برای امنیت ملی خواند,علی فالح الزیدی، نخست‌وزیر عراق، ادغام نیروهای پشمیرگا زیر چتر وزارت امور پشمیرگا را گامی مهم برای تثبیت امنیت ملی و وحدت تصمیمات دفاعی دانست. این اقدام به منظور تقویت هماهنگی نظامی در منطقه انجام شده است.
+28d4f5cf437ec733,irrelevant,,1,mee,groq,2,,,,,,,
+7d74f48448e3b3e8,sent_followup,band=mid sim=0.73 score=21.12 kept=above_floor prior=9939c91f,3,france24|tg_geopwatch|tg_tabzlive,groq,2,military,escalation,unconfirmed,1,21.124,پرتابه ناشناخته به تانکر در تنگه هرمز اصابت کرد و دو نفر زخمی شدند,یک پرتابه ناشناخته به تانکری که وارد تنگه هرمز می‌شد اصابت کرد و دست‌کم دو نفر زخمی شدند. نیروهای نظامی بریتانیا اعلام کردند کشتی به مقصد بعدی خود ادامه می‌دهد و اثر محیط‌زیستی ندارد.
+0d84bca4b33f6f96,clickbait,,2,aawsat,groq,2,,,,,,,
+0051e94ea02b6489,irrelevant,,8,sky_news_arabia|tg_entekhab|tg_fighter_radar|tg_geopolitics_prime|tg_iranian_militarism|tg_militarywave|tg_minas_tirith,groq,2,,,,,,,
+cfe1aa4e7608a341,sent_followup,band=mid sim=0.64 score=14.88 kept=above_floor prior=ef4c4bfc,1,al_jazeera,groq,2,economy,economy,unconfirmed,1,14.882,تغییر الگوهای کاری در ایران برای صرفه‌جویی در انرژی,دولت ایران برای مقابله با کمبود سوخت و انرژی، در حال تغییر برخی الگوهای کاری است. این اقدامات تأثیر مستقیمی بر زندگی روزمره و محیط کار ایرانیان دارد. هدف اصلی کاهش مصرف در شرایط بحران اقتصادی است.
+822fe1b881584f15,relevance_dropped,,2,al_manar|mee,groq,2,politics,none,unconfirmed,1,9.975,برنامه‌های گسترش یشیوا در شعیج‌جاره با حمایت مالی بریتانیا,شبکه آموزشی اهر سامایاح مجوز گسترش فعالیت‌های خود در محله شعیج‌جاره قدس شرقی را دریافت کرده است. گزارش‌ها از تلاش برای ساخت کنیسی دائمی در نزدیکی مسجدالاقصی و تغییر کاربری قبرستان باب‌الرحمه خبر می‌دهند. این اقدامات با حمایت مالی از نهادهای خیریه بریتانیایی انجام می‌شود.
+dc0eb54cd6e9e141,relevance_dropped,,1,mehr,groq,2,economy,none,unconfirmed,1,11.825,توسعه واحد کنترل موتور بومی توسط مهندسان ایرانی,مهندسان ایرانی در یک شرکت دانش‌بنیان تهران، نسل جدیدی از واحدهای کنترل موتور را توسعه داده‌اند. این فناوری برای استفاده گسترده در صنعت خودرو آماده شده است. این اقدام گامی در جهت کاهش وابستگی به قطعات وارداتی محسوب می‌شود.
+02ce98af8bb9eb0f,unparseable,,1,bbc_en,groq,2,,,,,,,
+8f1e932e6606e29e,unparseable,,1,aawsat,groq,2,,,,,,,
+408b3bd8699d87f2,unparseable,,1,mee,groq,2,,,,,,,
+0244f7f795f67634,unparseable,,1,bbc_en_me,groq,2,,,,,,,
+86344be7165438db,unparseable,,1,al_jazeera,groq,2,,,,,,,
+f50215e21e2c903e,irrelevant,,1,tehran_times,groq,2,,,,,,,
+131ab4d9c182ea16,irrelevant,,1,tehran_times,groq,2,,,,,,,
+a8df22c982bd60a8,relevance_dropped,,1,irna,groq,2,politics,none,unconfirmed,1,9.631,برگزاری نمایشگاه تأثیر حمله آمریکا به مدرسه میناب در ژنو,نمایشگاهی با موضوع تأثیر حمله آمریکا به یک مدرسه در میناب در فوریه برگزار شد. این رویداد در بیرون از مقر سازمان ملل متحد در ژنو برپا شد.
+d59c4e1e459a7f6d,sent_followup,band=mid sim=0.69 score=18.22 kept=above_floor prior=6d642455,7,ajar|tg_minas_tirith|tg_rnintel,groq,2,military,balance,unconfirmed,1,18.221,گسترش درگیری‌ها بر سر ارتفاعات راهبردی غرب تعز در یمن,مواجهات شدید بین نیروهای انصارالله و نیروهای مورد حمایت ائتلاف در جبهه‌های غرب و جنوب غرب تعز ادامه دارد. گزارش‌ها از تلاش برای کنترل ارتفاعات راهبردی که بر تنگه باب‌المندب نظارت دارند حکایت می‌کند.
+958eea234e156d35,irrelevant,,1,mehr,groq,2,,,,,,,
+ba103f4931e5832a,relevance_dropped,,1,tehran_times,groq2,2,economy,none,unconfirmed,1,11.517,معاون بانک مرکزی بر آمادگی شبکه بانکی برای چالش‌های بین‌المللی تأکید کرد,معاون روابط بین‌الملل بانک مرکزی بر ضرورت آمادگی شبکه بانکی برای مواجهه با تحولات سریع بین‌المللی تأکید کرد. او گفت که ارتباط نزدیک بین بانک مرکزی و شبکه بانکی می‌تواند به یافتن راهکارهای مؤثر در تعاملات بانکی بین‌المللی منجر شود.
+bc15fd4a5e8d4246,irrelevant,,1,al_jazeera,groq2,2,,,,,,,
+afa1b3658f680274,repeat_dropped,band=mid sim=0.71 score=12.43 blocked=below_floor prior=3389a43e,1,irna,groq2,2,military,none,unconfirmed,1,12.434,فرمانده ارتش ایران وعده پاسخ قاطع به هرگونه تجاوز را داد,سردار امیر حاتمی، فرمانده کل ارتش، اعلام کرد هرگونه تجاوز علیه امنیت و تمامیت ارضی ایران با پاسخی قاطع و پشیمانی‌آور مواجه خواهد شد. این بیانیه یک موضع رسمی نظامی است و رویداد عملیاتی جدیدی گزارش نشده است.
+7b7515de18fb41e5,irrelevant,,1,tehran_times,groq2,2,,,,,,,
+ac92b7366cc10a58,relevance_dropped,,1,france24,groq2,2,security,none,unconfirmed,1,10.413,یک مستصبع اسرائیلی و یک فلسطینی در خشونت‌های جدید کرانه باختری کشته شدند,در خشونت‌های جدید در کرانه باختری اشغالی، نیروهای اسرائیلی یک مظنون فلسطینی را دستگیر کردند که متهم به کشتن یک مرد اسرائیلی است. در رویدادی جداگانه، سربازان اسرائیلی یک راننده فلسطینی را کشتند که ارتش ادعا کرد قصد تصادف عمدی با آن‌ها را داشته است.
+5d709510a8dec590,irrelevant,,2,al_jazeera,groq2,2,,,,,,,
+cbf007ed67641d5c,sent,,1,mee,groq2,2,politics,balance,unconfirmed,1,14.339,دیدار نخست اردوغان و برنهام در مجمع عمومی سازمان ملل,رئیس‌جمهور ترکیه، رجب طیب اردوغان، قرار است برای نخستین بار با اندی برنهام، نخست‌وزیر جدید بریتانیا، در حاشیه مجمع عمومی سازمان ملل متحد در نیویورک دیدار کند. همچنین احتمال برگزاری دیداری با دونالد ترامپ در جریان این نشست‌ها مطرح است.
+6e684a929b622fef,relevance_dropped,,1,sky_news_arabia,groq2,2,other,none,unconfirmed,1,6.308,ارسال ۹ تانکر آب آشامیدنی به نوار غزه,عملیات «فارس شهم» سه تانکر آب آشامیدنی سالم را به شرکت آب و فاضلاب و شهرداری‌های ساحلی در نوار غزه تحویل داد. این اقدام با هدف تسهیل دسترسی ساکنان و آوارگان به آب و حمایت از تلاش‌های شهرداری‌ها برای برآورده کردن نیازهای فزاینده انجام شده است.
+bdaa4e08d787c9d9,irrelevant,,1,sky_news_arabia,groq2,2,,,,,,,
+894af922d1f95335,relevance_dropped,,1,al_jazeera,groq2,2,security,none,unconfirmed,1,10.300,اعتقال ده‌ها فلسطینی در درگیری‌های کرانه باختری,نیروهای اسرائیلی در جریان درگیری‌هایی در کرانه باختری اشغالی، دست‌کم ۵۳ مرد جوان را در شهر بدو بازداشت کردند. این درگیری‌ها منجر به محاصره شهر و تعطیلی مدارس و کسب‌وکارها شد.
+4f70f843fa1980ba,irrelevant,,1,tehran_times,groq,2,,,,,,,
+e4be0e63d9802062,irrelevant,,1,tehran_times,groq,2,,,,,,,
+7f9e93dc68c5e63d,irrelevant,,1,mehr,groq,2,,,,,,,
+eba4a10418cf5224,relevance_dropped,,1,ajar,groq,2,politics,none,unconfirmed,1,9.194,تشکیل کمیته ملی برای دفاع از حقوق اسرای غزه,شبکه سازمان‌های مردم‌نهاد فلسطین با همکاری نهادهای حقوقی، «کمیته ملی دفاع از حقوق اسرای غزه» را تشکیل داد. این اقدام در حاشیه اعتصاب هفتگی خانواده‌های اسرا صورت گرفت.
+829745766852995c,clickbait,,2,ajar,groq,2,,,,,,,
+0eceb49bd9cd0f48,repeat_dropped,band=mid sim=0.56 score=9.18 blocked=below_floor prior=35c80a50,1,mee,groq2,2,politics,none,unconfirmed,1,9.180,نتنياهو بازدید از تونل‌های زیر مسجد الاقصی و یورش بن‌گور به حرم,بنیامین نتانیاهو نخست‌وزیر اسرائیل از تونل‌های زیر مجموعه مسجد الاقصی بازدید کرد و ویدیویی از این بازدید منتشر نمود. همزمان، صدها یهودی افراطی در آستانه یوم کپور به محوطه مقدس حمله کردند. این اقدامات تحریک‌آمیز در منطقه قدس رخ داد.
+a65717fd40440825,irrelevant,,1,tehran_times,groq2,2,,,,,,,
+d01b166d033d63d0,relevance_dropped,,1,irna,groq2,2,politics,none,unconfirmed,1,9.152,معاون وزیر دفاع: دفاع مقدس مسیر خودکفایی دفاعی ایران را شکل داد,سردار مجید ابن‌الرضا، معاون وزیر دفاع ایران، جنگ هشت‌ساله دفاع مقدس را مکتبی برای کسب تجربه و اعتماد به نفس توصیف کرد. او این دوره را عامل اصلی شکل‌گیری مسیر دفاعی و خودکفایی کشور دانست. این اظهارات جنبه‌ای سیاسی-دفاعی دارد.
+6604a9be9d26177e,irrelevant,,2,ajar,groq2,2,,,,,,,
+d7d7cc104145e870,sent,,1,ajar,groq2,2,economy,economy,unconfirmed,1,14.083,جهاز قطر و جی‌پی مورگان شراکت ۲۰ میلیارد دلاری را آغاز کردند,جهاز قطر برای سرمایه‌گذاری و بانک جی‌پی مورگان شراکت مالی به ارزش ۲۰ میلیارد دلار را اعلام کردند. این سرمایه‌گذاری شامل ۱۵ میلیارد دلار برای سهام جهانی و ۵ میلیارد دلار برای حمایت از شرکت‌های متوسط آمریکایی است. این رویداد تأثیر مستقیمی بر بازارهای مالی منطقه و جهان دارد.
+393a544de43406ce,repeat_dropped,band=mid sim=0.58 score=9.98 blocked=below_floor prior=e4b96547,1,sky_news_arabia,groq2,2,security,none,unconfirmed,1,9.982,عراق اعلام کرد ۶ میلیون سلاح را جمع‌آوری می‌کند,مسئول وزارت داخله عراق اعلام کرد دولت در حال اجرای طرحی برای جمع‌آوری ۶ میلیون قطعه سلاح است. این اقدام بخشی از تلاش‌ها برای تمرکز سلاح در دست نیروهای امنیتی رسمی کشور است.
+af946e0a6afda325,repeat_dropped,band=mid sim=0.65 score=13.84 blocked=below_floor prior=ef4c4bfc,1,ajar,groq2,2,economy,economy,unconfirmed,1,13.840,عقوبات غرب فشار اقتصادی بر معیشت ایرانیان را افزایش داد,تشدید تحریم‌های غربی و محدودیت‌های جدید، چالش‌های دولت ایران برای حفظ مسیرهای تجاری و مالی را افزایش داده است. این وضعیت مستقیماً بر قدرت خرید و معیشت شهروندان اثر منفی گذاشته است.
+e59fed58ad4b9266,repeat_dropped,band=mid sim=0.59 score=13.83 blocked=below_floor prior=b4c254ff,1,al_jazeera,groq2,2,economy,economy,unconfirmed,1,13.832,داده‌های رسمی: جنگ هزینه‌های نفتی ۱۰ درصد از GDP ایران را کاهش داد,داده‌های جدید رسمی نشان می‌دهد بخش نفت و گاز ایران ۲۶ درصد کوچک شده است. این کاهش به دلیل هزینه‌های جنگ آمریکا و اسرائیل علیه ایران رخ داده و منجر به افت ۱۰ درصدی تولید ناخالص داخلی شده است.
+cc1f05688a2a2351,irrelevant,,1,al_monitor,groq2,2,,,,,,,
+818d6146e08685cf,repeat_dropped,band=mid sim=0.62 score=11.77 blocked=below_floor prior=d1242b49,9,tg_defenderdome|tg_entekhab|tg_fighter_radar|tg_padeshah_fxn|tg_tsepress,groq2,3,politics,balance,rumour,0,11.769,وزیر خزانه‌داری آمریکا از مذاکرات پنهانی با چین درباره ایران خبر داد,اسکات بسنت، وزیر خزانه‌داری آمریکا، اعلام کرد که با چین درباره ایران مذاکرات پشت‌پرده داشته‌اند. همچنین دیدار ترامپ و شی جین‌پینگ در هفته جاری در آمریکا تأیید شد که می‌تواند بر دیپلماسی منطقه‌ای اثر بگذارد.
+3f96b6b112986aee,repeat_dropped,band=mid sim=0.58 score=7.45 blocked=below_floor prior=d0145f33,6,tg_entekhab|tg_fighter_radar|tg_iranian_militarism,groq2,3,security,none,rumour,0,7.452,کشته شدن یک مأمور انتظامی در حمله مسلحانه در ایرانشهر,در پی حمله مسلحانه به خودروی پلیس در محور بزمان-ایرانشهر، یک مأمور کشته و سه نفر زخمی شدند. پلیس سیستان و بلوچستان این رویداد را اقدام تروریستی خوانده و در حال شناسایی عاملان است.
+51429e46560c37ba,repeat_dropped,band=mid sim=0.60 score=5.95 blocked=below_floor prior=6712dbe3,1,al_manar,groq2,3,politics,none,rumour,0,5.947,بحث درباره اسرای لبنانی در نشست دیپلماتیک در ژنو,سفیر لبنان در ژنو با فعالان حقوق بشر درباره طرح لایحه‌ای برای بررسی وضعیت اسرای لبنانی در سجون اسرائیل گفتگو کرد. این نشست بخشی از تلاش‌های دیپلماتیک برای افزایش فشار بین‌المللی است.
+8965cfee5fe6bdde,repeat_dropped,band=mid sim=0.64 score=11.32 blocked=below_floor prior=b4c254ff,5,tg_fighter_radar|tg_tabzlive|tg_wfwitness,groq2,3,economy,economy,rumour,0,11.325,ونس: افزایش قیمت بنزین ناشی از تهدید کشتیرانی توسط ایران است,جی‌دی ونس، معاون رئیس‌جمهور آمریکا، افزایش قیمت انرژی را به دلیل تهدید کشتیرانی بین‌المللی توسط ایران دانست. او گفت که دولت در حال بررسی راهکارهایی برای کاهش مالیات بنزین برای شهروندان آمریکایی است.
+b3a33cae09aa83d9,repeat_dropped,band=mid sim=0.68 score=9.41 blocked=below_floor prior=7ea66263,6,tg_entekhab|tg_fighter_radar|tg_mes|tg_minas_tirith|tg_wfwitness,groq2,3,military,none,rumour,0,9.412,هشدارهای قرمز در شمال اسرائیل و بمباران جنوب لبنان,هشدارهای قرمز در منطقه Malkia در شمال اسرائیل فعال شد و ارتش اسرائیل در حال بررسی جزئیات است. همزمان، توپخانه اسرائیلی به مناطق جنوب لبنان شلیک کرد و تماس‌های دیپلماتیک برای کنترل تنش‌ها انجام شد.
+7a7d381f13f2c9af,repeat_dropped,band=mid sim=0.68 score=10.89 blocked=below_floor prior=71c1b6d1,1,tg_fighter_radar,groq2,3,economy,economy,rumour,0,10.893,افت قیمت نفت برنت به زیر ۱۰۰ دلار,قیمت نفت خام برنت با کاهش ۳.۷ درصدی به زیر سطح ۱۰۰ دلار در هر بشکه رسید. این کاهش قیمت در بازارهای جهانی مشاهده شد.
+6e45e5e013a665ed,repeat_dropped,band=mid sim=0.64 score=9.97 blocked=below_floor prior=9939c91f,2,al_manar|tg_fighter_radar,groq2,3,security,economy,rumour,0,9.973,ناقله گاز در تنگه هرمز با آوار ناشی از پرتابه برخورد کرد,سازمان دریایی بریتانیا (UKMTO) از برخورد یک تانکر حامل گاز مایع با آوار ناشی از پرتابه‌های نامشخص در تنگه هرمز خبر داد. کاپیتان کشتی تأیید کرد که خدمه سالم هستند، نشتی محیط‌زیستی رخ نداده و کشتی به مسیر خود ادامه می‌دهد.
+81ad0053f5ef617c,irrelevant,,1,tg_tabzlive,groq2,3,,,,,,,
+e52f25ec82c794c3,repeat_dropped,band=mid sim=0.61 score=10.86 blocked=below_floor prior=edb09686,1,al_manar,groq2,3,politics,balance,rumour,0,10.864,جنبلاط: توافق چارچوبی در صورت توقف حملات و خروج اسرائیل قابل قبول است,ولید جنبلاط، رئیس پیشین حزب پیشرو سوسیالیست لبنان، اعلام کرد که اگر توافق چارچوبی منجر به توقف حملات و انسحاب ارتش اسرائیل شود، مشکلی با آن ندارد. این بیانیه در راستای دیپلماسی منطقه‌ای و مدیریت تنش‌های امنیتی لبنان مطرح شده است.
+b9895b9b00788a6f,relevance_dropped,,6,tg_irane_azad_news|tg_iranian_militarism|tg_padeshah_fxn|tg_vira_university,groq2,3,security,none,rumour,0,7.361,ویدیوی آموزش نظامی شبه‌نظامیان فاطمیون در مدرسه دخترانه سراوان منتشر شد,ویدیویی از آموزش نظامی اعضای گروه فاطمیون در یک مدرسه دخترانه در منطقه گشت سراوان منتشر شد. این گزارش‌ها به‌همراه تصاویر دیگر از حضور مقامات نظامی در مراسم‌های داخلی، بازتاب‌هایی از فعالیت‌های امنیتی و نظامی در استان سیستان و بلوچستان را نشان می‌دهد.
+00ebf98eeb9f536c,repeat_dropped,band=high sim=0.92 score=11.04 blocked=both prior=b689cd34,3,tg_defenderdome|tg_wfwitness,groq2,3,economy,economy,rumour,0,11.038,ترامپ از زلنسکی خواست حملات به زیرساخت‌های انرژی روسیه را محدود کند,دونالد ترامپ در تماس تلفنی با ولادیمیر زلنسکی، با ارجاع به تأثیرات بر بازار جهانی انرژی، از او خواست حملات به پالایشگاه‌ها و زیرساخت‌های نفت و گاز روسیه را متوقف کند. زلنسکی در پاسخ تأکید کرد که پیش از هرگونه کاهش تنش، روسیه باید حملات به زیرساخت‌های مدنی و انرژی اوکراین را متوقف کند.
+37633db5ff07f208,unavailable,,2,tg_wfwitness,,3,,,,,,,
+129ba9a53f183c8e,unavailable,,2,tg_tabzlive|tg_wfwitness,,3,,,,,,,
+33874fd5e4f0e309,unavailable,,1,tg_tabzlive,,3,,,,,,,
+223ac52416d940eb,unavailable,,1,tg_wfwitness,,3,,,,,,,
+bac2e2362a6bb949,unavailable,,1,tg_tabzlive,,3,,,,,,,
+6e15bcd234675a71,unavailable,,5,tg_entekhab|tg_tsepress,,3,,,,,,,
+ec862bf87231a7e8,unavailable,,1,tg_wfwitness,,3,,,,,,,
+4c78deafd7b04d0d,unavailable,,10,tg_entekhab|tg_geopolitics_prime|tg_iranian_militarism|tg_mes|tg_minas_tirith|tg_wfwitness,,3,,,,,,,
+f83b88fe3c56a250,unavailable,,1,tg_wfwitness,,3,,,,,,,
+7041d4046346427e,unavailable,,1,tg_iranian_militarism,,3,,,,,,,
+0d23bacaada48e7d,clickbait,,1,tg_iranian_militarism,groq2,3,,,,,,,
+c2f4732e4f222659,clickbait,,2,tg_iranian_militarism,groq2,3,,,,,,,
+bba10c5f4ca2fbce,repeat_dropped,band=mid sim=0.57 score=10.22 blocked=below_floor prior=0e43460a,1,tg_tsepress,groq2,3,economy,economy,rumour,0,10.221,ثبت رکورد معاملات در صندوق اهرم بورس تهران,صندوق اهرم با ثبت بیش از ۴۵۵۰ میلیارد تومان ارزش معاملات، رکورد جدیدی در بورس ثبت کرد. این حجم معاملات در شرایطی رخ داد که قیمت این نماد حدود ۱۷.۵ درصد کاهش داشته است.
+3e7cc4e5312894db,sent_followup,band=mid sim=0.66 score=16.29 kept=above_floor prior=9939c91f,2,tg_fighter_radar|tg_mes,groq2,3,military,escalation,rumour,0,16.291,گزارش از اصابت گلوله به تانکر نفتی در تنگه هرمز,سازمان عملیات تجاری بریتانیا اعلام کرد یک تانکر نفتی در تنگه هرمز مورد اصابت گلوله قرار گرفته و دو نفر از خدمه مجروح شده‌اند. این گزارش هنوز توسط منابع رسمی ایران یا آمریکا تأیید نشده است.
+58802375b41e1a26,clickbait,,3,ajar|al_jazeera|bbc_en,groq2,2,,,,,,,
+2c8e7a6f78dce62b,irrelevant,,3,al_jazeera|sky_news_arabia|tg_defenderdome,groq2,2,,,,,,,
+51b4496e9a766730,irrelevant,,2,al_jazeera|bbc_en,groq2,2,,,,,,,
+c3d8bdefe6125b98,irrelevant,,3,al_jazeera|sky_news_arabia,groq2,2,,,,,,,
+9ea23a1b6daf9173,irrelevant,,1,bbc_en,groq2,2,,,,,,,
+a1da6922211b757c,irrelevant,,3,ajar|al_jazeera|tg_wfwitness,groq2,2,,,,,,,
+279433c2d55a6cd8,clickbait,,1,tehran_times,groq2,2,,,,,,,
+aa10a1da941edf46,clickbait,,1,al_jazeera,groq2,2,,,,,,,
+57d66c3b85247a70,irrelevant,,1,sky_news_arabia,groq2,2,,,,,,,
+f440b6f78ca2498a,irrelevant,,1,bbc_en,groq2,2,,,,,,,
+26c5855867e6bab5,clickbait,,1,dw,groq2,2,,,,,,,
+c65b044c6ff08fc1,irrelevant,,1,sky_news_arabia,groq,2,,,,,,,
+930f3e3bc9336cf4,irrelevant,,1,al_jazeera,groq,2,,,,,,,
+cbc3bce759d2be46,irrelevant,,1,al_jazeera,groq,2,,,,,,,
+7e496f82cdf20593,irrelevant,,1,sky_news_arabia,groq,2,,,,,,,
+5fca0e387005e013,irrelevant,,1,bbc_en,groq,2,,,,,,,
+1a28ef680b2bf85e,clickbait,,1,tehran_times,groq2,2,,,,,,,
+11b2fcb02579ff3b,clickbait,,1,sky_news_arabia,groq2,2,,,,,,,
+0760717847be06d2,irrelevant,,1,bbc_en,groq2,2,,,,,,,
+edc9ed4a5d2dbfc8,irrelevant,,1,sky_news_arabia,groq2,2,,,,,,,
+0b8ff1098d5093b6,irrelevant,,1,ajar,groq2,2,,,,,,,
+de393822b9c93287,irrelevant,,1,aviationist,groq2,2,,,,,,,
+97fb59e2cc579dc7,irrelevant,,1,ajar,groq2,2,,,,,,,
+cc85167cbf71b044,clickbait,,1,al_jazeera,groq2,2,,,,,,,
+45da07e1a84038dd,clickbait,,1,ajar,groq2,2,,,,,,,
+11a69045137785cc,clickbait,,1,sky_news_arabia,groq2,2,,,,,,,
+69762c3e804f327d,irrelevant,,1,ajar,groq2,2,,,,,,,
+0d526ed2f90797f8,irrelevant,,4,tg_tabzlive|tg_wfwitness,groq2,3,,,,,,,
+62dabee09de4d41e,relevance_dropped,,1,al_manar,groq2,3,politics,none,rumour,0,5.948,بحث عون با وزرای لبنان درباره وضعیت جنوب و مسکن ارتش,جوزاف عون، رئیس‌جمهور لبنان، با وزرای دفاع و توسعه اداری دیدار کرد. در این نشست آخرین تحولات امنیتی و موضوع ساخت مسکن برای نیروهای ارتش در بعبدا بررسی شد.
+1bebdc49ee783f1f,irrelevant,,5,tg_defenderdome|tg_tabzlive|tg_wfwitness,groq2,3,,,,,,,
+6658af2588e39f8a,repeat_dropped,band=mid sim=0.64 score=10.88 blocked=below_floor prior=d1242b49,1,tg_tabzlive,groq2,3,economy,economy,rumour,0,10.882,آمادگی آمریکا و چین برای تمدید آتش‌بس تجاری,آمریکا و چین در حال آماده‌سازی برای بحث تمدید توافق تجاری فعلی در قمت ترامپ و شی جین‌پینگ هستند. پکن تمدید طولانی‌مدت را خواستار است در حالی که واشنگتن پیشنهاد تمدید شش‌ماهه داده است.
+950b9b15493f2536,irrelevant,,2,tg_tabzlive|tg_wfwitness,groq2,3,,,,,,,
+b1c8168c4827a1ce,irrelevant,,1,tg_tabzlive,groq2,3,,,,,,,
+a1cddf4fa91777e7,repeat_dropped,band=high sim=0.84 score=10.74 blocked=below_floor prior=d1242b49,1,tg_defenderdome,groq2,3,politics,balance,rumour,0,10.742,ترامپ میزبان شی جین‌پینگ در نخستین بازدید دولتی از سال ۲۰۱۱ خواهد بود,دونالد ترامپ اعلام کرد شی جین‌پینگ، رئیس‌جمهور چین، از سه‌شنبه در کاخ سفید به میهمانی او خواهد آمد. این نخستین بازدید دولتی شی از آمریکا از سال ۲۰۱۱ است و مراسم تشریفاتی گسترده‌ای برای آن برنامه‌ریزی شده است.
+dd0bb8d770cad454,irrelevant,,1,tg_militarywave,groq2,3,,,,,,,
+0a4feb9212b57cf3,irrelevant,,1,tg_tabzlive,groq2,3,,,,,,,
+330d16eebde0e42e,relevance_dropped,,1,tg_entekhab,groq2,3,economy,none,rumour,0,7.572,سازمان ثبت اسناد: پیش‌فروش ساختمان فقط با شناسه یکتا مجاز است,سازمان ثبت اسناد اعلام کرد پیش‌فروش ساختمان تنها با استفاده از شناسه یکتا امکان‌پذیر است. پیش‌فروش عادی با سند سبز حمایت قضایی ندارد.
+df9f2c35824f293f,irrelevant,,2,tg_mornovosti,groq2,3,,,,,,,
+c6dc407293bc23af,irrelevant,,1,tg_wfwitness,groq2,3,,,,,,,
+ede0e22a497ea6ec,irrelevant,,2,tg_mes|tg_rnintel,groq2,3,,,,,,,
+9f1d1e3b74e842d7,irrelevant,,1,tg_tweet_mardomi,groq2,3,,,,,,,
+c2e791c270d63a22,clickbait,,1,tg_behold_israel,groq2,3,,,,,,,
+816967006b2df2ee,clickbait,,2,tg_irane_azad_news|tg_tweet_mardomi,groq2,3,,,,,,,
+255b545e0f6fd7b8,irrelevant,,1,tg_geopolitics_prime,groq2,3,,,,,,,
+cf59837a588ab51c,clickbait,,2,tg_irane_azad_news|tg_tweet_mardomi,groq2,3,,,,,,,
+866b7a60a42a3490,clickbait,,1,tg_tweet_mardomi,groq2,3,,,,,,,
+4fe5373876ae5d85,lead_only,,1,tg_vahid_online,groq2,3,politics,none,unconfirmed,0,5.717,فرانسه سفیر ایران را به دلیل پلمب مرکز فرهنگی احضار کرد,وزارت خارجه فرانسه در واکنش به تعطیلی یک مرکز آموزش زبان فرانسه وابسته به سفارتش در تهران، سفیر ایران را احضار کرد. مقامات ایرانی این اقدام را بر اساس دستور قضایی دادستانی تهران توجیه کرده‌اند.
+9b3485a5e92c034a,lead_only,,1,tg_vahid_online,groq2,3,military,escalation,unconfirmed,0,16.715,یک نفتکش در تنگه هرمز هدف پرتابه ناشناس قرار گرفت,یک نفتکش هنگام ورود به تنگه هرمز هدف یک پرتابه ناشناس قرار گرفت و دو نفر از خدمه آن زخمی شدند. ارتش بریتانیا این رویداد را تأیید کرده است.
+d960187fb1e868c5,irrelevant,,1,tg_behold_israel,groq2,3,,,,,,,
+d2edb2086f9e57ff,irrelevant,,1,tg_behold_israel,groq2,3,,,,,,,
+d324334c9e065152,irrelevant,,1,tg_vira_university,groq2,3,,,,,,,
+fd70bdd15c930b50,unavailable,,1,tg_tweet_mardomi,,3,,,,,,,
+bd1a2d3fe974b813,unavailable,,1,tg_behold_israel,,3,,,,,,,
+18e73e993230ef44,unavailable,,1,tg_esellco,,3,,,,,,,
+347f2dcd8e87392c,unavailable,,1,tg_geopolitics_prime,,3,,,,,,,
+0812543b2fccbf0a,unavailable,,1,tg_vira_university,,3,,,,,,,
+67b569cff26c8550,irrelevant,,3,tg_irane_azad_news|tg_padeshah_fxn,groq,3,,,,,,,
+fe9a111d351063d7,lead_only,,3,tg_tweet_mardomi|tg_vira_university,groq,3,security,none,unconfirmed,0,6.454,شورای تأمین هرمزگان برگزاری غیرحضوری مدارس را برای دو ماه تصویب کرد,شورای تأمین استان هرمزگان تصمیم گرفت کلیه مدارس استان تا دو ماه آینده به صورت غیرحضوری برگزار شوند. این تصمیم با واکنش‌های متضاد از سوی استانداری و وزارت آموزش و پرورش همراه شده است که از عدم قطعیت در اجرای آن خبر داده‌اند.
+55db0237c5835fee,irrelevant,,1,tg_irane_azad_news,groq,3,,,,,,,

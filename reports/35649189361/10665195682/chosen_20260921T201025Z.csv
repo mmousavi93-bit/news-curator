@@ -1,0 +1,146 @@
+﻿cluster_key,fate,reason,n_members,sources,provider,best_tier,category,significance,claim_status,independent_count,score,headline,summary
+89da786afd4526eb,relevance_dropped,band=mid sim=0.61 score=14.04 kept=above_floor prior=50b2ec01,3,bbc_persian|mee|tehran_times,groq,2,politics,none,likely,3,14.035,کمیته حقیقت‌یاب سازمان ملل گزارش خود را درباره ایران ارائه کرد,کمیته مستقل حقیقت‌یاب سازمان ملل در نشست شورای حقوق بشر در ژنو گزارش خود را ارائه کرد. سارا حسین، رئیس کمیته، هم سرکوب اعتراضات و هم حملات آمریکا و اسرائیل را ناقض حقوق مردم ایران دانست. این گزارش در آستانه مجمع عمومی سازمان ملل منتشر شد.
+57af64916e81cc7e,sent_followup,band=mid sim=0.80 score=22.43 kept=above_floor prior=2267e711,7,reuters_gnews|sky_news_arabia|tg_geopolitics_prime|tg_padeshah_fxn|tg_tabzlive|tg_vahid_online|walla,groq,2,military,balance,likely,3,22.427,ترامپ در آخرین لحظه از حمله به حوثی‌ها منصرف شد,دونالد ترامپ دستور آماده‌سازی برای حملات هوایی به حوثی‌ها را صادر کرد اما در آخرین لحظه آن را لغو نمود. این تصمیم پس از تماس تلفنی با محمد بن سلمان و فشارهای دیپلماتیک اتخاذ شد. همزمان، رئیس شورای رهبری یمن از ترامپ خواستار حمایت آمریکا در برابر حوثی‌ها شد.
+2c368fe60650b37e,sent_followup,band=mid sim=0.75 score=25.42 kept=above_floor prior=df2ff8ab,7,al_monitor|ap_gnews|tehran_times|tg_padeshah_fxn|tg_tabzlive|walla,groq,2,military,escalation,likely,4,25.419,نیروهای مسلح ایران از پاسخ قاطع به هرگونه تهاجم جدید خبر داد,سپاه پاسداران و ستاد کل نیروهای مسلح ایران اعلام کردند در صورت تکرار حملات، از سلاح‌های جدید و جغرافیای گسترده‌تری برای پاسخ استفاده خواهند کرد. مقامات ایرانی تأکید کردند برای جنگ طولانی آماده هستند و هزینه سنگینی برای مهاجمان متحمل خواهند شد.
+a40b67279605762a,sent_followup,band=high sim=0.86 score=19.68 kept=development prior=97ac1280,10,aawsat|ajar|mee|sky_news_arabia|tehran_times|tg_entekhab|tg_geopolitics_prime|tg_tsepress,groq,2,politics,balance,likely,5,19.681,قطر برای تسهیل توافق میان واشنگتن و تهران تلاش می‌کند,سخنگوی وزارت خارجه قطر اعلام کرد دوحه در تلاش است توافقی کوتاه‌مدت میان آمریکا و ایران برای آغاز مذاکرات تسهیل کند. نخست‌وزیر قطر تأکید کرد منطقه به چارچوب امنیتی جدیدی نیاز دارد که ایران در آن نقش داشته باشد. ایران نیز شروطی برای بازگشت به مذاکرات مطرح کرده است.
+cd268ea6f1866a99,irrelevant,,6,bbc_persian|maariv|sky_news_arabia|tg_mes|tg_padeshah_fxn,groq,2,,,,,,,
+204c5218c2422867,repeat_dropped,band=high sim=0.82 score=18.90 blocked=no_development prior=e3cdd444,4,al_jazeera|iran_international|mee|tg_behold_israel,groq,2,economy,economy,likely,3,18.896,وزیر خزانه‌داری آمریکا تهدید به قطع دسترسی ایرلاین‌های ایرانی به سیستم دلار کرد,اسکات بسنت اعلام کرد از ۲۳ سپتامبر، فرودگاه‌ها و شرکت‌هایی که به ایرلاین‌های ایرانی خدمات می‌دهند از سیستم مالی آمریکا حذف می‌شوند. ترکیه و عراق نیز اعلام کرده‌اند پروازهای ایرانی را متوقف می‌کنند. این اقدام فشار اقتصادی مستقیم بر زیرساخت‌های حمل‌ونقل ایران وارد می‌کند.
+db90ae4e17371466,irrelevant,,4,ajar|al_monitor|tehran_times|walla,groq,2,,,,,,,
+0c66bb8f7b9524f4,sent_followup,band=mid sim=0.75 score=20.40 kept=above_floor prior=59078891,5,al_monitor|tg_entekhab|tg_fighter_radar|walla,groq,2,military,balance,likely,2,20.400,پاکستان ۲۸ شورشی را در مرز افغانستان کشت و عربستان حملات هوایی به یمن را تشدید کرد,پاکستان اعلام کرد در حملات هوایی به مرز افغانستان ۲۸ شورشی را کشت، در حالی که طالبان و سازمان ملل از کشته شدن ۳ غیرنظامی خبر دادند. همزمان، عربستان حملات هوایی خود به یمن را تشدید کرد و انصارالله تهدید به پاسخ‌گویی در عمق خاک عربستان نمود. این درگیری‌ها تنش‌های امنیتی در منطقه را افزایش می‌دهد.
+8991c3e97066a9af,sent_followup,band=mid sim=0.65 score=17.95 kept=above_floor prior=e3cdd444,14,aawsat|sky_news_arabia|tg_esellco|tg_fighter_radar|tg_geopwatch|tg_irane_azad_news|tg_iranian_militarism|tg_mes|tg_padeshah_fxn|tg_vahid_online,groq,2,economy,economy,likely,2,17.955,عراق اولین کشوری شد که پروازهای ایرلاین‌های تحریم‌شده ایران را متوقف کرد,منابع دولتی عراق تأیید کردند که از بامداد سه‌شنبه، پروازهای شرکت‌های هواپیمایی ایرانی مشمول تحریم‌های آمریکا را متوقف می‌کنند. این تصمیم در پی هشدار وزارت خزانه‌داری آمریکا مبنی بر قطع دسترسی به سیستم دلار صورت گرفته است. این اقدام بخشی از محاصره هوایی و اقتصادی ایران توسط همسایگان تحت فشار آمریکا است.
+03ab3e428df7f6cf,sent_followup,band=mid sim=0.59 score=17.23 kept=above_floor prior=760e6b27,4,maariv|mee|tg_tabzlive|tg_wfwitness,groq,2,economy,economy,likely,2,17.232,اداره ترامپ طرح ۵ میلیارد دلاری برای بازسازی زیرساخت‌های انرژی خلیج فارس را پیشنهاد داد,روزنامه وال استریت ژورنال گزارش داد که دولت آمریکا پیشنهاد سرمایه‌گذاری ۵ میلیارد دلاری در صندوقی جدید برای بازسازی زیرساخت‌های انرژی آسیب‌دیده در جنگ ایران را مطرح کرده است. هدف این طرح کاهش وابستگی کشورهای خلیج فارس به تنگه هرمز برای صادرات نفت و گاز است. این طرح می‌تواند تأثیرات اقتصادی بلندمدتی بر بازارهای انرژی منطقه داشته باشد.
+ba67053ae86ed0d9,sent_followup,band=high sim=0.81 score=17.26 kept=development prior=e905b035,5,ajar|mehr|tg_entekhab,groq,2,politics,balance,likely,2,17.264,وزیران کشور ایران و پاکستان در تهران دیدار و گفتگو کردند,اسکندر مومنی و سید محسن رضا نقوی در تهران دیدار کردند و درباره همکاری‌های دوجانبه گفتگو کردند. وزیر پاکستانی از تلاش‌های اسلام‌آباد برای میانجی‌گری در فرآیند صلح با ایالات متحده خبر داد. رئیس‌جمهور ایران بر گسترش تعاملات اقتصادی و انرژی با پاکستان تأکید کرد.
+6208aa9259fdbaf2,irrelevant,,3,aawsat|ajar|tg_irane_azad_news,groq,2,,,,,,,
+0b61f24b5e2235db,sent_followup,band=mid sim=0.78 score=19.74 kept=above_floor prior=64f7a65c,2,mee|sky_news_arabia,groq,2,politics,escalation,likely,2,19.742,ایالات متحده ویزای برخی اعضای هیئت ایران برای سازمان ملل را رد کرد,ایالات متحده از صدور ویزا برای برخی اعضای هیئت همراه مسعود پزشکیان، از جمله تیم ارتباطات، برای سفر به نیویورک خودداری کرد. رسانه‌های دولتی ایران این اقدام را گامی خصمانه و بی‌سابقه خوانده‌اند. پزشکیان قرار است بالاترین مقام ایرانی باشد که پس از آغاز جنگ وارد ایالات متحده می‌شود.
+d62b8e10b4c98043,irrelevant,,3,al_jazeera|sky_news_arabia|tg_wfwitness,groq,2,,,,,,,
+ade693182771879e,sent_followup,band=mid sim=0.66 score=17.81 kept=above_floor prior=32419ae7,3,al_jazeera|maariv|tg_tabzlive,groq,2,security,balance,likely,2,17.810,سری انفجارهای مرموز در انبارهای نظامی سوریه در جریان است,سری انفجارهایی در انبارهای سلاح نظامی سوریه رخ داده که مقامات در حال بررسی آن‌ها هستند. گزارش‌ها از احتمال دخالت اسرائیل خبر می‌دهند، هرچند دمشق اتهام رسمی‌ای مطرح نکرده است. این حوادث نگرانی‌هایی درباره امنیت زیرساخت‌های نظامی در حال بازسازی سوریه ایجاد کرده است.
+dabe781ca400e6ac,repeat_dropped,band=high sim=0.88 score=22.48 blocked=no_development prior=616049c5,2,mee|tehran_times,groq,2,military,escalation,likely,2,22.478,ادعای سرنگونی پهپاد آمریکایی در تنگه هرمز توسط سپاه,سپاه پاسداران اعلام کرد پهپاد MQ-1 آمریکایی را در تنگه هرمز سرنگون کرده است. این ادعا در حالی مطرح می‌شود که منابع مستقلی آن را تأیید نکرده‌اند و گزارش‌های متضادی وجود دارد.
+a7403f2a283201a7,sent_followup,band=mid sim=0.75 score=15.43 kept=above_floor prior=7d74f484,4,mee|mehr|tg_entekhab|tg_vira_university,groq,2,security,economy,likely,2,15.426,آسیب دیدن کشتی حامل گاز مایع در تنگه هرمز,کشتی‌ای حامل گاز مایع (LPG) هنگام خروج از تنگه هرمز بر اثر برخورد با بقایای پرتابه‌ای ناشناس آسیب دید. سازمان عملیات تجارت دریایی بریتانیا (UKMTO) اعلام کرد خدمه سالم هستند و کشتی به مسیر خود ادامه می‌دهد.
+0403c2d33d505132,irrelevant,,4,ajar|al_manar|tg_entekhab,groq,2,,,,,,,
+ccd2dc984887cc2e,repeat_dropped,band=mid sim=0.66 score=13.58 blocked=below_floor prior=35c80a50,7,tehran_times|tg_geopolitics_prime|tg_rnintel|tg_wfwitness,groq,2,military,none,unconfirmed,1,13.578,حمله هوایی و زمینی گسترده اسرائیل به جنوب لبنان,نیروهای اسرائیلی موجی از آتش‌باری توپخانه‌ای، حملات هوایی و نفوذ زمینی را در جنوب لبنان آغاز کردند. این حملات شامل شهرهای خیم، حداده و حاریس بود و به عنوان تشدید خطرناک توصیف شد.
+cc37a61a2c1acd27,irrelevant,,5,al_manar|maariv|tg_irane_azad_news|walla,groq,2,,,,,,,
+891769ba3b41f866,relevance_dropped,,1,maariv,groq,2,military,none,unconfirmed,1,12.963,ترکیه مانور نظامی بزرگ با ۱۵۰ وسیله در دریای مدیترانه آغاز کرد,ترکیه تمرین نظامی گسترده‌ای با مشارکت بیش از ۱۵۰ وسیله نظامی در دریای مدیترانه آغاز کرده است. جزئیات بیشتر درباره اهداف یا نتایج این مانور در منابع ارائه‌شده ذکر نشده است.
+f176fff070a4357b,repeat_dropped,band=mid sim=0.61 score=10.31 blocked=below_floor prior=ec581b97,5,al_manar|maariv|tg_entekhab|walla,groq,2,politics,none,unconfirmed,1,10.315,قطر مسئولیت انتقال کمک‌های مالی به حماس را بر عهده اسرائیل دانست,قطر ادعا کرد اگر کمک‌های مالی ارسالی به غزه به دست حماس افتاده باشد، مسئولیت آن با اسرائیل است که نظارت بر انتقال کمک‌ها را بر عهده داشت. این واکنش پس از انتشار گزارش «نیویورکر» درباره ارتباطات احتمالی مقامات قطری با مشاوران نتانیاهو صورت گرفت. همچنین سخنگوی حماس از پایبندی به آتش‌بس و نقض آن توسط اسرائیل خبر داد.
+af97a33a5b2a67d3,relevance_dropped,,1,al_monitor,groq,2,other,none,unconfirmed,1,6.900,برنامه جهانی غذا پاسخ به بحران گرسنگی در یمن را تشدید کرد,برنامه جهانی غذا اعلام کرد اقدامات خود را برای مقابله با بحران فزاینده گرسنگی در یمن تشدید کرده است. این اقدام در پی تصرف سواحل دریای سرخ توسط حوثی‌ها و جابه‌جایی بیش از ۱۲۰ هزار نفر صورت گرفته است.
+dbbb6206a9db83c6,relevance_dropped,,2,mehr|tg_entekhab,groq,2,politics,none,unconfirmed,1,9.954,وزارت خارجه ایران بستن مرکز زبان وابسته به سفارت فرانسه را رد کرد,وزارت خارجه ایران ادعاهای فرانسه درباره بستن مرکز زبان وابسته به سفارتش را قویاً رد کرد. مقامات ایرانی تأکید کردند این مرکز مجوز قانونی نداشت و از فرانسه خواستار پرهیز از اقدامات خلاف عرف دیپلماتیک شدند.
+bfceb674cc65561c,sent_followup,band=mid sim=0.79 score=18.34 kept=above_floor prior=1637ef52,6,maariv|tg_defenderdome|tg_tabzlive|tg_wfwitness|walla,groq,2,military,balance,unconfirmed,1,18.342,بریتانیا در حال بررسی ارائه حمایت نظامی دفاعی به عربستان است,بریتانیا در حال بررسی درخواست عربستان برای ارائه حمایت دفاعی نظامی علیه حوثی‌ها است. این حمایت می‌تواند شامل سوخت‌رسانی هوایی به هواپیماهای عربستانی و تشویق سایر کشورها به مشارکت باشد. رهبر حوثی‌ها نیز در واکنش، کشورهای همپیمان عربستان را به پذیرش تحریم‌های یمن فراخواند.
+1855ae6196661201,relevance_dropped,,3,al_jazeera|tg_rnintel|tg_tabzlive,groq,2,politics,none,unconfirmed,1,10.027,نظرسنجی: تأیید ترامپ به ۳۲ درصد رسید,بر اساس نظرسنجی ریترز/ایپسوس، میزان تأیید ترامپ به ۳۲ درصد کاهش یافت که پایین‌ترین رقم دوران سیاسی اوست. این افت عمدتاً به دلیل نارضایتی از هزینه‌های زندگی و جنگ با ایران رخ داده است.
+8bcc3fb3fe8a3909,sent_followup,band=mid sim=0.66 score=15.13 kept=above_floor prior=316ec114,4,reuters_gnews|tg_entekhab|tg_padeshah_fxn,groq,2,politics,balance,unconfirmed,1,15.126,گفت‌وگوی وزرای خارجه چین و آلمان درباره ایران,وزیران خارجه چین و آلمان درباره وضعیت ایران و بحران اوکراین گفت‌وگو کردند. همچنین رسانه‌ها گزارش داده‌اند که ایران برای بازگشت به مذاکرات با آمریکا هفت شرط غیرهسته‌ای مطرح کرده است.
+4367ce12239ea7b5,repeat_dropped,band=mid sim=0.65 score=11.02 blocked=below_floor prior=91b93756,3,tg_entekhab|tg_minas_tirith|walla,groq,2,security,none,unconfirmed,1,11.020,دستگیری دو تروریست در کرانه باختری,نیروهای اسرائیلی در کرانه باختری دو نفر را دستگیر کردند که قصد انجام فوری عملیات تروریستی را داشتند. در همین عملیات‌ها، سلاح‌های کلاشینکف و مواد منفجره کشف شد.
+6280d599ccc089da,irrelevant,,1,al_jazeera,groq,2,,,,,,,
+7488617fa885a21c,sent_followup,band=mid sim=0.60 score=16.09 kept=above_floor prior=e4b96547,4,ajar|tg_fighter_radar,groq,2,security,balance,unconfirmed,1,16.086,توافق عراق برای حصر سلاح گروه‌های مسلح,منابع عراقی از توافق برای حصر سلاح گروه‌های شبه‌نظامی تا میانه ۲۰۲۷ خبر دادند. این روند از یکم اکتبر آغاز می‌شود و با مقاومت برخی گروه‌های اصلی مواجه است.
+9b06b5c27228f055,irrelevant,,2,al_jazeera|tg_iranian_militarism,groq,2,,,,,,,
+5fbd95aecb6d759e,irrelevant,,1,haaretz,groq,2,,,,,,,
+7be230164cd7c5b0,repeat_dropped,band=mid sim=0.66 score=12.68 blocked=below_floor prior=74de8478,1,maariv,groq,2,military,none,unconfirmed,1,12.675,تأیید ارتش اسرائیل حمله به زیرساخت‌های حماس در غزه,ارتش اسرائیل حمله به زیرساخت‌های حماس در غزه را تأیید کرد. جزئیات بیشتر درباره نوع و شدت این حملات در منابع ارائه نشده است.
+14002fe5bdcb9492,relevance_dropped,,1,al_jazeera,groq,2,other,none,unconfirmed,1,6.625,بازگشت کودکان غزه به کلاس‌های درس در میان ویرانه‌ها,کودکان غزه پس از سه سال به کلاس‌های درس بازگشتند. آن‌ها با چالش‌هایی مانند مدارس آسیب‌دیده، استفاده از چادرها و کمبود تجهیزات مواجه هستند.
+4cbf0587b0d9e7d1,irrelevant,,1,mehr,groq,2,,,,,,,
+49493fc501c36763,repeat_dropped,band=mid sim=0.58 score=10.79 blocked=below_floor prior=84f31252,3,haaretz|maariv|walla,groq2,2,security,none,unconfirmed,1,10.795,تیراندازی به یک کنیسه در کانادا و زخمی شدن یک پلیس,در انتاریو کانادا، در حین نماز یوم کیپور، تیراندازی به سمت یک کنیسه رخ داد و یک افسر پلیس زخمی شد. مقامات اسرائیلی این رویداد را یک حمله تروریستی و نشانه‌ای از افزایش آنتی‌سیمیسم خواندند.
+b198356a1c7379e7,sent_followup,band=mid sim=0.75 score=14.59 kept=above_floor prior=c5961fbd,1,mehr,groq2,2,politics,balance,unconfirmed,1,14.585,نایب‌آدمیرال ایرانی: تنگه هرمز قطعاً در دست ایران است,حبیب‌الله صیاری، معاون هماهنگی نیروی زمینی ارتش ایران، ادعاهای مقامات آمریکایی درباره کنترل تنگه هرمز را رد کرد. او تأکید کرد که این آبراهه آبی قطعاً تحت کنترل ایران قرار دارد.
+68a00ba7944819d5,repeat_dropped,band=mid sim=0.56 score=12.54 blocked=below_floor prior=35c80a50,1,maariv,groq2,2,military,none,unconfirmed,1,12.543,انفجار مین در کنار یک ماشین‌آلات نظامی در غزه,ارتش اسرائیل اعلام کرد که امروز یک مین در کنار یک ماشین‌آلات مهندسی در غزه منفجر شد. در این حادثه هیچ‌کس زخمی نشد.
+5b50c9ff04411be2,repeat_dropped,band=mid sim=0.67 score=9.51 blocked=below_floor prior=caede068,1,mehr,groq2,2,politics,none,unconfirmed,1,9.508,رهبر انصارالله: عربستان سعودی جنایات جنگی علیه یمن مرتکب شده است,عبدالملک الحوثی، رهبر انصارالله، عربستان سعودی را به ارتکاب جنایات جنگی علیه یمن متهم کرد. او همچنین انقلاب ۲۱ سپتامبر یمن را تضمین‌کننده آزادی و استقلال خواند.
+ce1914b46c494552,clickbait,,2,mee|tg_geopolitics_prime,groq2,2,,,,,,,
+c4d557509fc1c0c3,sent_followup,band=mid sim=0.55 score=14.49 kept=above_floor prior=89e00af7,1,aawsat,groq2,2,politics,balance,unconfirmed,1,14.493,پاریس طرح برگزاری کنفرانس جامع برای حمایت از لبنان را مطرح کرد,فرانسه قصد دارد در آینده کنفرانسی جامع برای لبنان برگزار کند که فراتر از حمایت نظامی از ارتش باشد. در حال حاضر دو ابتکار اروپایی برای حمایت نظامی و مالی از لبنان در حال بحث است.
+bcc1729d6876f3f6,repeat_dropped,band=mid sim=0.62 score=9.47 blocked=below_floor prior=f332458e,1,sky_news_arabia,groq2,2,politics,none,unconfirmed,1,9.474,امارات بر اهمیت امنیت زنجیره‌های تأمین برای صلح بین‌المللی تأکید کرد,خليفة شاهین المرر، وزیر امور خارجه امارات، تأمین و حفاظت از جریان تجارت و انرژی را ستون اصلی صلح و امنیت جهانی دانست. این بیانیه در چارچوب دیپلماسی اقتصادی و امنیتی امارات مطرح شد.
+265f670226b999fb,repeat_dropped,band=mid sim=0.76 score=6.41 blocked=below_floor prior=0a65fb9f,1,sky_news_arabia,groq2,2,other,none,unconfirmed,1,6.411,صهاريج اماراتی به کاهش کمبود آب در غزه کمک می‌کنند,غزه با بحران آب ناشی از آسیب دیدن شبکه‌های تأمین و کمبود تجهیزات مواجه است و ساکنان به‌طور فزاینده‌ای به آب‌های حمل‌شده با صهاريج وابسته شده‌اند. صهاريج اماراتی برای کاهش رنج آوارگان به منطقه اعزام شده‌اند.
+38867ed1c74725c3,irrelevant,,1,al_jazeera,groq2,2,,,,,,,
+880557223db35f71,sent_followup,band=mid sim=0.56 score=20.49 kept=above_floor prior=d59c4e1e,2,tehran_times|tg_mes,groq2,2,military,escalation,unconfirmed,1,20.490,حوثی‌ها چندین منطقه کلیدی در جنوب تیز را تصرف کردند,نیروهای انصارالله (حوثی‌ها) شهر موقه، جزیره مایون و ارتفاعات راهبردی در استان لحج را تصرف کرده‌اند. آن‌ها همچنین کنترل کوه راسین و مناطق مرزی تیز و لحج را در دست گرفته و به سمت جاده تیز-عدن فشار می‌آورند.
+f38ddda36aa0a27c,clickbait,,1,tehran_times,groq2,2,,,,,,,
+8da0a28da4adc003,irrelevant,,1,tehran_times,groq2,2,,,,,,,
+585ca5b39ae00d71,irrelevant,,1,tehran_times,groq2,2,,,,,,,
+24bab6c920fb4f87,clickbait,,1,tehran_times,groq2,2,,,,,,,
+9ae8d2ce1e2e9497,sent_followup,band=mid sim=0.59 score=17.43 kept=above_floor prior=8900d497,2,aviationist|the_war_zone,groq2,2,military,balance,unconfirmed,1,17.435,پرواز آزمایشی پهپاد FQ-42 در کنار جنگنده‌های F-35 و F-15E در پایگاه کریچ,نمونه اولیه پهپاد جنگی FQ-42 Vengeance در پایگاه هوایی کریچ در کنار جنگنده‌های F-35A و F-15E پرواز کرد. این مانور برای آماده‌سازی عملیات‌های مشترک با هواپیماهای سرنشین‌دار انجام شد. این توسعه فناوری نظامی می‌تواند موازنه قدرت در منطقه را تحت تأثیر قرار دهد.
+94de039f35990f46,relevance_dropped,,1,mee,groq2,2,security,none,unconfirmed,1,10.240,اعتقال ۱۱ متظاهر مؤید للفلسطین در تونس,حکومت تونس دست کم ۱۱ نفر را به اتهام شرکت در تظاهرات برای آزادی فعالان فلسطینی بازداشت کرد. تعداد دقیق بازداشت‌شدگان بین وکلا و گروه‌های فعال متفاوت است و ارقام رسمی منتشر نشده است.
+e8ed58d2af6740e3,irrelevant,,1,ajar,groq2,2,,,,,,,
+a902a4d37fce4ebe,irrelevant,,1,ajar,groq2,2,,,,,,,
+022831cc2cdd36f5,sent,,1,al_monitor,groq2,2,military,balance,unconfirmed,1,17.086,ازسرگیری مذاکرات خرید F-16 بین ترکیه و آمریکا,ترکیه و آمریکا مذاکرات خرید جنگنده F-16 را پیش از دیدار احتمالی ترامپ و اردوغان از سر گرفتند. این مذاکرات در بستر مدرن‌سازی نیروی هوایی ترکیه و گسترش ناوگان نسل پنجم در منطقه صورت می‌گیرد.
+84c0e700bcd2e5b8,irrelevant,,1,ajar,groq2,2,,,,,,,
+5127f57998e02e69,clickbait,,1,ajar,groq,2,,,,,,,
+1453c8a5960722e9,repeat_dropped,band=mid sim=0.60 score=13.78 blocked=below_floor prior=b66a8ec1,1,sky_news_arabia,groq,2,economy,economy,unconfirmed,1,13.784,اعتراف رئیس‌جمهور ایران به افزایش شدید تورم و کاهش قدرت خرید,مسعود پزشکیان افزایش چشمگیر تورم در ایران را تأیید کرد و گفت که این امر افزایش حقوق را خنثی می‌کند. این اظهارات وضعیت اقتصادی فعلی کشور را تأیید می‌کند.
+3459dd430c95cde5,sent,,1,reuters_gnews,groq,2,economy,economy,unconfirmed,1,12.607,جستجوی تنوع در تأمین گاز طبیعی مایع توسط خریداران و فروشندگان,بازرگانان LNG در پی تنوع بیشتر در منابع تأمین هستند. این حرکت در پاسخ به اختلالات ناشی از جنگ ایران صورت می‌گیرد.
+8f053a397a2568ce,sent_followup,band=mid sim=0.75 score=14.30 kept=above_floor prior=a3037a38,4,tg_geopolitics_prime|tg_iranian_militarism|tg_mes|tg_minas_tirith,groq,3,military,balance,rumour,0,14.296,حضور بیش از ۲۵ هواپیمای سوخت‌رسان آمریکایی در پایگاه العیدید قطر,تصاویر ماهواره‌ای نشان می‌دهد بیش از ۲۵ هواپیمای سوخت‌رسان آمریکایی در پایگاه العیدید مستقر شده‌اند. این بزرگ‌ترین حضور از ابتدای جنگ ایران است و هواپیماها به صورت پراکنده پارک شده‌اند تا در برابر حملات موشکی آسیب‌پذیر نباشند. این امر نشان‌دهنده آمادگی برای مأموریت‌های هوایی گسترده‌تر است.
+f1a0a32b7a8868f3,repeat_dropped,band=high sim=0.94 score=5.99 blocked=both prior=cbac4fc8,1,al_manar,groq,3,politics,none,rumour,0,5.990,اعلام برنامه سفر رئیس‌جمهور ایران به مجمع عمومی سازمان ملل,رئیس‌جمهور ایران اعلام کرد فردا به نیویورک سفر می‌کند تا در نشست مجمع عمومی شرکت کند. برنامه او شامل سخنرانی و دیدار با رهبران دیگر است.
+89b646c7170bb9b4,repeat_dropped,band=mid sim=0.66 score=11.97 blocked=below_floor prior=3be197d9,19,al_manar|tg_entekhab|tg_fighter_radar|tg_irane_azad_news|tg_tweet_mardomi|tg_wfwitness,groq2,3,politics,balance,rumour,0,11.968,ایران هفت شرط برای بازگشت به مذاکرات با آمریکا اعلام کرد,دبیر شورای عالی امنیت ملی ایران اعلام کرد که تهران هفت شرط برای ازسرگیری گفتگوها با واشنگتن مطرح کرده است. منابع سیاسی تأیید می‌کنند که این شروط جدید هستند و مستقیماً به مسائل هسته‌ای مربوط نمی‌شوند. این حرکت دیپلماتیک در حالی صورت می‌گیرد که قیمت نفت برنت پس از اظهارات ترامپ مبنی بر موافقت احتمالی با مذاکرات، کاهش یافته است.
+cd1cd46e3c417718,rank_dropped,,1,tg_wfwitness,groq2,3,economy,economy,rumour,0,10.966,گروه مسلح لیبی تولید نفت میدان شارا را متوقف کرد,شرکت ملی نفت لیبی اعلام کرد که یک گروه مسلح شیر شماره ۷ خط لوله میدان شارا را بسته و تولید را متوقف کرده است. این میدان با ظرفیت روزانه ۳۰۰ هزار بشکه، منبع اصلی درآمد دولت لیبی است و ادامه این وضعیت منجر به اعلام فورس ماژور و اختلال در صادرات خواهد شد.
+13e56cd033fd423b,sent_followup,band=mid sim=0.77 score=14.46 kept=above_floor prior=3f5c5e91,6,tg_entekhab|tg_fighter_radar|tg_minas_tirith|tg_padeshah_fxn,groq2,3,military,balance,rumour,0,14.457,پرواز هواپیمای آواکس آمریکا از عربستان گزارش شد,گزارش‌های میدانی از پرواز یک فروند هواپیمای آواکس E-3 سنتری ارتش آمریکا از پایگاه‌های عربستان سعودی خبر می‌دهند. همزمان، فعالیت‌های گسترده کشتی‌های سوخت‌رسان و هواپیماهای گشت دریایی P8 در خلیج فارس و دریای عمان مشاهده شده است. این تحرکات نظامی در آستانه احتمالی درگیری‌های بیشتر در منطقه قرار دارد.
+f1314dd3a53fbe75,clickbait,,11,tg_fighter_radar|tg_irane_azad_news|tg_minas_tirith|tg_padeshah_fxn|tg_tweet_mardomi,groq2,3,,,,,,,
+3aca71026cc03f32,repeat_dropped,band=mid sim=0.60 score=9.40 blocked=below_floor prior=8900d497,6,al_manar|tg_fighter_radar|tg_tabzlive,groq2,3,military,none,rumour,0,9.402,حمله به خودروی مهندسی اسرائیل و بمباران شرق غزه,ارتش اسرائیل اعلام کرد یک خودروی مهندسی بدون سرنشین در شمال غزه با یک بسته انفجاری هدف قرار گرفت، اما تلفاتی گزارش نشد. در واکنش به این حادثه، جنگنده‌های اسرائیلی حملاتی را علیه زیرساخت‌های حماس در شرق شهر غزه انجام دادند. این درگیری‌ها بخشی از ادامه وضعیت نظامی در نوار غزه است.
+894685ebc3e8b7fe,unavailable,,5,tg_iranian_militarism,,3,,,,,,,
+b403cadd6007d101,unavailable,,3,tg_iranian_militarism|tg_tsepress|tg_vahid_online,,3,,,,,,,
+119b69ececc93f86,unavailable,,2,tg_wfwitness,,3,,,,,,,
+52ca8a4d539e92b6,unavailable,,5,tg_tabzlive|tg_wfwitness,,3,,,,,,,
+e3cffffe948120e7,unavailable,,2,tg_iranian_militarism|tg_padeshah_fxn,,3,,,,,,,
+c4d4245e47592289,repeat_dropped,band=mid sim=0.70 score=10.74 blocked=below_floor prior=fba7ba3a,3,tg_entekhab|tg_minas_tirith,groq2,3,economy,economy,rumour,0,10.744,روسیه صادرات گازوئیل را به دلیل حملات اوکراین تمدید می‌کند,حملات اوکراین به پالایشگاه مسکو باعث آسیب شدید به واحدهای فرآوری شده و روسیه قصد دارد ممنوعیت صادرات گازوئیل را تمدید کند. این تصمیم در حالی گرفته می‌شود که مجارستان از آمریکا خواسته است از تحریم‌های احتمالی بابت خرید نفت روسیه معاف شود.
+719b001645f208b0,clickbait,,2,tg_fighter_radar|tg_tweet_mardomi,groq2,3,,,,,,,
+52a36a98d1f3458c,irrelevant,,1,tg_entekhab,groq2,3,,,,,,,
+29838277e8a7e671,repeat_dropped,band=mid sim=0.75 score=10.63 blocked=below_floor prior=71c1b6d1,3,tg_tsepress,groq2,3,economy,economy,rumour,0,10.631,قیمت نفت برنت به زیر ۱۰۰ دلار کاهش یافت,قیمت جهانی نفت برنت به کمتر از ۱۰۰ دلار کاهش یافته و نفت آمریکا نیز ۵ درصد افت کرده است. همزمان قیمت جهانی مس تا سطح ۱۴۸۰۰ دلار پیشروی داشته است.
+af6d38a55aa7419e,sent_followup,band=mid sim=0.68 score=16.44 kept=above_floor prior=5cb53d47,3,tg_iranian_militarism|tg_vahid_online,groq2,3,military,escalation,rumour,0,16.444,ادعای شناسایی موشک فریب آمریکایی در نزدیکی تنگه هرمز,منابع غیررسمی ادعا کرده‌اند که هواگردی که در نزدیکی تنگه هرمز ساقط شد، یک موشک فریب آمریکایی بوده است. همچنین گزارش‌هایی از افزایش فعالیت‌های شناسایی هوایی آمریکا در منطقه منتشر شده که برخی آن را مقدمه‌ای برای درگیری می‌دانند.
+79775b11ff274b2c,irrelevant,,1,tg_rnintel,groq2,3,,,,,,,
+1d900631f9556220,irrelevant,,1,maariv,groq2,2,,,,,,,
+a66a782bd4a65e1d,irrelevant,,3,maariv|tg_tabzlive|tg_wfwitness,groq2,2,,,,,,,
+da11f8cef501c138,irrelevant,,2,maariv,groq2,2,,,,,,,
+cdc650a199bdd5e2,irrelevant,,1,sky_news_arabia,groq2,2,,,,,,,
+192cc3f803a46f54,irrelevant,,1,maariv,groq2,2,,,,,,,
+0abb9a30bc5d1167,irrelevant,,1,mee,groq2,2,,,,,,,
+53d7af56801dcc91,irrelevant,,1,sky_news_arabia,groq2,2,,,,,,,
+ace4fe5da381af65,irrelevant,,1,bbc_persian,groq2,2,,,,,,,
+4885181b8b7bc42b,irrelevant,,1,maariv,groq2,2,,,,,,,
+39ef2bd857586477,irrelevant,,1,walla,groq2,2,,,,,,,
+1a51b116517acb21,irrelevant,,1,bbc_en,groq2,2,,,,,,,
+62cabe617dab29d1,irrelevant,,1,al_jazeera,groq2,2,,,,,,,
+2a505e76d6f94d0c,irrelevant,,1,al_jazeera,groq2,2,,,,,,,
+cb1b9c9428adf190,irrelevant,,1,al_jazeera,groq2,2,,,,,,,
+26de02c3b047a2ce,sent_followup,band=mid sim=0.72 score=18.35 kept=above_floor prior=7d74f484,1,sky_news_arabia,groq2,2,security,escalation,unconfirmed,1,18.354,تصادف دو کشتی تجاری در تنگه هرمز و زخمی شدن دو نفر از خدمه,دو کشتی تجاری در تنگه هرمز با اشیای پرتابی ناشناخته برخورد کردند که منجر به زخمی شدن دو نفر از خدمه شد. این رویداد توسط سازمان دریانوردی بریتانیا تأیید شده است.
+995da64417a3855a,irrelevant,,1,al_jazeera,groq2,2,,,,,,,
+52d049e21e6301b6,relevance_dropped,,1,al_jazeera,groq2,2,politics,none,unconfirmed,1,9.290,بن‌گیور خواستار اعدام فلسطینی است که یک مستوطن را کشته است,ایتان بن‌گیور، وزیر امنیت ملی اسرائیل، خواستار اعدام فلسطینی‌ای شده که یک مستوطن را به قتل رسانده است. این مطلب صرفاً یک گزارش خبری از خواسته‌های سیاسی یک مقام اسرائیلی است و جزئیات بیشتری در متن ارائه نشده است.
+5ad55f1d21ff1d86,relevance_dropped,,1,maariv,groq2,2,security,none,unconfirmed,1,10.265,زخمی شدن یک زن جوان در درگیری خشونت‌آمیز در شرق اورشلیم,یک زن حدود ۲۰ ساله در جریان یک حادثه خشونت‌آمیز در شرق اورشلیم زخمی شد. وضعیت او به عنوان متوسط گزارش شده است. جزئیات بیشتری در مورد عاملان یا انگیزه این حادثه در متن ارائه نشده است.
+58c3aff6d3135c11,relevance_dropped,,1,maariv,groq2,2,security,none,unconfirmed,1,10.183,پلیس اسرائیل تحقیقاتی درباره مرگ یک مهاجر غیرقانونی در اوم‌ال‌فحم آغاز کرد,پلیس اسرائیل تحقیقاتی را درباره شرایط مرگ یک شهروند غیرقانونی آغاز کرد که جسد او در منطقه اوم‌ال‌فحم پیدا شد. جزئیات بیشتری در مورد علت دقیق مرگ یا هویت فرد در خبرها ذکر نشده است.
+53a61df4378f8b34,irrelevant,,1,bbc_en,groq2,2,,,,,,,
+5e2e7576f64f6a15,irrelevant,,2,al_jazeera,groq2,2,,,,,,,
+3b0e714945ab2b46,irrelevant,,1,ajar,groq2,2,,,,,,,
+12124ee37c28e7d9,irrelevant,,1,maariv,groq2,2,,,,,,,
+8d4b458189d37bd7,irrelevant,,1,walla,groq2,2,,,,,,,
+82e68df899e65714,irrelevant,,1,bbc_en,groq2,2,,,,,,,
+4e72cb816ec29895,irrelevant,,1,walla,groq2,2,,,,,,,
+c33a51761d2c81d4,irrelevant,,1,ajar,groq2,2,,,,,,,
+21bba8f6debeaec0,irrelevant,,1,sky_news_arabia,groq2,2,,,,,,,
+23f3bdc045e1a9da,irrelevant,,1,ajar,groq2,2,,,,,,,
+dca9972b89987941,irrelevant,,1,ajar,groq2,2,,,,,,,
+f3f6b46c795abb37,clickbait,,1,ajar,groq2,2,,,,,,,
+e30c013d393840e6,clickbait,,1,ajar,groq2,2,,,,,,,
+6fe0e360d13bc9e4,irrelevant,,1,ajar,groq2,2,,,,,,,
+fc6ffe04682619eb,clickbait,,1,ajar,groq2,2,,,,,,,
+53ba321e7310ef6b,irrelevant,,2,tg_tabzlive|tg_wfwitness,groq2,3,,,,,,,
+fe29718f3af0beeb,irrelevant,,2,tg_defenderdome|tg_tabzlive,groq2,3,,,,,,,
+cf60f9f63a3f26d9,clickbait,,1,tg_fighter_radar,groq2,3,,,,,,,
+263ff08bc26ebc7c,irrelevant,,1,tg_wfwitness,groq2,3,,,,,,,
+ad5c8a55207ffadb,irrelevant,,1,tg_wfwitness,groq2,3,,,,,,,
+d9746c0a75f6e5f7,rank_dropped,,1,tg_fighter_radar,groq2,3,economy,economy,rumour,0,10.800,تلاش جمهوری‌خواهان برای توقف صادرات گازوئیل از آمریکا,قانون‌گذاران حزب جمهوری‌خواه در حال تلاش برای توقف صادرات گازوئیل از ایالات متحده هستند. جزئیات بیشتر در مورد وضعیت نهایی این طرح در منابع ارائه نشده است.
+825d9350681acf10,irrelevant,,1,tg_rnintel,groq2,3,,,,,,,
+befd1b052d366b0b,irrelevant,,1,tg_tabzlive,groq2,3,,,,,,,
+2038b2881a46646e,irrelevant,,1,tg_mornovosti,groq2,3,,,,,,,
+cac6cf96a3201380,irrelevant,,2,tg_tabzlive,groq2,3,,,,,,,
+8fa3b9c7afeee61f,clickbait,,1,tg_militarywave,groq2,3,,,,,,,
+ca9d34d70d583512,clickbait,,1,tg_minas_tirith,groq2,3,,,,,,,
+ea982dd8fac712ef,clickbait,,2,tg_militarywave,groq2,3,,,,,,,
+452405d060295363,relevance_dropped,,1,tg_defenderdome,groq2,3,economy,none,rumour,0,6.978,ترامپ از مذاکرات تجاری پتاش با بلاروس خبر داد,دونالد ترامپ اعلام کرد که توافق تجاری پتاش با بلاروس در حال شکل‌گیری است. این توافق به عنوان جایگزینی برای توافقات با کانادا در میان تنش‌های تجاری ذکر شده است.
+12c4737f7ab92d8c,clickbait,,1,tg_militarywave,groq2,3,,,,,,,
+8c48a0c534c30bdb,irrelevant,,1,tg_geopolitics_prime,groq,3,,,,,,,
+7c516d8699d8e74b,clickbait,,1,tg_geopolitics_prime,groq,3,,,,,,,
+b84aacd23f905968,lead_only,,1,tg_irane_azad_news,groq,3,security,none,unconfirmed,0,6.866,انتقال زندانی سیاسی به سلول انفرادی و خطر اعدام,علی زارعی، زندانی سیاسی، پس از بازگشت از آلمان بازداشت و به اعدام محکوم شد. او اکنون به سلول انفرادی منتقل شده و در معرض خطر اعدام قرار دارد.
+e54024437f3b19d2,clickbait,,1,tg_tweet_mardomi,groq,3,,,,,,,
+e4e4a6e341fb97d8,clickbait,,1,tg_vira_university,groq,3,,,,,,,
+d9ca25bec4b8ca1c,unavailable,,1,tg_vira_university,,3,,,,,,,
+5877da4807568f37,unavailable,,1,tg_esellco,,3,,,,,,,
+543a8c71e28bda87,unavailable,,1,tg_behold_israel,,3,,,,,,,
+64f0a00aa811662e,unavailable,,1,tg_padeshah_fxn,,3,,,,,,,
+88656e24e8766708,unavailable,,1,tg_irane_azad_news,,3,,,,,,,
+76e95689ede35e44,clickbait,,1,tg_padeshah_fxn,groq2,3,,,,,,,
+8759bc8693a089ce,irrelevant,,1,tg_vira_university,groq2,3,,,,,,,
+0010c62b56198203,irrelevant,,1,tg_vira_university,groq2,3,,,,,,,
+1beb670b2a26e980,irrelevant,,1,tg_behold_israel,groq2,3,,,,,,,
+7550c9e6f23b9c74,irrelevant,,1,tg_irane_azad_news,groq2,3,,,,,,,
+7711ad29212d47ba,unavailable,,1,tg_vira_university,,3,,,,,,,
+a534014cd3f57e39,unavailable,,1,tg_irane_azad_news,,3,,,,,,,
+7964f0e0339a4a9a,unavailable,,1,tg_geopolitics_prime,,3,,,,,,,
+bf6de6f56140d804,unavailable,,1,tg_padeshah_fxn,,3,,,,,,,
+d3457d81d8c151b7,unavailable,,1,tg_padeshah_fxn,,3,,,,,,,

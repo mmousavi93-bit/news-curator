@@ -1,0 +1,41 @@
+﻿cluster_key,fate,reason,n_members,sources,provider,best_tier,category,claim_status,independent_count,score,headline,summary
+bd469409d05f3b2d,repeat_dropped,,21,ap_gnews|bbc_en|maariv|mee|sky_news_arabia|tg_behold_israel|tg_defenderdome|tg_exciton_missile|tg_fighter_radar|tg_irane_azad_news|tg_minas_tirith|tg_tabzlive|tg_tanker_trackers|tg_tweet_mardomi|tg_vahid_online|tg_wfwitness|walla,groq,2,,,,,,
+7beb714e03b6acdf,irrelevant,,2,maariv,groq,2,,,,,,
+31dac2d499439b7d,repeat_dropped,,4,al_manar|maariv|tg_irane_azad_news|tg_tweet_mardomi,groq,2,,,,,,
+94ee9777ebaf8a9a,sent,,1,maariv,groq,2,economy,unconfirmed,1,8.988,آتش‌سوزی در یک تاسیسات حیاتی صنعتی ایران,گزارش‌ها حاکی از آن است که آتش در یکی از مراکز کلیدی صنعتی ایران شعله‌ور شده و خساراتی به ارزش میلیاردها دلار به آن وارد شده است.
+2c0e4da40097f6dd,unavailable,,5,aawsat|al_manar|irna,,2,,,,,,
+f77ca14a8746f20c,repeat_dropped,,2,irna|mehr,groq,2,,,,,,
+b677cc7229a2b30e,irrelevant,,1,sky_news_arabia,groq,2,,,,,,
+55ae9c7da99c5add,repeat_dropped,,6,mehr|sky_news_arabia|tg_minas_tirith|tg_padeshah_fxn|tg_rnintel,groq,2,,,,,,
+60d244a9f7e6c7d0,relevance_dropped,,1,tehran_times,groq,2,economy,unconfirmed,1,8.963,تولید گاز فاز ۱۱ پارس جنوبی به یک میلیارد فوت مکعب در روز نزدیک می‌شود,تولید در مکان B از ۴۰۰ میلیون فوت مکعب به بیش از ۹۱۵ میلیون فوت مکعب در روز افزایش یافته است. با اتصال چاه دوازدهم در هفته‌های آینده، تولید به سقف مقرر خواهد رسید.
+ca63618c1b118ef9,repeat_dropped,,8,ajar|al_manar|tg_fighter_radar|tg_irane_azad_news|tg_iranian_militarism|tg_padeshah_fxn,groq,2,,,,,,
+9b427f848adf4891,repeat_dropped,,5,ajar|al_jazeera|tg_defenderdome|tg_minas_tirith|tg_tabzlive,groq,2,,,,,,
+966f73f49fb8c6ff,unavailable,,6,aawsat|al_jazeera|al_monitor|france24|sky_news_arabia|tg_tabzlive,,2,,,,,,
+6a57c6e65c081971,sent,,1,tehran_times,groq,2,economy,unconfirmed,1,8.922,اتحادیه اتاق‌های بازرگانی ایران مأموریت تجاری به قزاقستان اعزام می‌کند,این مأموریت هم‌زمان با برگزاری نمایشگاه بین‌المللی نفت و گاز در آلماتی در اواخر سپتامبر ۲۰۲۶ انجام خواهد شد.
+769dcb0111d63f6d,repeat_dropped,,3,aawsat|irna,groq,2,,,,,,
+985a6b96b9729368,relevance_dropped,,1,tehran_times,groq,2,economy,unconfirmed,1,8.905,وزیر صنعت بر لزوم فعال‌سازی مرزهای استان ایلام تأکید کرد,وزیر صنعت، معدن و تجارت خواستار تقویت مرز مهران و توسعه بازارهای مرزی برای افزایش سهم استان از تجارت کشور شد.
+48ff17651e0cdc5e,irrelevant,,1,al_jazeera,groq,2,,,,,,
+d862930f25deee8b,sent,,1,tehran_times,groq,2,economy,unconfirmed,1,8.840,وزیر نفت ایران از افزایش صادرات و تولید در دو سال اخیر خبر داد,مهدی پاکنجاد اعلام کرد که صادرات نفت بدون وقفه ادامه داشته و تولید افزایش یافته است.
+2efc0c996031bbe7,irrelevant,,1,tehran_times,groq,2,,,,,,
+3abe927c2f4b99c5,irrelevant,,1,bbc_persian,groq,2,,,,,,
+d60d9d74f86caa4e,sent,,1,al_jazeera,groq,2,security,unconfirmed,1,10.811,اداره ترامپ دستور انجام تست پلی‌گراف برای کارکنان پنتاگون را صادر کرد,این اقدام در پی گزارش‌هایی مبنی بر کاهش ذخایر تسلیحاتی ایالات متحده و به منظور شناسایی نشت اطلاعات انجام شده است.
+8185d5fe1b70a0b6,fatal,,1,tehran_times,openrouter,2,,,,,,
+780b562655a577f2,fatal,,1,tehran_times,openrouter,2,,,,,,
+14323a7d98d815f2,irrelevant,,1,tehran_times,groq,2,,,,,,
+05ac1eeff595590e,irrelevant,,1,tehran_times,groq,2,,,,,,
+b009067012ed5eaa,irrelevant,,2,al_jazeera,groq,2,,,,,,
+263808efa484a188,lang_dropped,,12,aawsat|ajar|ap_gnews|tg_fighter_radar|tg_irane_azad_news|tg_iranian_militarism|tg_padeshah_fxn|tg_tabzlive|tg_vira_university|tg_wfwitness,groq,2,military,likely,3,17.794,نیروهای اسرائیل عملیات تخریب و انفجار در جنوب لبنان را گسترش دادند,گزارش‌ها از انجام ده‌ها عملیات تخریب در شهرک‌های بنی‌حیان و المنصوریه و گسترش منطقه عملیاتی فراتر از خط زرد خبر می‌دهند؛ ادعاهای جدید درباره تونل‌ها در بعلبك نیز مطرح شده است.
+e03e9d0d2410cfd0,irrelevant,,3,ajar|al_jazeera|bbc_en,groq,2,,,,,,
+a10147ce82c96b99,repeat_dropped,,1,irna,groq,2,,,,,,
+c5a293b2ecfe8bcc,clickbait,,1,maariv,groq,2,,,,,,
+311ac2974c015775,sent,,1,iran_international,groq,2,politics,unconfirmed,1,9.747,احمد علم‌الهدی برای ریاست مجلس خبرگان رهبری کاندیدای انتخابات شد,منابع آگاه گزارش می‌دهند که این روحانی تندرو در حال کسب حمایت برای تصدی این پست کلیدی هستند که مسئولیت انتخاب و نظارت بر رهبر را بر عهده دارد.
+b6cf9a09359df98a,repeat_dropped,,2,ajar|al_manar,groq,2,,,,,,
+de7ea00d172c006c,sent,,7,ap_gnews|aviationist|maariv|mehr|tg_tabzlive|tg_wfwitness|walla,groq,2,military,likely,4,17.322,سقوط یک جنگنده F-4 نیروی هوایی یونان در نمایش هوایی نزدیک آتن,این حادثه در پایگاه تانگرا رخ داد و وضعیت دو سرنشین هنوز نامشخص است؛ هیچ نشانه‌ای از پرش با چتر نجات مشاهده نشده و جستجو در محل آغاز شده است.
+bc8b4d0911406d6f,irrelevant,,1,al_jazeera,groq,2,,,,,,
+20dd5492b9ed6438,relevance_dropped,,1,walla,groq,2,security,unconfirmed,1,10.667,صدها یروشلمی در حمایت از کافه‌ای که به دلیل اعتراضات حared بسته شد حضور یافتند,مدیریت کافه «کافه هاسمتا» در یروشلم پس از دو ماه اعتراضات حared تصمیم به تعطیلی آن در روز شنبه گرفت، اما جنبش «هتئوروت» با جمع‌آوری کمک‌های مالی از ادامه فعالیت یک دستفروش قهوه در همان محل خبر داد.
+e973dd75c7ea1cc3,cap_refused,,1,sky_news_arabia,,2,,,,,,
+d447d4be9c01095a,cap_refused,,1,al_jazeera,,2,,,,,,
+bedf45e3ba102f87,cap_refused,,2,mehr|tg_minas_tirith,,2,,,,,,
+112e5bc1bc241b8a,cap_refused,,1,al_jazeera,,2,,,,,,
+14dbae2744798fdc,cap_refused,,1,sky_news_arabia,,2,,,,,,
+f9850e8ce1e7e85f,cap_refused,,1,tehran_times,,2,,,,,,
