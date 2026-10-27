@@ -38,7 +38,12 @@ def load_items(path):
 def load_clusters(path):
     result = {}
     for number, row in enumerate(csv_rows(path), 2):
-        n = int(row['n_members'])
+        if not (row.get('cluster_key') or '').strip():
+            continue  # deferred/queue placeholder rows carry no key or members
+        raw_n = (row.get('n_members') or '').strip()
+        if not raw_n.isdigit():
+            continue  # malformed cardinality; not a recoverable cluster
+        n = int(raw_n)
         if n <= 0:
             raise ValueError('cardinality must be positive')
         c = dict(cluster_key=row['cluster_key'], n_members=n,
