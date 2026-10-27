@@ -20,6 +20,7 @@ from agent.llm.breaker import backoff_delay
 from agent.llm.call import _OK, _SAME, Provider, attempt
 from agent.llm.errors import FATAL, REFUSED_CAP, UNAVAILABLE, LlmResult
 from agent.llm.providers import ImageInput
+from agent.llm.overflow import select_overflow
 from agent.llm.token_pacer import estimate_tokens
 
 if TYPE_CHECKING:
@@ -89,6 +90,9 @@ def failover(
             if router._cooldowns.any_ready((q.name for q in queue), now):
                 queue.append(provider)
                 continue
+        tokens_est = estimate_tokens(prompt)
+        provider = select_overflow(router, provider, queue, tokens_est)
+        name = provider.name
         if provider.spend is not None and not provider.spend.acquire():
             continue  # the guard logged it
 
@@ -102,7 +106,6 @@ def failover(
         # window (measured 2026-09-08: 35/35 groq failures were 429s and
         # the lockout never recovered), so a pacer that books only
         # successes reproduces the lockout exactly.
-        tokens_est = estimate_tokens(prompt)
         router._token_pacer.wait(name, provider.tpm, tokens_est)
         router._call_index += 1
         outcome, result = attempt(

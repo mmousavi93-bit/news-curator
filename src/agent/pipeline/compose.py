@@ -9,8 +9,7 @@ from __future__ import annotations
 import logging
 
 from agent.collectors.tz import to_tehran
-from agent.delivery.formatter import escape_html, format_split_tracked
-from agent.delivery.message import Message
+from agent.delivery.formatter import escape_html
 from agent.pipeline.deescalation import is_escalation, maybe_deescalation_notice
 from agent.pipeline.flash_watchdog import flash_warning
 from agent.pipeline.labels import labels_for
@@ -19,7 +18,7 @@ from agent.pipeline.queue import select_digest
 from agent.pipeline.rank import rank_events
 from agent.pipeline.render import _raw_fallback, build_digest_items
 from agent.pipeline.render_leads import build_lead_message
-from agent.pipeline.synthesis import build_synthesis
+from agent.pipeline.synthesis_support import pack_digest
 from agent.util.jalali import format_jalali
 
 
@@ -46,6 +45,7 @@ class ComposeStage:
         ctx.delivery_states = {}
         ctx.delivered_keys = []
         ctx.delivery_page_states = []
+        ctx.synthesis_evidence_keys = []
         # Flash-monitor liveness (9r). Computed BEFORE any budgeting so the
         # line is inside the character budget, never appended after the split
         # (constraint 8: never discover the 4,096 cap at send time). It rides
@@ -134,15 +134,6 @@ class ComposeStage:
             f"{labels['header']} — {format_jalali(now_tehran, with_time=True)}"
             f" {labels['tehran']}{marker}"
         )
-        # Session 25: the one-line synthesis ("big picture") under the header.
-        synthesis = ""
-        if (settings.digest_rank.synthesis_enabled and len(kept) >= 2
-                and self._synthesis_template):
-            synthesis = build_synthesis(
-                ctx, kept, self._synthesis_template, self._logger
-            )
-        if synthesis:
-            header = f"{header}\n{labels['synthesis_header']}: {synthesis}"
         if preamble:
             # Above the digest header on purpose: the watchdog warning is a
             # statement about the system, the de-escalation notice about the
@@ -159,15 +150,11 @@ class ComposeStage:
         # truncation-tracking below must enumerate `ordered_events`.
         items, ordered_events = build_digest_items(kept, clusters, settings, labels)
 
-        message = Message(header=header, items=tuple(items),
-                          footer=raw_fallback or None)
-        max_units = settings.delivery.telegram_max_chars
         # The packer supplies exact item indices and full/headline-only forms.
         # This follows ordered_events, not rank order or text/headline matching.
-        page_forms: list[dict[int, str]] = []
-        ctx.messages, truncated_orders = format_split_tracked(
-            message, max_units=max_units, max_messages=settings.digest_rank.max_messages,
-            page_forms=page_forms,
+        ctx.messages, truncated_orders, page_forms = pack_digest(
+            ctx, header, items, ordered_events, raw_fallback,
+            self._synthesis_template, labels, self._logger,
         )
         ctx.message_event_keys = [
             [ordered_events[i].event_key for i in sorted(forms)] for forms in page_forms

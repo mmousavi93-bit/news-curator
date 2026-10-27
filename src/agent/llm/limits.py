@@ -17,7 +17,7 @@ tested and will be trusted anyway (PHASE_5_BRIEF §5).
 from __future__ import annotations
 
 import logging
-from typing import Callable
+from agent.llm.rpm_pacer import RpmPacer  # preserve existing public import
 
 
 class CallBudget:
@@ -129,6 +129,13 @@ class ProviderBudget:
         self._warned = False
         self._warned_day = False
 
+    def has_capacity(self) -> bool:
+        """Inspect existing spend/run/day guards without consuming a slot."""
+        return (not self.halted
+                and (self._max_spend is None or self.spend_usd <= self._max_spend)
+                and (self._max_calls_day is None or self.daily_calls < self._max_calls_day)
+                and (self._max_calls is None or self.calls < self._max_calls))
+
     def acquire(self) -> bool:
         if self.halted:
             return False
@@ -173,28 +180,3 @@ class ProviderBudget:
                     "llm provider %s: spend $%.4f exceeds $%.2f (halt flag off, continuing)",
                     self.name, self.spend_usd, self._max_spend,
                 )
-
-
-class RpmPacer:
-    """Proactive pacing (PHASE_5_BRIEF §5). RPM binds long before RPD: 40 Gemini
-    calls at 5 RPM is an eight-minute wall-clock floor; a pacer that waits for
-    429s spends the run budget on retries and learns the limit expensively.
-    Calls are serial and stay serial -- parallelism would break the pacer and
-    buys nothing against a 5 RPM ceiling.
-    """
-
-    def __init__(self, clock: Callable[[], float], sleep: Callable[[float], None]) -> None:
-        self._clock = clock
-        self._sleep = sleep
-        self._last: dict[str, float] = {}
-
-    def wait(self, name: str, rpm: int | None) -> None:
-        """Sleep (through the injected sleep callable) until `interval` has
-        elapsed since the previous call for this provider."""
-        if rpm is None:
-            return
-        interval = 60.0 / rpm
-        elapsed = self._clock() - self._last.get(name, float("-inf"))
-        if elapsed < interval:
-            self._sleep(interval - elapsed)
-        self._last[name] = self._clock()

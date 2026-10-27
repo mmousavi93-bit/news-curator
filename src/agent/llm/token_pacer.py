@@ -110,6 +110,23 @@ class TokenPacer:
     def _window_sum(self, name: str) -> int:
         return sum(tokens for _, tokens in self._windows.get(name, ()))
 
+    def delay(self, name: str, tpm: int | None, estimated_tokens: int) -> float:
+        """Model wait exactly, without purging, booking, logging or sleeping."""
+        if not tpm or tpm <= 0 or estimated_tokens > tpm:
+            return 0.0
+        now = self._clock()
+        live = [(at, tokens) for at, tokens in self._windows.get(name, ())
+                if now - at < _WINDOW_SECONDS]
+        total = sum(tokens for _, tokens in live)
+        budget = int(tpm * _SAFETY_FACTOR)
+        delay = 0.0
+        for at, tokens in live:
+            if total + estimated_tokens <= budget:
+                break
+            total -= tokens
+            delay = max(delay, at + _WINDOW_SECONDS - now)
+        return delay
+
     def wait(self, name: str, tpm: int | None, estimated_tokens: int) -> None:
         """Book `estimated_tokens` for this provider and sleep (through the
         injected sleep callable) until the trailing 120s window has room.

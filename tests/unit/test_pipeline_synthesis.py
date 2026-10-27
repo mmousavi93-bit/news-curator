@@ -5,6 +5,7 @@ line, never raises, never sinks the digest."""
 from __future__ import annotations
 
 from datetime import datetime, timezone
+import json
 
 from agent.llm.errors import LlmResult
 from agent.memory.event_models import Event
@@ -35,7 +36,8 @@ class _FakeRouter:
 
 def _events(n: int = 2) -> list[Event]:
     return [
-        Event(event_key=f"k{i}" * 8, summary=f"خلاصه {i}", headline=f"تیتر {i}",
+        Event(event_key=f"k{i}" * 8, summary=f"گزارش تازه رویداد {i}", headline=f"تیتر {i}",
+              claim_status="confirmed",
               category="military", significance="escalation",
               first_seen_at=NOW, last_updated_at=NOW)
         for i in range(n)
@@ -49,7 +51,9 @@ def _ctx(router):
 def test_returns_the_line_when_valid():
     router = _FakeRouter(LlmResult(
         ok=True, status="ok",
-        text='{"synthesis": "امروز چند جبهه به طور همزمان فعال شد."}'))
+        text=json.dumps({"synthesis": "امروز چند جبهه به طور همزمان فعال شد.",
+                         "evidence": [{"event_id": e.event_key, "quote": e.summary}
+                                      for e in _events()]})))
     line = build_synthesis(_ctx(router), _events(), TPL, _Log())
     assert line == "امروز چند جبهه به طور همزمان فعال شد."
 
