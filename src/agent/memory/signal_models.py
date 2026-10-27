@@ -126,3 +126,39 @@ def restore_history(header, records, ledger, baselines):
         setattr(history, name, header[name])
     history.materialize()
     return history
+
+
+def load_signal_history(conn, catalog):
+    """Load required state; absence is an error, never an implicit new ledger.
+
+    Returns (history, calendar, source snapshots). A new empty history must be
+    constructed explicitly by the offline caller and persisted once.
+    """
+    import sqlite3
+    from agent.memory.db import StateError
+    from agent.memory import signal_models as sm
+    from agent.pipeline.signal_calendar import SignalCalendar
+
+    try:
+        row = conn.execute("SELECT header, calendar FROM signal_history_meta WHERE singleton=1").fetchone()
+        if row is None:
+            raise StateError("missing required signal history")
+        header = sm.unpack(row[0])
+        if header["catalog"] != frozenset(catalog):
+            raise StateError("signal history catalog mismatch")
+        records, sources, baselines = {}, {}, {}
+        for r in conn.execute("SELECT occurrence_key, payload FROM signal_occurrences ORDER BY occurrence_key"):
+            records[r[0]], snapshot = sm.unpack(r[1])
+            sources.update(snapshot)
+        ledger = {r[0]: sm.unpack(r[1]) for r in conn.execute("SELECT signal_id, payload FROM signal_novelty")}
+        for r in conn.execute("SELECT baseline_key, payload FROM signal_baselines ORDER BY baseline_key"):
+            baselines[r[0]], snapshot = sm.unpack(r[1])
+            sources.update(snapshot)
+        history = sm.restore_history(header, records, ledger, baselines)
+        calendar = SignalCalendar()
+        calendar.__dict__.update(sm.unpack(row[1]))
+        return history, calendar, sources
+    except StateError:
+        raise
+    except (ValueError, KeyError, TypeError, sqlite3.DatabaseError) as exc:
+        raise StateError(f"corrupt required signal history: {exc}") from exc
