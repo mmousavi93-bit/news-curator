@@ -105,7 +105,7 @@ D2: same_leader_negative_shift
 D3: iranian_route_closure_shift
 D4: chronic_threat_or_anonymous_preparation
 E1: iran_attributed commercial_vessel_impact gulf_waters
-E2: distinct_second_vessel_attack
+E2: distinct_second_vessel_attack iran_attributed commercial_vessel_impact gulf_waters
 E3: us_gulf_asset_impact
 E4: proxy_front_widens
 E5: major_interception_or_near_miss
@@ -126,6 +126,9 @@ cancellations retain the grounded deadline identity. No subtractive signals.
 Official soothing statements may carry soothing and official_statement predicates;
 schedules may carry schedule. Their validated evidence goes to the calendar
 side channel; no soothing statement alone implies a catalog signal.
+Emit these in soothing_statements (signal_id:soothing) and scheduled_events
+(signal_id:schedule), respectively, using the same candidate schema. Schedule
+actions are schedule, reschedule or cancel. Never put these IDs in signals.
 
 Historical joins: prior_ids must reference supplied retained occurrence keys or
 baseline IDs. A2 requires two accepted overlapping A1 posture intervals in the

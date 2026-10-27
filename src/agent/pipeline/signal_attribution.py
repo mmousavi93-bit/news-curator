@@ -95,7 +95,7 @@ def historical_predicates(candidate, history, day):
                 or candidate.dates[1] > day or min(candidate.numbers) <= 0):
             raise EvidenceError("invalid comparable rial observations")
         # IRR per USD rising means the rial depreciates; model does no arithmetic.
-        if "irr_per_usd" not in candidate.predicates or candidate.numbers[1] / candidate.numbers[0] - 1 <= .15:
+        if "irr_per_usd" not in candidate.predicates or 1 - candidate.numbers[0] / candidate.numbers[1] <= .15:
             raise EvidenceError("H3 depreciation must exceed 15 percent")
         return
     if history is None:
@@ -140,7 +140,8 @@ def historical_predicates(candidate, history, day):
 
 def derive(candidate: Candidate, items, credibility, *, now, history=None):
     day, tier, count = supporting_fields(candidate, items, credibility, now)
-    historical_predicates(candidate, history, day)
+    if candidate.transition != "end":
+        historical_predicates(candidate, history, day)
     if candidate.occurrence_date and candidate.occurrence_date > day:
         raise EvidenceError("future occurrence")
     if candidate.occurrence_date and candidate.occurrence_date < day:
@@ -151,10 +152,18 @@ def derive(candidate: Candidate, items, credibility, *, now, history=None):
     if candidate.transition == "end":
         if candidate.signal_id not in STATE_ENDS or count < 2:
             raise EvidenceError("uncorroborated/invalid state end")
+        if candidate.signal_id == "A2" and (len(candidate.numbers) != 1
+                                             or not 0 <= candidate.numbers[0] < 2):
+            raise EvidenceError("A2 end requires confirmed theater count below two")
         end = candidate.effective_date or day
         if end > local_day(now):
             raise EvidenceError("future withdrawal pending verification")
     else:
         end = None
     novelty = history.factor(candidate.signal_id) if history else 1.0
+    old = history.find(candidate) if history else None
+    if old is not None:
+        day = old.event.event_date
+        if candidate.transition != "end":
+            end = old.event.state_end_date
     return AttributedSignal(candidate.signal_id, day, tier, count, novelty, end)

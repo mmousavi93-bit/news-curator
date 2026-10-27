@@ -28,6 +28,8 @@ class SignalCalendar:
             raise EvidenceError("deadline requires corroborated authority-issued C1")
         identity = candidate.occurrence_id
         action = candidate.action.casefold()
+        if action not in {"issue", "extend", "cancel"}:
+            raise EvidenceError("invalid deadline action")
         old = self.deadlines.get(identity)
         if action in {"extend", "cancel"} and old is None:
             raise EvidenceError("calendar update has no grounded prior deadline")
@@ -39,10 +41,14 @@ class SignalCalendar:
             if len(candidate.dates) != 1:
                 raise EvidenceError("deadline requires one grounded date")
             due = candidate.dates[0]
-            if due < day:
+            if due < local_day(now):
                 raise EvidenceError("expired newly issued deadline")
             if old and due != old.due and action != "extend":
                 raise EvidenceError("changed deadline requires explicit extension")
+            if old and action == "extend" and due <= old.due:
+                raise EvidenceError("extension must move deadline later")
+        if old and day < old.observed:
+            raise EvidenceError("out-of-order deadline update")
         entry = Deadline(identity, due, candidate, day, action == "cancel")
         self.deadlines[identity] = entry
         self.updates.append(entry)
@@ -52,8 +58,13 @@ class SignalCalendar:
         if count < 2 or "schedule" not in candidate.predicates or len(candidate.dates) != 1:
             raise EvidenceError("schedule requires corroborated dated prior arrangement")
         old = self.schedules.get(identity)
+        if candidate.action not in {"schedule", "reschedule", "cancel"}:
+            raise EvidenceError("invalid schedule action")
         if candidate.action in {"reschedule", "cancel"} and old is None:
             raise EvidenceError("unknown schedule update")
+        if old and (old.candidate.actor != candidate.actor or old.candidate.object != candidate.object
+                    or day < old.observed):
+            raise EvidenceError("conflicting schedule update")
         self.schedules[identity] = Deadline(identity, candidate.dates[0], candidate, day,
                                             candidate.action == "cancel")
 
@@ -73,7 +84,9 @@ class SignalCalendar:
             raise EvidenceError("future soothing statement")
         old = self.statements.get(candidate.occurrence_id)
         # Reposts cannot renew a statement's 72-hour window.
-        if old is None:
+        if old is not None and (old[1].actor != candidate.actor or old[1].object != candidate.object):
+            raise EvidenceError("conflicting statement identity")
+        if old is None or observed < old[0]:
             self.statements[candidate.occurrence_id] = (observed, candidate)
 
     def kwargs(self, *, now):

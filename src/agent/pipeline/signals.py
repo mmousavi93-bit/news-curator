@@ -19,6 +19,7 @@ is validated before deterministic attribution; no model date fallback is used.
 from __future__ import annotations
 
 from dataclasses import dataclass, replace
+from copy import deepcopy
 from typing import Mapping
 
 from agent.config import ConfigError
@@ -98,6 +99,8 @@ def attribute_run(candidates, items, credibility, *, now, history, weights,
     """
     if history is None:
         raise EvidenceError("missing required history")
+    destination = history
+    history = deepcopy(history)  # a rejected run cannot leave half-applied transitions
     for sid in history.ledger:
         history.factor(sid)
     new = []
@@ -105,11 +108,13 @@ def attribute_run(candidates, items, credibility, *, now, history, weights,
                                                        c.occurrence_id)):
         event = derive(candidate, items, credibility, now=now, history=history)
         if history.accept(candidate, event, items, credibility, now=now):
-            new.append(event)
+            new.append(history.find(candidate).event)
     history.advance(now=now, complete=complete, new_ids={e.signal_id for e in new},
                     linked_consequences=linked_consequences)
     history.reset_for(new, weights)
-    return tuple(SignalEvent(**e.fields()) for e in history.materialize())
+    events = tuple(SignalEvent(**e.fields()) for e in history.materialize())
+    destination.__dict__.update(history.__dict__)
+    return events
 
 
 def extract(

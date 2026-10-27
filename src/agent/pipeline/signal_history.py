@@ -61,6 +61,7 @@ class Baseline:
 
 class SignalHistory:
     def __init__(self, catalog):
+        self.catalog = frozenset(catalog)
         self.ledger = {sid: Cycle() for sid in catalog}
         self.records = {}
         self.baselines = {}
@@ -70,6 +71,8 @@ class SignalHistory:
         self.consequence_days = {}
 
     def factor(self, sid):
+        if set(self.ledger) != self.catalog:
+            raise EvidenceError("missing/corrupt required novelty ledger")
         cycle = self.ledger.get(sid)
         if (not isinstance(cycle, Cycle) or cycle.factor not in (1.0, .6, .36, .3)
                 or type(cycle.quiet_days) is not int or cycle.quiet_days < 0):
@@ -162,6 +165,7 @@ class SignalHistory:
                 raise EvidenceError("unsupported kinetic consequence link")
             parent.linked_consequences.add(consequence_key)
             linked_ids.add(parent.event.signal_id)
+            self.ledger[parent.event.signal_id].quiet_days = 0
         self.consequence_days.setdefault(today, set()).update(linked_ids)
         linked_ids |= self.consequence_days[today]
         local = now.astimezone(TEHRAN)

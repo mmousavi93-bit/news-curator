@@ -9,6 +9,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import date
 import re
+import math
 
 
 class EvidenceError(ValueError):
@@ -121,6 +122,8 @@ def validate_candidate(raw, items, catalog, *, calendar=False):
     for row in evidence:
         if not isinstance(row, dict):
             raise EvidenceError("invalid support")
+        if set(row) - {"item_id", "quote", "relay_of", "uncertain"}:
+            raise EvidenceError("unknown support fields")
         item_id, quote = _required(row, "item_id"), _required(row, "quote")
         if item_id not in items:
             raise EvidenceError("foreign item ID")
@@ -153,11 +156,13 @@ def validate_candidate(raw, items, catalog, *, calendar=False):
     dates = tuple(grounded_date(d) for d in dates_raw)
     if None in dates:
         raise EvidenceError("unsupported date")
-    if any(type(n) not in (int, float) for n in numbers):
+    if any(type(n) not in (int, float) or not math.isfinite(n) for n in numbers):
         raise EvidenceError("unsupported number")
     # Unicode decimal digits normalize via int/float (including Persian/Arabic).
     literal_text = " ".join(fields[n] for n in ("claim", "actor", "action", "object", "location"))
     claimed = re.findall(r"\d+(?:\.\d+)?", literal_text)
+    for literal in re.findall(r"\d{4}-\d{2}-\d{2}", literal_text):
+        grounded_date(literal)
     for support in supports:
         quoted = {float(v) for v in re.findall(r"\d+(?:\.\d+)?", support.quote)}
         if any(float(v) not in quoted for v in (*claimed, *numbers)):
