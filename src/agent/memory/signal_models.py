@@ -9,7 +9,6 @@ import hashlib
 import json
 
 from agent.collectors.base import Item
-from agent.memory.models import to_utc_iso
 from agent.pipeline.signal_attribution import AttributedSignal
 from agent.pipeline.signal_calendar import Deadline, SignalCalendar
 from agent.pipeline.signal_contract import Candidate, Support
@@ -128,6 +127,24 @@ def restore_history(header, records, ledger, baselines):
     return history
 
 
+def raw_quotes(raw_response, item_key):
+    """Capture quoted spans verbatim; validation belongs to the extractor."""
+    from agent.pipeline.contract import extract_json
+    try:
+        envelope = extract_json(raw_response)
+    except ValueError:
+        return []
+    quotes = set()
+    for kind in ("signals", "countdowns", "soothing_statements", "scheduled_events"):
+        for row in envelope.get(kind, []) if isinstance(envelope.get(kind), list) else []:
+            for support in row.get("supports", []) if isinstance(row, dict) else []:
+                if isinstance(support, dict) and support.get("item_id") == item_key:
+                    quote = support.get("quote")
+                    if isinstance(quote, str):
+                        quotes.add(quote)
+    return sorted(quotes)
+
+
 def load_signal_history(conn, catalog):
     """Load required state; absence is an error, never an implicit new ledger.
 
@@ -146,7 +163,7 @@ def load_signal_history(conn, catalog):
         header = sm.unpack(row[0])
         if header["catalog"] != frozenset(catalog):
             raise StateError("signal history catalog mismatch")
-        records, sources, baselines = {}, {}, {}
+        records, sources, baselines = {}, dict(header.get("source_snapshots", {})), {}
         for r in conn.execute("SELECT occurrence_key, payload FROM signal_occurrences ORDER BY occurrence_key"):
             records[r[0]], snapshot = sm.unpack(r[1])
             sources.update(snapshot)

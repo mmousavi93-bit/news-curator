@@ -1,6 +1,6 @@
 """Atomic occurrence/episode and calendar repository writes."""
 def persist_signal_history(conn, history, *, run_key, observed_at, raw_records=(),
-                           calendar=None, source_snapshots=None):
+                           calendar=None, source_snapshots=None, calendar_items=None):
     """Atomic offline state/evidence/checkpoint write. A replay is a no-op.
     Reusing a run key with different state or provenance halts. Older runs
     cannot overwrite newer state. No clock or classifier is consulted here.
@@ -15,11 +15,32 @@ def persist_signal_history(conn, history, *, run_key, observed_at, raw_records=(
     if not run_key or stamp is None:
         raise StateError("signal run requires key and observation timestamp")
     sources = source_snapshots or {}
+    if any(not isinstance(v, dict) or not {"tier", "group"} <= v.keys() for v in sources.values()):
+        raise StateError("source snapshots require configured tier and group")
     header = sm.history_header(history)
-    cal = sm.calendar_payload(calendar)
+    prior = conn.execute("SELECT header, calendar FROM signal_history_meta").fetchone()
+    cal = sm.unpack(prior[1]) if calendar is None and prior else sm.calendar_payload(calendar)
     baselines = {k: (v, history.baseline_evidence[k])
                  for k, v in history.baselines.items()}
     raw_records = tuple(sorted(raw_records, key=lambda r: r.key))
+    evidence_items = dict(calendar_items or {})
+    for raw in raw_records:
+        evidence_items.update(raw.items)
+    for record in history.records.values():
+        evidence_items.update(record.items)
+    for _, (_, baseline_items, _) in baselines.values():
+        evidence_items.update(baseline_items)
+    if prior:
+        evidence_items = {**sm.unpack(prior[0]).get("calendar_items", {}), **evidence_items}
+    calendar_supports = {s.item_id for kind in ("deadlines", "schedules", "statements")
+        for entry in cal[kind].values() for s in
+        (entry[1] if kind == "statements" else entry.candidate).supports}
+    if calendar_supports - evidence_items.keys():
+        raise StateError("missing calendar supporting item snapshot")
+    header["calendar_items"] = {k: evidence_items[k] for k in sorted(calendar_supports)}
+    if any(i.source_id not in sources for i in header["calendar_items"].values()):
+        raise StateError("missing calendar source snapshot")
+    header["source_snapshots"] = sources
     payload = sm.pack((header, history.records, history.ledger, baselines, cal,
                        raw_records_payload(raw_records), sources))
     state_hash = sm.digest(payload)
@@ -54,9 +75,10 @@ def persist_signal_history(conn, history, *, run_key, observed_at, raw_records=(
             conn.execute("INSERT INTO signal_raw_candidates VALUES (?, ?, ?, ?, ?)",
                          (raw.key, run_key, raw.cluster_key, stamp, sm.pack(vars(raw))))
             for item_key, item in sorted(raw.items.items()):
-                conn.execute("INSERT INTO signal_supports VALUES (?, ?, ?, ?)",
+                conn.execute("INSERT INTO signal_supports VALUES (?, ?, ?, ?, ?)",
                              (raw.key, item_key, sm.pack(item),
-                              sm.pack(raw.sources[item.source_id])))
+                              sm.pack(raw.sources[item.source_id]),
+                              sm.pack(sm.raw_quotes(raw.raw_response, item_key))))
         for key, record in sorted(history.records.items()):
             e = record.event
             old = conn.execute("SELECT signal_event_id FROM signal_occurrences "
@@ -101,7 +123,7 @@ def persist_signal_history(conn, history, *, run_key, observed_at, raw_records=(
                          "payload=excluded.payload",
                          (key, statement_id, baseline.observed.isoformat(),
                           sm.pack(((baseline, evidence), snapshot))))
-        _persist_signal_calendar(conn, cal, stamp)
+        _persist_signal_calendar(conn, cal, stamp, evidence_items)
         conn.execute("INSERT INTO signal_history_meta VALUES (1, ?, ?, ?) "
                      "ON CONFLICT(singleton) DO UPDATE SET header=excluded.header, "
                      "calendar=excluded.calendar, observed_at=excluded.observed_at",
@@ -114,7 +136,7 @@ def persist_signal_history(conn, history, *, run_key, observed_at, raw_records=(
         raise
 def raw_records_payload(records):
     return tuple(vars(r) for r in records)
-def _persist_signal_calendar(conn, calendar, stamp):
+def _persist_signal_calendar(conn, calendar, stamp, items):
     """Mirror side channels into legacy tables with stable companion keys."""
     from agent.memory.signal_models import digest
     from agent.memory.models import to_utc_iso
@@ -129,7 +151,7 @@ def _persist_signal_calendar(conn, calendar, stamp):
                     row_id = conn.execute(
                         "INSERT INTO [speaker_statements] (speaker, source_id, said_at, tone, text_hash) "
                         "VALUES (?, ?, ?, 'soothing', ?)", (candidate.actor,
-                        candidate.supports[0].item_id, to_utc_iso(observed),
+                        items[candidate.supports[0].item_id].source_id, to_utc_iso(observed),
                         digest(candidate.claim))).lastrowid
                     conn.execute("INSERT INTO signal_calendar_rows VALUES (?, NULL, ?)", (key, row_id))
             else:

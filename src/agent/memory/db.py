@@ -139,10 +139,10 @@ def open_db(path: Path, *, create_if_absent: bool = False) -> sqlite3.Connection
                 "upgraded state database schema %d -> %d (additive only)",
                 version, SCHEMA_VERSION,
             )
+        _ensure_signal_schema(conn)
     except Exception:
         conn.close()
         raise
-    _ensure_signal_schema(conn)
     conn.execute("PRAGMA foreign_keys = ON")
     return conn
 
@@ -165,7 +165,10 @@ def assert_halt_flags(ops) -> None:
 
 def _ensure_signal_schema(conn):
     """Independent extension marker keeps the legacy v4 schema contract intact."""
-    if conn.execute("SELECT value FROM meta WHERE key='signal_schema_version'").fetchone():
+    version = conn.execute("SELECT value FROM meta WHERE key='signal_schema_version'").fetchone()
+    if version:
+        if version[0] != "1":
+            raise StateError("unknown signal schema extension version")
         return
     ddl = _SCHEMA_PATH.read_text(encoding="utf-8").split(
         "-- SIGNAL_EXTRACTION_V5", 1)[1].split("-- END_SIGNAL_EXTRACTION_V5", 1)[0]

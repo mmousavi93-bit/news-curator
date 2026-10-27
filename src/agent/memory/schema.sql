@@ -256,6 +256,7 @@ CREATE TABLE IF NOT EXISTS signal_raw_candidates (
 CREATE TABLE IF NOT EXISTS signal_supports (
     raw_key TEXT NOT NULL REFERENCES signal_raw_candidates(raw_key) ON DELETE CASCADE,
     item_key TEXT NOT NULL, item_snapshot TEXT NOT NULL, source_snapshot TEXT NOT NULL,
+    quote_snapshot TEXT NOT NULL,
     PRIMARY KEY (raw_key, item_key)
 );
 -- Companion rows preserve the old schema and its single-group consumers.

@@ -229,3 +229,107 @@ def test_measure_abstention_is_false_negative_without_gold_generation():
     result = h.measure([], gold)
     assert result["candidate_metrics"]["fn"] == 1
     assert result["candidate_metrics"]["recall"] == 0
+
+
+def test_baseline_calendar_and_source_snapshots_survive_restart(tmp_path):
+    from agent.pipeline.signal_calendar import Deadline
+    conn = initialize(tmp_path / "state.db")
+    history, candidate, items, cred, sources = setup_history()
+    baseline = replace(candidate, predicates=candidate.predicates | {"positive_statement"})
+    history.add_baseline("baseline", "positive_statement", baseline, items, cred, now=NOW)
+    history.find(candidate).candidate = replace(candidate, prior_ids=("baseline",))
+    calendar = SignalCalendar()
+    calendar.statements["soothing"] = (NOW, candidate)
+    calendar.deadlines["deadline"] = Deadline("deadline", NOW.date() + timedelta(days=3), candidate, NOW.date())
+    calendar.schedules["meeting"] = Deadline("meeting", NOW.date() + timedelta(days=2), candidate, NOW.date())
+    calendar.updates.append(calendar.deadlines["deadline"])
+    save(conn, history, sources, calendar=calendar)
+    loaded, restored_calendar, snapshots = load_signal_history(conn, CATALOG)
+    assert pack(vars(loaded)) == pack(vars(history))
+    assert pack(vars(restored_calendar)) == pack(vars(calendar))
+    assert snapshots == sources
+    before = counts(conn)
+    save(conn, loaded, sources, calendar=restored_calendar)
+    assert counts(conn) == before
+    assert conn.execute("SELECT source_id FROM speaker_statements WHERE tone='soothing'").fetchone()[0] in sources
+    prune(conn, SETTINGS, NOW + timedelta(days=50))
+    assert counts(conn)["signal_baselines"] == 1  # referenced by retained occurrence
+    loaded, cal, _ = load_signal_history(conn, CATALOG)
+    assert "baseline" in loaded.baselines
+    assert not cal.statements
+    assert len(cal.deadlines) == 1
+    conn.close()
+
+
+def test_checkpoint_and_linked_consequences_are_not_reapplied(tmp_path):
+    conn = initialize(tmp_path / "state.db")
+    history, candidate, items, cred, sources = setup_history()
+    attack, aitems, _ = fixture("E1")
+    event = derive(attack, aitems, cred, now=NOW, history=history)
+    history.accept(attack, event, aitems, cred, now=NOW)
+    from agent.pipeline.signal_attribution import TEHRAN
+    canonical = NOW.astimezone(TEHRAN).replace(hour=9, minute=0, second=0, microsecond=0)
+    history.advance(now=canonical, complete=True,
+        linked_consequences=[(occurrence_key(candidate), occurrence_key(attack))])
+    save(conn, history, sources)
+    restored, _, _ = load_signal_history(conn, CATALOG)
+    assert pack(vars(restored)) == pack(vars(history))
+    restored.advance(now=canonical, complete=True)
+    assert restored.checkpoints == history.checkpoints
+    assert restored.ledger == history.ledger
+    conn.close()
+
+
+def test_immutable_raw_quote_snapshots_and_cascade_retention(tmp_path):
+    conn = initialize(tmp_path / "state.db")
+    history, candidate, items, _, sources = setup_history()
+    from dataclasses import asdict
+    raw = RawCandidateRecord("r1", "cluster", digest("input"), "p", "m", "provider", "s",
+        json.dumps({"none": False, "signals": [{"supports": [asdict(s) for s in candidate.supports]}]}),
+        NOW, items, sources, "ok")
+    save(conn, history, sources, raw_records=[raw])
+    quote = conn.execute("SELECT quote_snapshot FROM signal_supports ORDER BY item_key").fetchone()[0]
+    assert unpack(quote) == [candidate.supports[0].quote]
+    frozen = conn.execute("SELECT payload FROM signal_raw_candidates").fetchone()[0]
+    with pytest.raises(StateError, match="conflicting"):
+        save(conn, history, sources, raw_records=[replace(raw, raw_response="changed")])
+    assert conn.execute("SELECT payload FROM signal_raw_candidates").fetchone()[0] == frozen
+    prune(conn, SETTINGS, NOW + timedelta(days=181))
+    assert counts(conn)["signal_raw_candidates"] == 0
+    assert counts(conn)["signal_supports"] == 0
+    conn.close()
+
+
+def test_date_only_snapshot_and_order_independent_encoding():
+    _, _, items, _, _ = setup_history()
+    item = replace(next(iter(items.values())), date_only=True)
+    assert unpack(pack(item)) == item
+    assert pack({"b": {"y", "x"}, "a": (1, 2)}) == pack({"a": (1, 2), "b": {"x", "y"}})
+
+
+def test_harness_validated_candidate_and_oracle_score_comparison():
+    # Controlled stage-2 fixture only; no historical labels are created.
+    from dataclasses import asdict
+    import yaml
+    h = harness()
+    history, candidate, items, _, sources = setup_history()
+    weights = yaml.safe_load((ROOT / "config/risk_weights.yaml").read_text())
+    members = [{**asdict(i), "published_at": i.published_at.isoformat()} for i in items.values()]
+    raw = json.loads(json.dumps(asdict(candidate), default=lambda v: sorted(v) if isinstance(v, frozenset) else v.isoformat()))
+    capture = {"provider": "captured", "model_version": "test", "schema_version": "1",
+               "prompt_version": "1", "raw_response": json.dumps({"none": False, "signals": [raw]})}
+    dataset = {"runs": [{"run_key": "r", "cutoff": NOW.isoformat(), "sources": sources,
+        "complete": True, "market_events": [], "clusters": [
+            {"cluster_key": "c", "language": "en", "items": members, "capture": capture}]}]}
+    results = h.replay(dataset, weights, "{items}")
+    identity = occurrence_key(candidate)
+    assert list(results[0]["accepted"]) == [identity]
+    labels = {"runs": [{"run_key": "r", "clusters": [
+        {"cluster_key": "c", "language": "en", "candidates": [identity]}],
+        "accepted": {identity: h.event_fields(history.materialize()[0])},
+        "side_channels": {"deadline": None, "deception": False}}]}
+    measured = h.measure(results, labels, weights)
+    assert measured["candidate_metrics"]["f1"] == 1
+    assert measured["accepted_metrics"]["f1"] == 1
+    assert measured["field_accuracy"] == 1
+    assert measured["score_comparisons"][0]["delta"] == {"STRAT": 0, "TACT": 0}

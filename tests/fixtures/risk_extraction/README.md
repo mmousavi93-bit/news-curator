@@ -24,6 +24,10 @@ The root contains `runs`, ordered chronologically. Each run has:
 - `complete`: collection/extraction health, explicitly supplied, default false.
 - `clusters`: all sampled clusters, including negatives and skipped clusters.
 - Optional `body_chars` (default 4000), `linked_consequences` (occurrence-key pairs).
+- Optional `baseline_updates`: references to captured validated candidates via
+  `candidate_key`, with stable `key`, baseline `kind`, and optional grounded ISO
+  `due`. These are captured semantic annotations, separate from gold labels;
+  `add_baseline` checks the candidate predicates and corroboration.
 - Optional `market_events`: explicit G1/G2 fixtures with six event fields and
   explicit corroboration counts. Omission is reported as missing markets.
 
@@ -53,6 +57,8 @@ derived fields: `signal_id`, `event_date` (ISO date), `source_tier`,
 These represent the expected retained score inputs at that cutoff, not only new
 firings. Keys use `signal_history.occurrence_key`: JSON array of normalized
 signal/actor/object/location/occurrence/episode identity, with the A2 theater rule.
+Optional run `side_channels` supplies independently labeled `deadline` (ISO date
+or null) and `deception` (boolean) for oracle/extracted score comparison.
 
 Store supporting item IDs, exact source-language quotes, state transitions,
 C1/soothing/schedule side channels, baseline references, collection availability,

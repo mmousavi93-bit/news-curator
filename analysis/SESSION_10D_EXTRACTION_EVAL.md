@@ -20,7 +20,9 @@ markets and extracted scores. With independent labels it also computes candidate
 and accepted TP/FP/FN, micro precision/recall/F1, accepted per-ID/category and
 candidate per-language breakdowns, exact field accuracy, floor-critical misses,
 quiet correct-none, and supplied history/source coverage. Empty denominators are
-null. Gold positives with missing predictions remain false negatives.
+null. Gold positives with missing predictions remain false negatives. Supplied
+labels also produce oracle/extracted score deltas with explicit market and side
+channel coverage; future oracle evidence is rejected at each cutoff.
 
 Five **synthetic scorer fidelity** checks import the unchanged `SCENARIOS` without
 calling the CSV-writing main. Explicit-count SignalEvents must match rounded
@@ -34,6 +36,8 @@ baselines, calendar, novelty ledger and daily checkpoints in one savepoint.
 construct `SignalHistory(catalog)` only for an authorized new offline history.
 Use plain mapping `source_snapshots` with original configured tier/group, a stable
 `run_key`, an aware `observed_at`, and optional `RawCandidateRecord` captures.
+For calendar evidence outside retained occurrences, supply `calendar_items`
+or the corresponding raw captures so original supporting items are retained.
 Reusing a key with different state/provenance or writing older state halts.
 Identical replay is a no-op, including after restart. Dates and observation times
 are separate. Open/end/confirmation/check dates and linked evidence round-trip.

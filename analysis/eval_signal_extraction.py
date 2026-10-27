@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+from copy import deepcopy
 from collections import Counter
 from dataclasses import asdict
 from datetime import date, datetime
@@ -74,7 +75,7 @@ def replay(dataset, weights, template):
             raise ValueError("runs must be chronological")
         previous = now
         credibility = {k: SimpleNamespace(**v) for k, v in run["sources"].items()}
-        candidates, items, clusters, fates = [], {}, [], []
+        candidates, items, clusters, fates, calendar_actions = [], {}, [], [], []
         for row in run["clusters"]:
             members = []
             for data in row["items"]:
@@ -101,14 +102,11 @@ def replay(dataset, weights, template):
                     history_context=row.get("history_context", ""))
                 candidates.extend(result.signals)
                 for candidate in result.countdowns:
-                    calendar.update_deadline(candidate, {i.url: i for i in members}, credibility, now=now)
+                    calendar_actions.append(("deadline", candidate))
                 for candidate in result.soothing_statements:
-                    calendar.add_soothing(candidate, {i.url: i for i in members}, credibility, now=now)
+                    calendar_actions.append(("soothing", candidate))
                 for candidate in result.scheduled_events:
-                    subset = {i.url: i for i in members}
-                    calendar.update_schedule(candidate.occurrence_id, candidate, subset, credibility, now=now)
-                    history.add_baseline(candidate.occurrence_id, "schedule", candidate,
-                                         subset, credibility, now=now, due=candidate.dates[0])
+                    calendar_actions.append(("schedule", candidate))
             fate = result.status if result else row.get("fate", "missing_capture")
             fates.append(fate)
             clusters.append({"cluster_key": cluster.key, "language": row.get("language", "unknown"),
@@ -119,13 +117,31 @@ def replay(dataset, weights, template):
             items.update({i.url: i for i in members})
         complete = run.get("complete", False) and all(f in {"ok", "none"} for f in fates)
         error = None
+        previous_history, previous_calendar = deepcopy(history), deepcopy(calendar)
         try:
+            for kind, candidate in calendar_actions:
+                if kind == "deadline":
+                    calendar.update_deadline(candidate, items, credibility, now=now)
+                elif kind == "soothing":
+                    calendar.add_soothing(candidate, items, credibility, now=now)
+                else:
+                    calendar.update_schedule(candidate.occurrence_id, candidate, items, credibility, now=now)
+                    history.add_baseline(candidate.occurrence_id, "schedule", candidate,
+                                         items, credibility, now=now, due=candidate.dates[0])
+            candidate_map = {occurrence_key(c): c for c in candidates}
+            for update in run.get("baseline_updates", []):
+                candidate = candidate_map[update["candidate_key"]]
+                due = date.fromisoformat(update["due"]) if update.get("due") else None
+                history.add_baseline(update["key"], update["kind"], candidate, items,
+                                     credibility, now=now, due=due)
             events = attribute_run(candidates, items, credibility, now=now, history=history,
                                    weights=weights, complete=complete,
                                    linked_consequences=run.get("linked_consequences", ()))
         except EvidenceError as exc:
             error = str(exc)
-            events = tuple(SignalEvent(**e.fields()) for e in history.materialize())
+            history, calendar = previous_history, previous_calendar
+            events = attribute_run([], {}, credibility, now=now, history=history,
+                                   weights=weights, complete=False)
         markets = [read_event(e) for e in run.get("market_events", [])]
         if any(e.signal_id not in {"G1", "G2"} for e in markets):
             raise ValueError("market boundary accepts G1/G2 only")
@@ -135,6 +151,7 @@ def replay(dataset, weights, template):
                 zip(sorted(history.records.items()), history.materialize())
                 if e.independent_source_count >= 2},
             "score": scores(engine, list(events) + markets, now, calendar.kwargs(now=now)),
+            "market_events": [event_fields(e) for e in markets],
             "markets_missing": "market_events" not in run,
             "calls": sum("capture" in c for c in run["clusters"]),
             "tokens": dict(sum((Counter(c.get("capture", {}).get("usage", {}))
@@ -150,7 +167,7 @@ def prf(predicted, gold):
             "f1": 2 * tp / (2 * tp + fp + fn) if 2 * tp + fp + fn else None}
 
 
-def measure(results, labels=None):
+def measure(results, labels=None, weights=None):
     clusters = [c for r in results for c in r["clusters"]]
     report = {"label_status": "no labels", "accuracy_gate": "incomplete",
         "runs": len(results), "clusters": len(clusters),
@@ -169,6 +186,7 @@ def measure(results, labels=None):
     report["label_status"] = "labels present"
     predictions = {r["run_key"]: r for r in results}
     candidate_p, candidate_g, accepted_p, accepted_g = set(), set(), set(), set()
+    score_comparisons = []
     dimensions, exact, field_total, quiet, quiet_correct, critical_misses = {}, 0, 0, 0, 0, []
     for gold in labels["runs"]:
         key = gold["run_key"]
@@ -202,6 +220,21 @@ def measure(results, labels=None):
             exact += sum(pred["accepted"].get(identity, {}).get(f) == v for f, v in fields.items())
             if identity not in pred["accepted"] and fields["signal_id"] in {"B1", "B2", "B6", "E1", "E2"}:
                 critical_misses.append([key, identity])
+        if weights and "cutoff" in pred:
+            now = datetime.fromisoformat(pred["cutoff"])
+            events = [read_event(e) for e in gold["accepted"].values()]
+            if any(e.event_date > local_day(now) or
+                   (e.state_end_date and e.state_end_date > local_day(now)) for e in events):
+                raise ValueError("future oracle label at replay cutoff")
+            markets = [read_event(e) for e in pred.get("market_events", [])]
+            kwargs = dict(gold.get("side_channels", {}))
+            if kwargs.get("deadline"):
+                kwargs["deadline"] = date.fromisoformat(kwargs["deadline"])
+            oracle = scores(RiskEngine(weights), events + markets, now, kwargs)
+            score_comparisons.append({"run_key": key, "oracle": oracle, "extracted": pred["score"],
+                "missing_markets": pred["markets_missing"],
+                "side_channels_labeled": "side_channels" in gold,
+                "delta": {k: round(pred["score"][k] - oracle[k], 1) for k in oracle}})
     report.update(candidate_metrics=prf(candidate_p, candidate_g),
         accepted_metrics=prf(accepted_p, accepted_g),
         field_accuracy=exact / field_total if field_total else None,
@@ -211,6 +244,7 @@ def measure(results, labels=None):
         breakdown={f"{k}:{v}": prf(p, g) for (k, v), (p, g) in sorted(dimensions.items())},
         evidence_validity="provenance validated mechanically; semantic entailment requires human review",
         source_history_coverage=labels.get("coverage", "missing"),
+        score_comparisons=score_comparisons,
         unsupported_classes="unmeasured; absence of gold is not evidence of accuracy")
     # Semantic review, score coverage, repeated-live and cost gates remain human work.
     return report
@@ -243,7 +277,7 @@ def main(argv=None):
     labels = json.loads(args.labels.read_text(encoding="utf-8")) if args.labels.exists() else None
     template = (ROOT / "config/prompts/signal_extraction.txt").read_text(encoding="utf-8")
     results = replay(dataset, weights, template)
-    print(dumps({"metrics": measure(results, labels), "replay": results,
+    print(dumps({"metrics": measure(results, labels, weights), "replay": results,
                  "calibration": calibration(weights)}))
 
 
