@@ -1,0 +1,95 @@
+﻿name: Reconstruct signal dataset
+on:
+  workflow_dispatch:
+    inputs:
+      manifest_ref:
+        description: Immutable 40-character input commit SHA (source-only, no labels)
+        required: true
+        type: string
+      manifest_sha256:
+        description: SHA256 of manifest bytes
+        required: true
+        type: string
+      manifest_path:
+        description: Manifest path within input snapshot
+        default: analysis/session_10i/manifest.json
+        type: string
+permissions:
+  contents: write
+concurrency:
+  group: signal-dataset-reports-bridge
+  cancel-in-progress: false
+jobs:
+  reconstruct:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate immutable input
+        env:
+          INPUT_REF: ${{ inputs.manifest_ref }}
+          INPUT_HASH: ${{ inputs.manifest_sha256 }}
+          INPUT_PATH: ${{ inputs.manifest_path }}
+        run: |
+          [[ "$INPUT_REF" =~ ^[a-f0-9]{40}$ ]]
+          [[ "$INPUT_HASH" =~ ^[a-f0-9]{64}$ ]]
+          git fetch origin "$INPUT_REF"
+          python - <<'PY'
+          import hashlib, json, os, pathlib, subprocess
+          root = pathlib.Path(os.environ['RUNNER_TEMP'])/'signal-input'
+          ref = os.environ['INPUT_REF']
+          def export(name, digest, suffixes):
+              path = pathlib.PurePosixPath(name)
+              if (path.is_absolute() or '..' in path.parts or ':' in name or '\\' in name
+                      or path.suffix not in suffixes or any(word in name.lower() for word in ('label', 'gold'))):
+                  raise ValueError('invalid source-only snapshot path')
+              data = subprocess.check_output(['git', 'show', ref+':'+name])
+              if hashlib.sha256(data).hexdigest() != digest:
+                  raise ValueError('input checksum mismatch')
+              target = root/path
+              target.parent.mkdir(parents=True, exist_ok=True)
+              target.write_bytes(data)
+              return data
+          manifest = json.loads(export(os.environ['INPUT_PATH'], os.environ['INPUT_HASH'], {'.json'}))
+          for run in manifest['runs']:
+              for field in ('read', 'chosen', 'cutoff_evidence', 'source_snapshot', 'settings_snapshot'):
+                  record = run.get(field)
+                  if record:
+                      export(record['path'], record['sha256'], {'.csv', '.yaml', '.yml'})
+          PY
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: signal-minilm-${{ inputs.manifest_sha256 }}
+      - run: pip install -e '.[embeddings]'
+      - name: Hash-first then exact CI fallback
+        env:
+          INPUT_PATH: ${{ inputs.manifest_path }}
+        run: |
+          cd "$RUNNER_TEMP/signal-input"
+          python -B "$GITHUB_WORKSPACE/tools/reconstruct_dataset.py" --manifest "$INPUT_PATH" --allow-partial --out "$RUNNER_TEMP/hash-memberships.json"
+          python -B "$GITHUB_WORKSPACE/tools/recluster_signal_dataset.py" --manifest "$INPUT_PATH" --memberships "$RUNNER_TEMP/hash-memberships.json" --out "$RUNNER_TEMP/recovery.json"
+          dataset_id=$(python -c 'import json,os; print(json.load(open(os.environ["INPUT_PATH"]))["dataset_id"])')
+          [[ "$dataset_id" =~ ^[a-zA-Z0-9_-]+$ ]]
+          mkdir -p "$GITHUB_WORKSPACE/signal-results/$dataset_id/$GITHUB_RUN_ID"
+          cp "$RUNNER_TEMP/hash-memberships.json" "$RUNNER_TEMP/recovery.json" "$GITHUB_WORKSPACE/signal-results/$dataset_id/$GITHUB_RUN_ID/"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: signal-dataset-reports
+          path: signal-results/
+      - name: Export JSON bridge snapshot
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          bridge=$(mktemp -d)
+          cp -R signal-results "$bridge/"
+          git -C "$bridge" init -b signal-dataset-reports
+          git -C "$bridge" config user.name 'github-actions[bot]'
+          git -C "$bridge" config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git -C "$bridge" add signal-results
+          git -C "$bridge" commit -m "Signal recovery workflow $GITHUB_RUN_ID"
+          auth=$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)
+          git -C "$bridge" -c "http.extraheader=AUTHORIZATION: basic $auth" push --force "https://github.com/$GITHUB_REPOSITORY.git" HEAD:refs/heads/signal-dataset-reports
