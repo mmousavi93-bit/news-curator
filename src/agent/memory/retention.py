@@ -97,12 +97,71 @@ def prune(conn: sqlite3.Connection, retention, now: datetime) -> dict[str, int]:
     deleted: dict[str, int] = {}
     conn.execute("BEGIN")
     try:
+        _prune_signal_state(conn, retention, now)
         for table, column, attr in _WINDOWS:
             boundary = cutoff(now, getattr(retention, attr))
-            cur = conn.execute(f"DELETE FROM {table} WHERE {column} < ?", (boundary,))
+            protected = {
+                "signal_events": " AND id NOT IN (SELECT signal_event_id FROM signal_occurrences)",
+                "speaker_statements": " AND id NOT IN (SELECT statement_id FROM signal_baselines "
+                "WHERE statement_id IS NOT NULL) AND id NOT IN (SELECT statement_id FROM "
+                "signal_calendar_rows WHERE statement_id IS NOT NULL)",
+                "scheduled_events": " AND id NOT IN (SELECT schedule_id FROM signal_calendar_rows "
+                "WHERE schedule_id IS NOT NULL)",
+            }.get(table, "")
+            cur = conn.execute(f"DELETE FROM {table} WHERE {column} < ?{protected}", (boundary,))
             deleted[table] = cur.rowcount if cur.rowcount and cur.rowcount > 0 else 0
     except Exception:
         conn.execute("ROLLBACK")
         raise
     conn.execute("COMMIT")
     return deleted
+
+
+def _prune_signal_state(conn, retention, now):
+    """Keep open episodes, referenced evidence and novelty/checkpoints forever.
+
+    Collector item expiry never cascades into the extraction evidence store.
+    Baselines have at least 30 complete days of headroom even under shorter
+    user settings. The caller owns the single pruning transaction.
+    """
+    from agent.memory.signal_models import pack, unpack
+    from agent.pipeline.signal_contract import STATE_ENDS
+
+    rows = {r[0]: unpack(r[1])[0] for r in conn.execute(
+        "SELECT occurrence_key, payload FROM signal_occurrences")}
+    needed = set()
+    for record in rows.values():
+        needed.update(record.candidate.prior_ids)
+        needed.update(record.linked_consequences)
+        for candidate, _items in record.end_evidence:
+            needed.update(candidate.prior_ids)
+    boundary = (now - timedelta(days=max(180, retention.signal_events_days))).date()
+    for key, record in rows.items():
+        active = record.event.signal_id in STATE_ENDS and record.event.state_end_date is None
+        last = max(record.event.state_end_date or record.event.event_date,
+                   record.last_confirmed_at)
+        if not active and last < boundary and key not in needed:
+            conn.execute("DELETE FROM signal_occurrences WHERE occurrence_key=?", (key,))
+    baseline_boundary = (now - timedelta(days=max(45, retention.speaker_statements_days))).date()
+    for key, payload in conn.execute("SELECT baseline_key, payload FROM signal_baselines").fetchall():
+        (baseline, _), _sources = unpack(payload)
+        if (baseline.observed < baseline_boundary and key not in needed
+                and (baseline.due is None or baseline.due < now.date())):
+            conn.execute("DELETE FROM signal_baselines WHERE baseline_key=?", (key,))
+    conn.execute("DELETE FROM signal_raw_candidates WHERE observed_at < ?",
+                 (cutoff(now, max(180, retention.signal_events_days)),))
+    row = conn.execute("SELECT calendar FROM signal_history_meta WHERE singleton=1").fetchone()
+    if row:
+        calendar = unpack(row[0])
+        for key, (observed, _) in list(calendar["statements"].items()):
+            if observed.date() < baseline_boundary:
+                del calendar["statements"][key]
+                conn.execute("DELETE FROM signal_calendar_rows WHERE calendar_key=?", ("statements:" + key,))
+        for kind in ("deadlines", "schedules"):
+            for key, entry in list(calendar[kind].items()):
+                if entry.cancelled and entry.observed < boundary:
+                    del calendar[kind][key]
+                    conn.execute("DELETE FROM signal_calendar_rows WHERE calendar_key=?", (kind + ":" + key,))
+        calendar["updates"] = [e for e in calendar["updates"]
+                               if not e.cancelled or e.observed >= boundary]
+        conn.execute("UPDATE signal_history_meta SET calendar=? WHERE singleton=1", (pack(calendar),))

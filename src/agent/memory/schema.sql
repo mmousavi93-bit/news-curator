@@ -240,3 +240,43 @@ CREATE TABLE IF NOT EXISTS pending (
     ranked_at  TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_pending_ranked ON pending (ranked_at);
+-- SIGNAL_EXTRACTION_V5 (also executed as the additive v4 -> v5 migration).
+CREATE TABLE IF NOT EXISTS signal_history_meta (
+    singleton INTEGER PRIMARY KEY CHECK (singleton = 1),
+    header TEXT NOT NULL, calendar TEXT NOT NULL, observed_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS signal_runs (
+    run_key TEXT PRIMARY KEY, state_hash TEXT NOT NULL, observed_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS signal_raw_candidates (
+    raw_key TEXT PRIMARY KEY, run_key TEXT NOT NULL, cluster_key TEXT NOT NULL,
+    observed_at TEXT NOT NULL, payload TEXT NOT NULL,
+    UNIQUE (run_key, cluster_key)
+);
+CREATE TABLE IF NOT EXISTS signal_supports (
+    raw_key TEXT NOT NULL REFERENCES signal_raw_candidates(raw_key) ON DELETE CASCADE,
+    item_key TEXT NOT NULL, item_snapshot TEXT NOT NULL, source_snapshot TEXT NOT NULL,
+    PRIMARY KEY (raw_key, item_key)
+);
+-- Companion rows preserve the old schema and its single-group consumers.
+CREATE TABLE IF NOT EXISTS signal_occurrences (
+    occurrence_key TEXT PRIMARY KEY,
+    signal_event_id INTEGER NOT NULL UNIQUE REFERENCES signal_events(id),
+    event_date TEXT NOT NULL, state_end_date TEXT,
+    last_confirmed_at TEXT NOT NULL, last_checked_at TEXT NOT NULL,
+    observed_at TEXT NOT NULL, payload TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS signal_novelty (
+    signal_id TEXT PRIMARY KEY, payload TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS signal_baselines (
+    baseline_key TEXT PRIMARY KEY,
+    statement_id INTEGER UNIQUE REFERENCES speaker_statements(id),
+    observed_day TEXT NOT NULL, payload TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS signal_calendar_rows (
+    calendar_key TEXT PRIMARY KEY,
+    schedule_id INTEGER UNIQUE REFERENCES scheduled_events(id),
+    statement_id INTEGER UNIQUE REFERENCES speaker_statements(id)
+);
+-- END_SIGNAL_EXTRACTION_V5
